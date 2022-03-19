@@ -20,6 +20,25 @@ Hi! I'm your first Markdown file in **StackEdit**. If you want to learn about St
 7.  สต๊อก
 8.  ตั้งค่า
 
+## **สินค้า**
+แสดงรายการกลุ่มสินค้า
+สร้าง Database table laundry_types (ชนิดผ้า)
+`{ fields: { id, name } }`
+
+ 1. ผ้าขน
+ 2. ผ้ารีด
+ 3. ผ้า OR
+ 4. ...
+
+เมื่อกดเข้าไปในแต่ละ ชนิดผ้า จะแสดงรายการจาก  table jobs where laundry_type_d = ชนิดผ้า
+
+ 1.  มีฟิลเตอร์กรองข้อมูลตามวันที่
+ 2. มี Sort Order
+ 3. แสดง Summary สรุปยอด
+	 1. จำนวนชิ้น
+	 2. น้ำหนัก
+
+
 ## **ปฏิบัติการ**
 
  1. รับสินค้า (สร้าง Job Group)
