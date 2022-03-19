@@ -9,6 +9,7 @@ Hi! I'm your first Markdown file in **StackEdit**. If you want to learn about St
 	1. ผ้าทั่วไป
 	2. ผ้าแก้ไข
 2.  ลูกค้า
+	1. ใส่ข้อมูลผ้าสะอาดและจำนวนเงิน
 3.  ปฏิบัติการ
 	1. รับสินค้า
 	2. ซัก
@@ -21,7 +22,7 @@ Hi! I'm your first Markdown file in **StackEdit**. If you want to learn about St
 5.  พนักงาน
 	1.  เลือกแผนก
 		1. เลือกพนักงาน
-			1. กรองวันที่
+			1. กรองวันที่ข้อมูล Jobs ที่ทำได้
 			2. แสดงกราฟจำนวนผ้าที่ทำได้ในแต่ละ ชม ของทุกวันรวมกัน
 6.  วิเคราะห์
 7.  สต๊อก
@@ -52,7 +53,17 @@ Hi! I'm your first Markdown file in **StackEdit**. If you want to learn about St
  4. ไฮไลต์ข้อความ Text Color ตามสีของผ้า
 
 ## ลูกค้า
-แสดงรายการ
+แสดงรายการลูกค้า
+สร้าง Database table customers 
+`{ fields: { id, name } }`
+
+ 1. โรงพยาบาล A
+ 2. โรงพยาบาล B
+ 3. โรงพยาบาล C
+ 4. ...
+
+เมื่อเลือกแล้ว ให้แสดงรายการ `table jobs` ของลูกค้านั้นๆ
+- ป้อนข้อมูลผ้าสะอาด และจำนวนเงิน
 
 ## ปฏิบัติการ
 
@@ -64,14 +75,6 @@ Hi! I'm your first Markdown file in **StackEdit**. If you want to learn about St
  2. ซัก (สร้าง Job ID Status = ซัก)
  สร้าง Database table jobs 
  `{ fields: { id, job_group_id {customer_id, weight}, employee_id, job_type = enum(new, edit), washing_machine_id, laundry_type_d, laundry_id, weight, color } `
-สร้าง Database table washing_machine
-`{ fields: { id, name, maximum_weight} }`
-สร้าง Database table laundry_types (ชนิดผ้า)
-`{ fields: { id, name } }`
-สร้าง Database table laundries (ผ้า)
-`{ fields: { id, name, laundry_type_d} }`
-สร้าง Database table employees
-`{ fields: { id, name, department} }`
 	 2. เลือกพนักงาน
 	 3. ผ้าทั่วไป ผ้าแก้ไข
 	 4. เครื่องซักผ้า (เลือกตามน้ำหนักผ้า)
@@ -138,6 +141,18 @@ Hi! I'm your first Markdown file in **StackEdit**. If you want to learn about St
  1. สามารถเพิ่มหรือลบได้
  2. สามารถเพิ่ทหรือลบจำนวนได้
  3. บันทึกประวัติการเพิ่มหรือลดจำนวน
+
+## ตั้งค่า
+
+ 1. เครื่องซักผ้า
+สร้าง Database table washing_machine
+`{ fields: { id, name, maximum_weight} }`
+ 2. ชนิดผ้า
+ สร้าง Database table laundry_types
+`{ fields: { id, name } }`
+ 3. ผ้า
+สร้าง Database table laundries
+`{ fields: { id, name, laundry_type_d} }`
 
 
 # Semantic Commit Messages
