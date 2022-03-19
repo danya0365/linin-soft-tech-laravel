@@ -1,6 +1,6 @@
 # LininSoftTech!
 
-Hi! I'm your first Markdown file in **StackEdit**. If you want to learn about StackEdit, you can read me. If you want to play with Markdown, you can edit me. Once you have finished with me, you can create new files by opening the **file explorer** on the left corner of the navigation bar.
+ซอฟท์แวร์จัดการบันทึกประวัติการทำงานของพนักงานในแต่ละวัน รวมทั้งบันทึกข้อมูลวัตถุดิบและพลังงานทั้งหมดที่ใช้ด้วย และสามารถดูข้อมูลสถิติทั้งหมดที่เกิดขึ้นกับพนักงาน วัตถุดิบ และพลังงาน
 
 
 # **หน้าแรก**
