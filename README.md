@@ -47,7 +47,7 @@
 ## ลูกค้า
 แสดงรายการลูกค้า
 สร้าง Database table customers 
-`{ fields: { id, name } }`
+`{ fields: { id, name, sum_wet_weight, sum_dry_weight, sum_billing_weight, sum_edit_weight } }`
 
 พร้อมกับ sum ข้อมูลจาก  `table jobs`
 มี column ยอดรวมน้ำหนักผ้าเปียก, ยอดรวมผ้าสะอาด, ยอดรวมน้ำหนักแก้ไข
