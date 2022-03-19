@@ -23,9 +23,23 @@ Hi! I'm your first Markdown file in **StackEdit**. If you want to learn about St
 ## **ปฏิบัติการ**
 
  1. รับสินค้า (สร้าง Job Group)
+สร้าง Database table job_groups 
+`{ fields: { id, customer_id, weight, employee_id } }`
 	 1. เลือกชื่อลูกค้า
 	 2. ใส่จำนวนน้ำหนัก
  2. ซัก (สร้าง Job ID Status = ซัก)
+ สร้าง Database table jobs 
+ `{ fields: { id, job_group_id {customer_id, weight}, employee_id, job_type = enum(new, edit), washing_machine_id, laundry_type_d, laundry_id, weight, color } `
+สร้าง Database table washing_machine
+`{ fields: { id, name, maximum_weight} }`
+สร้าง Database table laundry_types (ชนิดผ้า)
+`{ fields: { id, name } }`
+สร้าง Database table laundries (ผ้า)
+`{ fields: { id, name, laundry_type_d} }`
+สร้าง Database table employees
+`{ fields: { id, name, department} }`
+สร้าง Database table departments (ซัก, อบ,  รีด, พับแพ็ค, จัดเก็บ)
+`{ fields: { id, name } }`
 	 2. เลือกพนักงาน
 	 3. ผ้าทั่วไป ผ้าแก้ไข
 	 4. เครื่องซักผ้า (เลือกตามน้ำหนักผ้า)
