@@ -20,11 +20,15 @@ Hi! I'm your first Markdown file in **StackEdit**. If you want to learn about St
 7.  สต๊อก
 8.  ตั้งค่า
 
+
 ## **สินค้า**
-แสดงรายการกลุ่มสินค้า
+แสดงรายการ
+ 1. ผ้าทั่วไป
+ 2. ผ้าแก้ไข
+
+เมื่อเลือกแล้วจะแสดงรายการกลุ่มสินค้า
 สร้าง Database table laundry_types (ชนิดผ้า)
 `{ fields: { id, name } }`
-
  1. ผ้าขน
  2. ผ้ารีด
  3. ผ้า OR
@@ -37,7 +41,7 @@ Hi! I'm your first Markdown file in **StackEdit**. If you want to learn about St
  3. แสดง Summary สรุปยอด
 	 1. จำนวนชิ้น
 	 2. น้ำหนัก
-
+ 4. ไฮไลต์ข้อความ Text Color ตามสีของผ้า
 
 ## **ปฏิบัติการ**
 
