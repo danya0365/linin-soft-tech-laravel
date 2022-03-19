@@ -20,10 +20,11 @@ Hi! I'm your first Markdown file in **StackEdit**. If you want to learn about St
 5.  พนักงาน
 6.  วิเคราะห์
 7.  สต๊อก
+	1. ประเภทของสินค้า (เพิ่มและลบ)
+		1. สินค้า
 8.  ตั้งค่า
 
-
-## **สินค้า**
+## สินค้า
 แสดงรายการ
  1. ผ้าทั่วไป
  2. ผ้าแก้ไข
@@ -45,7 +46,10 @@ Hi! I'm your first Markdown file in **StackEdit**. If you want to learn about St
 	 2. น้ำหนัก
  4. ไฮไลต์ข้อความ Text Color ตามสีของผ้า
 
-## **ปฏิบัติการ**
+## ลูกค้า
+แสดงรายการ
+
+## ปฏิบัติการ
 
  1. รับสินค้า (สร้าง Job Group)
 สร้าง Database table job_groups 
@@ -83,6 +87,50 @@ Hi! I'm your first Markdown file in **StackEdit**. If you want to learn about St
 	 1. ถ้าเลือก Job (ผ้า 20กก จาก  100กก) ทำงานต่อจากการ รีด แต่เปลี่ยนพนักงาน นับจำนวน ผ้า ไม่ได้นับตามน้ำหนัก
 	 2. ถ้าเลือก Job Group (หยิบผ้าที่รีดแล้ว จาก 100กก) จะเป็นการเอาผ้าที่รีด ทั้งหมดจาก Job Group มาพับแพค
  6. จัดเก็บ (รอยืนยันอีกที)
+
+## พลังงาน
+บันทึกประวัติการใช้งานพลังงานในแต่ละวันหรือสัปดาห์หรือเดือนตามตกลง
+สร้าง Database table energy_resources
+`{ fields: { id, name } }`	
+
+แสดงรายการพลังงาน
+ 1. น้ำ
+ 2. ไฟฟ้า
+ 3. แก็ส
+ 4. ชีวมวล
+ 5. น้ำมันเตา
+ 6. ประวัติ
+	 7. แสดงประวัติการบันทึกการใช้งาน
+
+## พนักงาน
+แสดงรายการ 
+สร้าง Database table employees
+`{ fields: { id, name, department} }`
+
+## วิเคราะห์
+แสดงสถิติอย่างละเอียด 
+					
+## สต๊อก
+
+สร้าง Database table material_resource_groups
+`{ fields: { id, name } }`	
+แสดงรายการกลุ่มต้นทุนการผลิต  
+
+ 1. เคมี/ผงซักฟอก
+ 2. ถุงพลาสติก
+ 3. วัสดุทั่วไป
+ 4. ...
+
+เมื่อกดเข้าไปในแต่ละเมนู จะเจอไอเท็มย่อยของเมนูนั้นๆ
+สร้าง Database table material_resources
+`{ fields: { id, name, material_resource_group_id, unit, total_quantity, remain_quantity } }`	
+
+สร้าง Database table material_resource_stock_logs
+`{ fields: { id, material_resource_id, quantity, type = export, import } }`	
+
+ 1. สามารถเพิ่มหรือลบได้
+ 2. สามารถเพิ่ทหรือลบจำนวนได้
+ 3. บันทึกประวัติการเพิ่มหรือลดจำนวน
 
 
 # Semantic Commit Messages
