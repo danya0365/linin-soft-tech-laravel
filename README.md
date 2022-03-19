@@ -17,11 +17,16 @@ Hi! I'm your first Markdown file in **StackEdit**. If you want to learn about St
 	5. พับแพค
 	6. จัดเก็บ
 4.  พลังงาน
+	1. บันทึกพลังงานที่ใช้
 5.  พนักงาน
+	1.  เลือกแผนก
+		1. เลือกพนักงาน
+			1. กรองวันที่
+			2. แสดงกราฟจำนวนผ้าที่ทำได้ในแต่ละ ชม ของทุกวันรวมกัน
 6.  วิเคราะห์
 7.  สต๊อก
-	1. ประเภทของสินค้า (เพิ่มและลบ)
-		1. สินค้า
+	1. เลือกประเภทของวัตถุดิบ
+		1. วัตถุดิบ
 8.  ตั้งค่า
 
 ## สินค้า
@@ -67,8 +72,6 @@ Hi! I'm your first Markdown file in **StackEdit**. If you want to learn about St
 `{ fields: { id, name, laundry_type_d} }`
 สร้าง Database table employees
 `{ fields: { id, name, department} }`
-สร้าง Database table departments (ซัก, อบ,  รีด, พับแพ็ค, จัดเก็บ)
-`{ fields: { id, name } }`
 	 2. เลือกพนักงาน
 	 3. ผ้าทั่วไป ผ้าแก้ไข
 	 4. เครื่องซักผ้า (เลือกตามน้ำหนักผ้า)
@@ -103,7 +106,11 @@ Hi! I'm your first Markdown file in **StackEdit**. If you want to learn about St
 	 7. แสดงประวัติการบันทึกการใช้งาน
 
 ## พนักงาน
-แสดงรายการ 
+แสดงรายการแผนกของพนักงาน
+สร้าง Database table departments (ซัก, อบ,  รีด, พับแพ็ค, จัดเก็บ)
+`{ fields: { id, name } }`
+
+เลือกแผนกแล้ว แสดงรายการพนักงาน
 สร้าง Database table employees
 `{ fields: { id, name, department} }`
 
