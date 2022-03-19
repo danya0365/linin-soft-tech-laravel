@@ -165,6 +165,10 @@
  5. จัดการพนักงาน table employees
 
 
+## Integrate CRUD Generator
+โดยจะใช้ Lib [appzcoder/crud-generator](https://github.com/appzcoder/crud-generator)
+
+
 # Semantic Commit Messages
 
 See how a minor change to your commit message style can make you a better programmer.
