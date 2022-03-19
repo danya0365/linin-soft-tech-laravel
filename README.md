@@ -6,6 +6,8 @@ Hi! I'm your first Markdown file in **StackEdit**. If you want to learn about St
 # **หน้าแรก**
 
 1.  สินค้า
+	1. ผ้าทั่วไป
+	2. ผ้าแก้ไข
 2.  ลูกค้า
 3.  ปฏิบัติการ
 	1. รับสินค้า
