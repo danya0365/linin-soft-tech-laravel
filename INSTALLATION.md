@@ -32,8 +32,24 @@ Once the application's Docker containers have been started, you can access the a
 
 ```sail yarn```
 
+### DB Seeder
+
+```sail php artisan migrate:fresh --seed```
+
 ### Database Management
 [PhpMyAdmin](http://localhost:8081/)
+
+### Generate CRUD 
+[awais-vteams/laravel-crud-generator](https://github.com/awais-vteams/laravel-crud-generator)
+
+Add migration file to create `table` first
+```sail php artisan make:migration create_banks_table```
+
+Then generate CRUD
+```sail php artisan make:crud banks```
+
+Add route.php
+```Route::resource('banks', 'BankController');```
 
 
 ## Executing Commands
