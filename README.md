@@ -35,19 +35,19 @@
  1. ผ้าทั่วไป
  2. ผ้าแก้ไข
 
-เมื่อกดเข้าไปจะแสดงรายการจาก  table jobs
+เมื่อกดเข้าไปจะแสดงรายการจาก  table `jobs`
  1. มีฟิลเตอร์กรองข้อมูลตามวันที่
- 2. มีฟิลเตอร์กรองตามชนิดผ้า
+ 2. มีฟิลเตอร์กรองตามชนิดผ้า table `linen_types`
  3. มี Sort Order
- 4. แสดง Summary สรุปยอด
+ 4. แสดง Summary ของ Table สรุปยอด
 	 1. จำนวนชิ้น
 	 2. น้ำหนัก
  5. ไฮไลต์ข้อความ Text Color ตามสีของผ้า
 
 ## ลูกค้า
 แสดงรายการลูกค้า
-สร้าง Database table customers 
-`{ fields: { id, name, sum_wet_weight, sum_dry_weight, sum_billing_weight, sum_edit_weight } }`
+สร้าง Database table `customers`
+`{ fields: { id, name, total_wet_weight, total_dry_weight, total_billing_weight, total_edit_weight, total_billing_payment } }`
 
 พร้อมกับ sum ข้อมูลจาก  `table jobs`
 มี column ยอดรวมน้ำหนักผ้าเปียก, ยอดรวมผ้าสะอาด, ยอดรวมน้ำหนักแก้ไข
@@ -57,46 +57,61 @@
  4. ...
 
 เมื่อเลือกแล้ว ให้แสดงรายการ `table jobs` ของลูกค้านั้นๆ
-- ป้อนข้อมูลผ้าสะอาด และจำนวนเงิน
+- ป้อนข้อมูลผ้าสะอาด และจำนวนเงิน ลง `table jobs`
+
+สร้าง Database table `customer_billing_payment_logs`
+`{ fields: { id, customer_id, wet_weight, payment_paid } }`
 
 ## ปฏิบัติการ
 
  1. รับสินค้า (สร้าง Job Group)
-สร้าง Database table job_groups 
-`{ fields: { id, customer_id, wet_weight, employee_id, dry_weight, total_pieces } }`
-สร้าง Database table job_group_activity_logs 
-`{ fields: { id, job_group_id, log_type, employee_id, old_value, new_value } }`
+สร้าง Database table `job_groups`
+`{ fields: { id, customer_id, wet_weight, employee_id, dry_weight, total_pieces, status = enum(in progress, packing, done) } }`
+สร้าง Database table `job_group_activity_logs`
+`{ fields: { id, job_group_id, employee_id, log_type = enum(status, dry_weight, total_pieces), employee_id, old_value, new_value } }`
 	 1. เลือกชื่อลูกค้า
 	 2. ใส่จำนวนน้ำหนัก
  2. ซัก (สร้าง Job ID Status = ซัก)
- สร้าง Database table jobs 
- `{ fields: { id, job_group_id {customer_id, weight}, employee_id, job_type = enum(new, edit), washing_machine_id, dryer_machine_id, laundry_type_id, laundry_id, weight, color } `
- สร้าง Database table job_activity_logs 
-`{ fields: { id, job_id, log_type, employee_id, old_value, new_value } }`
-	 2. ต้องเลือกพนังงานคนที่เบิกพร้อมใส่ Password ส่วนตัวเพื่อป้องกันการแกล้ง
-	 3. ผ้าทั่วไป ผ้าแก้ไข
-	 4. เครื่องซักผ้า (เลือกตามน้ำหนักผ้า)
-	 5. เลือกกองผ้าจากลูกค้าที่รับมาช่วงเช้า เช่น กองผ้า Customer A ขนาด 100กก. (เลือก Job Group)
-	 6. ชนิดผ้า (ผ้าขน)
-	 7. ผ้าเช็ดมือ
-	 8. ใส่จำนวนกี่โลที่หยิบจากกองผ้าลูกค้า (ต้องไม่เกิน 100กก และไม่เกินขนาดตความจุ เครื่องซักผ้า)
-	 9. เลือกสี 
-	 10. ยืนยัน 
+ สร้าง Database table `jobs`
+ `{ fields: { id, job_group_id {customer_id, weight}, employee_id, job_type = enum(new, edit), washing_machine_id, dryer_machine_id, laundry_type_id, laundry_product_id, wet_weight, color, status = enum(ซัก, อบ, รีด) }`
+ สร้าง Database table `job_activity_logs`
+`{ fields: { id, job_id, employee_id, log_type = enum(status, washing_machine_id, dryer_machine_id, laundry_type_id, laundry_product_id, wet_weight, color), employee_id, old_value, new_value } }`
+สร้าง Database table `employee_operation_logs`
+`{ fields: { id, employee_id, operation_type = enum(ซัก, อบ, รีด, พับแพ็ค, จัดเก็บ) action_type = enum(start, stop) } }`
+	 1. ต้องเลือกพนังงานคนที่เบิกพร้อมใส่ Password ส่วนตัวเพื่อป้องกันการแกล้ง
+	 2. ผ้าทั่วไป ผ้าแก้ไข
+	 3. เครื่องซักผ้า (เลือกตามน้ำหนักผ้า)
+	 4. เลือกกองผ้าจากลูกค้าที่รับมาช่วงเช้า เช่น กองผ้า Customer A ขนาด 100กก. (เลือก Job Group)
+	 5. ชนิดผ้า (ผ้าขน)
+	 6. ผ้าเช็ดมือ
+	 7. ใส่จำนวนกี่โลที่หยิบจากกองผ้าลูกค้า (ต้องไม่เกิน 100กก และไม่เกินขนาดตความจุ เครื่องซักผ้า)
+	 8. เลือกสี 
+	 9. ยืนยัน 
+	 10. เพิ่ม log ลง table `job_activity_logs`
+	 11. เพิ่ม log ลง table `employee_operation_logs`
  3. อบ  (เลือก Job ID Status = ซัก เปลี่ยนเป็น Status = อบ)
 	 1. เลือก Job ทำงานต่อจาก การซัก แต่เปลี่ยนพนักงาน ขั้นตอนคล้ายกันหมด แต่ต้องเลือก dryer_machines
- 4. รีด (เลือก Job รอยืนยันอีกที)
+	 2. เพิ่ม log ลง table `job_activity_logs`
+	 3. เพิ่ม log ลง table `employee_operation_logs`
+ 4. รีด (เลือก Job Status = อบ เปลี่ยนเป็น Status = รีด)
 	 1. ถ้าเลือก Job (ผ้า 20กก จาก  100กก) ทำงานต่อจากการ อบ แต่เปลี่ยนพนักงาน นับจำนวนผ้า แทนนับตามน้ำหนัก
- 5. พับแพ็ค (เลือก Job Group)
+	 2. เพิ่ม log ลง table `job_activity_logs`
+	 3. เพิ่ม log ลง table `employee_operation_logs`
+ 5. พับแพ็ค (เลือก Job Group Set Status = packing)
 	 1. ถ้าเลือก Job Group (หยิบผ้าที่รีดแล้ว จาก 100กก) จะเป็นการเอาผ้าที่รีด ทั้งหมดจาก Job Group มาพับแพค ใส่จำนวนชิ้น
- 6. จัดเก็บ (เลือก Job Group)
-	 7. เลือกผ้าจาก Job Group แล้วเอาไปชั่งน้ำหนักตอนแห้ง
+	 2. เพิ่ม log ลง table `job_group_activity_logs`
+	 3. เพิ่ม log ลง table `employee_operation_logs`
+ 6. จัดเก็บ (เลือก Job Group Set Status = done)
+	 1. เลือกผ้าจาก Job Group แล้วเอาไปชั่งน้ำหนักตอนแห้ง
+	 2. เพิ่ม log ลง table `job_group_activity_logs`
+	 3. เพิ่ม log ลง table `employee_operation_logs`
 
 ## พลังงาน
 บันทึกประวัติการใช้งานพลังงานในแต่ละวันหรือสัปดาห์หรือเดือนตามตกลง
-สร้าง Database table energy_resources
+สร้าง Database table `energy_resources`
 `{ fields: { id, name } }`	
 
-สร้าง Database table energy_resource_logs
+สร้าง Database table `energy_resource_logs`
 `{ fields: { id, energy_resource_id, value, unit, lot_number } }`	
 
 แสดงรายการพลังงาน และสร้างหน้ารายการบันทึกในแต่ละหน้าแบบละเอียด
@@ -108,14 +123,16 @@
  6. ประวัติ
 	 1. แสดงประวัติการบันทึกการใช้งาน
 
+กดเข้าไปในแต่ละเมนูพลังงาน แล้วบันทึกข้อมูลลง table `energy_resource_logs`
+
 ## พนักงาน
 แสดงรายการแผนกของพนักงาน
-สร้าง Database table departments (ซัก, อบ,  รีด, พับแพ็ค, จัดเก็บ)
+สร้าง Database table `departments` (ซัก, อบ,  รีด, พับแพ็ค, จัดเก็บ)
 `{ fields: { id, name } }`
 
 เลือกแผนกแล้ว แสดงรายการพนักงาน
-สร้าง Database table employees
-`{ fields: { id, name, department} }`
+สร้าง Database table `employees`
+`{ fields: { id, name, photo, department_id} }`
 
 เลือกพนักงาน
  1. กรองวันที่ข้อมูล Jobs ที่ทำได้
@@ -126,7 +143,7 @@
 					
 ## สต๊อก
 
-สร้าง Database table inventory_groups
+สร้าง Database table `inventory_groups`
 `{ fields: { id, name } }`	
 แสดงรายการกลุ่มต้นทุนการผลิต  
 
@@ -136,13 +153,13 @@
  4. ...
 
 เมื่อกดเข้าไปในแต่ละเมนู จะเจอไอเท็มย่อยของเมนูนั้นๆ
-สร้าง Database table inventories
+สร้าง Database table `inventories`
 `{ fields: { id, name, material_resource_group_id, unit, total_quantity, remain_quantity } }`	
 
-สร้าง Database table material_resource_stock_logs
+สร้าง Database table `material_resource_stock_logs`
 `{ fields: { id, material_resource_id, quantity, type = export, import } }`	
 
-ต้องเลือกพนังงานคนที่เบิกพร้อมใส่ Password ส่วนตัวเพื่อป้องกันการแกล้ง
+ต้องเลือกพนักงานคนที่เบิกพร้อมใส่ Password ส่วนตัวเพื่อป้องกันการแกล้ง
 
  1. สามารถเพิ่มหรือลบได้
  2. สามารถเพิ่มหรือลบจำนวนได้
@@ -151,18 +168,21 @@
 ## ตั้งค่า
 
  1. เครื่องซักผ้า
-สร้าง Database table washing_machines
+สร้าง Database table `washing_machines`
 `{ fields: { id, name, maximum_weight} }`
  2. เครื่องอบ
-สร้าง Database table dryer_machines
+สร้าง Database table `dryer_machines`
 `{ fields: { id, name, maximum_weight} }`
  3. ชนิดผ้า
- สร้าง Database table linen_types
+ สร้าง Database table `linen_types`
 `{ fields: { id, name } }`
  4. ผ้า
-สร้าง Database table linen_products
+สร้าง Database table `linen_products`
 `{ fields: { id, name, laundry_type_d} }`
- 5. จัดการพนักงาน table employees
+ 5. จัดการพนักงาน table `employees`
+
+> **Note** ทุกครั้งที่เลือกพนักงานเพื่อดำเนินการ จะต้อง Password ส่วนตัวเพื่อป้องกันการแกล้ง
+
 
 
 ## Integrate CRUD Generator
