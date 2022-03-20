@@ -15,6 +15,9 @@ return new class extends Migration
     {
         Schema::create('dryer_machines', function (Blueprint $table) {
             $table->id();
+            $table->string('name');
+            $table->string('photo');
+            $table->integer('maximum_weight');
             $table->timestamps();
         });
     }
