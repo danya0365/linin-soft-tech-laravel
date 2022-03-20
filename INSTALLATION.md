@@ -32,6 +32,10 @@ Once the application's Docker containers have been started, you can access the a
 
 ```sail yarn```
 
+### DB Seeder
+
+```sail php artisan migrate:fresh --seed```
+
 ### Database Management
 [PhpMyAdmin](http://localhost:8081/)
 
