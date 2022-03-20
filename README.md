@@ -182,10 +182,10 @@
 
  1. เครื่องซักผ้า
 สร้าง Database table `washing_machines`
-```{ fields: { id, name, maximum_weight} }```
+```{ fields: { id, name, photo, maximum_weight} }```
  2. เครื่องอบ
 สร้าง Database table `dryer_machines`
-```{ fields: { id, name, maximum_weight} }```
+```{ fields: { id, name, photo, maximum_weight} }```
  3. ชนิดผ้า
  สร้าง Database table `linen_types`
 ```{ fields: { id, name } }```
