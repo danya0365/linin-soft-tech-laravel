@@ -47,7 +47,7 @@
 ## ลูกค้า
 แสดงรายการลูกค้า
 สร้าง Database table `customers`
-`{ fields: { id, name, total_wet_weight, total_dry_weight, total_billing_weight, total_edit_weight, total_billing_payment } }`
+```{ fields: { id, name, total_wet_weight, total_dry_weight, total_billing_weight, total_edit_weight, total_billing_payment } }```
 
 พร้อมกับ sum ข้อมูลจาก  `table jobs`
 มี column ยอดรวมน้ำหนักผ้าเปียก, ยอดรวมผ้าสะอาด, ยอดรวมน้ำหนักแก้ไข
@@ -60,24 +60,24 @@
 - ป้อนข้อมูลผ้าสะอาด และจำนวนเงิน ลง `table jobs`
 
 สร้าง Database table `customer_billing_payment_logs`
-`{ fields: { id, customer_id, wet_weight, payment_paid } }`
+```{ fields: { id, customer_id, wet_weight, payment_paid } }```
 
 ## ปฏิบัติการ
 
  1. รับสินค้า (สร้าง Job Group)
 สร้าง Database table `job_groups`
-`{ fields: { id, customer_id, wet_weight, employee_id, dry_weight, total_pieces, status = enum(in progress, packing, done) } }`
+```{ fields: { id, customer_id, wet_weight, employee_id, dry_weight, total_pieces, status = enum(in progress, packing, done) } }```
 สร้าง Database table `job_group_activity_logs`
-`{ fields: { id, job_group_id, employee_id, log_type = enum(status, dry_weight, total_pieces), employee_id, old_value, new_value } }`
+```{ fields: { id, job_group_id, employee_id, log_type = enum(status, dry_weight, total_pieces), employee_id, old_value, new_value } }```
 	 1. เลือกชื่อลูกค้า
 	 2. ใส่จำนวนน้ำหนัก
  2. ซัก (สร้าง Job ID Status = ซัก)
  สร้าง Database table `jobs`
- `{ fields: { id, job_group_id {customer_id, weight}, employee_id, job_type = enum(new, edit), washing_machine_id, dryer_machine_id, laundry_type_id, laundry_product_id, wet_weight, color, status = enum(ซัก, อบ, รีด) }`
+ ```{ fields: { id, job_group_id {customer_id, weight}, employee_id, job_type = enum(new, edit), washing_machine_id, dryer_machine_id, laundry_type_id, laundry_product_id, wet_weight, color, status = enum(ซัก, อบ, รีด) }```
  สร้าง Database table `job_activity_logs`
-`{ fields: { id, job_id, employee_id, log_type = enum(status, washing_machine_id, dryer_machine_id, laundry_type_id, laundry_product_id, wet_weight, color), employee_id, old_value, new_value } }`
+```{ fields: { id, job_id, employee_id, log_type = enum(status, washing_machine_id, dryer_machine_id, laundry_type_id, laundry_product_id, wet_weight, color), employee_id, old_value, new_value } }```
 สร้าง Database table `employee_operation_logs`
-`{ fields: { id, employee_id, operation_type = enum(ซัก, อบ, รีด, พับแพ็ค, จัดเก็บ) action_type = enum(start, stop) } }`
+```{ fields: { id, employee_id, operation_type = enum(ซัก, อบ, รีด, พับแพ็ค, จัดเก็บ) action_type = enum(start, stop) } }```
 	 1. ต้องเลือกพนังงานคนที่เบิกพร้อมใส่ Password ส่วนตัวเพื่อป้องกันการแกล้ง
 	 2. ผ้าทั่วไป ผ้าแก้ไข
 	 3. เครื่องซักผ้า (เลือกตามน้ำหนักผ้า)
@@ -109,10 +109,10 @@
 ## พลังงาน
 บันทึกประวัติการใช้งานพลังงานในแต่ละวันหรือสัปดาห์หรือเดือนตามตกลง
 สร้าง Database table `energy_resources`
-`{ fields: { id, name } }`	
+```{ fields: { id, name } }```	
 
 สร้าง Database table `energy_resource_logs`
-`{ fields: { id, energy_resource_id, value, unit, lot_number } }`	
+```{ fields: { id, energy_resource_id, value, unit, lot_number } }```	
 
 แสดงรายการพลังงาน และสร้างหน้ารายการบันทึกในแต่ละหน้าแบบละเอียด
  1. น้ำ
@@ -128,11 +128,11 @@
 ## พนักงาน
 แสดงรายการแผนกของพนักงาน
 สร้าง Database table `departments` (ซัก, อบ,  รีด, พับแพ็ค, จัดเก็บ)
-`{ fields: { id, name } }`
+```{ fields: { id, name } }```
 
 เลือกแผนกแล้ว แสดงรายการพนักงาน
 สร้าง Database table `employees`
-`{ fields: { id, name, photo, department_id} }`
+```{ fields: { id, name, photo, department_id} }```
 
 เลือกพนักงาน
  1. กรองวันที่ข้อมูล Jobs ที่ทำได้
@@ -144,7 +144,7 @@
 ## สต๊อก
 
 สร้าง Database table `inventory_groups`
-`{ fields: { id, name } }`	
+```{ fields: { id, name } }```	
 แสดงรายการกลุ่มต้นทุนการผลิต  
 
  1. เคมี/ผงซักฟอก
@@ -154,10 +154,10 @@
 
 เมื่อกดเข้าไปในแต่ละเมนู จะเจอไอเท็มย่อยของเมนูนั้นๆ
 สร้าง Database table `inventories`
-`{ fields: { id, name, material_resource_group_id, unit, total_quantity, remain_quantity } }`	
+```{ fields: { id, name, material_resource_group_id, unit, total_quantity, remain_quantity } }```	
 
-สร้าง Database table `material_resource_stock_logs`
-`{ fields: { id, material_resource_id, quantity, type = export, import } }`	
+สร้าง Database table `inventory_stock_logs`
+```{ fields: { id, material_resource_id, quantity, type = export, import } }```	
 
 ต้องเลือกพนักงานคนที่เบิกพร้อมใส่ Password ส่วนตัวเพื่อป้องกันการแกล้ง
 
@@ -169,25 +169,19 @@
 
  1. เครื่องซักผ้า
 สร้าง Database table `washing_machines`
-`{ fields: { id, name, maximum_weight} }`
+```{ fields: { id, name, maximum_weight} }```
  2. เครื่องอบ
 สร้าง Database table `dryer_machines`
-`{ fields: { id, name, maximum_weight} }`
+```{ fields: { id, name, maximum_weight} }```
  3. ชนิดผ้า
  สร้าง Database table `linen_types`
-`{ fields: { id, name } }`
+```{ fields: { id, name } }```
  4. ผ้า
 สร้าง Database table `linen_products`
-`{ fields: { id, name, laundry_type_d} }`
+```{ fields: { id, name, laundry_type_d} }```
  5. จัดการพนักงาน table `employees`
 
 > **Note** ทุกครั้งที่เลือกพนักงานเพื่อดำเนินการ จะต้อง Password ส่วนตัวเพื่อป้องกันการแกล้ง
-
-
-
-## Integrate CRUD Generator
-โดยจะใช้ Lib [appzcoder/crud-generator](https://github.com/appzcoder/crud-generator)
-
 
 # Semantic Commit Messages
 
