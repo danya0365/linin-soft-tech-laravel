@@ -167,7 +167,7 @@
 
 เมื่อกดเข้าไปในแต่ละเมนู จะเจอไอเท็มย่อยของเมนูนั้นๆ
 สร้าง Database table `inventories`
-```{ fields: { id, name, material_resource_group_id, unit, total_quantity, remain_quantity } }```	
+```{ fields: { id, name, inventory_group_id, unit, total_quantity, remain_quantity } }```	
 
 สร้าง Database table `inventory_stock_logs`
 ```{ fields: { id, material_resource_id, quantity, type = export, import } }```	
