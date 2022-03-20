@@ -15,6 +15,9 @@ return new class extends Migration
     {
         Schema::create('inventory_stock_logs', function (Blueprint $table) {
             $table->id();
+            $table->integer('inventory_id');
+            $table->enum('type', ['export', 'import']);
+            $table->integer('quantity');
             $table->timestamps();
         });
     }

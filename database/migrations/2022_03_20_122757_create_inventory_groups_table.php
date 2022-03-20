@@ -15,11 +15,7 @@ return new class extends Migration
     {
         Schema::create('inventory_groups', function (Blueprint $table) {
             $table->id();
-            $table->integer('inventory_group_id');
             $table->string('name');
-            $table->string('unit');
-            $table->integer('total_quantity');
-            $table->integer('remain_quantity');
             $table->timestamps();
         });
     }

@@ -170,7 +170,7 @@
 ```{ fields: { id, name, inventory_group_id, unit, total_quantity, remain_quantity } }```	
 
 สร้าง Database table `inventory_stock_logs`
-```{ fields: { id, material_resource_id, quantity, type = export, import } }```	
+```{ fields: { id, inventory_id, quantity, type = export, import } }```	
 
 ต้องเลือกพนักงานคนที่เบิกพร้อมใส่ Password ส่วนตัวเพื่อป้องกันการแกล้ง
 
