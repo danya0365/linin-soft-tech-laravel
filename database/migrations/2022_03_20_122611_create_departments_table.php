@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::create('departments', function (Blueprint $table) {
             $table->id();
+            $table->string('name'); // (ซัก, อบ, รีด, พับแพ็ค, จัดเก็บ)
             $table->timestamps();
         });
     }
