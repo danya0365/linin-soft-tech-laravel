@@ -16,22 +16,40 @@ class DepartmentSeeder extends Seeder
     public function run()
     {
         DB::table('departments')->insert([
-            'name' => 'รับสินค้า'
+            'name' => 'รับสินค้า',
+            'input_unit' => 'weight',
+            'created_at' =>  \Carbon\Carbon::now(),
+            'updated_at' => \Carbon\Carbon::now()
         ]);
         DB::table('departments')->insert([
-            'name' => 'ซัก'
+            'name' => 'ซัก',
+            'input_unit' => 'weight',
+            'created_at' =>  \Carbon\Carbon::now(),
+            'updated_at' => \Carbon\Carbon::now()
         ]);
         DB::table('departments')->insert([
-            'name' => 'อบ'
+            'name' => 'อบ',
+            'input_unit' => 'weight',
+            'created_at' =>  \Carbon\Carbon::now(),
+            'updated_at' => \Carbon\Carbon::now()
         ]);
         DB::table('departments')->insert([
-            'name' => 'รีด'
+            'name' => 'รีด',
+            'input_unit' => 'piece',
+            'created_at' =>  \Carbon\Carbon::now(),
+            'updated_at' => \Carbon\Carbon::now()
         ]);
         DB::table('departments')->insert([
-            'name' => 'พับแพ็ค'
+            'name' => 'พับแพ็ค',
+            'input_unit' => 'piece',
+            'created_at' =>  \Carbon\Carbon::now(),
+            'updated_at' => \Carbon\Carbon::now()
         ]);
         DB::table('departments')->insert([
-            'name' => 'จัดเก็บ'
+            'name' => 'จัดเก็บ',
+            'input_unit' => 'weight',
+            'created_at' =>  \Carbon\Carbon::now(),
+            'updated_at' => \Carbon\Carbon::now()
         ]);
     }
 }
