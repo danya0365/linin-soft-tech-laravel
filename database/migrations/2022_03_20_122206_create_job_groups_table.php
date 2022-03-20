@@ -20,7 +20,7 @@ return new class extends Migration
             $table->float('wet_weight')->default(0.0);
             $table->float('dry_weight')->default(0.0);
             $table->integer('total_pieces')->default(0);
-            $table->enum('operation_status', ['progress', 'packing', 'done']);
+            $table->enum('operation_status', ['progress', 'packing', 'collect']);
             $table->timestamps();
         });
     }

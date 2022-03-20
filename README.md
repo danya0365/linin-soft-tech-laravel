@@ -66,18 +66,26 @@
 
  1. รับสินค้า (สร้าง Job Group)
 สร้าง Database table `job_groups`
-```{ fields: { id, customer_id, wet_weight, employee_id, dry_weight, total_pieces, status = operation_status(progress, packing, done) } }```
+
+```{ fields: { id, customer_id, wet_weight, employee_id, dry_weight, total_pieces, status = operation_status(progress, packing, collect) } }```
+
 สร้าง Database table `job_group_activity_logs`
-```{ fields: { id, job_group_id, employee_id, log_type = enum(status, dry_weight, total_pieces), employee_id, old_value, new_value } }```
+
+```{ fields: { id, job_group_id, employee_id, log_type = enum(status, dry_weight, total_pieces), old_value, new_value } }```
 	 1. เลือกชื่อลูกค้า
 	 2. ใส่จำนวนน้ำหนัก
  1. ซัก (สร้าง Job ID Status = ซัก)
  สร้าง Database table `jobs`
- ```{ fields: { id, job_group_id {customer_id, weight}, employee_id, job_type = enum(new, edit), washing_machine_id, dryer_machine_id, laundry_type_id, laundry_product_id, wet_weight, color, operation_status = enum(ซัก, อบ, รีด) }```
+
+ ```{ fields: { id, job_group_id {customer_id, weight}, employee_id, job_type = enum(new, edit), washing_machine_id, dryer_machine_id, laundry_type_id, laundry_product_id, wet_weight, color, operation_status = enum('wash', 'dry', 'iron') }```
+
  สร้าง Database table `job_activity_logs`
-```{ fields: { id, job_id, employee_id, log_type = enum(status, washing_machine_id, dryer_machine_id, laundry_type_id, laundry_product_id, wet_weight, color), employee_id, old_value, new_value } }```
+
+```{ fields: { id, job_id, employee_id, log_type = enum(status, washing_machine_id, dryer_machine_id, laundry_type_id, laundry_product_id, wet_weight, color), old_value, new_value } }```
+
 สร้าง Database table `employee_operation_logs`
-```{ fields: { id, employee_id, operation_type = enum(ซัก, อบ, รีด, พับแพ็ค, จัดเก็บ) action_type = enum(start, stop) } }```
+
+```{ fields: { id, employee_id, operation_type = enum('wash', 'dry', 'iron', 'packing', 'collect') action_type = enum(start, stop) } }```
 	 1. ต้องเลือกพนังงานคนที่เบิกพร้อมใส่ Password ส่วนตัวเพื่อป้องกันการแกล้ง
 	 2. ผ้าทั่วไป ผ้าแก้ไข
 	 3. เครื่องซักผ้า (เลือกตามน้ำหนักผ้า)
@@ -89,22 +97,22 @@
 	 9. ยืนยัน 
 	 10. เพิ่ม log ลง table `job_activity_logs`
 	 11. เพิ่ม log ลง table `employee_operation_logs`
- 3. อบ  (เลือก Job ID Status = ซัก เปลี่ยนเป็น Status = อบ)
-	 1. เลือก Job ทำงานต่อจาก การซัก แต่เปลี่ยนพนักงาน ขั้นตอนคล้ายกันหมด แต่ต้องเลือก dryer_machines
-	 2. เพิ่ม log ลง table `job_activity_logs`
-	 3. เพิ่ม log ลง table `employee_operation_logs`
- 4. รีด (เลือก Job Status = อบ เปลี่ยนเป็น Status = รีด)
-	 1. ถ้าเลือก Job (ผ้า 20กก จาก  100กก) ทำงานต่อจากการ อบ แต่เปลี่ยนพนักงาน นับจำนวนผ้า แทนนับตามน้ำหนัก
-	 2. เพิ่ม log ลง table `job_activity_logs`
-	 3. เพิ่ม log ลง table `employee_operation_logs`
- 5. พับแพ็ค (เลือก Job Group Set Status = packing)
-	 1. ถ้าเลือก Job Group (หยิบผ้าที่รีดแล้ว จาก 100กก) จะเป็นการเอาผ้าที่รีด ทั้งหมดจาก Job Group มาพับแพค ใส่จำนวนชิ้น
-	 2. เพิ่ม log ลง table `job_group_activity_logs`
-	 3. เพิ่ม log ลง table `employee_operation_logs`
- 6. จัดเก็บ (เลือก Job Group Set Status = done)
-	 1. เลือกผ้าจาก Job Group แล้วเอาไปชั่งน้ำหนักตอนแห้ง
-	 2. เพิ่ม log ลง table `job_group_activity_logs`
-	 3. เพิ่ม log ลง table `employee_operation_logs`
+ 1. อบ  (เลือก Job ID Status = ซัก เปลี่ยนเป็น Status = อบ)
+	 12. เลือก Job ทำงานต่อจาก การซัก แต่เปลี่ยนพนักงาน ขั้นตอนคล้ายกันหมด แต่ต้องเลือก dryer_machines
+	 13. เพิ่ม log ลง table `job_activity_logs`
+	 14. เพิ่ม log ลง table `employee_operation_logs`
+ 2. รีด (เลือก Job Status = อบ เปลี่ยนเป็น Status = รีด)
+	 15. ถ้าเลือก Job (ผ้า 20กก จาก  100กก) ทำงานต่อจากการ อบ แต่เปลี่ยนพนักงาน นับจำนวนผ้า แทนนับตามน้ำหนัก
+	 16. เพิ่ม log ลง table `job_activity_logs`
+	 17. เพิ่ม log ลง table `employee_operation_logs`
+ 3. พับแพ็ค (เลือก Job Group Set Status = packing)
+	 18. ถ้าเลือก Job Group (หยิบผ้าที่รีดแล้ว จาก 100กก) จะเป็นการเอาผ้าที่รีด ทั้งหมดจาก Job Group มาพับแพค ใส่จำนวนชิ้น
+	 19. เพิ่ม log ลง table `job_group_activity_logs`
+	 20. เพิ่ม log ลง table `employee_operation_logs`
+ 4. จัดเก็บ (เลือก Job Group Set Status = collect)
+	 21. เลือกผ้าจาก Job Group แล้วเอาไปชั่งน้ำหนักตอนแห้ง
+	 22. เพิ่ม log ลง table `job_group_activity_logs`
+	 23. เพิ่ม log ลง table `employee_operation_logs`
 
 ## พลังงาน
 บันทึกประวัติการใช้งานพลังงานในแต่ละวันหรือสัปดาห์หรือเดือนตามตกลง
