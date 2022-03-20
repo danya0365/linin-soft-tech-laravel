@@ -16,10 +16,10 @@ return new class extends Migration
         Schema::create('customers', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->integer('total_wet_weight')->default(0);
-            $table->integer('total_dry_weight')->default(0);
-            $table->integer('total_billing_weight')->default(0);
-            $table->integer('total_edit_weight')->default(0);
+            $table->float('total_wet_weight')->default(0);
+            $table->float('total_dry_weight')->default(0);
+            $table->float('total_billing_weight')->default(0);
+            $table->float('total_edit_weight')->default(0);
             $table->float('total_billing_payment')->default(0.0);
             $table->timestamps();
         });

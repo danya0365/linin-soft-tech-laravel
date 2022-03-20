@@ -66,14 +66,14 @@
 
  1. รับสินค้า (สร้าง Job Group)
 สร้าง Database table `job_groups`
-```{ fields: { id, customer_id, wet_weight, employee_id, dry_weight, total_pieces, status = enum(in progress, packing, done) } }```
+```{ fields: { id, customer_id, wet_weight, employee_id, dry_weight, total_pieces, status = operation_status(progress, packing, done) } }```
 สร้าง Database table `job_group_activity_logs`
 ```{ fields: { id, job_group_id, employee_id, log_type = enum(status, dry_weight, total_pieces), employee_id, old_value, new_value } }```
 	 1. เลือกชื่อลูกค้า
 	 2. ใส่จำนวนน้ำหนัก
- 2. ซัก (สร้าง Job ID Status = ซัก)
+ 1. ซัก (สร้าง Job ID Status = ซัก)
  สร้าง Database table `jobs`
- ```{ fields: { id, job_group_id {customer_id, weight}, employee_id, job_type = enum(new, edit), washing_machine_id, dryer_machine_id, laundry_type_id, laundry_product_id, wet_weight, color, status = enum(ซัก, อบ, รีด) }```
+ ```{ fields: { id, job_group_id {customer_id, weight}, employee_id, job_type = enum(new, edit), washing_machine_id, dryer_machine_id, laundry_type_id, laundry_product_id, wet_weight, color, operation_status = enum(ซัก, อบ, รีด) }```
  สร้าง Database table `job_activity_logs`
 ```{ fields: { id, job_id, employee_id, log_type = enum(status, washing_machine_id, dryer_machine_id, laundry_type_id, laundry_product_id, wet_weight, color), employee_id, old_value, new_value } }```
 สร้าง Database table `employee_operation_logs`

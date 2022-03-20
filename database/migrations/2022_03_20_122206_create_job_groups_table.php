@@ -15,6 +15,12 @@ return new class extends Migration
     {
         Schema::create('job_groups', function (Blueprint $table) {
             $table->id();
+            $table->integer('customer_id');
+            $table->integer('employee_id');
+            $table->float('wet_weight')->default(0.0);
+            $table->float('dry_weight')->default(0.0);
+            $table->integer('total_pieces')->default(0);
+            $table->enum('operation_status', ['progress', 'packing', 'done']);
             $table->timestamps();
         });
     }
