@@ -24,6 +24,7 @@ return new class extends Migration
             $table->integer('laundry_type_id')->nullable();
             $table->integer('wet_weight')->nullable();
             $table->string('color')->nullable();
+            $table->string('tags')->nullable();
             $table->timestamps();
         });
     }
