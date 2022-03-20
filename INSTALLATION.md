@@ -28,6 +28,11 @@ Once the application's Docker containers have been started, you can access the a
 
 ```./vendor/bin/sail stop```
 
+### Execute NPM
+
+```sail yarn```
+
+
 ## Executing Commands
 
 When using Laravel Sail, your application is executing within a Docker container and is isolated from your local computer. However, Sail provides a convenient way to run various commands against your application such as arbitrary PHP commands, Artisan commands, Composer commands, and Node / NPM commands.
