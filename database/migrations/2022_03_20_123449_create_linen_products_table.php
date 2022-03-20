@@ -15,6 +15,8 @@ return new class extends Migration
     {
         Schema::create('linen_products', function (Blueprint $table) {
             $table->id();
+            $table->integer('linen_type_id');
+            $table->string('name');
             $table->timestamps();
         });
     }

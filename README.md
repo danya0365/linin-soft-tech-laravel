@@ -191,7 +191,7 @@
 ```{ fields: { id, name } }```
  4. ผ้า
 สร้าง Database table `linen_products`
-```{ fields: { id, name, laundry_type_d} }```
+```{ fields: { id, name, linen_type_id} }```
  5. จัดการพนักงาน table `employees`
 
 > **Note** ทุกครั้งที่เลือกพนักงานเพื่อดำเนินการ จะต้อง Password ส่วนตัวเพื่อป้องกันการแกล้ง
