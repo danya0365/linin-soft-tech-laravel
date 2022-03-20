@@ -15,6 +15,9 @@ return new class extends Migration
     {
         Schema::create('customer_billing_payment_logs', function (Blueprint $table) {
             $table->id();
+            $table->integer('customer_id');
+            $table->integer('dry_weight');
+            $table->float('payment_paid');
             $table->timestamps();
         });
     }

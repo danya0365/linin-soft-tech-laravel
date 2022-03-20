@@ -60,7 +60,7 @@
 - ป้อนข้อมูลผ้าสะอาด และจำนวนเงิน ลง `table jobs`
 
 สร้าง Database table `customer_billing_payment_logs`
-```{ fields: { id, customer_id, wet_weight, payment_paid } }```
+```{ fields: { id, customer_id, dry_weight, payment_paid } }```
 
 ## ปฏิบัติการ
 
