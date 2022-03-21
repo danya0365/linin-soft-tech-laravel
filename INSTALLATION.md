@@ -51,6 +51,12 @@ Then generate CRUD
 Add route.php
 ```Route::resource('banks', 'BankController');```
 
+### ทุกครั้งที่มีการเพิ่ม Lib ด้วย NodeJS
+
+ต้องทำการติดตั้งและ Generate css และ js ไปที่ public folder ด้วยคำสั่ง
+
+```yarn && yarn dev```
+
 
 ## Executing Commands
 
