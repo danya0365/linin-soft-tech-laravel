@@ -29,3 +29,36 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 Route::group(['middleware' => ['admin']], function () {
     Route::resource('users', App\Http\Controllers\UserController::class);
 });
+
+Route::group(['prefix' => 'worker'], function () {
+
+    Route::get('/', [App\Http\Controllers\WorkerController::class, 'index'])->name('worker.index');
+
+    Route::get('/product', function () {
+        return ['hello world'];
+    })->name('worker.product');
+
+    Route::get('/customer', function () {
+        return ['hello world'];
+    })->name('worker.customer');
+
+    Route::get('/operation', function () {
+        return ['hello world'];
+    })->name('worker.operation');
+
+    Route::get('/energy', function () {
+        return ['hello world'];
+    })->name('worker.energy');
+
+    Route::get('/employee', function () {
+        return ['hello world'];
+    })->name('worker.employee');
+
+    Route::get('/report', function () {
+        return ['hello world'];
+    })->name('worker.report');
+
+    Route::get('/stock', function () {
+        return ['hello world'];
+    })->name('worker.stock');
+});
