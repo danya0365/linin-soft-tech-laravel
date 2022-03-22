@@ -61,6 +61,8 @@
             </div>
         </nav>
 
+        <!-- <x-breadcrumb :links="[['name' => "Worker", 'link' => "{{ route('worker.index') }}" ]]" /> -->
+
         <main class="py-4">
             @yield('content')
         </main>
