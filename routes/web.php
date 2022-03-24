@@ -29,6 +29,7 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 Route::group(['middleware' => ['admin']], function () {
     Route::resource('users', App\Http\Controllers\UserController::class);
     Route::resource('customer-groups', App\Http\Controllers\CustomerGroupController::class);
+    Route::resource('customers', App\Http\Controllers\CustomerController::class);
 });
 
 Route::group(['prefix' => 'worker', 'middleware' => ['auth']], function () {

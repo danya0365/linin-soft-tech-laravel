@@ -17,6 +17,7 @@
                     <div class="d-grid gap-3">
                         <a class="btn btn-outline-secondary btn-lg" href="{{ route('users.index') }}" role="button">{{ __('User') }}</a>
                         <a class="btn btn-outline-secondary btn-lg" href="{{ route('customer-groups.index') }}" role="button">{{ __('กลุ่มลูกค้า') }}</a>
+                        <a class="btn btn-outline-secondary btn-lg" href="{{ route('customers.index') }}" role="button">{{ __('ลูกค้า') }}</a>
                     </div>
                 </div>
             </div>
