@@ -30,7 +30,7 @@ Route::group(['middleware' => ['admin']], function () {
     Route::resource('users', App\Http\Controllers\UserController::class);
 });
 
-Route::group(['prefix' => 'worker'], function () {
+Route::group(['prefix' => 'worker', 'middleware' => ['auth']], function () {
 
     Route::get('/', [App\Http\Controllers\WorkerController::class, 'index'])->name('worker.index');
 
