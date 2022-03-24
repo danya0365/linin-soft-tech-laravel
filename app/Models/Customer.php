@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+
 /**
  * Class Customer
  *
@@ -23,26 +25,29 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Customer extends Model
 {
-    
-    static $rules = [
-		'name' => 'required',
-		'customer_group_id' => 'required',
-		'total_wet_weight' => 'required',
-		'total_dry_weight' => 'required',
-		'total_billing_weight' => 'required',
-		'total_edit_weight' => 'required',
-		'total_billing_payment' => 'required',
-    ];
+  use HasFactory;
 
-    protected $perPage = 20;
+  static $rules = [
+    'name' => 'required',
+    'customer_group_id' => 'required',
+    'total_wet_weight' => 'required',
+    'total_dry_weight' => 'required',
+    'total_billing_weight' => 'required',
+    'total_edit_weight' => 'required',
+    'total_billing_payment' => 'required',
+  ];
 
-    /**
-     * Attributes that should be mass-assignable.
-     *
-     * @var array
-     */
-    protected $fillable = ['name','customer_group_id','total_wet_weight','total_dry_weight','total_billing_weight','total_edit_weight','total_billing_payment'];
+  protected $perPage = 20;
 
+  /**
+   * Attributes that should be mass-assignable.
+   *
+   * @var array
+   */
+  protected $fillable = ['name', 'customer_group_id', 'total_wet_weight', 'total_dry_weight', 'total_billing_weight', 'total_edit_weight', 'total_billing_payment'];
 
-
+  public function group()
+  {
+    return $this->belongsTo(CustomerGroup::class);
+  }
 }

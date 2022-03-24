@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 /**
  * Class CustomerGroup
@@ -17,20 +18,23 @@ use Illuminate\Database\Eloquent\Model;
  */
 class CustomerGroup extends Model
 {
-    
-    static $rules = [
-		'name' => 'required',
-    ];
+  use HasFactory;
 
-    protected $perPage = 20;
+  static $rules = [
+    'name' => 'required',
+  ];
 
-    /**
-     * Attributes that should be mass-assignable.
-     *
-     * @var array
-     */
-    protected $fillable = ['name'];
+  protected $perPage = 20;
 
+  /**
+   * Attributes that should be mass-assignable.
+   *
+   * @var array
+   */
+  protected $fillable = ['name'];
 
-
+  public function customers()
+  {
+    return $this->hasMany(Customer::class);
+  }
 }
