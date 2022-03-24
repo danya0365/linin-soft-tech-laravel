@@ -13,9 +13,9 @@
     <div class="row justify-content-center">
         <div class="col-md-12 m-2">
             <div class="card">
-                <div class="card-header">แบบฟอร์ม Submit</div>
+                <div class="card-header">น้ำหนักเปียก</div>
                 <div class="card-body">
-                    <form method="POST" action="{{ route('users.store') }}"  role="form" enctype="multipart/form-data">
+                    <form method="POST" action="{{ route('worker.operation.pick-up.submit', ['jobGroupId' => $jobGroup->id ]) }}"  role="form" enctype="multipart/form-data">
                         @csrf
                         {{ Form::hidden('wet_weight', $jobGroup->wet_weight) }}
                         <div class="box box-info padding-1">
@@ -68,16 +68,27 @@
 </div>
 <script type="text/javascript">
 $(function(){
-    var number = '0';
+    var number = $('[name=wet_weight]').val();
+    var setPadResult = function(number){
+        var numbers = number.split('.');
+        if (numbers.length == 2) {
+            number = numbers[0] + '.' + numbers[1];
+            number = parseFloat(number);
+        } else {
+            number = parseInt(number);
+        }
+        $("#pad-result").html(number.toLocaleString());
+        $('[name=wet_weight]').val(number);
+    }
+    setPadResult(number);
     $('.pad-number').click(function(){
         var padNumber =  $.trim($(this).text())
-        number = number != '0' ? number + padNumber : padNumber;
+        padNumber = padNumber.replace(',', '');
+        number = number != '0' ? number + '' + padNumber : padNumber;
         if ( padNumber == 'ลบ') {
             number = '0';
         }
-        console.log('padNumber', padNumber);
-        console.log('number', number);
-        $("#pad-result").html(number);
+        setPadResult(number);
     })
 })
 </script>
