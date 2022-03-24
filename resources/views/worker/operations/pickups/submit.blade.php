@@ -66,16 +66,17 @@
         </div>
     </div>
 </div>
-<script>
-var $ = window.$;
+<script type="text/javascript">
 $(function(){
     var number = '0';
     $('.pad-number').click(function(){
-        var padNumber = $(this).text()
-        number = number + padNumber
+        var padNumber =  $.trim($(this).text())
+        number = number != '0' ? number + padNumber : padNumber;
         if ( padNumber == 'ลบ') {
             number = '0';
         }
+        console.log('padNumber', padNumber);
+        console.log('number', number);
         $("#pad-result").html(number);
     })
 })
