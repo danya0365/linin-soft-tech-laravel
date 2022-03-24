@@ -6,6 +6,8 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\CustomerGroup;
 use App\Models\Customer;
+use App\Models\Department;
+use App\Models\Employee;
 
 class DatabaseSeeder extends Seeder
 {
@@ -31,6 +33,12 @@ class DatabaseSeeder extends Seeder
             ->count(20)
             //->sequence(fn ($sequence) => ['name' => 'โรงพยาบาล ' . $sequence->index, 'group' => CustomerGroup::all()->random()])
             ->sequence(fn ($sequence) => ['customer_group_id' => CustomerGroup::all()->random()->id])
+            ->create();
+
+        Employee::factory()
+            ->count(100)
+            //->sequence(fn ($sequence) => ['name' => 'โรงพยาบาล ' . $sequence->index, 'group' => CustomerGroup::all()->random()])
+            ->sequence(fn ($sequence) => ['department_id' => Department::all()->random()->id])
             ->create();
     }
 }
