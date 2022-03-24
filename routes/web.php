@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Auth;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect('home');
 });
 
 Route::get('/test', function () {
@@ -61,4 +61,9 @@ Route::group(['prefix' => 'worker'], function () {
     Route::get('/stock', function () {
         return ['hello world'];
     })->name('worker.stock');
+});
+
+Route::group(['prefix' => 'admin'], function () {
+
+    Route::get('/', [App\Http\Controllers\AdminController::class, 'index'])->name('admin.index');
 });
