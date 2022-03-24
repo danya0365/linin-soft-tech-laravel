@@ -8,6 +8,12 @@
                 <div class="card-header">{{ __('Login') }}</div>
 
                 <div class="card-body">
+
+                    <div class="row mb-3">
+                        <div class="col-lg-8">
+                            <div class="bi bi-apple rounded-3 d-flex align-items-center justify-content-center p-3 py-6" style="font-size: 10em"></div>
+                        </div>
+                    </div>
                     <form method="POST" action="{{ route('login') }}">
                         @csrf
 
@@ -54,7 +60,7 @@
                         <div class="row mb-0">
                             <div class="col-md-8 offset-md-4">
                                 <button type="submit" class="btn btn-primary">
-                                    {{ __('Login') }}
+                                    <i class="bi bi-box-arrow-right"></i> {{ __('Login') }}
                                 </button>
 
                                 @if (Route::has('password.request'))
