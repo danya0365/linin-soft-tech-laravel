@@ -7,10 +7,10 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Laravel') }}</title>
+    <title>{{ __('Worker - LininSoftTech') }}</title>
 
     <!-- Scripts -->
-    <script src="{{ asset('js/app.js') }}" defer></script>
+    <script src="{{ asset('js/app.js') }}"></script>
 
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
@@ -60,8 +60,6 @@
                 </div>
             </div>
         </nav>
-
-        <!-- <x-breadcrumb :links="[['name' => "Worker", 'link' => "{{ route('worker.index') }}" ]]" /> -->
 
         <main class="py-4">
             @yield('content')

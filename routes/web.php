@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Auth;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect('home');
 });
 
 Route::get('/test', function () {
@@ -28,11 +28,13 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 
 Route::group(['middleware' => ['admin']], function () {
     Route::resource('users', App\Http\Controllers\UserController::class);
+    Route::resource('customer-groups', App\Http\Controllers\CustomerGroupController::class);
+    Route::resource('customers', App\Http\Controllers\CustomerController::class);
 });
 
-Route::group(['prefix' => 'worker'], function () {
+Route::group(['prefix' => 'worker', 'middleware' => ['auth']], function () {
 
-    Route::get('/', [App\Http\Controllers\WorkerController::class, 'index'])->name('worker.index');
+    Route::get('/', [App\Http\Controllers\WorkerController::class, 'index'])->name('worker');
 
     Route::get('/product', function () {
         return ['hello world'];
@@ -42,9 +44,38 @@ Route::group(['prefix' => 'worker'], function () {
         return ['hello world'];
     })->name('worker.customer');
 
-    Route::get('/operation', function () {
-        return ['hello world'];
-    })->name('worker.operation');
+    Route::group(['prefix' => 'operation'], function () {
+        Route::get('/', [App\Http\Controllers\Worker\OperationController::class, 'index'])->name('worker.operation');
+
+        Route::group(['prefix' => 'pickup'], function () {
+            Route::get('/employee', [App\Http\Controllers\Worker\Operation\PickupController::class, 'selectEmployee'])->name('worker.operation.pick-up.select-employee');
+            Route::get('/employee/{employeeId}', [App\Http\Controllers\Worker\Operation\PickupController::class, 'setSelectEmployee'])->name('worker.operation.pick-up.set-select-employee');
+            Route::get('/{jobGroupId}/customer', [App\Http\Controllers\Worker\Operation\PickupController::class, 'selectCustomer'])->name('worker.operation.pick-up.select-customer');
+            Route::get('/{jobGroupId}/customer/{customerId}', [App\Http\Controllers\Worker\Operation\PickupController::class, 'setSelectCustomer'])->name('worker.operation.pick-up.set-select-customer');
+            Route::get('/{jobGroupId}/submit', [App\Http\Controllers\Worker\Operation\PickupController::class, 'getSubmit'])->name('worker.operation.pick-up.submit');
+            Route::post('/{jobGroupId}/submit', [App\Http\Controllers\Worker\Operation\PickupController::class, 'postSubmit'])->name('worker.operation.pick-up.submit');
+        });
+
+        Route::group(['prefix' => 'wash'], function () {
+            Route::get('/', [App\Http\Controllers\Worker\Operation\WashController::class, 'index'])->name('worker.operation.wash');
+        });
+
+        Route::group(['prefix' => 'dry'], function () {
+            Route::get('/', [App\Http\Controllers\Worker\Operation\DryController::class, 'index'])->name('worker.operation.dry');
+        });
+
+        Route::group(['prefix' => 'iron'], function () {
+            Route::get('/', [App\Http\Controllers\Worker\Operation\IronController::class, 'index'])->name('worker.operation.iron');
+        });
+
+        Route::group(['prefix' => 'packing'], function () {
+            Route::get('/', [App\Http\Controllers\Worker\Operation\PackingController::class, 'index'])->name('worker.operation.packing');
+        });
+
+        Route::group(['prefix' => 'collect'], function () {
+            Route::get('/', [App\Http\Controllers\Worker\Operation\CollectController::class, 'index'])->name('worker.operation.collect');
+        });
+    });
 
     Route::get('/energy', function () {
         return ['hello world'];
@@ -61,4 +92,9 @@ Route::group(['prefix' => 'worker'], function () {
     Route::get('/stock', function () {
         return ['hello world'];
     })->name('worker.stock');
+});
+
+Route::group(['prefix' => 'admin'], function () {
+
+    Route::get('/', [App\Http\Controllers\AdminController::class, 'index'])->name('admin.index');
 });

@@ -30,7 +30,14 @@ Once the application's Docker containers have been started, you can access the a
 
 ### Execute NPM
 
+Install dependency
 ```sail yarn```
+
+Add new package
+```sail yarn add {packageName}```
+
+Build Js/css 
+```sail yarn dev```
 
 ### DB Seeder
 
