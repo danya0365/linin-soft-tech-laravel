@@ -55,4 +55,9 @@ class Job extends Model
   {
     return $this->belongsTo(Customer::class);
   }
+
+  public function jobGroup()
+  {
+    return $this->belongsTo(JobGroup::class);
+  }
 }

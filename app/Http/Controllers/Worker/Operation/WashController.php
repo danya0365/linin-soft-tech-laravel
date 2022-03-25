@@ -9,6 +9,7 @@ use App\Models\CustomerGroup;
 use App\Models\Department;
 use App\Models\JobGroup;
 use App\Models\Job;
+use App\Models\JobCase;
 
 class WashController extends Controller
 {
@@ -31,7 +32,7 @@ class WashController extends Controller
     {
         $job = Job::with('employee')->where('id', $jobId)->first();
         $customerGroup = CustomerGroup::with('customers')->get();
-        return view('worker.operations.wash.select-customer', ['customerGroups' => $customerGroup->toArray(), 'job' => $job]);
+        return view('worker.operations.wash.select-customer', ['customerGroups' => $customerGroup->toArray(), 'job' => $job->toArray()]);
     }
 
     public function setSelectCustomer($jobId, $customerId)
@@ -46,7 +47,7 @@ class WashController extends Controller
     {
         $job = Job::with('employee')->with('customer')->where('id', $jobId)->first();
         $todayJobGroups = JobGroup::where('customer_id', $job->customer_id)->whereDate('created_at', \Carbon\Carbon::today())->get();
-        return view('worker.operations.wash.select-job-group', ['todayJobGroups' => $todayJobGroups->toArray(), 'job' => $job]);
+        return view('worker.operations.wash.select-job-group', ['todayJobGroups' => $todayJobGroups->toArray(), 'job' => $job->toArray()]);
     }
 
     public function setSelectJobGroup($jobId, $jobGroupId)
@@ -54,6 +55,21 @@ class WashController extends Controller
         $job = Job::find($jobId);
         $job->job_group_id = $jobGroupId;
         $job->save();
-        return redirect(route('worker.operation.wash.select-linen-type', ['jobId' => $job->id]));
+        return redirect(route('worker.operation.wash.select-job-case', ['jobId' => $job->id]));
+    }
+
+    public function selectJobCase($jobId)
+    {
+        $job = Job::with('employee')->with('customer')->with('jobGroup')->where('id', $jobId)->first();
+        $jobCases = JobCase::$list;
+        return view('worker.operations.wash.select-job-case', ['job' => $job->toArray(), 'jobCases' => $jobCases]);
+    }
+
+    public function setSelectJobCase($jobId, $jobCase)
+    {
+        $job = Job::find($jobId);
+        $job->job_case = $jobCase;
+        $job->save();
+        return redirect(route('worker.operation.wash.select-washing-machine', ['jobId' => $job->id]));
     }
 }
