@@ -24,7 +24,7 @@
                             <a href="{{ route('worker.operation.wash.set-select-job-case', ['jobId' => $job['id'], 'jobCase' => $jobCase['var']]) }}">
                                 <div class="p-3 border bg-light" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center">
-                                        <div class="bi bi-building" style="font-size: 3em"></div>
+                                        <div class="bi {{ $jobCase['icon'] }}" style="font-size: 3em"></div>
                                     </div>
                                     <div class="text-center">{{ $jobCase['title'] }}</div>
                                 </div>
