@@ -24,6 +24,7 @@ class WashController extends Controller
     {
         $job = new Job;
         $job->employee_id = $employeeId;
+        $job->wash_employee_id = $employeeId;
         $job->status = 'wash';
         $job->save();
         return redirect(route('worker.operation.wash.select-customer', ['jobId' => $job->id]));
@@ -56,6 +57,8 @@ class WashController extends Controller
         $job = Job::find($jobId);
         $job->job_group_id = $jobGroupId;
         $job->save();
+
+        JobGroup::where('id', $jobGroupId)->update(['operation_status' => 'progress']);
         return redirect(route('worker.operation.wash.select-job-case', ['jobId' => $job->id]));
     }
 
@@ -78,14 +81,18 @@ class WashController extends Controller
     {
         $job = Job::with('employee')->with('customer')->with('jobGroup')->where('id', $jobId)->first();
         $washingMachines = WashingMachine::with('job')->get();
-        return view('worker.operations.wash.select-washing-machine', ['job' => $job->toArray(), 'washingMachines' => $washingMachines]);
+        return view('worker.operations.wash.select-washing-machine', ['job' => $job->toArray(), 'washingMachines' => $washingMachines->toArray()]);
     }
 
     public function setSelectWashingMachine($jobId, $washingMachineId)
     {
         $job = Job::find($jobId);
+        $prevWashingMachineId = $job->washing_machine_id;
         $job->washing_machine_id = $washingMachineId;
         $job->save();
+
+        if ($prevWashingMachineId) WashingMachine::where('id', $prevWashingMachineId)->update(['job_id' => null]);
+        WashingMachine::where('id', $washingMachineId)->update(['job_id' => $job->id]);
         return redirect(route('worker.operation.wash.select-linen-type', ['jobId' => $job->id]));
     }
 }

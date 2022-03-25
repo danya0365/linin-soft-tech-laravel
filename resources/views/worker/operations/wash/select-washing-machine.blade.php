@@ -28,6 +28,7 @@
                                         <div class="bi {{ $washingMachine['photo'] }}" style="font-size: 3em"></div>
                                     </div>
                                     <div class="text-center">{{ $washingMachine['name'] }}</div>
+                                    <div class="text-center">สถานะ: {{ $washingMachine['status_text'] }}</div>
                                 </div>
                             </a>
                         </div>

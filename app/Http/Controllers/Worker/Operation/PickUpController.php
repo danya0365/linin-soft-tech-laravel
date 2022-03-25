@@ -21,7 +21,8 @@ class PickUpController extends Controller
     {
         $jobGroup = new JobGroup;
         $jobGroup->employee_id = $employeeId;
-        $jobGroup->operation_status = 'progress';
+        $jobGroup->pickup_employee_id = $employeeId;
+        $jobGroup->operation_status = 'pickup';
         $jobGroup->save();
         return redirect(route('worker.operation.pick-up.select-customer', ['jobGroupId' => $jobGroup->id]));
     }

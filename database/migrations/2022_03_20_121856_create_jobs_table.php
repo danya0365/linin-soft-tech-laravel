@@ -18,6 +18,9 @@ return new class extends Migration
             $table->integer('job_group_id')->nullable();
             $table->integer('customer_id')->nullable();
             $table->integer('employee_id');
+            $table->integer('wash_employee_id')->nullable();
+            $table->integer('dry_employee_id')->nullable();
+            $table->integer('iron_employee_id')->nullable();
             $table->enum('job_case', ['new', 'edit'])->nullable();
             $table->integer('washing_machine_id')->nullable();
             $table->integer('dryer_machine_id')->nullable();

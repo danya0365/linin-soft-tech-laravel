@@ -42,4 +42,20 @@ class WashingMachine extends Model
   {
     return $this->belongsTo(Job::class);
   }
+
+  /**
+   * Convert the model instance to an array.
+   *
+   * @return array
+   */
+  public function toArray()
+  {
+    $array = parent::toArray();
+
+    $array['status_text'] = (function ($jobId) {
+      return $jobId ? 'ไม่ว่าง' : 'พร้อมใช้งาน';
+    })($array['job_id']);
+
+    return $array;
+  }
 }

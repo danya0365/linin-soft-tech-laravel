@@ -23,10 +23,11 @@
                             <a href="{{ route('worker.operation.wash.set-select-job-group', ['jobId' => $job['id'], 'jobGroupId' => $todayJobGroup['id']]) }}">
                                 <div class="p-3 border bg-light" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center">
-                                        <div class="bi bi-building" style="font-size: 3em"></div>
+                                        <div class="bi bi-hdd-rack" style="font-size: 3em"></div>
                                     </div>
                                     <div class="text-center">วันนี้ไปรับผ้า: {{ $todayJobGroup['created_at'] }}</div>
                                     <div class="text-center">น้ำหนักเปียกรวม: {{ $todayJobGroup['wet_weight'] }}</div>
+                                    <div class="text-center">สถานะ: {{ $todayJobGroup['operation_status'] }}</div>
                                 </div>
                             </a>
                         </div>
