@@ -67,6 +67,8 @@ Route::group(['prefix' => 'worker', 'middleware' => ['auth']], function () {
             Route::get('/employee', [App\Http\Controllers\Worker\Operation\WashController::class, 'selectEmployee'])->name('worker.operation.wash.select-employee');
             Route::get('/employee/{employeeId}', [App\Http\Controllers\Worker\Operation\WashController::class, 'setSelectEmployee'])->name('worker.operation.wash.set-select-employee');
             Route::get('/{jobId}/customer', [App\Http\Controllers\Worker\Operation\WashController::class, 'selectCustomer'])->name('worker.operation.wash.select-customer');
+            Route::get('/{jobId}/customer/{customerId}', [App\Http\Controllers\Worker\Operation\WashController::class, 'setSelectCustomer'])->name('worker.operation.wash.set-select-customer');
+            Route::get('/{jobId}/job-group', [App\Http\Controllers\Worker\Operation\WashController::class, 'selectJobGroup'])->name('worker.operation.wash.select-job-group');
         });
 
         Route::group(['prefix' => 'dry'], function () {

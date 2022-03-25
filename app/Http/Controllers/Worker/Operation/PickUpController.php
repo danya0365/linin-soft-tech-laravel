@@ -35,7 +35,7 @@ class PickUpController extends Controller
     public function setSelectCustomer($jobGroupId, $customerId)
     {
         $todayJob = JobGroup::where('customer_id', $customerId)->whereDate('created_at', \Carbon\Carbon::today())->get();
-        if ($todayJob) {
+        if ($todayJob->count() > 1) {
             // TODO: Notify to user here by alert box
             $jobGroup = JobGroup::find($jobGroupId);
             $jobGroup->customer_id = $customerId;
