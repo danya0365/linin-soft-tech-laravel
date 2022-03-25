@@ -61,6 +61,10 @@ class PickUpController extends Controller
         $jobGroup = JobGroup::find($jobGroupId);
         $jobGroup->wet_weight = $request->get('wet_weight');
         $jobGroup->save();
+
+        // TODO: update customer total_wet_weight
+        $totalWetWeight = JobGroup::where('customer_id', $jobGroup->customer_id)->sum('total_wet_weight');
+        Customer::where('id', $jobGroup->customer_id)->update(['total_wet_weight' => $totalWetWeight]);
         return view('worker.operations.pickups.submit', ['jobGroup' => $jobGroup]);
     }
 }
