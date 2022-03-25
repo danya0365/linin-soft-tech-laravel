@@ -12,12 +12,14 @@
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card">
-                <div class="card-header">{{ __('Worker Menu') }}</div>
+                <div class="card-header">{{ __('Admin Menu') }}</div>
                 <div class="card-body">
                     <div class="d-grid gap-3">
-                        <a class="btn btn-outline-secondary btn-lg" href="{{ route('users.index') }}" role="button">{{ __('User') }}</a>
+                        <a class="btn btn-outline-secondary btn-lg" href="{{ route('users.index') }}" role="button">{{ __('ไอดีล็อกอิน') }}</a>
                         <a class="btn btn-outline-secondary btn-lg" href="{{ route('customer-groups.index') }}" role="button">{{ __('กลุ่มลูกค้า') }}</a>
                         <a class="btn btn-outline-secondary btn-lg" href="{{ route('customers.index') }}" role="button">{{ __('ลูกค้า') }}</a>
+                        <a class="btn btn-outline-secondary btn-lg" href="{{ route('departments.index') }}" role="button">{{ __('แผนกพนักงาน') }}</a>
+                        <a class="btn btn-outline-secondary btn-lg" href="{{ route('employees.index') }}" role="button">{{ __('พนักงาน') }}</a>
                     </div>
                 </div>
             </div>

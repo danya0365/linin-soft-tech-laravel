@@ -26,10 +26,17 @@ Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
+
+Route::group(['prefix' => 'admin', 'middleware' => ['admin']], function () {
+    Route::get('/', [App\Http\Controllers\AdminController::class, 'index'])->name('admin');
+});
+
 Route::group(['middleware' => ['admin']], function () {
     Route::resource('users', App\Http\Controllers\UserController::class);
     Route::resource('customer-groups', App\Http\Controllers\CustomerGroupController::class);
     Route::resource('customers', App\Http\Controllers\CustomerController::class);
+    Route::resource('departments', App\Http\Controllers\DepartmentController::class);
+    Route::resource('employees', App\Http\Controllers\EmployeeController::class);
 });
 
 Route::group(['prefix' => 'worker', 'middleware' => ['auth']], function () {
@@ -92,9 +99,4 @@ Route::group(['prefix' => 'worker', 'middleware' => ['auth']], function () {
     Route::get('/stock', function () {
         return ['hello world'];
     })->name('worker.stock');
-});
-
-Route::group(['prefix' => 'admin'], function () {
-
-    Route::get('/', [App\Http\Controllers\AdminController::class, 'index'])->name('admin.index');
 });
