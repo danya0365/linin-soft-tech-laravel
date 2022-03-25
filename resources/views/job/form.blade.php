@@ -32,9 +32,9 @@
             {!! $errors->first('dryer_machine_id', '<div class="invalid-feedback">:message</div>') !!}
         </div>
         <div class="form-group">
-            {{ Form::label('laundry_type_id') }}
-            {{ Form::text('laundry_type_id', $job->laundry_type_id, ['class' => 'form-control' . ($errors->has('laundry_type_id') ? ' is-invalid' : ''), 'placeholder' => 'Laundry Type Id']) }}
-            {!! $errors->first('laundry_type_id', '<div class="invalid-feedback">:message</div>') !!}
+            {{ Form::label('linen_type_id') }}
+            {{ Form::text('linen_type_id', $job->linen_type_id, ['class' => 'form-control' . ($errors->has('linen_type_id') ? ' is-invalid' : ''), 'placeholder' => 'Laundry Type Id']) }}
+            {!! $errors->first('linen_type_id', '<div class="invalid-feedback">:message</div>') !!}
         </div>
         <div class="form-group">
             {{ Form::label('wet_weight') }}

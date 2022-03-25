@@ -45,8 +45,8 @@
                             {{ $job->dryer_machine_id }}
                         </div>
                         <div class="form-group">
-                            <strong>Laundry Type Id:</strong>
-                            {{ $job->laundry_type_id }}
+                            <strong>Linen Type Id:</strong>
+                            {{ $job->linen_type_id }}
                         </div>
                         <div class="form-group">
                             <strong>Wet Weight:</strong>

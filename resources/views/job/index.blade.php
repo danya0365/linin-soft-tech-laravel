@@ -62,7 +62,7 @@
 											<td>{{ $job->job_type }}</td>
 											<td>{{ $job->washing_machine_id }}</td>
 											<td>{{ $job->dryer_machine_id }}</td>
-											<td>{{ $job->laundry_type_id }}</td>
+											<td>{{ $job->linen_type_id }}</td>
 											<td>{{ $job->wet_weight }}</td>
 											<td>{{ $job->color }}</td>
 											<td>{{ $job->status }}</td>

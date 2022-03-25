@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property $job_type
  * @property $washing_machine_id
  * @property $dryer_machine_id
- * @property $laundry_type_id
+ * @property $linen_type_id
  * @property $wet_weight
  * @property $color
  * @property $status
@@ -43,7 +43,7 @@ class Job extends Model
    *
    * @var array
    */
-  protected $fillable = ['job_group_id', 'customer_id', 'employee_id', 'job_type', 'washing_machine_id', 'dryer_machine_id', 'laundry_type_id', 'wet_weight', 'color', 'status', 'tags'];
+  protected $fillable = ['job_group_id', 'customer_id', 'employee_id', 'job_type', 'washing_machine_id', 'dryer_machine_id', 'linen_type_id', 'wet_weight', 'color', 'status', 'tags'];
 
 
   public function employee()
