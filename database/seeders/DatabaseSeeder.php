@@ -8,6 +8,7 @@ use App\Models\CustomerGroup;
 use App\Models\Customer;
 use App\Models\Department;
 use App\Models\Employee;
+use App\Models\WashingMachine;
 
 class DatabaseSeeder extends Seeder
 {
@@ -39,6 +40,12 @@ class DatabaseSeeder extends Seeder
             ->count(100)
             //->sequence(fn ($sequence) => ['name' => 'โรงพยาบาล ' . $sequence->index, 'group' => CustomerGroup::all()->random()])
             ->sequence(fn ($sequence) => ['department_id' => Department::all()->random()->id])
+            ->create();
+
+
+        WashingMachine::factory()
+            ->count(30)
+            ->sequence(fn ($sequence) => ['name' => 'เครื่องซักผ้า ' . $sequence->index + 1, 'photo' => 'bi-server'])
             ->create();
     }
 }

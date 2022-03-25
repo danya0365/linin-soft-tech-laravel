@@ -10,6 +10,7 @@ use App\Models\Department;
 use App\Models\JobGroup;
 use App\Models\Job;
 use App\Models\JobCase;
+use App\Models\WashingMachine;
 
 class WashController extends Controller
 {
@@ -71,5 +72,20 @@ class WashController extends Controller
         $job->job_case = $jobCase;
         $job->save();
         return redirect(route('worker.operation.wash.select-washing-machine', ['jobId' => $job->id]));
+    }
+
+    public function selectWashingMachine($jobId)
+    {
+        $job = Job::with('employee')->with('customer')->with('jobGroup')->where('id', $jobId)->first();
+        $washingMachines = WashingMachine::with('job')->get();
+        return view('worker.operations.wash.select-washing-machine', ['job' => $job->toArray(), 'washingMachines' => $washingMachines]);
+    }
+
+    public function setSelectWashingMachine($jobId, $washingMachineId)
+    {
+        $job = Job::find($jobId);
+        $job->washing_machine_id = $washingMachineId;
+        $job->save();
+        return redirect(route('worker.operation.wash.select-linen-type', ['jobId' => $job->id]));
     }
 }

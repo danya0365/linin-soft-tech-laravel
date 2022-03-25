@@ -60,4 +60,25 @@ class Job extends Model
   {
     return $this->belongsTo(JobGroup::class);
   }
+
+  /**
+   * Convert the model instance to an array.
+   *
+   * @return array
+   */
+  public function toArray()
+  {
+    $array = parent::toArray();
+
+    $array['job_case'] = (function ($jobVar) {
+      foreach (JobCase::$list as $jobCase) {
+        if ($jobCase['var'] == $jobVar) {
+          return $jobCase;
+        }
+      }
+      return $jobVar;
+    })($array['job_case']);
+
+    return $array;
+  }
 }

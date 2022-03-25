@@ -1,0 +1,45 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+
+/**
+ * Class WashingMachine
+ *
+ * @property $id
+ * @property $name
+ * @property $photo
+ * @property $maximum_weight
+ * @property $created_at
+ * @property $updated_at
+ *
+ * @package App
+ * @mixin \Illuminate\Database\Eloquent\Builder
+ */
+class WashingMachine extends Model
+{
+  use HasFactory;
+
+  static $rules = [
+    'name' => 'required',
+    'photo' => 'required',
+    'maximum_weight' => 'required',
+  ];
+
+  protected $perPage = 20;
+
+  /**
+   * Attributes that should be mass-assignable.
+   *
+   * @var array
+   */
+  protected $fillable = ['name', 'photo', 'maximum_weight', 'job_id'];
+
+
+  public function job()
+  {
+    return $this->belongsTo(Job::class);
+  }
+}

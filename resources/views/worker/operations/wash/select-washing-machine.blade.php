@@ -10,23 +10,24 @@
           <li class="breadcrumb-item"><a href="{{ route('worker.operation.wash.select-employee') }}">พนักงาน: {{ $job['employee']['name'] }}</a></li>
           <li class="breadcrumb-item"><a href="{{ route('worker.operation.wash.select-customer', ['jobId' => $job['id']]) }}">ลูกค้า: {{ $job['customer']['name'] }}</a></li>
           <li class="breadcrumb-item"><a href="{{ route('worker.operation.wash.select-job-group', ['jobId' => $job['id']]) }}">ตู้เก็บน้ำหนัก: {{ $job['job_group']['wet_weight'] }}</a></li>
-          <li class="breadcrumb-item active" aria-current="page">ซัก - เลือกเคสงาน</li>
+          <li class="breadcrumb-item"><a href="{{ route('worker.operation.wash.select-job-case', ['jobId' => $job['id']]) }}">{{ $job['job_case']['name'] }}</a></li>
+          <li class="breadcrumb-item active" aria-current="page">ซัก - เลือกเครื่องซักผ้า</li>
         </ol>
     </nav>
     <div class="row justify-content-center">
         <div class="col-md-12 m-2">
             <div class="card">
-                <div class="card-header">เคสงาน</div>
+                <div class="card-header">เครื่องซักผ้า</div>
                 <div class="card-body">
                     <div class="row g-2">
-                        @foreach ($jobCases as $jobCase )
-                        <div class="col-sm-6">
-                            <a href="{{ route('worker.operation.wash.set-select-job-case', ['jobId' => $job['id'], 'jobCase' => $jobCase['var']]) }}">
+                        @foreach ($washingMachines as $washingMachine )
+                        <div class="col-sm-4">
+                            <a href="{{ route('worker.operation.wash.set-select-washing-machine', ['jobId' => $job['id'], 'washingMachineId' => $washingMachine['id']]) }}">
                                 <div class="p-3 border bg-light" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center">
-                                        <div class="bi {{ $jobCase['icon'] }}" style="font-size: 3em"></div>
+                                        <div class="bi {{ $washingMachine['photo'] }}" style="font-size: 3em"></div>
                                     </div>
-                                    <div class="text-center">{{ $jobCase['name'] }}</div>
+                                    <div class="text-center">{{ $washingMachine['name'] }}</div>
                                 </div>
                             </a>
                         </div>
