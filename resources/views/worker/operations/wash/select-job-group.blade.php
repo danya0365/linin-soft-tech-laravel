@@ -8,24 +8,25 @@
           <li class="breadcrumb-item"><a href="{{ route('worker') }}">Worker</a></li>
           <li class="breadcrumb-item"><a href="{{ route('worker.operation') }}">ปฏิบัติการ</a></li>
           <li class="breadcrumb-item"><a href="{{ route('worker.operation.wash.select-employee') }}">พนักงาน: {{ $job['employee']['name'] }}</a></li>
-          <li class="breadcrumb-item active" aria-current="page">ซัก - เลือกลูกค้า</li>
+          <li class="breadcrumb-item"><a href="{{ route('worker.operation.wash.select-customer', ['jobId' => $job['id']]) }}">ลูกค้า: {{ $job['customer']['name'] }}</a></li>
+          <li class="breadcrumb-item active" aria-current="page">ซัก - เลือกตู้เก็บผ้า</li>
         </ol>
     </nav>
     <div class="row justify-content-center">
-        @foreach ($customerGroups as $customerGroup)
         <div class="col-md-12 m-2">
             <div class="card">
-                <div class="card-header">{{ $customerGroup['name'] }}</div>
+                <div class="card-header">ตู้เก็บผ้าวันนี้ของลูกค้า: {{ $job['customer']['name'] }}</div>
                 <div class="card-body">
                     <div class="row g-2">
-                        @foreach ($customerGroup['customers'] as $customer)
+                        @foreach ($todayJobGroups as $todayJobGroup )
                         <div class="col-sm-4">
-                            <a href="{{ route('worker.operation.wash.set-select-customer', ['jobId' => $job['id'], 'customerId' => $customer['id']]) }}">
+                            <a href="{{ route('worker.operation.wash.set-select-job-group', ['jobId' => $job['id'], 'jobGroupId' => $todayJobGroup['id']]) }}">
                                 <div class="p-3 border bg-light" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center">
                                         <div class="bi bi-building" style="font-size: 3em"></div>
                                     </div>
-                                    <div class="text-center">{{ $customer['name'] }}</div>
+                                    <div class="text-center">วันนี้ไปรับผ้า: {{ $todayJobGroup['created_at'] }}</div>
+                                    <div class="text-center">น้ำหนักเปียกรวม: {{ $todayJobGroup['wet_weight'] }}</div>
                                 </div>
                             </a>
                         </div>
@@ -34,7 +35,6 @@
                 </div>
             </div>
         </div>
-        @endforeach
     </div>
 </div>
 @endsection

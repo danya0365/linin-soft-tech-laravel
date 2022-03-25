@@ -7,6 +7,8 @@
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="{{ route('worker') }}">Worker</a></li>
           <li class="breadcrumb-item"><a href="{{ route('worker.operation') }}">ปฏิบัติการ</a></li>
+          <li class="breadcrumb-item"><a href="{{ route('worker.operation.pick-up.select-employee') }}">พนักงาน: {{ $jobGroup['employee']['name'] }}</a></li>
+          <li class="breadcrumb-item"><a href="{{ route('worker.operation.pick-up.select-employee') }}">ลูกค้า: {{ $jobGroup['customer']['name'] }}</a></li>
           <li class="breadcrumb-item active" aria-current="page">รับสินค้า - แบบฟอร์ม Submit</li>
         </ol>
     </nav>

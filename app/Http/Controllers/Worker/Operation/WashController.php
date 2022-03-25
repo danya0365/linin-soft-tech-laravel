@@ -29,14 +29,13 @@ class WashController extends Controller
 
     public function selectCustomer($jobId)
     {
+        $job = Job::with('employee')->where('id', $jobId)->first();
         $customerGroup = CustomerGroup::with('customers')->get();
-        return view('worker.operations.wash.select-customer', ['customerGroups' => $customerGroup->toArray(), 'jobId' => $jobId]);
+        return view('worker.operations.wash.select-customer', ['customerGroups' => $customerGroup->toArray(), 'job' => $job]);
     }
 
     public function setSelectCustomer($jobId, $customerId)
     {
-        $todayJobs = JobGroup::where('customer_id', $customerId)->whereDate('created_at', \Carbon\Carbon::today())->get();
-
         $job = Job::find($jobId);
         $job->customer_id = $customerId;
         $job->save();
@@ -45,8 +44,16 @@ class WashController extends Controller
 
     public function selectJobGroup($jobId)
     {
+        $job = Job::with('employee')->with('customer')->where('id', $jobId)->first();
+        $todayJobGroups = JobGroup::where('customer_id', $job->customer_id)->whereDate('created_at', \Carbon\Carbon::today())->get();
+        return view('worker.operations.wash.select-job-group', ['todayJobGroups' => $todayJobGroups->toArray(), 'job' => $job]);
+    }
+
+    public function setSelectJobGroup($jobId, $jobGroupId)
+    {
         $job = Job::find($jobId);
-        $todayJobGroups = JobGroup::where('customer_id', $job->customerId)->whereDate('created_at', \Carbon\Carbon::today())->get();
-        return view('worker.operations.wash.select-job-group', ['todayJobGroups' => $todayJobGroups->toArray(), 'jobId' => $jobId]);
+        $job->job_group_id = $jobGroupId;
+        $job->save();
+        return redirect(route('worker.operation.wash.select-linen-type', ['jobId' => $job->id]));
     }
 }

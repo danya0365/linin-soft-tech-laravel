@@ -28,8 +28,9 @@ class PickUpController extends Controller
 
     public function selectCustomer($jobGroupId)
     {
+        $jobGroup = JobGroup::with('employee')->where('id', $jobGroupId)->first();
         $customerGroup = CustomerGroup::with('customers')->get();
-        return view('worker.operations.pickups.select-customer', ['customerGroups' => $customerGroup->toArray(), 'jobGroupId' => $jobGroupId]);
+        return view('worker.operations.pickups.select-customer', ['customerGroups' => $customerGroup->toArray(), 'jobGroup' => $jobGroup->toArray()]);
     }
 
     public function setSelectCustomer($jobGroupId, $customerId)
@@ -45,13 +46,12 @@ class PickUpController extends Controller
             $jobGroup->customer_id = $customerId;
             $jobGroup->save();
         }
-
         return redirect(route('worker.operation.pick-up.submit', ['jobGroupId' => $jobGroup->id]));
     }
 
     public function getSubmit(Request $request, $jobGroupId)
     {
-        $jobGroup = JobGroup::find($jobGroupId);
+        $jobGroup = JobGroup::with('employee')->with('customer')->where('id', $jobGroupId)->first();
         return view('worker.operations.pickups.submit', ['jobGroup' => $jobGroup]);
     }
 

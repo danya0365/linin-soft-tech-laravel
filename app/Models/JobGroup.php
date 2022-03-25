@@ -40,4 +40,14 @@ class JobGroup extends Model
    * @var array
    */
   protected $fillable = ['customer_id', 'employee_id', 'wet_weight', 'dry_weight', 'total_pieces', 'operation_status'];
+
+  public function employee()
+  {
+    return $this->belongsTo(Employee::class);
+  }
+
+  public function customer()
+  {
+    return $this->belongsTo(Customer::class);
+  }
 }
