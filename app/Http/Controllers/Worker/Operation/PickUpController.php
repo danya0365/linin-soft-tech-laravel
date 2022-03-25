@@ -7,6 +7,7 @@ use App\Models\Customer;
 use Illuminate\Http\Request;
 use App\Models\CustomerGroup;
 use App\Models\Department;
+use App\Models\EmployeeOperationLog;
 use App\Models\JobGroup;
 
 class PickUpController extends Controller
@@ -24,6 +25,12 @@ class PickUpController extends Controller
         $jobGroup->pickup_employee_id = $employeeId;
         $jobGroup->operation_status = 'pickup';
         $jobGroup->save();
+
+        $employeeOperationLog = new EmployeeOperationLog;
+        $employeeOperationLog->employee_id = $employeeId;
+        $employeeOperationLog->operation_type = 'pickup';
+        $employeeOperationLog->action_type = 'start';
+        $employeeOperationLog->save();
         return redirect(route('worker.operation.pick-up.select-customer', ['jobGroupId' => $jobGroup->id]));
     }
 

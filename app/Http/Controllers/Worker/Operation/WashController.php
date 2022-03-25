@@ -11,12 +11,13 @@ use App\Models\JobGroup;
 use App\Models\Job;
 use App\Models\JobCase;
 use App\Models\WashingMachine;
+use App\Models\EmployeeOperationLog;
 
 class WashController extends Controller
 {
     public function selectEmployee()
     {
-        $departments = Department::with('employees')->where('id', 1)->get();
+        $departments = Department::with('employees')->where('id', 2)->get();
         return view('worker.operations.wash.select-employee', ['departments' => $departments->toArray()]);
     }
 
@@ -27,6 +28,12 @@ class WashController extends Controller
         $job->wash_employee_id = $employeeId;
         $job->status = 'wash';
         $job->save();
+
+        $employeeOperationLog = new EmployeeOperationLog;
+        $employeeOperationLog->employee_id = $employeeId;
+        $employeeOperationLog->operation_type = 'wash';
+        $employeeOperationLog->action_type = 'start';
+        $employeeOperationLog->save();
         return redirect(route('worker.operation.wash.select-customer', ['jobId' => $job->id]));
     }
 
@@ -58,7 +65,16 @@ class WashController extends Controller
         $job->job_group_id = $jobGroupId;
         $job->save();
 
-        JobGroup::where('id', $jobGroupId)->update(['operation_status' => 'progress']);
+        $jobGroup = JobGroup::find($jobGroupId);
+        $jobGroup->operation_status = 'progress';
+        $jobGroup->save();
+
+        $employeeOperationLog = new EmployeeOperationLog;
+        $employeeOperationLog->employee_id = $jobGroup->pickup_employee_id;
+        $employeeOperationLog->operation_type = 'pickup';
+        $employeeOperationLog->action_type = 'stop';
+        $employeeOperationLog->save();
+
         return redirect(route('worker.operation.wash.select-job-case', ['jobId' => $job->id]));
     }
 
