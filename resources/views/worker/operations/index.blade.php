@@ -17,7 +17,7 @@
                     <div class="d-grid gap-3">
                         <a class="btn btn-outline-secondary btn-lg" href="{{ route('worker.operation.pick-up.select-employee') }}" role="button">{{ __('รับสินค้า') }}</a>
                         <a class="btn btn-outline-secondary btn-lg" href="{{ route('worker.operation.wash.select-employee') }}" role="button">{{ __('ซัก') }}</a>
-                        <a class="btn btn-outline-secondary btn-lg" href="{{ route('worker.operation.dry') }}" role="button">{{ __('อบ') }}</a>
+                        <a class="btn btn-outline-secondary btn-lg" href="{{ route('worker.operation.dry.select-job') }}" role="button">{{ __('อบ') }}</a>
                         <a class="btn btn-outline-secondary btn-lg" href="{{ route('worker.operation.iron') }}" role="button">{{ __('รีด') }}</a>
                         <a class="btn btn-outline-secondary btn-lg" href="{{ route('worker.operation.packing') }}" role="button">{{ __('พับแพ็ค') }}</a>
                         <a class="btn btn-outline-secondary btn-lg" href="{{ route('worker.operation.collect') }}" role="button">{{ __('จัดเก็บ') }}</a>

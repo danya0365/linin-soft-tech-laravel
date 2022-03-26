@@ -64,6 +64,13 @@ Add route.php
 
 ```yarn && yarn dev```
 
+### Generate Rnum
+
+สร้าง enum UserType
+```
+php artisan make:enum UserType
+```
+
 ### CronJob Schedule
 
 add new command

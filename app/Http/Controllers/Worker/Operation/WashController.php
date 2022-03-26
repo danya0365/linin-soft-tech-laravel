@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers\Worker\Operation;
 
+use App\Enums\EmployeeOperationActionType;
+use App\Enums\JobGroupStatus;
+use App\Enums\WorkerOperationStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use Illuminate\Http\Request;
@@ -70,13 +73,13 @@ class WashController extends Controller
         $job->save();
 
         $jobGroup = JobGroup::find($jobGroupId);
-        $jobGroup->operation_status = 'progress';
+        $jobGroup->operation_status = JobGroupStatus::Progress();
         $jobGroup->save();
 
         $employeeOperationLog = new EmployeeOperationLog;
         $employeeOperationLog->employee_id = $jobGroup->pickup_employee_id;
-        $employeeOperationLog->operation_type = 'pickup';
-        $employeeOperationLog->action_type = 'stop';
+        $employeeOperationLog->operation_type = WorkerOperationStatus::PickUp();
+        $employeeOperationLog->action_type = EmployeeOperationActionType::Stop();
         $employeeOperationLog->save();
 
         return redirect(route('worker.operation.wash.select-job-case', ['jobId' => $job->id]));
@@ -159,8 +162,8 @@ class WashController extends Controller
 
         $employeeOperationLog = new EmployeeOperationLog;
         $employeeOperationLog->employee_id = $job->wash_employee_id;
-        $employeeOperationLog->operation_type = 'wash';
-        $employeeOperationLog->action_type = 'progress';
+        $employeeOperationLog->operation_type = WorkerOperationStatus::Wash();
+        $employeeOperationLog->action_type = EmployeeOperationActionType::Progress();
         $employeeOperationLog->save();
 
         $job = Job::with('employee')->with('customer')->with('jobGroup')->with('washingMachine')->with('linenType')->where('id', $jobId)->first();
@@ -195,13 +198,13 @@ class WashController extends Controller
 
             // $sum      = $second + $minute + $hours + $day + $week + $month + $year;
             $interval = 0;
-            $start = EmployeeOperationLog::where('operation_type', 'wash')
+            $start = EmployeeOperationLog::where('operation_type', WorkerOperationStatus::Wash())
                 ->where('action_type', 'start')
                 ->where('employee_id', $job->wash_employee_id)
                 ->orderBy('id', 'desc')
                 ->first();
             if ($start) {
-                $end = EmployeeOperationLog::where('operation_type', 'wash')
+                $end = EmployeeOperationLog::where('operation_type', WorkerOperationStatus::Wash())
                     ->where('employee_id', $job->wash_employee_id)
                     ->orderBy('id', 'desc')
                     ->first();

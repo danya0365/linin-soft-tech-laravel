@@ -49,4 +49,9 @@ class Customer extends Model
   {
     return $this->belongsTo(CustomerGroup::class);
   }
+
+  public function jobs()
+  {
+    return $this->toMany(Job::class);
+  }
 }
