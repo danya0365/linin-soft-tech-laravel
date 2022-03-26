@@ -6,19 +6,14 @@ use App\Enums\DepartmentNameId;
 use App\Enums\EmployeeOperationActionType;
 use App\Enums\WorkerOperationStatus;
 use App\Http\Controllers\Controller;
-use App\Models\Customer;
 use Illuminate\Http\Request;
-use App\Models\CustomerGroup;
 use App\Models\Department;
 use App\Models\DryerMachine;
-use App\Models\JobGroup;
 use App\Models\Job;
-use App\Models\JobCase;
-use App\Models\WashingMachine;
 use App\Models\EmployeeOperationLog;
-use App\Models\LinenProduct;
 use App\Models\LinenType;
 use Carbon\CarbonInterval;
+use App\Translations\Translator;
 
 class DryController extends Controller
 {
@@ -126,5 +121,58 @@ class DryController extends Controller
         $employeeOperationLog->action_type = EmployeeOperationActionType::Progress();
         $employeeOperationLog->save();
         return redirect(route('worker.operation.dry.employee-result', ['jobId' => $job->id]));
+    }
+
+
+    public function getEmployeeResult($jobId)
+    {
+        $linenTypes = LinenType::with('linenProducts')->get();
+        $job = Job::with('employee')->with('customer')->with('jobGroup')->with('washingMachine')->with('dryerMachine')->with('linenType')->with('washEmployee')->with('dryEmployee')->where('id', $jobId)->first();
+
+        $summaryReports = (function () use ($linenTypes, $job) {
+            $totalValue = 0;
+            $summaryReports = [];
+            foreach ($linenTypes as $linenType) {
+                $value = Job::where('dry_employee_id', $job->dry_employee_id)->where('linen_type_id', $linenType->id)->sum('wet_weight');
+                $totalValue += $value;
+                $summaryReports[] = ['title' => $linenType->name, 'value' => $value];
+            }
+            $summaryReports[] = ['title' => 'จำนวนที่อบแล้ว', 'value' => $totalValue];
+            return $summaryReports;
+        })();
+
+        $workingDuration = (function () use ($job) {
+            // $second = 1;
+            // $minute = 60 * $second;
+            // $hours  = 60 * $minute;
+            // $day    = 24 * $hours;
+            // $week   = 7  * $day;
+            // $month  = 4  * $week;
+            // $year   = 12 * $month;
+
+            // $sum      = $second + $minute + $hours + $day + $week + $month + $year;
+            $interval = 0;
+            $start = EmployeeOperationLog::where('operation_type', WorkerOperationStatus::Dry())
+                ->where('action_type', EmployeeOperationActionType::Start())
+                ->where('employee_id', $job->dry_employee_id)
+                ->orderBy('id', 'desc')
+                ->first();
+            if ($start) {
+                $end = EmployeeOperationLog::where('operation_type', WorkerOperationStatus::Dry())
+                    ->where('employee_id', $job->dry_employee_id)
+                    ->orderBy('id', 'desc')
+                    ->first();
+                $diff = $start->created_at->diff($end->created_at);
+                $interval = (function (\DateInterval $interval) {
+                    return $interval->days * 86400 + $interval->h * 3600 + $interval->i * 60 + $interval->s;
+                })($diff);
+            }
+            $interval = CarbonInterval::seconds($interval)->cascade();
+
+            $interval->setLocalTranslator(new Translator());
+            return $interval->forHumans();
+        })();
+
+        return view('worker.operations.wash.employee-result', ['job' => $job->toArray(), 'summaryReports' => $summaryReports, 'workingDuration' => $workingDuration]);
     }
 }

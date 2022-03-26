@@ -7,7 +7,6 @@ use App\Enums\EmployeeOperationActionType;
 use App\Enums\JobGroupStatus;
 use App\Enums\WorkerOperationStatus;
 use App\Http\Controllers\Controller;
-use App\Models\Customer;
 use Illuminate\Http\Request;
 use App\Models\CustomerGroup;
 use App\Models\Department;
@@ -198,7 +197,7 @@ class WashController extends Controller
             // $sum      = $second + $minute + $hours + $day + $week + $month + $year;
             $interval = 0;
             $start = EmployeeOperationLog::where('operation_type', WorkerOperationStatus::Wash())
-                ->where('action_type', 'start')
+                ->where('action_type', EmployeeOperationActionType::Start())
                 ->where('employee_id', $job->wash_employee_id)
                 ->orderBy('id', 'desc')
                 ->first();

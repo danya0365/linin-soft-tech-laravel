@@ -90,6 +90,7 @@ Route::group(['prefix' => 'worker', 'middleware' => ['auth']], function () {
             Route::get('/{jobId}/dryer-machine/{dryerMachineId}', [App\Http\Controllers\Worker\Operation\DryController::class, 'setSelectDryerMachine'])->name('worker.operation.dry.set-select-dryer-machine');
             Route::get('/{jobId}/submit', [App\Http\Controllers\Worker\Operation\DryController::class, 'getSubmit'])->name('worker.operation.dry.submit');
             Route::post('/{jobId}/submit', [App\Http\Controllers\Worker\Operation\DryController::class, 'postSubmit'])->name('worker.operation.dry.submit');
+            Route::get('/{jobId}/employee-result', [App\Http\Controllers\Worker\Operation\DryController::class, 'getEmployeeResult'])->name('worker.operation.dry.employee-result');
         });
 
         Route::group(['prefix' => 'iron'], function () {
