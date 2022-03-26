@@ -7,6 +7,7 @@ use Illuminate\Database\Seeder;
 use App\Models\CustomerGroup;
 use App\Models\Customer;
 use App\Models\Department;
+use App\Models\DryerMachine;
 use App\Models\Employee;
 use App\Models\WashingMachine;
 
@@ -21,6 +22,10 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
+        DryerMachine::factory()
+            ->count(30)
+            ->sequence(fn ($sequence) => ['name' => 'เครื่องอบผ้า ' . $sequence->index + 1, 'photo' => 'bi-server'])
+            ->create();
         $this->call([
             UserSeeder::class,
             DepartmentSeeder::class,
@@ -49,6 +54,11 @@ class DatabaseSeeder extends Seeder
         WashingMachine::factory()
             ->count(30)
             ->sequence(fn ($sequence) => ['name' => 'เครื่องซักผ้า ' . $sequence->index + 1, 'photo' => 'bi-server'])
+            ->create();
+
+        DryerMachine::factory()
+            ->count(30)
+            ->sequence(fn ($sequence) => ['name' => 'เครื่องอบผ้า ' . $sequence->index + 1, 'photo' => 'bi-server'])
             ->create();
     }
 }

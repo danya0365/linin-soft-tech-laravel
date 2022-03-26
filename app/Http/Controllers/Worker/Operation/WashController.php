@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers\Worker\Operation;
 
+use App\Enums\DepartmentNameId;
+use App\Enums\EmployeeOperationActionType;
+use App\Enums\JobGroupStatus;
+use App\Enums\WorkerOperationStatus;
 use App\Http\Controllers\Controller;
-use App\Models\Customer;
 use Illuminate\Http\Request;
 use App\Models\CustomerGroup;
 use App\Models\Department;
@@ -15,12 +18,13 @@ use App\Models\EmployeeOperationLog;
 use App\Models\LinenProduct;
 use App\Models\LinenType;
 use Carbon\CarbonInterval;
+use App\Translations\Translator;
 
 class WashController extends Controller
 {
     public function selectEmployee()
     {
-        $departments = Department::with('employees')->where('id', 2)->get();
+        $departments = Department::with('employees')->where('id', DepartmentNameId::Wash())->get();
         return view('worker.operations.wash.select-employee', ['departments' => $departments->toArray()]);
     }
 
@@ -29,13 +33,13 @@ class WashController extends Controller
         $job = new Job;
         $job->employee_id = $employeeId;
         $job->wash_employee_id = $employeeId;
-        $job->status = 'wash';
+        $job->status = WorkerOperationStatus::Wash();
         $job->save();
 
         $employeeOperationLog = new EmployeeOperationLog;
         $employeeOperationLog->employee_id = $employeeId;
-        $employeeOperationLog->operation_type = 'wash';
-        $employeeOperationLog->action_type = 'start';
+        $employeeOperationLog->operation_type = WorkerOperationStatus::Wash();
+        $employeeOperationLog->action_type = EmployeeOperationActionType::Start();
         $employeeOperationLog->save();
         return redirect(route('worker.operation.wash.select-customer', ['jobId' => $job->id]));
     }
@@ -69,13 +73,13 @@ class WashController extends Controller
         $job->save();
 
         $jobGroup = JobGroup::find($jobGroupId);
-        $jobGroup->operation_status = 'progress';
+        $jobGroup->operation_status = JobGroupStatus::Progress();
         $jobGroup->save();
 
         $employeeOperationLog = new EmployeeOperationLog;
         $employeeOperationLog->employee_id = $jobGroup->pickup_employee_id;
-        $employeeOperationLog->operation_type = 'pickup';
-        $employeeOperationLog->action_type = 'stop';
+        $employeeOperationLog->operation_type = WorkerOperationStatus::PickUp();
+        $employeeOperationLog->action_type = EmployeeOperationActionType::Stop();
         $employeeOperationLog->save();
 
         return redirect(route('worker.operation.wash.select-job-case', ['jobId' => $job->id]));
@@ -158,11 +162,9 @@ class WashController extends Controller
 
         $employeeOperationLog = new EmployeeOperationLog;
         $employeeOperationLog->employee_id = $job->wash_employee_id;
-        $employeeOperationLog->operation_type = 'wash';
-        $employeeOperationLog->action_type = 'progress';
+        $employeeOperationLog->operation_type = WorkerOperationStatus::Wash();
+        $employeeOperationLog->action_type = EmployeeOperationActionType::Progress();
         $employeeOperationLog->save();
-
-        $job = Job::with('employee')->with('customer')->with('jobGroup')->with('washingMachine')->with('linenType')->where('id', $jobId)->first();
         return redirect(route('worker.operation.wash.employee-result', ['jobId' => $job->id]));
     }
 
@@ -194,13 +196,13 @@ class WashController extends Controller
 
             // $sum      = $second + $minute + $hours + $day + $week + $month + $year;
             $interval = 0;
-            $start = EmployeeOperationLog::where('operation_type', 'wash')
-                ->where('action_type', 'start')
+            $start = EmployeeOperationLog::where('operation_type', WorkerOperationStatus::Wash())
+                ->where('action_type', EmployeeOperationActionType::Start())
                 ->where('employee_id', $job->wash_employee_id)
                 ->orderBy('id', 'desc')
                 ->first();
             if ($start) {
-                $end = EmployeeOperationLog::where('operation_type', 'wash')
+                $end = EmployeeOperationLog::where('operation_type', WorkerOperationStatus::Wash())
                     ->where('employee_id', $job->wash_employee_id)
                     ->orderBy('id', 'desc')
                     ->first();
@@ -211,7 +213,7 @@ class WashController extends Controller
             }
             $interval = CarbonInterval::seconds($interval)->cascade();
 
-            //$interval->setLocalTranslator(new Translator());
+            $interval->setLocalTranslator(new Translator());
             return $interval->forHumans();
         })();
 

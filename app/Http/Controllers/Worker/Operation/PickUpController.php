@@ -2,6 +2,10 @@
 
 namespace App\Http\Controllers\Worker\Operation;
 
+use App\Enums\DepartmentNameId;
+use App\Enums\EmployeeOperationActionType;
+use App\Enums\JobGroupStatus;
+use App\Enums\WorkerOperationStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use Illuminate\Http\Request;
@@ -14,7 +18,7 @@ class PickUpController extends Controller
 {
     public function selectEmployee()
     {
-        $departments = Department::with('employees')->where('id', 1)->get();
+        $departments = Department::with('employees')->where('id', DepartmentNameId::PickUp())->get();
         return view('worker.operations.pickups.select-employee', ['departments' => $departments->toArray()]);
     }
 
@@ -23,13 +27,13 @@ class PickUpController extends Controller
         $jobGroup = new JobGroup;
         $jobGroup->employee_id = $employeeId;
         $jobGroup->pickup_employee_id = $employeeId;
-        $jobGroup->operation_status = 'pickup';
+        $jobGroup->operation_status = JobGroupStatus::PickUp();
         $jobGroup->save();
 
         $employeeOperationLog = new EmployeeOperationLog;
         $employeeOperationLog->employee_id = $employeeId;
-        $employeeOperationLog->operation_type = 'pickup';
-        $employeeOperationLog->action_type = 'start';
+        $employeeOperationLog->operation_type = WorkerOperationStatus::PickUp();
+        $employeeOperationLog->action_type = EmployeeOperationActionType::Start();
         $employeeOperationLog->save();
         return redirect(route('worker.operation.pick-up.select-customer', ['jobGroupId' => $jobGroup->id]));
     }

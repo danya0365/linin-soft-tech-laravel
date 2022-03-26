@@ -4,20 +4,18 @@ namespace App\Translations;
 
 use Symfony\Component\Translation\MessageCatalogueInterface;
 use Symfony\Component\Translation\TranslatorBagInterface;
-use Symfony\Contracts\Translation\LocaleAwareInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use Symfony\Bundle\FrameworkBundle\Translation\Translator as BaseTranslator;
 
 class Translator implements TranslatorInterface, TranslatorBagInterface
 {
     protected const TRANS = [
-        'year'   => 'y',
-        'month'  => 'm',
-        'week'   => 'w',
-        'day'    => 'd',
-        'hour'   => 'h',
-        'minute' => 'm',
-        'second' => 's',
+        'year'   => 'ปี',
+        'month'  => 'เดือน',
+        'week'   => 'สัปดาห์',
+        'day'    => 'วัน',
+        'hour'   => 'ชั่วโมง',
+        'minute' => 'นาที',
+        'second' => 'วินาที',
     ];
 
     // public function trans(string $id, array $parameters = [], string $domain = null, string $locale = null)
@@ -33,20 +31,23 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
     public function trans(string $id, array $parameters = [], string $domain = null, string $locale = null): string
     {
         //return $this->translator->trans($id,$parameters,$domain,$locale);
-        return strtoupper($id); // Verify calling this class
+        //return strtoupper($id); // Verify calling this class
+        return $parameters[':count'] . self::TRANS[$id];
     }
 
     public function getCatalogue(string $locale = null): MessageCatalogueInterface
     {
-        return $this->translator->getCatalogue($locale);
+        //return $this->translator->getCatalogue($locale);
+        return new \Symfony\Component\Translation\MessageCatalogue('th_TH');
+    }
+
+    public function getCatalogues(): array
+    {
+        return $this->translator->getCatalogues();
     }
 
     public function getLocale(): string
     {
         return $this->translator->getLocale();
-    }
-    public function setLocale(string $locale)
-    {
-        $this->translator->setLocale($locale);
     }
 }

@@ -76,7 +76,15 @@ class Job extends Model
     return $this->belongsTo(Employee::class, 'wash_employee_id');
   }
 
+  public function dryerMachine()
+  {
+    return $this->belongsTo(DryerMachine::class);
+  }
 
+  public function dryEmployee()
+  {
+    return $this->belongsTo(Employee::class, 'dry_employee_id');
+  }
   /**
    * Convert the model instance to an array.
    *
@@ -94,6 +102,10 @@ class Job extends Model
       }
       return $jobVar;
     })($array['job_case']);
+
+    $array['status_text'] = (function ($jobStatus) {
+      return ucfirst($jobStatus);
+    })($array['status']);
 
     return $array;
   }

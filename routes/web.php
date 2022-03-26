@@ -82,7 +82,15 @@ Route::group(['prefix' => 'worker', 'middleware' => ['auth']], function () {
         });
 
         Route::group(['prefix' => 'dry'], function () {
-            Route::get('/', [App\Http\Controllers\Worker\Operation\DryController::class, 'index'])->name('worker.operation.dry');
+            Route::get('/job', [App\Http\Controllers\Worker\Operation\DryController::class, 'selectJob'])->name('worker.operation.dry.select-job');
+            Route::get('/job/{jobId}', [App\Http\Controllers\Worker\Operation\DryController::class, 'setSelectJob'])->name('worker.operation.dry.set-select-job');
+            Route::get('/{jobId}/employee', [App\Http\Controllers\Worker\Operation\DryController::class, 'selectEmployee'])->name('worker.operation.dry.select-employee');
+            Route::get('/{jobId}/employee/{employeeId}', [App\Http\Controllers\Worker\Operation\DryController::class, 'setSelectEmployee'])->name('worker.operation.dry.set-select-employee');
+            Route::get('/{jobId}/dryer-machine', [App\Http\Controllers\Worker\Operation\DryController::class, 'selectDryerMachine'])->name('worker.operation.dry.select-dryer-machine');
+            Route::get('/{jobId}/dryer-machine/{dryerMachineId}', [App\Http\Controllers\Worker\Operation\DryController::class, 'setSelectDryerMachine'])->name('worker.operation.dry.set-select-dryer-machine');
+            Route::get('/{jobId}/submit', [App\Http\Controllers\Worker\Operation\DryController::class, 'getSubmit'])->name('worker.operation.dry.submit');
+            Route::post('/{jobId}/submit', [App\Http\Controllers\Worker\Operation\DryController::class, 'postSubmit'])->name('worker.operation.dry.submit');
+            Route::get('/{jobId}/employee-result', [App\Http\Controllers\Worker\Operation\DryController::class, 'getEmployeeResult'])->name('worker.operation.dry.employee-result');
         });
 
         Route::group(['prefix' => 'iron'], function () {
