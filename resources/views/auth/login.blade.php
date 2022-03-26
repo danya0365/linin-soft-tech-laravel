@@ -10,7 +10,7 @@
                 <div class="card-body">
 
                     <div class="row mb-3">
-                        <div class="col-lg-8">
+                        <div class="col-12">
                             <div class="bi bi-apple rounded-3 d-flex align-items-center justify-content-center p-3 py-6" style="font-size: 10em"></div>
                         </div>
                     </div>
