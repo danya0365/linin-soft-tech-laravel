@@ -72,6 +72,12 @@ $(function(){
             return linenProducts.find(linenProduct => linenProduct.id == element).name
         })
 
+        console.log('selectCheckbox', selectCheckbox);
+        if (!selectCheckbox || selectCheckbox.length === 0) {
+            Swal.fire('กรุณาเลือก 1 อย่าง', '', 'error')
+            return
+        }
+
         Swal.fire({
             title: `ยืนยันที่จะเลือก ${selectedLinenProducts}`,
             showDenyButton: true,

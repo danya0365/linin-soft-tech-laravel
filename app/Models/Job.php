@@ -71,6 +71,12 @@ class Job extends Model
     return $this->belongsTo(LinenType::class);
   }
 
+  public function washEmployee()
+  {
+    return $this->belongsTo(Employee::class, 'wash_employee_id');
+  }
+
+
   /**
    * Convert the model instance to an array.
    *

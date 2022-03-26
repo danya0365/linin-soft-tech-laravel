@@ -38,10 +38,13 @@ class DatabaseSeeder extends Seeder
 
         Employee::factory()
             ->count(100)
-            //->sequence(fn ($sequence) => ['name' => 'โรงพยาบาล ' . $sequence->index, 'group' => CustomerGroup::all()->random()])
-            ->sequence(fn ($sequence) => ['department_id' => Department::all()->random()->id])
+            ->sequence(fn ($sequence) => [
+                'department_id' => Department::all()->random()->id,
+                'code' => sprintf('%05d', $sequence->index + 1),
+                'photo' => 'bi-person-circle',
+                'password' => '1234'
+            ])
             ->create();
-
 
         WashingMachine::factory()
             ->count(30)
