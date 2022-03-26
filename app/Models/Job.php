@@ -76,6 +76,10 @@ class Job extends Model
     return $this->belongsTo(Employee::class, 'wash_employee_id');
   }
 
+  public function dryerMachine()
+  {
+    return $this->belongsTo(DryerMachine::class);
+  }
 
   /**
    * Convert the model instance to an array.

@@ -166,8 +166,6 @@ class WashController extends Controller
         $employeeOperationLog->operation_type = WorkerOperationStatus::Wash();
         $employeeOperationLog->action_type = EmployeeOperationActionType::Progress();
         $employeeOperationLog->save();
-
-        $job = Job::with('employee')->with('customer')->with('jobGroup')->with('washingMachine')->with('linenType')->where('id', $jobId)->first();
         return redirect(route('worker.operation.wash.employee-result', ['jobId' => $job->id]));
     }
 

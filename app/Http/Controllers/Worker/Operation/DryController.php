@@ -105,4 +105,26 @@ class DryController extends Controller
         DryerMachine::where('id', $dryerMachineId)->update(['job_id' => $job->id]);
         return redirect(route('worker.operation.dry.submit', ['jobId' => $job->id]));
     }
+
+    public function getSubmit(Request $request, $jobId)
+    {
+        $job = Job::with('employee')->with('customer')->with('jobGroup')->with('washingMachine')->with('dryerMachine')->with('linenType')->with('washEmployee')->where('id', $jobId)->first();
+        return view('worker.operations.dry.submit', ['job' => $job->toArray()]);
+    }
+
+    public function postSubmit(Request $request, $jobId)
+    {
+        request()->validate(['wet_weight' => 'required', 'color' => 'required']);
+        $job = Job::find($jobId);
+        $job->wet_weight = $request->get('wet_weight');
+        $job->color = $request->get('color');
+        $job->save();
+
+        $employeeOperationLog = new EmployeeOperationLog;
+        $employeeOperationLog->employee_id = $job->dry_employee_id;
+        $employeeOperationLog->operation_type = WorkerOperationStatus::Dry();
+        $employeeOperationLog->action_type = EmployeeOperationActionType::Progress();
+        $employeeOperationLog->save();
+        return redirect(route('worker.operation.dry.employee-result', ['jobId' => $job->id]));
+    }
 }
