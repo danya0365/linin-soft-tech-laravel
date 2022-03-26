@@ -25,6 +25,7 @@
                                       <li class="list-group-item">น้ำหนักเปียก: {{ $job['wet_weight'] }}</li>
                                       <li class="list-group-item" style="color: {{ $job['color'] }}">สี: {{ $job['color'] }}</li>
                                       <li class="list-group-item">พนักงานซัก: {{ $job['wash_employee']['name'] }}</li>
+                                      <li class="list-group-item">สถานะ: {{ $job['status_text'] }}</li>
                                     </ul>
                                 </div>
                             </a>

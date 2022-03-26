@@ -14,24 +14,25 @@
             <li class="breadcrumb-item"><a href="{{ route('worker.operation.dry.select-job', ['jobId' => $job['id']]) }}">{{ $job['job_case']['name'] }}</a></li>
             <li class="breadcrumb-item"><a href="{{ route('worker.operation.dry.select-job', ['jobId' => $job['id']]) }}">{{ $job['washing_machine']['name'] }}</a></li>
             <li class="breadcrumb-item"><a href="{{ route('worker.operation.dry.select-job', ['jobId' => $job['id']]) }}">{{ $job['linen_type']['name'] }}</a></li>
-            <li class="breadcrumb-item active" aria-current="page">อบ - เลือกพนักงาน</li>
+            <li class="breadcrumb-item"><a href="{{ route('worker.operation.dry.select-employee', ['jobId' => $job['id']]) }}">พนักงาน: {{ $job['employee']['name'] }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">อบ - เครื่องอบผ้า</li>
         </ol>
     </nav>
     <div class="row justify-content-center">
-        @foreach ($departments as $department)
         <div class="col-md-12 m-2">
             <div class="card">
-                <div class="card-header">{{ $department['name'] }}</div>
+                <div class="card-header">เครื่องอบผ้า</div>
                 <div class="card-body">
                     <div class="row g-2">
-                        @foreach ($department['employees'] as $employee)
+                        @foreach ($dryerMachines as $dryerMachine )
                         <div class="col-sm-4">
-                            <a href="{{ route('worker.operation.dry.set-select-employee', ['jobId' => $job['id'], 'employeeId' => $employee['id']]) }}">
+                            <a href="{{ route('worker.operation.dry.set-select-dryer-machine', ['jobId' => $job['id'], 'dryerMachineId' => $dryerMachine['id']]) }}">
                                 <div class="p-3 border bg-light" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center">
-                                        <div class="bi bi-person-square" style="font-size: 3em"></div>
+                                        <div class="bi {{ $dryerMachine['photo'] }}" style="font-size: 3em"></div>
                                     </div>
-                                    <div class="text-center">{{ $employee['name'] }}</div>
+                                    <div class="text-center">{{ $dryerMachine['name'] }}</div>
+                                    <div class="text-center">สถานะ: {{ $dryerMachine['status_text'] }}</div>
                                 </div>
                             </a>
                         </div>
@@ -40,7 +41,6 @@
                 </div>
             </div>
         </div>
-        @endforeach
     </div>
 </div>
 @endsection

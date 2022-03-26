@@ -10,6 +10,7 @@ use App\Models\Customer;
 use Illuminate\Http\Request;
 use App\Models\CustomerGroup;
 use App\Models\Department;
+use App\Models\DryerMachine;
 use App\Models\JobGroup;
 use App\Models\Job;
 use App\Models\JobCase;
@@ -29,7 +30,7 @@ class DryController extends Controller
             ->with('washingMachine')
             ->with('linenType')
             ->with('washEmployee')
-            ->where('status', WorkerOperationStatus::Wash())
+            ->whereIn('status', [WorkerOperationStatus::Wash(), WorkerOperationStatus::Dry()])
             ->get();
 
         $customers = [];
@@ -83,6 +84,25 @@ class DryController extends Controller
         $employeeOperationLog->save();
 
 
-        return redirect(route('worker.operation.dry.select-customer', ['jobId' => $job->id]));
+        return redirect(route('worker.operation.dry.select-dryer-machine', ['jobId' => $job->id]));
+    }
+
+    public function selectDryerMachine($jobId)
+    {
+        $job = Job::with('employee')->with('customer')->with('jobGroup')->with('washingMachine')->with('linenType')->with('washEmployee')->where('id', $jobId)->first();
+        $dryerMachines = DryerMachine::with('job')->get();
+        return view('worker.operations.dry.select-dryer-machine', ['job' => $job->toArray(), 'dryerMachines' => $dryerMachines->toArray()]);
+    }
+
+    public function setSelectDryerMachine($jobId, $dryerMachineId)
+    {
+        $job = Job::find($jobId);
+        $prevDryerMachineId = $job->dryer_machine_id;
+        $job->dryer_machine_id = $dryerMachineId;
+        $job->save();
+
+        if ($prevDryerMachineId) DryerMachine::where('id', $prevDryerMachineId)->update(['job_id' => null]);
+        DryerMachine::where('id', $dryerMachineId)->update(['job_id' => $job->id]);
+        return redirect(route('worker.operation.dry.submit', ['jobId' => $job->id]));
     }
 }

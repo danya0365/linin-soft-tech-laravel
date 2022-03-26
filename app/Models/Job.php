@@ -95,6 +95,10 @@ class Job extends Model
       return $jobVar;
     })($array['job_case']);
 
+    $array['status_text'] = (function ($jobStatus) {
+      return ucfirst($jobStatus);
+    })($array['status']);
+
     return $array;
   }
 }
