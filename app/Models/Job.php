@@ -66,6 +66,11 @@ class Job extends Model
     return $this->belongsTo(WashingMachine::class);
   }
 
+  public function linenType()
+  {
+    return $this->belongsTo(LinenType::class);
+  }
+
   /**
    * Convert the model instance to an array.
    *

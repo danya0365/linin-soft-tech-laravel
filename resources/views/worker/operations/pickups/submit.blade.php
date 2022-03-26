@@ -79,6 +79,9 @@ $(function(){
         } else {
             number = parseInt(number);
         }
+        if (isNaN(number)) {
+            number = 0;
+        }
         $("#pad-result").html(number.toLocaleString());
         $('[name=wet_weight]').val(number);
     }

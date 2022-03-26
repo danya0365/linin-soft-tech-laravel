@@ -140,4 +140,22 @@ class WashController extends Controller
 
         return redirect(route('worker.operation.wash.submit', ['jobId' => $job->id]));
     }
+
+    public function getSubmit(Request $request, $jobId)
+    {
+        $job = Job::with('employee')->with('customer')->with('jobGroup')->with('washingMachine')->with('linenType')->where('id', $jobId)->first();
+        return view('worker.operations.wash.submit', ['job' => $job->toArray()]);
+    }
+
+    public function postSubmit(Request $request, $jobId)
+    {
+        request()->validate(['wet_weight' => 'required', 'color' => 'required']);
+        $job = Job::find($jobId);
+        $job->wet_weight = $request->get('wet_weight');
+        $job->color = $request->get('color');
+        $job->save();
+
+        $job = Job::with('employee')->with('customer')->with('jobGroup')->with('washingMachine')->with('linenType')->where('id', $jobId)->first();
+        return view('worker.operations.wash.submit', ['job' => $job->toArray()]);
+    }
 }
