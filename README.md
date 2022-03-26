@@ -94,6 +94,9 @@ test to force run schedule
 
 ```sail php artisan schedule:run```
 
+***only for local server to force cronjob running
+```sail php artisan schedule:work```
+
 ### Set up your server to run crontab every second
 At last you can manage this command on scheduling task, you have to add a single entry to your server’s crontab file:
 ```* * * * * cd /path-to-your-project && php artisan schedule:run >> /dev/null 2>&1```
