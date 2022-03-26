@@ -96,7 +96,7 @@ test to force run schedule
 
 ### Set up your server to run crontab every second
 At last you can manage this command on scheduling task, you have to add a single entry to your server’s crontab file:
-```* * * * * php /path/to/artisan schedule:run 1>> /dev/null 2>&1```
+```* * * * * cd /path-to-your-project && php artisan schedule:run >> /dev/null 2>&1```
 
 ## Executing Commands
 
