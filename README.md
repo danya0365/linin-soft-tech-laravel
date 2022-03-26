@@ -64,6 +64,39 @@ Add route.php
 
 ```yarn && yarn dev```
 
+### CronJob Schedule
+
+add new command
+```sail php artisan make:command DaillyReportCron --command=dailyReport:cron```
+
+open ```app/Console/Commands/DaillyReportCron.php```
+
+search for ```function handle()```
+
+add below code 
+
+```
+use Illuminate\Support\Facades\Log;
+...
+
+function handle() {
+    Log::info("Cron is working fine!");
+}
+```
+
+open ```app/Console/Kernel.php```
+
+add below code in ```function schedule(Schedule $schedule)```
+
+```$schedule->command(DaillyReportCron::class)->daily();```
+
+test to force run schedule
+
+```sail php artisan schedule:run```
+
+### Set up your server to run crontab every second
+At last you can manage this command on scheduling task, you have to add a single entry to your server’s crontab file:
+```* * * * * php /path/to/artisan schedule:run 1>> /dev/null 2>&1```
 
 ## Executing Commands
 
