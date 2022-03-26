@@ -61,6 +61,11 @@ class Job extends Model
     return $this->belongsTo(JobGroup::class);
   }
 
+  public function washingMachine()
+  {
+    return $this->belongsTo(WashingMachine::class);
+  }
+
   /**
    * Convert the model instance to an array.
    *

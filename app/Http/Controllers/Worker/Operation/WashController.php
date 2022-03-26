@@ -12,6 +12,8 @@ use App\Models\Job;
 use App\Models\JobCase;
 use App\Models\WashingMachine;
 use App\Models\EmployeeOperationLog;
+use App\Models\LinenProduct;
+use App\Models\LinenType;
 
 class WashController extends Controller
 {
@@ -110,5 +112,32 @@ class WashController extends Controller
         if ($prevWashingMachineId) WashingMachine::where('id', $prevWashingMachineId)->update(['job_id' => null]);
         WashingMachine::where('id', $washingMachineId)->update(['job_id' => $job->id]);
         return redirect(route('worker.operation.wash.select-linen-type', ['jobId' => $job->id]));
+    }
+
+    public function selectLinenType($jobId)
+    {
+        $job = Job::with('employee')->with('customer')->with('jobGroup')->with('washingMachine')->where('id', $jobId)->first();
+        $linenTypes = LinenType::with('linenProducts')->get();
+        $linenProducts = LinenProduct::all();
+        return view('worker.operations.wash.select-linen-type', ['job' => $job->toArray(), 'linenTypes' => $linenTypes->toArray(), 'linenProductJson' => $linenProducts->toJson()]);
+    }
+
+    public function setSelectLinenType($jobId, $tags)
+    {
+        $linenProductIds = explode(',', $tags);
+        $linenProducts = LinenProduct::whereIn('id', $linenProductIds)->get();
+
+        $linenTypeId = null;
+        $tags = [];
+        foreach ($linenProducts as $linenProduct) {
+            $linenTypeId = $linenProduct->linen_type_id;
+            $tags[] = $linenProduct->name;
+        }
+        $job = Job::find($jobId);
+        $job->linen_type_id = $linenTypeId;
+        $job->tags = implode(', ', $tags);
+        $job->save();
+
+        return redirect(route('worker.operation.wash.submit', ['jobId' => $job->id]));
     }
 }

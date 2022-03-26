@@ -74,6 +74,8 @@ Route::group(['prefix' => 'worker', 'middleware' => ['auth']], function () {
             Route::get('/{jobId}/job-case/{jobCase}', [App\Http\Controllers\Worker\Operation\WashController::class, 'setSelectJobCase'])->name('worker.operation.wash.set-select-job-case');
             Route::get('/{jobId}/washing-machine', [App\Http\Controllers\Worker\Operation\WashController::class, 'selectWashingMachine'])->name('worker.operation.wash.select-washing-machine');
             Route::get('/{jobId}/washing-machine/{washingMachineId}', [App\Http\Controllers\Worker\Operation\WashController::class, 'setSelectWashingMachine'])->name('worker.operation.wash.set-select-washing-machine');
+            Route::get('/{jobId}/linen-type', [App\Http\Controllers\Worker\Operation\WashController::class, 'selectLinenType'])->name('worker.operation.wash.select-linen-type');
+            Route::get('/{jobId}/linen-type/{tags}', [App\Http\Controllers\Worker\Operation\WashController::class, 'setSelectLinenType'])->name('worker.operation.wash.set-select-linen-type');
         });
 
         Route::group(['prefix' => 'dry'], function () {
