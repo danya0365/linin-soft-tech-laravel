@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Worker\Operation;
 
+use App\Enums\DepartmentNameId;
 use App\Enums\EmployeeOperationActionType;
 use App\Enums\WorkerOperationStatus;
 use App\Http\Controllers\Controller;
@@ -53,10 +54,35 @@ class DryController extends Controller
 
         $employeeOperationLog = new EmployeeOperationLog;
         $employeeOperationLog->employee_id = $job->wash_employee_id;
+        $employeeOperationLog->operation_type = WorkerOperationStatus::Wash();
+        $employeeOperationLog->action_type = EmployeeOperationActionType::Stop();
+        $employeeOperationLog->save();
+
+        return redirect(route('worker.operation.dry.select-employee', ['jobId' => $job->id]));
+    }
+
+    public function selectEmployee($jobId)
+    {
+        $departments = Department::with('employees')->where('id', DepartmentNameId::Dry())->get();
+        $job = Job::with('employee')->with('customer')->with('jobGroup')->with('washingMachine')->with('linenType')->with('washEmployee')->where('id', $jobId)->first();
+        return view('worker.operations.dry.select-employee', ['departments' => $departments->toArray(), 'job' => $job->toArray()]);
+    }
+
+    public function setSelectEmployee($jobId, $employeeId)
+    {
+        $job = Job::find($jobId);
+        $job->employee_id = $employeeId;
+        $job->dry_employee_id = $employeeId;
+        $job->status = WorkerOperationStatus::Dry();
+        $job->save();
+
+        $employeeOperationLog = new EmployeeOperationLog;
+        $employeeOperationLog->employee_id = $employeeId;
         $employeeOperationLog->operation_type = WorkerOperationStatus::Dry();
         $employeeOperationLog->action_type = EmployeeOperationActionType::Start();
         $employeeOperationLog->save();
 
-        return redirect(route('worker.operation.dry.select-employee', ['jobId' => $job->id]));
+
+        return redirect(route('worker.operation.dry.select-customer', ['jobId' => $job->id]));
     }
 }

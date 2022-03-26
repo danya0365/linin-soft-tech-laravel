@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Worker\Operation;
 
+use App\Enums\DepartmentNameId;
 use App\Enums\EmployeeOperationActionType;
 use App\Enums\JobGroupStatus;
 use App\Enums\WorkerOperationStatus;
@@ -17,7 +18,7 @@ class PickUpController extends Controller
 {
     public function selectEmployee()
     {
-        $departments = Department::with('employees')->where('id', 1)->get();
+        $departments = Department::with('employees')->where('id', DepartmentNameId::PickUp())->get();
         return view('worker.operations.pickups.select-employee', ['departments' => $departments->toArray()]);
     }
 

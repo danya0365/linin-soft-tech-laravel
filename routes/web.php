@@ -84,6 +84,8 @@ Route::group(['prefix' => 'worker', 'middleware' => ['auth']], function () {
         Route::group(['prefix' => 'dry'], function () {
             Route::get('/job', [App\Http\Controllers\Worker\Operation\DryController::class, 'selectJob'])->name('worker.operation.dry.select-job');
             Route::get('/job/{jobId}', [App\Http\Controllers\Worker\Operation\DryController::class, 'setSelectJob'])->name('worker.operation.dry.set-select-job');
+            Route::get('/{jobId}/employee', [App\Http\Controllers\Worker\Operation\DryController::class, 'selectEmployee'])->name('worker.operation.dry.select-employee');
+            Route::get('/{jobId}/employee/{employeeId}', [App\Http\Controllers\Worker\Operation\DryController::class, 'setSelectEmployee'])->name('worker.operation.dry.set-select-employee');
         });
 
         Route::group(['prefix' => 'iron'], function () {

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Worker\Operation;
 
+use App\Enums\DepartmentNameId;
 use App\Enums\EmployeeOperationActionType;
 use App\Enums\JobGroupStatus;
 use App\Enums\WorkerOperationStatus;
@@ -24,7 +25,7 @@ class WashController extends Controller
 {
     public function selectEmployee()
     {
-        $departments = Department::with('employees')->where('id', 2)->get();
+        $departments = Department::with('employees')->where('id', DepartmentNameId::Wash())->get();
         return view('worker.operations.wash.select-employee', ['departments' => $departments->toArray()]);
     }
 
@@ -33,13 +34,13 @@ class WashController extends Controller
         $job = new Job;
         $job->employee_id = $employeeId;
         $job->wash_employee_id = $employeeId;
-        $job->status = 'wash';
+        $job->status = WorkerOperationStatus::Wash();
         $job->save();
 
         $employeeOperationLog = new EmployeeOperationLog;
         $employeeOperationLog->employee_id = $employeeId;
-        $employeeOperationLog->operation_type = 'wash';
-        $employeeOperationLog->action_type = 'start';
+        $employeeOperationLog->operation_type = WorkerOperationStatus::Wash();
+        $employeeOperationLog->action_type = EmployeeOperationActionType::Start();
         $employeeOperationLog->save();
         return redirect(route('worker.operation.wash.select-customer', ['jobId' => $job->id]));
     }
