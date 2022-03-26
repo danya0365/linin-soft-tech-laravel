@@ -15,6 +15,7 @@ use App\Models\EmployeeOperationLog;
 use App\Models\LinenProduct;
 use App\Models\LinenType;
 use Carbon\CarbonInterval;
+use App\Translations\Translator;
 
 class WashController extends Controller
 {
@@ -211,7 +212,7 @@ class WashController extends Controller
             }
             $interval = CarbonInterval::seconds($interval)->cascade();
 
-            //$interval->setLocalTranslator(new Translator());
+            $interval->setLocalTranslator(new Translator());
             return $interval->forHumans();
         })();
 
