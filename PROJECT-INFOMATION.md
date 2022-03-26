@@ -129,11 +129,11 @@ Database ทั้งหมด (19,000 บาท)
  1. ซัก (สร้าง Job ID Status = ซัก)
  สร้าง Database table `jobs`
 
- ```{ fields: { id, job_group_id {customer_id, weight}, employee_id, job_type = enum(new, edit), washing_machine_id, dryer_machine_id, laundry_type_id, laundry_product_id, wet_weight, color, operation_status = enum('wash', 'dry', 'iron') }```
+ ```{ fields: { id, job_group_id {customer_id, weight}, employee_id, job_type = enum(new, edit), washing_machine_id, dryer_machine_id, linen_type_id, laundry_product_id, wet_weight, color, operation_status = enum('wash', 'dry', 'iron') }```
 
  สร้าง Database table `job_activity_logs`
 
-```{ fields: { id, job_id, employee_id, log_type = enum(status, washing_machine_id, dryer_machine_id, laundry_type_id, laundry_product_id, wet_weight, color), old_value, new_value } }```
+```{ fields: { id, job_id, employee_id, log_type = enum(status, washing_machine_id, dryer_machine_id, linen_type_id, laundry_product_id, wet_weight, color), old_value, new_value } }```
 
 สร้าง Database table `employee_operation_logs`
 

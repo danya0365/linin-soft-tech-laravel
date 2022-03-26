@@ -7,6 +7,7 @@ use App\Models\Customer;
 use Illuminate\Http\Request;
 use App\Models\CustomerGroup;
 use App\Models\Department;
+use App\Models\EmployeeOperationLog;
 use App\Models\JobGroup;
 
 class PickUpController extends Controller
@@ -21,28 +22,44 @@ class PickUpController extends Controller
     {
         $jobGroup = new JobGroup;
         $jobGroup->employee_id = $employeeId;
-        $jobGroup->operation_status = 'progress';
+        $jobGroup->pickup_employee_id = $employeeId;
+        $jobGroup->operation_status = 'pickup';
         $jobGroup->save();
+
+        $employeeOperationLog = new EmployeeOperationLog;
+        $employeeOperationLog->employee_id = $employeeId;
+        $employeeOperationLog->operation_type = 'pickup';
+        $employeeOperationLog->action_type = 'start';
+        $employeeOperationLog->save();
         return redirect(route('worker.operation.pick-up.select-customer', ['jobGroupId' => $jobGroup->id]));
     }
 
     public function selectCustomer($jobGroupId)
     {
+        $jobGroup = JobGroup::with('employee')->where('id', $jobGroupId)->first();
         $customerGroup = CustomerGroup::with('customers')->get();
-        return view('worker.operations.pickups.select-customer', ['customerGroups' => $customerGroup->toArray(), 'jobGroupId' => $jobGroupId]);
+        return view('worker.operations.pickups.select-customer', ['customerGroups' => $customerGroup->toArray(), 'jobGroup' => $jobGroup->toArray()]);
     }
 
     public function setSelectCustomer($jobGroupId, $customerId)
     {
-        $jobGroup = JobGroup::find($jobGroupId);
-        $jobGroup->customer_id = $customerId;
-        $jobGroup->save();
+        $todayJob = JobGroup::where('customer_id', $customerId)->whereDate('created_at', \Carbon\Carbon::today())->get();
+        if ($todayJob->count() > 1) {
+            // TODO: Notify to user here by alert box
+            $jobGroup = JobGroup::find($jobGroupId);
+            $jobGroup->customer_id = $customerId;
+            $jobGroup->save();
+        } else {
+            $jobGroup = JobGroup::find($jobGroupId);
+            $jobGroup->customer_id = $customerId;
+            $jobGroup->save();
+        }
         return redirect(route('worker.operation.pick-up.submit', ['jobGroupId' => $jobGroup->id]));
     }
 
     public function getSubmit(Request $request, $jobGroupId)
     {
-        $jobGroup = JobGroup::find($jobGroupId);
+        $jobGroup = JobGroup::with('employee')->with('customer')->where('id', $jobGroupId)->first();
         return view('worker.operations.pickups.submit', ['jobGroup' => $jobGroup]);
     }
 
@@ -52,6 +69,10 @@ class PickUpController extends Controller
         $jobGroup = JobGroup::find($jobGroupId);
         $jobGroup->wet_weight = $request->get('wet_weight');
         $jobGroup->save();
+
+        // TODO: update customer total_wet_weight
+        $totalWetWeight = JobGroup::where('customer_id', $jobGroup->customer_id)->sum('wet_weight');
+        Customer::where('id', $jobGroup->customer_id)->update(['total_wet_weight' => $totalWetWeight]);
         return view('worker.operations.pickups.submit', ['jobGroup' => $jobGroup]);
     }
 }

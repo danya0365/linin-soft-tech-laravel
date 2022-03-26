@@ -16,8 +16,8 @@ return new class extends Migration
         Schema::create('employee_operation_logs', function (Blueprint $table) {
             $table->id();
             $table->integer('employee_id');
-            $table->enum('operation_type', ['wash', 'dry', 'iron', 'packing', 'collect']);
-            $table->enum('action_type', ['start', 'stop']);
+            $table->enum('operation_type', ['pickup', 'wash', 'dry', 'iron', 'packing', 'collect']);
+            $table->enum('action_type', ['start', 'progress', 'stop']);
             $table->timestamps();
         });
     }

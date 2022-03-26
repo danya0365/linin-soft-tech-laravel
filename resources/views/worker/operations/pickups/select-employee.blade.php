@@ -7,7 +7,7 @@
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="{{ route('worker') }}">Worker</a></li>
           <li class="breadcrumb-item"><a href="{{ route('worker.operation') }}">ปฏิบัติการ</a></li>
-          <li class="breadcrumb-item active" aria-current="page">รับสินค้า - เลือกลูกค้า</li>
+          <li class="breadcrumb-item active" aria-current="page">รับสินค้า - เลือกพนักงาน</li>
         </ol>
     </nav>
     <div class="row justify-content-center">

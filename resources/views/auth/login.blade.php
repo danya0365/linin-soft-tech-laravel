@@ -10,7 +10,7 @@
                 <div class="card-body">
 
                     <div class="row mb-3">
-                        <div class="col-lg-8">
+                        <div class="col-12">
                             <div class="bi bi-apple rounded-3 d-flex align-items-center justify-content-center p-3 py-6" style="font-size: 10em"></div>
                         </div>
                     </div>
@@ -21,7 +21,7 @@
                             <label for="email" class="col-md-4 col-form-label text-md-end">{{ __('Email Address') }}</label>
 
                             <div class="col-md-6">
-                                <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required autocomplete="email" autofocus>
+                                <input id="email" value="{{ env('APP_ENV', '') == 'local' ? 'admin.lininsofttech@gmail.com' : '' }}" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required autocomplete="email" autofocus>
 
                                 @error('email')
                                     <span class="invalid-feedback" role="alert">
@@ -35,7 +35,7 @@
                             <label for="password" class="col-md-4 col-form-label text-md-end">{{ __('Password') }}</label>
 
                             <div class="col-md-6">
-                                <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password" required autocomplete="current-password">
+                                <input id="password" value="{{ env('APP_ENV', '') == 'local' ? '12345678' : '' }}" type="password" class="form-control @error('password') is-invalid @enderror" name="password" required autocomplete="current-password">
 
                                 @error('password')
                                     <span class="invalid-feedback" role="alert">
