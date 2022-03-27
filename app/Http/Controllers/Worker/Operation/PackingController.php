@@ -14,11 +14,6 @@ use Illuminate\Http\Request;
 
 class PackingController extends Controller
 {
-    /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\Contracts\Support\Renderable
-     */
     public function index()
     {
         return redirect(route('worker.operation.packing.select-job-group'));
@@ -32,6 +27,7 @@ class PackingController extends Controller
             ->with('pickUpEmployee')
             ->with('packingEmployee')
             ->with('collectEmployee')
+            ->whereIn('operation_status', [WorkerOperationStatus::PickUp(), WorkerOperationStatus::Packing()])
             ->get();
 
         $customers = [];

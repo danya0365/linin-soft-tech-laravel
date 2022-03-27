@@ -81,7 +81,7 @@ class JobGroup extends Model
     $array = parent::toArray();
 
     $array['operation_status_text'] = (function ($jobStatus) {
-      $statusTexts = ['pickup' => 'รับสินค้า', 'progress' => 'ซัก, อบ, รีด', 'packing' => 'พับแพ็ค', 'collect' => 'จัดเก็บ'];
+      $statusTexts = ['pickup' => 'รับสินค้า', 'progress' => 'ซัก, อบ, รีด', 'packing' => 'พับแพ็ค', 'collect' => 'จัดเก็บ', 'close' => 'ปิดงาน'];
       foreach ($statusTexts as $status => $text) {
         if (strtolower($status) == strtolower($jobStatus)) {
           return $text;

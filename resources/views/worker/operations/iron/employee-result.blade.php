@@ -38,7 +38,7 @@
                         </div>
                         <div class="col-4">
                             <div class="d-grid gap-2" style="min-height: 60px">
-                                <button class="btn btn-outline-secondary" type="button">ยกเลิก</button>
+                                <button class="btn btn-outline-secondary" type="button">ปิดงาน</button>
                             </div>
                         </div>
                     </div>

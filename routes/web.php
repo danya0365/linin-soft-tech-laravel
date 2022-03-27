@@ -120,6 +120,8 @@ Route::group(['prefix' => 'worker', 'middleware' => ['auth']], function () {
 
         Route::group(['prefix' => 'collect'], function () {
             Route::get('/', [App\Http\Controllers\Worker\Operation\CollectController::class, 'index'])->name('worker.operation.collect');
+            Route::get('/job-group', [App\Http\Controllers\Worker\Operation\CollectController::class, 'selectJobGroup'])->name('worker.operation.collect.select-job-group');
+            Route::get('/job-group/{jobGroupId}', [App\Http\Controllers\Worker\Operation\CollectController::class, 'setSelectJobGroup'])->name('worker.operation.collect.set-select-job-group');
         });
     });
 

@@ -29,7 +29,7 @@ return new class extends Migration
             $table->integer('wet_weight')->nullable();
             $table->integer('piece')->nullable();
             $table->string('color')->nullable();
-            $table->enum('status', ['wash', 'dry', 'iron']);
+            $table->enum('status', ['wash', 'dry', 'iron', 'close']);
             $table->timestamps();
         });
     }
