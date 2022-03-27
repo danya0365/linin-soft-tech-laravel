@@ -70,7 +70,6 @@ class DryController extends Controller
         $job = Job::find($jobId);
         $job->employee_id = $employeeId;
         $job->dry_employee_id = $employeeId;
-        $job->status = WorkerOperationStatus::Dry();
         $job->save();
 
         EmployeeManager::createEmployeeOperationLog($employeeId, WorkerOperationStatus::Dry(), EmployeeOperationActionType::Start());

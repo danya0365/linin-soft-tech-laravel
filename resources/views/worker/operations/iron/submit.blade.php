@@ -16,7 +16,7 @@
             <li class="breadcrumb-item"><a href="{{ route('worker.operation.iron.select-job', ['jobId' => $job['id']]) }}">{{ $job['linen_type']['name'] }}</a></li>
             <li class="breadcrumb-item"><a href="{{ route('worker.operation.iron.select-job', ['jobId' => $job['id']]) }}">{{ $job['dryer_machine']['name'] }}</a></li>
             <li class="breadcrumb-item"><a href="{{ route('worker.operation.iron.select-employee', ['jobId' => $job['id']]) }}">พนักงาน: {{ $job['employee']['name'] }}</a></li>
-            <li class="breadcrumb-item active" aria-current="page">อบ - แบบฟอร์ม Submit</li>
+            <li class="breadcrumb-item active" aria-current="page">รีด - แบบฟอร์ม Submit</li>
         </ol>
     </nav>
     <div class="row justify-content-center">

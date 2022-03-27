@@ -79,7 +79,6 @@ class IronController extends Controller
         $job = Job::find($jobId);
         $job->employee_id = $employeeId;
         $job->iron_employee_id = $employeeId;
-        $job->status = WorkerOperationStatus::Dry();
         $job->save();
 
         EmployeeManager::createEmployeeOperationLog($employeeId, WorkerOperationStatus::Iron(), EmployeeOperationActionType::Start());
