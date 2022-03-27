@@ -47,7 +47,7 @@ class PackingController extends Controller
     public function setSelectJobGroup($jobId)
     {
         $jobGroups = JobGroup::find($jobId);
-        $jobGroups->status = WorkerOperationStatus::Packing();
+        $jobGroups->operation_status = WorkerOperationStatus::Packing();
         $jobGroups->save();
 
         return redirect(route('worker.operation.packing.select-employee', ['jobGroupId' => $jobGroups->id]));
