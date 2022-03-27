@@ -44,12 +44,38 @@ class CollectController extends Controller
         return view('worker.operations.collect.select-job-group', ['customers' => $customers]);
     }
 
-    public function setSelectJobGroup($jobId)
+    public function setSelectJobGroup($jobGroupId)
     {
-        $jobGroup = JobGroup::find($jobId);
-        $jobGroup->operation_status = WorkerOperationStatus::Packing();
+        $jobGroup = JobGroup::find($jobGroupId);
+        $jobGroup->operation_status = WorkerOperationStatus::Collect();
         $jobGroup->save();
 
         return redirect(route('worker.operation.collect.select-employee', ['jobGroupId' => $jobGroup->id]));
+    }
+
+    public function selectEmployee($jobGroupId)
+    {
+        $jobGroup = JobGroup::with('employee')
+            ->with('customer')
+            ->with('jobs')
+            ->with('pickUpEmployee')
+            ->with('packingEmployee')
+            ->with('collectEmployee')
+            ->where('id', $jobGroupId)->first();
+
+        $departments = Department::with('employees')->where('id', DepartmentNameId::Collect())->get();
+        return view('worker.operations.collect.select-employee', ['departments' => $departments->toArray(), 'jobGroup' => $jobGroup->toArray()]);
+    }
+
+    public function setSelectEmployee($jobGroupId, $employeeId)
+    {
+        $jobGroup = JobGroup::find($jobGroupId);
+        $jobGroup->employee_id = $employeeId;
+        $jobGroup->collect_employee_id = $employeeId;
+        $jobGroup->save();
+
+        EmployeeManager::createEmployeeOperationLog($employeeId, WorkerOperationStatus::Collect(), EmployeeOperationActionType::Start());
+
+        return redirect(route('worker.operation.collect.submit', ['jobGroupId' => $jobGroup->id]));
     }
 }
