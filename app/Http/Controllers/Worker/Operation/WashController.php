@@ -20,6 +20,11 @@ use App\Models\LinenType;
 
 class WashController extends Controller
 {
+    public function index()
+    {
+        return redirect(route('worker.operation.wash.select-employee'));
+    }
+
     public function selectEmployee()
     {
         $departments = Department::with('employees')->where('id', DepartmentNameId::Wash())->get();

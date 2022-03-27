@@ -16,6 +16,11 @@ use App\Models\WashingMachine;
 
 class DryController extends Controller
 {
+    public function index()
+    {
+        return redirect(route('worker.operation.dry.select-job'));
+    }
+    
     public function selectJob()
     {
         $jobs = Job::with('employee')

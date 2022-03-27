@@ -17,6 +17,11 @@ use App\Models\JobGroup;
 
 class PickUpController extends Controller
 {
+    public function index()
+    {
+        return redirect(route('worker.operation.pickup.select-employee'));
+    }
+
     public function selectEmployee()
     {
         $departments = Department::with('employees')->where('id', DepartmentNameId::PickUp())->get();
@@ -33,7 +38,7 @@ class PickUpController extends Controller
 
         EmployeeManager::createEmployeeOperationLog($employeeId, WorkerOperationStatus::PickUp(), EmployeeOperationActionType::Start());
 
-        return redirect(route('worker.operation.pick-up.select-customer', ['jobGroupId' => $jobGroup->id]));
+        return redirect(route('worker.operation.pickup.select-customer', ['jobGroupId' => $jobGroup->id]));
     }
 
     public function selectCustomer($jobGroupId)
@@ -56,7 +61,7 @@ class PickUpController extends Controller
             $jobGroup->customer_id = $customerId;
             $jobGroup->save();
         }
-        return redirect(route('worker.operation.pick-up.submit', ['jobGroupId' => $jobGroup->id]));
+        return redirect(route('worker.operation.pickup.submit', ['jobGroupId' => $jobGroup->id]));
     }
 
     public function getSubmit(Request $request, $jobGroupId)

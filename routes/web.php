@@ -55,15 +55,17 @@ Route::group(['prefix' => 'worker', 'middleware' => ['auth']], function () {
         Route::get('/', [App\Http\Controllers\Worker\OperationController::class, 'index'])->name('worker.operation');
 
         Route::group(['prefix' => 'pickup'], function () {
-            Route::get('/employee', [App\Http\Controllers\Worker\Operation\PickupController::class, 'selectEmployee'])->name('worker.operation.pick-up.select-employee');
-            Route::get('/employee/{employeeId}', [App\Http\Controllers\Worker\Operation\PickupController::class, 'setSelectEmployee'])->name('worker.operation.pick-up.set-select-employee');
-            Route::get('/{jobGroupId}/customer', [App\Http\Controllers\Worker\Operation\PickupController::class, 'selectCustomer'])->name('worker.operation.pick-up.select-customer');
-            Route::get('/{jobGroupId}/customer/{customerId}', [App\Http\Controllers\Worker\Operation\PickupController::class, 'setSelectCustomer'])->name('worker.operation.pick-up.set-select-customer');
-            Route::get('/{jobGroupId}/submit', [App\Http\Controllers\Worker\Operation\PickupController::class, 'getSubmit'])->name('worker.operation.pick-up.submit');
-            Route::post('/{jobGroupId}/submit', [App\Http\Controllers\Worker\Operation\PickupController::class, 'postSubmit'])->name('worker.operation.pick-up.submit');
+            Route::get('/', [App\Http\Controllers\Worker\Operation\PickupController::class, 'index'])->name('worker.operation.pick-up');
+            Route::get('/employee', [App\Http\Controllers\Worker\Operation\PickupController::class, 'selectEmployee'])->name('worker.operation.pickup.select-employee');
+            Route::get('/employee/{employeeId}', [App\Http\Controllers\Worker\Operation\PickupController::class, 'setSelectEmployee'])->name('worker.operation.pickup.set-select-employee');
+            Route::get('/{jobGroupId}/customer', [App\Http\Controllers\Worker\Operation\PickupController::class, 'selectCustomer'])->name('worker.operation.pickup.select-customer');
+            Route::get('/{jobGroupId}/customer/{customerId}', [App\Http\Controllers\Worker\Operation\PickupController::class, 'setSelectCustomer'])->name('worker.operation.pickup.set-select-customer');
+            Route::get('/{jobGroupId}/submit', [App\Http\Controllers\Worker\Operation\PickupController::class, 'getSubmit'])->name('worker.operation.pickup.submit');
+            Route::post('/{jobGroupId}/submit', [App\Http\Controllers\Worker\Operation\PickupController::class, 'postSubmit'])->name('worker.operation.pickup.submit');
         });
 
         Route::group(['prefix' => 'wash'], function () {
+            Route::get('/', [App\Http\Controllers\Worker\Operation\WashController::class, 'index'])->name('worker.operation.wash');
             Route::get('/employee', [App\Http\Controllers\Worker\Operation\WashController::class, 'selectEmployee'])->name('worker.operation.wash.select-employee');
             Route::get('/employee/{employeeId}', [App\Http\Controllers\Worker\Operation\WashController::class, 'setSelectEmployee'])->name('worker.operation.wash.set-select-employee');
             Route::get('/{jobId}/customer', [App\Http\Controllers\Worker\Operation\WashController::class, 'selectCustomer'])->name('worker.operation.wash.select-customer');
@@ -82,6 +84,7 @@ Route::group(['prefix' => 'worker', 'middleware' => ['auth']], function () {
         });
 
         Route::group(['prefix' => 'dry'], function () {
+            Route::get('/', [App\Http\Controllers\Worker\Operation\DryController::class, 'index'])->name('worker.operation.dry');
             Route::get('/job', [App\Http\Controllers\Worker\Operation\DryController::class, 'selectJob'])->name('worker.operation.dry.select-job');
             Route::get('/job/{jobId}', [App\Http\Controllers\Worker\Operation\DryController::class, 'setSelectJob'])->name('worker.operation.dry.set-select-job');
             Route::get('/{jobId}/employee', [App\Http\Controllers\Worker\Operation\DryController::class, 'selectEmployee'])->name('worker.operation.dry.select-employee');
@@ -95,6 +98,8 @@ Route::group(['prefix' => 'worker', 'middleware' => ['auth']], function () {
 
         Route::group(['prefix' => 'iron'], function () {
             Route::get('/', [App\Http\Controllers\Worker\Operation\IronController::class, 'index'])->name('worker.operation.iron');
+            Route::get('/job', [App\Http\Controllers\Worker\Operation\IronController::class, 'selectJob'])->name('worker.operation.iron.select-job');
+            Route::get('/job/{jobId}', [App\Http\Controllers\Worker\Operation\IronController::class, 'setSelectJob'])->name('worker.operation.iron.set-select-job');
         });
 
         Route::group(['prefix' => 'packing'], function () {
