@@ -64,11 +64,17 @@ Add route.php
 
 ```yarn && yarn dev```
 
-### Generate Rnum
+### Generate Enum
 
 สร้าง enum UserType
 ```
 php artisan make:enum UserType
+```
+
+### Generate Event & Listener
+```
+sail php artisan make:event EmployeeOperationLogCreated
+sail php artisan make:listener CalculateUserWorkingTimeNotification  --event=EmployeeOperationLogCreated
 ```
 
 ### CronJob Schedule

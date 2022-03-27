@@ -6,12 +6,14 @@ use App\Enums\DepartmentNameId;
 use App\Enums\EmployeeOperationActionType;
 use App\Enums\WorkerOperationStatus;
 use App\Http\Controllers\Controller;
+use App\Managers\EmployeeManager;
 use Illuminate\Http\Request;
 use App\Models\Department;
 use App\Models\DryerMachine;
 use App\Models\Job;
 use App\Models\EmployeeOperationLog;
 use App\Models\LinenType;
+use App\Models\WashingMachine;
 use Carbon\CarbonInterval;
 use App\Translations\Translator;
 
@@ -48,11 +50,9 @@ class DryController extends Controller
         $job->status = WorkerOperationStatus::Dry();
         $job->save();
 
-        $employeeOperationLog = new EmployeeOperationLog;
-        $employeeOperationLog->employee_id = $job->wash_employee_id;
-        $employeeOperationLog->operation_type = WorkerOperationStatus::Wash();
-        $employeeOperationLog->action_type = EmployeeOperationActionType::Stop();
-        $employeeOperationLog->save();
+        if ($job->washing_machine_id) WashingMachine::where('id', $job->washing_machine_id)->update(['job_id' => null]);
+
+        EmployeeManager::createEmployeeOperationLog($job->wash_employee_id, WorkerOperationStatus::Wash(), EmployeeOperationActionType::Stop());
 
         return redirect(route('worker.operation.dry.select-employee', ['jobId' => $job->id]));
     }
@@ -72,12 +72,7 @@ class DryController extends Controller
         $job->status = WorkerOperationStatus::Dry();
         $job->save();
 
-        $employeeOperationLog = new EmployeeOperationLog;
-        $employeeOperationLog->employee_id = $employeeId;
-        $employeeOperationLog->operation_type = WorkerOperationStatus::Dry();
-        $employeeOperationLog->action_type = EmployeeOperationActionType::Start();
-        $employeeOperationLog->save();
-
+        EmployeeManager::createEmployeeOperationLog($employeeId, WorkerOperationStatus::Dry(), EmployeeOperationActionType::Start());
 
         return redirect(route('worker.operation.dry.select-dryer-machine', ['jobId' => $job->id]));
     }
@@ -115,11 +110,8 @@ class DryController extends Controller
         $job->color = $request->get('color');
         $job->save();
 
-        $employeeOperationLog = new EmployeeOperationLog;
-        $employeeOperationLog->employee_id = $job->dry_employee_id;
-        $employeeOperationLog->operation_type = WorkerOperationStatus::Dry();
-        $employeeOperationLog->action_type = EmployeeOperationActionType::Progress();
-        $employeeOperationLog->save();
+        EmployeeManager::createEmployeeOperationLog($job->dry_employee_id, WorkerOperationStatus::Dry(), EmployeeOperationActionType::Progress());
+
         return redirect(route('worker.operation.dry.employee-result', ['jobId' => $job->id]));
     }
 

@@ -7,6 +7,7 @@ use App\Enums\EmployeeOperationActionType;
 use App\Enums\JobGroupStatus;
 use App\Enums\WorkerOperationStatus;
 use App\Http\Controllers\Controller;
+use App\Managers\EmployeeManager;
 use App\Models\Customer;
 use Illuminate\Http\Request;
 use App\Models\CustomerGroup;
@@ -30,11 +31,8 @@ class PickUpController extends Controller
         $jobGroup->operation_status = JobGroupStatus::PickUp();
         $jobGroup->save();
 
-        $employeeOperationLog = new EmployeeOperationLog;
-        $employeeOperationLog->employee_id = $employeeId;
-        $employeeOperationLog->operation_type = WorkerOperationStatus::PickUp();
-        $employeeOperationLog->action_type = EmployeeOperationActionType::Start();
-        $employeeOperationLog->save();
+        EmployeeManager::createEmployeeOperationLog($employeeId, WorkerOperationStatus::PickUp(), EmployeeOperationActionType::Start());
+
         return redirect(route('worker.operation.pick-up.select-customer', ['jobGroupId' => $jobGroup->id]));
     }
 

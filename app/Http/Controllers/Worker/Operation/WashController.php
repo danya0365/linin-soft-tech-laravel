@@ -7,6 +7,7 @@ use App\Enums\EmployeeOperationActionType;
 use App\Enums\JobGroupStatus;
 use App\Enums\WorkerOperationStatus;
 use App\Http\Controllers\Controller;
+use App\Managers\EmployeeManager;
 use Illuminate\Http\Request;
 use App\Models\CustomerGroup;
 use App\Models\Department;
@@ -36,11 +37,8 @@ class WashController extends Controller
         $job->status = WorkerOperationStatus::Wash();
         $job->save();
 
-        $employeeOperationLog = new EmployeeOperationLog;
-        $employeeOperationLog->employee_id = $employeeId;
-        $employeeOperationLog->operation_type = WorkerOperationStatus::Wash();
-        $employeeOperationLog->action_type = EmployeeOperationActionType::Start();
-        $employeeOperationLog->save();
+        EmployeeManager::createEmployeeOperationLog($employeeId, WorkerOperationStatus::Wash(), EmployeeOperationActionType::Start());
+
         return redirect(route('worker.operation.wash.select-customer', ['jobId' => $job->id]));
     }
 
@@ -76,11 +74,7 @@ class WashController extends Controller
         $jobGroup->operation_status = JobGroupStatus::Progress();
         $jobGroup->save();
 
-        $employeeOperationLog = new EmployeeOperationLog;
-        $employeeOperationLog->employee_id = $jobGroup->pickup_employee_id;
-        $employeeOperationLog->operation_type = WorkerOperationStatus::PickUp();
-        $employeeOperationLog->action_type = EmployeeOperationActionType::Stop();
-        $employeeOperationLog->save();
+        EmployeeManager::createEmployeeOperationLog($jobGroup->pickup_employee_id, WorkerOperationStatus::PickUp(), EmployeeOperationActionType::Stop());
 
         return redirect(route('worker.operation.wash.select-job-case', ['jobId' => $job->id]));
     }
@@ -160,11 +154,8 @@ class WashController extends Controller
         $job->color = $request->get('color');
         $job->save();
 
-        $employeeOperationLog = new EmployeeOperationLog;
-        $employeeOperationLog->employee_id = $job->wash_employee_id;
-        $employeeOperationLog->operation_type = WorkerOperationStatus::Wash();
-        $employeeOperationLog->action_type = EmployeeOperationActionType::Progress();
-        $employeeOperationLog->save();
+        EmployeeManager::createEmployeeOperationLog($job->wash_employee_id, WorkerOperationStatus::Wash(), EmployeeOperationActionType::Progress());
+
         return redirect(route('worker.operation.wash.employee-result', ['jobId' => $job->id]));
     }
 

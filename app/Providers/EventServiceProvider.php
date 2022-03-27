@@ -3,7 +3,9 @@
 namespace App\Providers;
 
 use App\Events\UserLoginSuccess;
+use App\Events\EmployeeOperationLogCreated;
 use App\Listeners\StoreUserLoginHistoryNotification;
+use App\Listeners\CalculateEmployeeWorkingTimeNotification;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -22,6 +24,9 @@ class EventServiceProvider extends ServiceProvider
         ],
         UserLoginSuccess::class => [
             StoreUserLoginHistoryNotification::class,
+        ],
+        EmployeeOperationLogCreated::class => [
+            CalculateEmployeeWorkingTimeNotification::class,
         ],
     ];
 

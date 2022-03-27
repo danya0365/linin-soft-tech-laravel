@@ -29,18 +29,10 @@ class StoreUserLoginHistoryNotification
     public function handle(UserLoginSuccess $event)
     {
         $userInfo = $event->user;
-
-        // $saveHistory = LoginHistory::create([
-        //     'name' => $userInfo->name,
-        //     'email' => $userInfo->email
-        // ]);
-        // return $saveHistory;
-
         $loginHistory = new LoginHistory;
         $loginHistory->user_id = $userInfo->id;
         $loginHistory->name = $userInfo->name;
         $loginHistory->email = $userInfo->email;
         $loginHistory->save();
-        return $loginHistory;
     }
 }
