@@ -11,7 +11,6 @@ use Illuminate\Http\Request;
 use App\Models\Department;
 use App\Models\DryerMachine;
 use App\Models\Job;
-use App\Models\LinenType;
 use App\Models\WashingMachine;
 
 class IronController extends Controller
@@ -114,5 +113,24 @@ class IronController extends Controller
         EmployeeManager::createEmployeeOperationLog($job->dry_employee_id, WorkerOperationStatus::Iron(), EmployeeOperationActionType::Progress());
 
         return redirect(route('worker.operation.iron.employee-result', ['jobId' => $job->id]));
+    }
+
+    public function getEmployeeResult($jobId)
+    {
+        $job = Job::with('employee')
+            ->with('customer')
+            ->with('jobGroup')
+            ->with('washingMachine')
+            ->with('dryerMachine')
+            ->with('linenType')
+            ->with('washEmployee')
+            ->with('dryEmployee')
+            ->with('ironEmployee')
+            ->where('id', $jobId)->first();
+
+        $summaryReports = $job->ironSummaryReport();
+        $workingDuration = $job->ironEmployee->getTotalTimeDurationOfWorkingTime();
+
+        return view('worker.operations.iron.employee-result', ['job' => $job->toArray(), 'summaryReports' => $summaryReports, 'workingDuration' => $workingDuration]);
     }
 }

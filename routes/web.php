@@ -104,6 +104,7 @@ Route::group(['prefix' => 'worker', 'middleware' => ['auth']], function () {
             Route::get('/{jobId}/employee/{employeeId}', [App\Http\Controllers\Worker\Operation\IronController::class, 'setSelectEmployee'])->name('worker.operation.iron.set-select-employee');
             Route::get('/{jobId}/submit', [App\Http\Controllers\Worker\Operation\IronController::class, 'getSubmit'])->name('worker.operation.iron.submit');
             Route::post('/{jobId}/submit', [App\Http\Controllers\Worker\Operation\IronController::class, 'postSubmit'])->name('worker.operation.iron.submit');
+            Route::get('/{jobId}/employee-result', [App\Http\Controllers\Worker\Operation\IronController::class, 'getEmployeeResult'])->name('worker.operation.iron.employee-result');
         });
 
         Route::group(['prefix' => 'packing'], function () {

@@ -11,7 +11,6 @@ use Illuminate\Http\Request;
 use App\Models\Department;
 use App\Models\DryerMachine;
 use App\Models\Job;
-use App\Models\LinenType;
 use App\Models\WashingMachine;
 
 class DryController extends Controller
@@ -20,7 +19,7 @@ class DryController extends Controller
     {
         return redirect(route('worker.operation.dry.select-job'));
     }
-    
+
     public function selectJob()
     {
         $jobs = Job::with('employee')
@@ -120,7 +119,6 @@ class DryController extends Controller
 
     public function getEmployeeResult($jobId)
     {
-        $linenTypes = LinenType::with('linenProducts')->get();
         $job = Job::with('employee')->with('customer')->with('jobGroup')->with('washingMachine')->with('dryerMachine')->with('linenType')->with('washEmployee')->with('dryEmployee')->where('id', $jobId)->first();
 
         $summaryReports = $job->drySummaryReport();

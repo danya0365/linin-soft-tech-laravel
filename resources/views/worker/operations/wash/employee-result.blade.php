@@ -54,11 +54,11 @@
                 </div>
                 <ul class="list-group list-group-flush">
                     @foreach ($summaryReports as $summaryReport)
-                    <li class="list-group-item">{{ $summaryReport['title'] }}: {{ number_format($summaryReport['value']) }}</li>
+                    <li class="list-group-item">{{ $summaryReport['title'] }}: {{ number_format($summaryReport['value']) }} กก.</li>
                     @endforeach
                   </ul>
                 <div class="card-footer text-muted text-center">
-                  เวลาการทำงานวันนี้: {{ $workingDuration }}
+                    เวลาการทำงานทั้งหมด: {{ $workingDuration }}
                 </div>
               </div>
         </div>

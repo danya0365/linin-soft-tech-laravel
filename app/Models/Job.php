@@ -115,7 +115,7 @@ class Job extends Model
     return $array;
   }
 
-  function washSummaryReport()
+  public function washSummaryReport()
   {
     $linenTypes = LinenType::with('linenProducts')->get();
     $summaryReports = [];
@@ -130,7 +130,7 @@ class Job extends Model
     return $summaryReports;
   }
 
-  function drySummaryReport()
+  public function drySummaryReport()
   {
     $linenTypes = LinenType::with('linenProducts')->get();
     $summaryReports = [];
@@ -142,6 +142,21 @@ class Job extends Model
       $summaryReports[] = ['title' => $linenType->name, 'value' => $value];
     }
     $summaryReports[] = ['title' => 'จำนวนที่อบแล้ว', 'value' => $totalValue];
+    return $summaryReports;
+  }
+
+  public function ironSummaryReport()
+  {
+    $linenTypes = LinenType::with('linenProducts')->get();
+    $summaryReports = [];
+    $totalValue = 0;
+    $summaryReports = [];
+    foreach ($linenTypes as $linenType) {
+      $value = Job::where('iron_employee_id', $this->iron_employee_id)->where('linen_type_id', $linenType->id)->sum('piece');
+      $totalValue += $value;
+      $summaryReports[] = ['title' => $linenType->name, 'value' => $value];
+    }
+    $summaryReports[] = ['title' => 'จำนวนที่รีดแล้ว', 'value' => $totalValue];
     return $summaryReports;
   }
 }
