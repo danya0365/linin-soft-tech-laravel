@@ -16,36 +16,42 @@ class DepartmentSeeder extends Seeder
     public function run()
     {
         DB::table('departments')->insert([
+            'var_name' => 'pickup',
             'name' => 'รับสินค้า',
             'input_unit' => 'weight',
             'created_at' =>  \Carbon\Carbon::now(),
             'updated_at' => \Carbon\Carbon::now()
         ]);
         DB::table('departments')->insert([
+            'var_name' => 'wash',
             'name' => 'ซัก',
             'input_unit' => 'weight',
             'created_at' =>  \Carbon\Carbon::now(),
             'updated_at' => \Carbon\Carbon::now()
         ]);
         DB::table('departments')->insert([
+            'var_name' => 'dry',
             'name' => 'อบ',
             'input_unit' => 'weight',
             'created_at' =>  \Carbon\Carbon::now(),
             'updated_at' => \Carbon\Carbon::now()
         ]);
         DB::table('departments')->insert([
+            'var_name' => 'iron',
             'name' => 'รีด',
             'input_unit' => 'piece',
             'created_at' =>  \Carbon\Carbon::now(),
             'updated_at' => \Carbon\Carbon::now()
         ]);
         DB::table('departments')->insert([
+            'var_name' => 'packing',
             'name' => 'พับแพ็ค',
             'input_unit' => 'piece',
             'created_at' =>  \Carbon\Carbon::now(),
             'updated_at' => \Carbon\Carbon::now()
         ]);
         DB::table('departments')->insert([
+            'var_name' => 'collect',
             'name' => 'จัดเก็บ',
             'input_unit' => 'weight',
             'created_at' =>  \Carbon\Carbon::now(),

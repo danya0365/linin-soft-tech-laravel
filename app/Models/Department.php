@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
  * Class Department
  *
  * @property $id
+ * @property $var_name
  * @property $name
  * @property $input_unit
  * @property $created_at
@@ -31,8 +32,7 @@ class Department extends Model
    *
    * @var array
    */
-  protected $fillable = ['name', 'input_unit'];
-
+  protected $fillable = ['var_name', 'name', 'input_unit'];
 
   public function employees()
   {

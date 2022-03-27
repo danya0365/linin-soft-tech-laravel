@@ -109,6 +109,13 @@ Route::group(['prefix' => 'worker', 'middleware' => ['auth']], function () {
 
         Route::group(['prefix' => 'packing'], function () {
             Route::get('/', [App\Http\Controllers\Worker\Operation\PackingController::class, 'index'])->name('worker.operation.packing');
+            Route::get('/job-group', [App\Http\Controllers\Worker\Operation\PackingController::class, 'selectJobGroup'])->name('worker.operation.packing.select-job-group');
+            Route::get('/job-group/{jobGroupId}', [App\Http\Controllers\Worker\Operation\PackingController::class, 'setSelectJobGroup'])->name('worker.operation.packing.set-select-job-group');
+            Route::get('/{jobGroupId}/employee', [App\Http\Controllers\Worker\Operation\PackingController::class, 'selectEmployee'])->name('worker.operation.packing.select-employee');
+            Route::get('/{jobGroupId}/employee/{employeeId}', [App\Http\Controllers\Worker\Operation\PackingController::class, 'setSelectEmployee'])->name('worker.operation.packing.set-select-employee');
+            Route::get('/{jobGroupId}/submit', [App\Http\Controllers\Worker\Operation\PackingController::class, 'getSubmit'])->name('worker.operation.packing.submit');
+            Route::post('/{jobGroupId}/submit', [App\Http\Controllers\Worker\Operation\PackingController::class, 'postSubmit'])->name('worker.operation.packing.submit');
+            Route::get('/{jobGroupId}/employee-result', [App\Http\Controllers\Worker\Operation\PackingController::class, 'getEmployeeResult'])->name('worker.operation.packing.employee-result');
         });
 
         Route::group(['prefix' => 'collect'], function () {

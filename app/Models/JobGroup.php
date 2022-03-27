@@ -50,4 +50,54 @@ class JobGroup extends Model
   {
     return $this->belongsTo(Customer::class);
   }
+
+  public function jobs()
+  {
+    return $this->hasMany(Job::class);
+  }
+
+  public function pickUpEmployee()
+  {
+    return $this->belongsTo(Employee::class, 'pickup_employee_id');
+  }
+
+  public function packingEmployee()
+  {
+    return $this->belongsTo(Employee::class, 'packing_employee_id');
+  }
+
+  public function collectEmployee()
+  {
+    return $this->belongsTo(Employee::class, 'collect_employee_id');
+  }
+
+  /**
+   * Convert the model instance to an array.
+   *
+   * @return array
+   */
+  public function toArray()
+  {
+    $array = parent::toArray();
+
+    $array['operation_status_text'] = (function ($jobStatus) {
+      $statusTexts = ['pickup' => 'รับสินค้า', 'progress' => 'ซัก, อบ, รีด', 'packing' => 'พับแพ็ค', 'collect' => 'จัดเก็บ'];
+      foreach ($statusTexts as $status => $text) {
+        if (strtolower($status) == strtolower($jobStatus)) {
+          return $text;
+        }
+      }
+      return ucfirst($jobStatus);
+    })($array['operation_status']);
+
+    return $array;
+  }
+
+  public function packingSummaryReport()
+  {
+    $summaryReports = [];
+    $totalValue = JobGroup::where('packing_employee_id', $this->packing_employee_id)->sum('total_pieces');
+    $summaryReports[] = ['title' => 'จำนวนที่พับแพ็คแล้ว', 'value' => $totalValue];
+    return $summaryReports;
+  }
 }
