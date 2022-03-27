@@ -17,6 +17,8 @@ return new class extends Migration
             $table->id();
             $table->integer('employee_id');
             $table->date('working_date');
+            $table->dateTime('started_at');
+            $table->dateTime('ended_at')->nullable();
             $table->integer('time_duration')->default(0);
             $table->timestamps();
 

@@ -32,8 +32,8 @@ class CalculateEmployeeWorkingTimeNotification
     {
         $employeeOperationLog = $event->employeeOperationLog;
 
-        $todayDate = Carbon::today();
+        $workingDate = Carbon::now();
 
-        EmployeeManager::calculateEmployeeWorkingTime($employeeOperationLog, $todayDate);
+        EmployeeManager::calculateEmployeeWorkingTime($employeeOperationLog, $workingDate);
     }
 }

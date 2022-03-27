@@ -165,6 +165,6 @@ class DryController extends Controller
             return $interval->forHumans();
         })();
 
-        return view('worker.operations.wash.employee-result', ['job' => $job->toArray(), 'summaryReports' => $summaryReports, 'workingDuration' => $workingDuration]);
+        return view('worker.operations.dry.employee-result', ['job' => $job->toArray(), 'summaryReports' => $summaryReports, 'workingDuration' => $workingDuration]);
     }
 }

@@ -32,6 +32,7 @@ class EmployeeManager extends Manager
         if (!$employeeWorkingTime) {
             $employeeWorkingTime = new EmployeeWorkingTime;
             $employeeWorkingTime->working_date = $workingDate;
+            $employeeWorkingTime->started_at = $workingDate;
             $employeeWorkingTime->employee_id = $employeeOperationLog->employee_id;
         }
         $timeDuration = (function () use ($workingDate, $employeeOperationLog) {
@@ -55,6 +56,7 @@ class EmployeeManager extends Manager
             return $intervalInSeconds;
         })();
         $employeeWorkingTime->time_duration = $timeDuration;
+        $employeeWorkingTime->ended_at = $workingDate;
         $employeeWorkingTime->save();
     }
 }
