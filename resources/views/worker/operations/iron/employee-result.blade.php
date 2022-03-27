@@ -7,17 +7,17 @@
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{ route('worker') }}">Worker</a></li>
             <li class="breadcrumb-item"><a href="{{ route('worker.operation') }}">ปฏิบัติการ</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.operation.dry.select-job', ['jobId' => $job['id']]) }}">ลูกค้า: {{ $job['customer']['name'] }}</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.operation.dry.select-job', ['jobId' => $job['id']]) }}">ตู้เก็บน้ำหนัก: {{ $job['job_group']['wet_weight'] }}</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.operation.dry.select-job', ['jobId' => $job['id']]) }}">รถเข็นน้ำหนัก: {{ $job['wet_weight'] }}</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.operation.dry.select-job', ['jobId' => $job['id']]) }}" style="color: {{ $job['color'] }}">สี: {{ $job['color'] }}</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.operation.dry.select-job', ['jobId' => $job['id']]) }}">{{ $job['job_case']['name'] }}</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.operation.dry.select-job', ['jobId' => $job['id']]) }}">{{ $job['washing_machine']['name'] }}</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.operation.dry.select-job', ['jobId' => $job['id']]) }}">{{ $job['linen_type']['name'] }}</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.operation.dry.select-employee', ['jobId' => $job['id']]) }}">พนักงาน: {{ $job['employee']['name'] }}</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.operation.dry.select-dryer-machine', ['jobId' => $job['id']]) }}">{{ $job['dryer_machine']['name'] }}</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.operation.dry.submit', ['jobId' => $job['id']]) }}">Submit</a></li>
-            <li class="breadcrumb-item active" aria-current="page">อบ - สรุปยอดพนักงาน</li>
+            <li class="breadcrumb-item"><a href="{{ route('worker.operation.iron.select-job', ['jobId' => $job['id']]) }}">ลูกค้า: {{ $job['customer']['name'] }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('worker.operation.iron.select-job', ['jobId' => $job['id']]) }}">ตู้เก็บน้ำหนัก: {{ $job['job_group']['wet_weight'] }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('worker.operation.iron.select-job', ['jobId' => $job['id']]) }}">รถเข็นน้ำหนัก: {{ $job['wet_weight'] }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('worker.operation.iron.select-job', ['jobId' => $job['id']]) }}" style="color: {{ $job['color'] }}">สี: {{ $job['color'] }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('worker.operation.iron.select-job', ['jobId' => $job['id']]) }}">{{ $job['job_case']['name'] }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('worker.operation.iron.select-job', ['jobId' => $job['id']]) }}">{{ $job['washing_machine']['name'] }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('worker.operation.iron.select-job', ['jobId' => $job['id']]) }}">{{ $job['linen_type']['name'] }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('worker.operation.iron.select-job', ['jobId' => $job['id']]) }}">{{ $job['dryer_machine']['name'] }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('worker.operation.iron.select-employee', ['jobId' => $job['id']]) }}">พนักงาน: {{ $job['employee']['name'] }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('worker.operation.iron.submit', ['jobId' => $job['id']]) }}">Submit</a></li>
+            <li class="breadcrumb-item active" aria-current="page">รีด - สรุปยอดพนักงาน</li>
         </ol>
     </nav>
     <div class="row justify-content-center">
@@ -49,19 +49,19 @@
                             <div class="bi bi-person-circle rounded-3 d-flex align-items-center justify-content-center p-3 py-6" style="font-size: 10em"></div>
                         </div>
                     </div>
-                    <h5 class="card-title text-center">{{ $job['dry_employee']['name'] }}</h5>
+                    <h5 class="card-title text-center">{{ $job['iron_employee']['name'] }}</h5>
                     <dl class="row">
                         <dt class="col-sm-3">Employee Code</dt>
-                        <dd class="col-sm-9">{{ $job['dry_employee']['code'] }}</dd>
+                        <dd class="col-sm-9">{{ $job['iron_employee']['code'] }}</dd>
                     </dl>
                 </div>
                 <ul class="list-group list-group-flush">
                     @foreach ($summaryReports as $summaryReport)
-                    <li class="list-group-item">{{ $summaryReport['title'] }}: {{ number_format($summaryReport['value']) }} กก.</li>
+                    <li class="list-group-item">{{ $summaryReport['title'] }}: {{ number_format($summaryReport['value']) }} ชิ้น</li>
                     @endforeach
                   </ul>
                 <div class="card-footer text-muted text-center">
-                    เวลาการทำงานทั้งหมด: {{ $workingDuration }}
+                  เวลาการทำงานทั้งหมด: {{ $workingDuration }}
                 </div>
               </div>
         </div>

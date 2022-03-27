@@ -42,7 +42,7 @@
                                                 </div>
                                             </div>
         
-                                            @foreach ([7, 8, 9, 4, 5, 6, 1, 2, 3, '.', 0, 'ลบ'] as $pad)
+                                            @foreach ([7, 8, 9, 4, 5, 6, 1, 2, 3, '', 0, 'ลบ'] as $pad)
                                             <div class="col-4">
                                                 <div class="border bg-light" style="width: 100%">
                                                     <div class="rounded-3 d-flex align-items-center justify-content-center pad-number" style="font-size: 48px">
@@ -127,6 +127,9 @@ $(function(){
     $('.pad-number').click(function(){
         var padNumber =  $.trim($(this).text())
         padNumber = padNumber.replace(',', '');
+        if ( padNumber == '') {
+            return
+        }
         number = number != '0' ? number + '' + padNumber : padNumber;
         if ( padNumber == 'ลบ') {
             number = '0';
@@ -135,7 +138,6 @@ $(function(){
     })
 
     var setColorResult = (color) => {
-        console.log('setColorResult', color);
         $("#color-result").css('background-color', color);
         $('[name=color]').val(color);
         selectColor = $('[name=color]').val();

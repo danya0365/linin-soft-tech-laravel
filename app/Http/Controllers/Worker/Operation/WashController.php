@@ -7,6 +7,7 @@ use App\Enums\EmployeeOperationActionType;
 use App\Enums\JobGroupStatus;
 use App\Enums\WorkerOperationStatus;
 use App\Http\Controllers\Controller;
+use App\Managers\EmployeeManager;
 use Illuminate\Http\Request;
 use App\Models\CustomerGroup;
 use App\Models\Department;
@@ -14,14 +15,16 @@ use App\Models\JobGroup;
 use App\Models\Job;
 use App\Models\JobCase;
 use App\Models\WashingMachine;
-use App\Models\EmployeeOperationLog;
 use App\Models\LinenProduct;
 use App\Models\LinenType;
-use Carbon\CarbonInterval;
-use App\Translations\Translator;
 
 class WashController extends Controller
 {
+    public function index()
+    {
+        return redirect(route('worker.operation.wash.select-employee'));
+    }
+
     public function selectEmployee()
     {
         $departments = Department::with('employees')->where('id', DepartmentNameId::Wash())->get();
@@ -36,11 +39,8 @@ class WashController extends Controller
         $job->status = WorkerOperationStatus::Wash();
         $job->save();
 
-        $employeeOperationLog = new EmployeeOperationLog;
-        $employeeOperationLog->employee_id = $employeeId;
-        $employeeOperationLog->operation_type = WorkerOperationStatus::Wash();
-        $employeeOperationLog->action_type = EmployeeOperationActionType::Start();
-        $employeeOperationLog->save();
+        EmployeeManager::createEmployeeOperationLog($employeeId, WorkerOperationStatus::Wash(), EmployeeOperationActionType::Start());
+
         return redirect(route('worker.operation.wash.select-customer', ['jobId' => $job->id]));
     }
 
@@ -76,11 +76,7 @@ class WashController extends Controller
         $jobGroup->operation_status = JobGroupStatus::Progress();
         $jobGroup->save();
 
-        $employeeOperationLog = new EmployeeOperationLog;
-        $employeeOperationLog->employee_id = $jobGroup->pickup_employee_id;
-        $employeeOperationLog->operation_type = WorkerOperationStatus::PickUp();
-        $employeeOperationLog->action_type = EmployeeOperationActionType::Stop();
-        $employeeOperationLog->save();
+        EmployeeManager::createEmployeeOperationLog($jobGroup->pickup_employee_id, WorkerOperationStatus::PickUp(), EmployeeOperationActionType::Stop());
 
         return redirect(route('worker.operation.wash.select-job-case', ['jobId' => $job->id]));
     }
@@ -160,62 +156,17 @@ class WashController extends Controller
         $job->color = $request->get('color');
         $job->save();
 
-        $employeeOperationLog = new EmployeeOperationLog;
-        $employeeOperationLog->employee_id = $job->wash_employee_id;
-        $employeeOperationLog->operation_type = WorkerOperationStatus::Wash();
-        $employeeOperationLog->action_type = EmployeeOperationActionType::Progress();
-        $employeeOperationLog->save();
+        EmployeeManager::createEmployeeOperationLog($job->wash_employee_id, WorkerOperationStatus::Wash(), EmployeeOperationActionType::Progress());
+
         return redirect(route('worker.operation.wash.employee-result', ['jobId' => $job->id]));
     }
 
     public function getEmployeeResult($jobId)
     {
-        $linenTypes = LinenType::with('linenProducts')->get();
         $job = Job::with('employee')->with('customer')->with('jobGroup')->with('washingMachine')->with('linenType')->with('washEmployee')->where('id', $jobId)->first();
 
-        $summaryReports = (function () use ($linenTypes, $job) {
-            $totalValue = 0;
-            $summaryReports = [];
-            foreach ($linenTypes as $linenType) {
-                $value = Job::where('wash_employee_id', $job->wash_employee_id)->where('linen_type_id', $linenType->id)->sum('wet_weight');
-                $totalValue += $value;
-                $summaryReports[] = ['title' => $linenType->name, 'value' => $value];
-            }
-            $summaryReports[] = ['title' => 'จำนวนที่ซักแล้ว', 'value' => $totalValue];
-            return $summaryReports;
-        })();
-
-        $workingDuration = (function () use ($job) {
-            // $second = 1;
-            // $minute = 60 * $second;
-            // $hours  = 60 * $minute;
-            // $day    = 24 * $hours;
-            // $week   = 7  * $day;
-            // $month  = 4  * $week;
-            // $year   = 12 * $month;
-
-            // $sum      = $second + $minute + $hours + $day + $week + $month + $year;
-            $interval = 0;
-            $start = EmployeeOperationLog::where('operation_type', WorkerOperationStatus::Wash())
-                ->where('action_type', EmployeeOperationActionType::Start())
-                ->where('employee_id', $job->wash_employee_id)
-                ->orderBy('id', 'desc')
-                ->first();
-            if ($start) {
-                $end = EmployeeOperationLog::where('operation_type', WorkerOperationStatus::Wash())
-                    ->where('employee_id', $job->wash_employee_id)
-                    ->orderBy('id', 'desc')
-                    ->first();
-                $diff = $start->created_at->diff($end->created_at);
-                $interval = (function (\DateInterval $interval) {
-                    return $interval->days * 86400 + $interval->h * 3600 + $interval->i * 60 + $interval->s;
-                })($diff);
-            }
-            $interval = CarbonInterval::seconds($interval)->cascade();
-
-            $interval->setLocalTranslator(new Translator());
-            return $interval->forHumans();
-        })();
+        $summaryReports = $job->washSummaryReport();
+        $workingDuration = $job->washEmployee->getTotalTimeDurationOfWorkingTime();
 
         return view('worker.operations.wash.employee-result', ['job' => $job->toArray(), 'summaryReports' => $summaryReports, 'workingDuration' => $workingDuration]);
     }

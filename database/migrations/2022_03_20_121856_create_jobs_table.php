@@ -27,6 +27,7 @@ return new class extends Migration
             $table->integer('linen_type_id')->nullable();
             $table->string('tags')->nullable();
             $table->integer('wet_weight')->nullable();
+            $table->integer('piece')->nullable();
             $table->string('color')->nullable();
             $table->enum('status', ['wash', 'dry', 'iron']);
             $table->timestamps();

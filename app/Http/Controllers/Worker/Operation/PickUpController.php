@@ -7,6 +7,7 @@ use App\Enums\EmployeeOperationActionType;
 use App\Enums\JobGroupStatus;
 use App\Enums\WorkerOperationStatus;
 use App\Http\Controllers\Controller;
+use App\Managers\EmployeeManager;
 use App\Models\Customer;
 use Illuminate\Http\Request;
 use App\Models\CustomerGroup;
@@ -16,6 +17,11 @@ use App\Models\JobGroup;
 
 class PickUpController extends Controller
 {
+    public function index()
+    {
+        return redirect(route('worker.operation.pickup.select-employee'));
+    }
+
     public function selectEmployee()
     {
         $departments = Department::with('employees')->where('id', DepartmentNameId::PickUp())->get();
@@ -30,12 +36,9 @@ class PickUpController extends Controller
         $jobGroup->operation_status = JobGroupStatus::PickUp();
         $jobGroup->save();
 
-        $employeeOperationLog = new EmployeeOperationLog;
-        $employeeOperationLog->employee_id = $employeeId;
-        $employeeOperationLog->operation_type = WorkerOperationStatus::PickUp();
-        $employeeOperationLog->action_type = EmployeeOperationActionType::Start();
-        $employeeOperationLog->save();
-        return redirect(route('worker.operation.pick-up.select-customer', ['jobGroupId' => $jobGroup->id]));
+        EmployeeManager::createEmployeeOperationLog($employeeId, WorkerOperationStatus::PickUp(), EmployeeOperationActionType::Start());
+
+        return redirect(route('worker.operation.pickup.select-customer', ['jobGroupId' => $jobGroup->id]));
     }
 
     public function selectCustomer($jobGroupId)
@@ -58,7 +61,7 @@ class PickUpController extends Controller
             $jobGroup->customer_id = $customerId;
             $jobGroup->save();
         }
-        return redirect(route('worker.operation.pick-up.submit', ['jobGroupId' => $jobGroup->id]));
+        return redirect(route('worker.operation.pickup.submit', ['jobGroupId' => $jobGroup->id]));
     }
 
     public function getSubmit(Request $request, $jobGroupId)

@@ -85,6 +85,11 @@ class Job extends Model
   {
     return $this->belongsTo(Employee::class, 'dry_employee_id');
   }
+
+  public function ironEmployee()
+  {
+    return $this->belongsTo(Employee::class, 'iron_employee_id');
+  }
   /**
    * Convert the model instance to an array.
    *
@@ -108,5 +113,50 @@ class Job extends Model
     })($array['status']);
 
     return $array;
+  }
+
+  public function washSummaryReport()
+  {
+    $linenTypes = LinenType::with('linenProducts')->get();
+    $summaryReports = [];
+    $totalValue = 0;
+    $summaryReports = [];
+    foreach ($linenTypes as $linenType) {
+      $value = Job::where('wash_employee_id', $this->wash_employee_id)->where('linen_type_id', $linenType->id)->sum('wet_weight');
+      $totalValue += $value;
+      $summaryReports[] = ['title' => $linenType->name, 'value' => $value];
+    }
+    $summaryReports[] = ['title' => 'จำนวนที่ซักแล้ว', 'value' => $totalValue];
+    return $summaryReports;
+  }
+
+  public function drySummaryReport()
+  {
+    $linenTypes = LinenType::with('linenProducts')->get();
+    $summaryReports = [];
+    $totalValue = 0;
+    $summaryReports = [];
+    foreach ($linenTypes as $linenType) {
+      $value = Job::where('dry_employee_id', $this->dry_employee_id)->where('linen_type_id', $linenType->id)->sum('wet_weight');
+      $totalValue += $value;
+      $summaryReports[] = ['title' => $linenType->name, 'value' => $value];
+    }
+    $summaryReports[] = ['title' => 'จำนวนที่อบแล้ว', 'value' => $totalValue];
+    return $summaryReports;
+  }
+
+  public function ironSummaryReport()
+  {
+    $linenTypes = LinenType::with('linenProducts')->get();
+    $summaryReports = [];
+    $totalValue = 0;
+    $summaryReports = [];
+    foreach ($linenTypes as $linenType) {
+      $value = Job::where('iron_employee_id', $this->iron_employee_id)->where('linen_type_id', $linenType->id)->sum('piece');
+      $totalValue += $value;
+      $summaryReports[] = ['title' => $linenType->name, 'value' => $value];
+    }
+    $summaryReports[] = ['title' => 'จำนวนที่รีดแล้ว', 'value' => $totalValue];
+    return $summaryReports;
   }
 }
