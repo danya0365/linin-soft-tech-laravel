@@ -21,6 +21,10 @@
                     <div class="card-body">
                         
                         <div class="form-group">
+                            <strong>Var Name:</strong>
+                            {{ $department->var_name }}
+                        </div>
+                        <div class="form-group">
                             <strong>Name:</strong>
                             {{ $department->name }}
                         </div>

@@ -36,6 +36,7 @@
                                     <tr>
                                         <th>No</th>
                                         
+										<th>Var Name</th>
 										<th>Name</th>
 										<th>Input Unit</th>
 
@@ -47,6 +48,7 @@
                                         <tr>
                                             <td>{{ ++$i }}</td>
                                             
+											<td>{{ $department->var_name }}</td>
 											<td>{{ $department->name }}</td>
 											<td>{{ $department->input_unit }}</td>
 
