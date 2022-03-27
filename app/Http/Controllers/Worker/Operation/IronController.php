@@ -13,7 +13,7 @@ use App\Models\DryerMachine;
 use App\Models\Job;
 use App\Models\WashingMachine;
 
-class PackingControllerIronController extends Controller
+class IronController extends Controller
 {
     public function index()
     {
@@ -131,5 +131,18 @@ class PackingControllerIronController extends Controller
         $workingDuration = $job->ironEmployee->getTotalTimeDurationOfWorkingTime();
 
         return view('worker.operations.iron.employee-result', ['job' => $job->toArray(), 'summaryReports' => $summaryReports, 'workingDuration' => $workingDuration]);
+    }
+
+    public function postEmployeeResult(Request $request, $jobId)
+    {
+        if ($request->get('status') == WorkerOperationStatus::Close()) {
+            $job = Job::find($jobId);
+            $job->status = $request->get('status');
+            $job->save();
+
+            EmployeeManager::createEmployeeOperationLog($job->dry_employee_id, WorkerOperationStatus::Iron(), EmployeeOperationActionType::Stop());
+        }
+
+        return redirect(route('worker.operation.iron.employee-result', ['jobId' => $jobId]));
     }
 }

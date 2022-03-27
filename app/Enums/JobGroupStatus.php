@@ -16,4 +16,5 @@ final class JobGroupStatus extends Enum
     const Progress =   'progress';
     const Packing = 'packing';
     const Collect = 'collect';
+    const Close = 'close';
 }

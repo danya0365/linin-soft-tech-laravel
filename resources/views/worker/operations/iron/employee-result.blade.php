@@ -37,9 +37,13 @@
                             </div>
                         </div>
                         <div class="col-4">
-                            <div class="d-grid gap-2" style="min-height: 60px">
-                                <button class="btn btn-outline-secondary" type="button">ยกเลิก</button>
-                            </div>
+                            <form method="POST" action="{{ route('worker.operation.iron.employee-result', ['jobId' => $job['id'] ]) }}"  role="form" enctype="multipart/form-data">
+                                @csrf
+                                {{ Form::hidden('status', App\Enums\WorkerOperationStatus::Close()) }}
+                                <div class="d-grid gap-2" style="min-height: 60px">
+                                    <button class="btn btn-outline-secondary" type="submit">ปิดงาน</button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>

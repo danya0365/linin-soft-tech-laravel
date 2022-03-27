@@ -81,7 +81,7 @@ class JobGroup extends Model
     $array = parent::toArray();
 
     $array['operation_status_text'] = (function ($jobStatus) {
-      $statusTexts = ['pickup' => 'รับสินค้า', 'progress' => 'ซัก, อบ, รีด', 'packing' => 'พับแพ็ค', 'collect' => 'จัดเก็บ'];
+      $statusTexts = ['pickup' => 'รับสินค้า', 'progress' => 'ซัก, อบ, รีด', 'packing' => 'พับแพ็ค', 'collect' => 'จัดเก็บ', 'close' => 'ปิดงาน'];
       foreach ($statusTexts as $status => $text) {
         if (strtolower($status) == strtolower($jobStatus)) {
           return $text;
@@ -98,6 +98,14 @@ class JobGroup extends Model
     $summaryReports = [];
     $totalValue = JobGroup::where('packing_employee_id', $this->packing_employee_id)->sum('total_pieces');
     $summaryReports[] = ['title' => 'จำนวนที่พับแพ็คแล้ว', 'value' => $totalValue];
+    return $summaryReports;
+  }
+
+  public function collectSummaryReport()
+  {
+    $summaryReports = [];
+    $totalValue = JobGroup::where('collect_employee_id', $this->collect_employee_id)->sum('dry_weight');
+    $summaryReports[] = ['title' => 'จำนวนที่จัดเก็บแล้ว', 'value' => $totalValue];
     return $summaryReports;
   }
 }

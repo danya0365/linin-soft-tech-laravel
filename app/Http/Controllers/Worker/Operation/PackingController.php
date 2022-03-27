@@ -14,11 +14,6 @@ use Illuminate\Http\Request;
 
 class PackingController extends Controller
 {
-    /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\Contracts\Support\Renderable
-     */
     public function index()
     {
         return redirect(route('worker.operation.packing.select-job-group'));
@@ -32,6 +27,7 @@ class PackingController extends Controller
             ->with('pickUpEmployee')
             ->with('packingEmployee')
             ->with('collectEmployee')
+            ->whereIn('operation_status', [JobGroupStatus::PickUp(), JobGroupStatus::Packing(), JobGroupStatus::Progress()])
             ->get();
 
         $customers = [];
@@ -48,9 +44,9 @@ class PackingController extends Controller
         return view('worker.operations.packing.select-job-group', ['customers' => $customers]);
     }
 
-    public function setSelectJobGroup($jobId)
+    public function setSelectJobGroup($jobGroupId)
     {
-        $jobGroup = JobGroup::find($jobId);
+        $jobGroup = JobGroup::find($jobGroupId);
         $jobGroup->operation_status = WorkerOperationStatus::Packing();
         $jobGroup->save();
 
@@ -67,7 +63,7 @@ class PackingController extends Controller
             ->with('collectEmployee')
             ->where('id', $jobGroupId)->first();
 
-        $departments = Department::with('employees')->where('id', DepartmentNameId::PickUp())->get();
+        $departments = Department::with('employees')->where('id', DepartmentNameId::Packing())->get();
         return view('worker.operations.packing.select-employee', ['departments' => $departments->toArray(), 'jobGroup' => $jobGroup->toArray()]);
     }
 
@@ -76,7 +72,6 @@ class PackingController extends Controller
         $jobGroup = JobGroup::find($jobGroupId);
         $jobGroup->employee_id = $employeeId;
         $jobGroup->packing_employee_id = $employeeId;
-        $jobGroup->operation_status = WorkerOperationStatus::Packing();
         $jobGroup->save();
 
         EmployeeManager::createEmployeeOperationLog($employeeId, WorkerOperationStatus::Packing(), EmployeeOperationActionType::Start());

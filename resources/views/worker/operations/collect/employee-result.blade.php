@@ -7,12 +7,14 @@
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{ route('worker') }}">Worker</a></li>
             <li class="breadcrumb-item"><a href="{{ route('worker.operation') }}">ปฏิบัติการ</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.operation.packing.select-job-group', ['jobGroupId' => $jobGroup['id']]) }}">ลูกค้า: {{ $jobGroup['customer']['name'] }}</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.operation.packing.select-job-group', ['jobGroupId' => $jobGroup['id']]) }}">น้ำหนักเปียก: {{ $jobGroup['wet_weight'] }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('worker.operation.collect.select-job-group', ['jobGroupId' => $jobGroup['id']]) }}">ลูกค้า: {{ $jobGroup['customer']['name'] }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('worker.operation.collect.select-job-group', ['jobGroupId' => $jobGroup['id']]) }}">น้ำหนักเปียก: {{ $jobGroup['wet_weight'] }}</a></li>
             <li class="breadcrumb-item"><a href="{{ route('worker.operation.collect.select-job-group', ['jobGroupId' => $jobGroup['id']]) }}">สถานะ: {{ $jobGroup['operation_status_text'] }}</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.operation.packing.select-employee', ['jobGroupId' => $jobGroup['id']]) }}">พนักงานพับแพ็ค: {{ $jobGroup['pick_up_employee']['name'] }}</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.operation.packing.submit', ['jobGroupId' => $jobGroup['id']]) }}">จำนวน: {{ $jobGroup['total_pieces'] }} ชิ้น</a></li>
-            <li class="breadcrumb-item active" aria-current="page">พับแพ็ค - สรุปยอดพนักงาน</li>
+            <li class="breadcrumb-item"><a href="{{ route('worker.operation.collect.select-job-group', ['jobGroupId' => $jobGroup['id']]) }}">พนักงานพับแพ็ค: {{ $jobGroup['pick_up_employee']['name'] }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('worker.operation.collect.select-job-group', ['jobGroupId' => $jobGroup['id']]) }}">จำนวน: {{ $jobGroup['total_pieces'] }} ชิ้น</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('worker.operation.collect.select-employee', ['jobGroupId' => $jobGroup['id']]) }}">พนักงานจัดเก็บ: {{ $jobGroup['collect_employee']['name'] }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('worker.operation.collect.submit', ['jobGroupId' => $jobGroup['id']]) }}">น้ำหนักแห้ง: {{ $jobGroup['dry_weight'] }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">จัดเก็บ - สรุปยอดพนักงาน</li>
         </ol>
     </nav>
     <div class="row justify-content-center">
@@ -32,9 +34,13 @@
                             </div>
                         </div>
                         <div class="col-4">
-                            <div class="d-grid gap-2" style="min-height: 60px">
-                                <button class="btn btn-outline-secondary" type="button">ยกเลิก</button>
-                            </div>
+                            <form method="POST" action="{{ route('worker.operation.collect.employee-result', ['jobGroupId' => $jobGroup['id'] ]) }}"  role="form" enctype="multipart/form-data">
+                                @csrf
+                                {{ Form::hidden('operation_status', App\Enums\JobGroupStatus::Close()) }}
+                                <div class="d-grid gap-2" style="min-height: 60px">
+                                    <button class="btn btn-outline-secondary" type="submit">ปิดงาน</button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -44,28 +50,28 @@
                             <div class="bi bi-person-circle rounded-3 d-flex align-items-center justify-content-center p-3 py-6" style="font-size: 10em"></div>
                         </div>
                     </div>
-                    <h5 class="card-title text-center">{{ $jobGroup['packing_employee']['name'] }}</h5>
+                    <h5 class="card-title text-center">{{ $jobGroup['collect_employee']['name'] }}</h5>
                     <dl class="row">
                         <dt class="col-sm-3">Employee Code</dt>
-                        <dd class="col-sm-9">{{ $jobGroup['packing_employee']['code'] }}</dd>
+                        <dd class="col-sm-9">{{ $jobGroup['collect_employee']['code'] }}</dd>
                     </dl>
                 </div>
                 <ul class="list-group list-group-flush">
                     @foreach ($summaryReports as $summaryReport)
-                    <li class="list-group-item">{{ $summaryReport['title'] }}: {{ number_format($summaryReport['value']) }} ชิ้น</li>
+                    <li class="list-group-item">{{ $summaryReport['title'] }}: {{ number_format($summaryReport['value']) }} กก.</li>
                     @endforeach
-                  </ul>
+                </ul>
                 <div class="card-footer text-muted text-center">
-                  เวลาการทำงานทั้งหมด: {{ $workingDuration }}
+                    เวลาการทำงานทั้งหมด: {{ $workingDuration }}
                 </div>
-              </div>
+            </div>
         </div>
     </div>
 </div>
 <script type="text/javascript">
-$(function(){
-    
-})
+    $(function() {
+
+    })
 </script>
 
 @endsection

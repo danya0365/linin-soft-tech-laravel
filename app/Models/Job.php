@@ -109,7 +109,7 @@ class Job extends Model
     })($array['job_case']);
 
     $array['status_text'] = (function ($jobStatus) {
-      $statusTexts = ['pickup' => 'รับสินค้า', 'wash' => 'ซัก', 'dry' => 'อบ', 'iron' => 'รีด', 'packing' => 'พับแพ็ค', 'collect' => 'จัดเก็บ'];
+      $statusTexts = ['pickup' => 'รับสินค้า', 'wash' => 'ซัก', 'dry' => 'อบ', 'iron' => 'รีด', 'packing' => 'พับแพ็ค', 'collect' => 'จัดเก็บ', 'close' => 'ปิดงาน'];
       foreach ($statusTexts as $status => $text) {
         if (strtolower($status) == strtolower($jobStatus)) {
           return $text;

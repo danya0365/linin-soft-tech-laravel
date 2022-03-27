@@ -7,10 +7,12 @@
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{ route('worker') }}">Worker</a></li>
             <li class="breadcrumb-item"><a href="{{ route('worker.operation') }}">ปฏิบัติการ</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.operation.packing.select-job-group', ['jobGroupId' => $jobGroup['id']]) }}">ลูกค้า: {{ $jobGroup['customer']['name'] }}</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.operation.packing.select-job-group', ['jobGroupId' => $jobGroup['id']]) }}">น้ำหนักเปียก: {{ $jobGroup['wet_weight'] }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('worker.operation.collect.select-job-group', ['jobGroupId' => $jobGroup['id']]) }}">ลูกค้า: {{ $jobGroup['customer']['name'] }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('worker.operation.collect.select-job-group', ['jobGroupId' => $jobGroup['id']]) }}">น้ำหนักเปียก: {{ $jobGroup['wet_weight'] }}</a></li>
             <li class="breadcrumb-item"><a href="{{ route('worker.operation.collect.select-job-group', ['jobGroupId' => $jobGroup['id']]) }}">สถานะ: {{ $jobGroup['operation_status_text'] }}</a></li>
-            <li class="breadcrumb-item active" aria-current="page">พับแพ็ค - เลือกพนักงาน</li>
+            <li class="breadcrumb-item"><a href="{{ route('worker.operation.collect.select-job-group', ['jobGroupId' => $jobGroup['id']]) }}">พนักงานพับแพ็ค: {{ $jobGroup['pick_up_employee']['name'] }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('worker.operation.collect.select-job-group', ['jobGroupId' => $jobGroup['id']]) }}">จำนวน: {{ $jobGroup['total_pieces'] }} ชิ้น</a></li>
+            <li class="breadcrumb-item active" aria-current="page">จัดเก็บ - เลือกพนักงาน</li>
         </ol>
     </nav>
     <div class="row justify-content-center">
@@ -22,7 +24,7 @@
                     <div class="row g-2">
                         @foreach ($department['employees'] as $employee)
                         <div class="col-sm-4">
-                            <a href="{{ route('worker.operation.packing.set-select-employee', ['jobGroupId' => $jobGroup['id'], 'employeeId' => $employee['id']]) }}">
+                            <a href="{{ route('worker.operation.collect.set-select-employee', ['jobGroupId' => $jobGroup['id'], 'employeeId' => $employee['id']]) }}">
                                 <div class="p-3 border bg-light" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center">
                                         <div class="bi bi-person-square" style="font-size: 3em"></div>

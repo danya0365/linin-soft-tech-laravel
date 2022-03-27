@@ -105,6 +105,7 @@ Route::group(['prefix' => 'worker', 'middleware' => ['auth']], function () {
             Route::get('/{jobId}/submit', [App\Http\Controllers\Worker\Operation\IronController::class, 'getSubmit'])->name('worker.operation.iron.submit');
             Route::post('/{jobId}/submit', [App\Http\Controllers\Worker\Operation\IronController::class, 'postSubmit'])->name('worker.operation.iron.submit');
             Route::get('/{jobId}/employee-result', [App\Http\Controllers\Worker\Operation\IronController::class, 'getEmployeeResult'])->name('worker.operation.iron.employee-result');
+            Route::post('/{jobId}/employee-result', [App\Http\Controllers\Worker\Operation\IronController::class, 'postEmployeeResult'])->name('worker.operation.iron.employee-result');
         });
 
         Route::group(['prefix' => 'packing'], function () {
@@ -120,6 +121,14 @@ Route::group(['prefix' => 'worker', 'middleware' => ['auth']], function () {
 
         Route::group(['prefix' => 'collect'], function () {
             Route::get('/', [App\Http\Controllers\Worker\Operation\CollectController::class, 'index'])->name('worker.operation.collect');
+            Route::get('/job-group', [App\Http\Controllers\Worker\Operation\CollectController::class, 'selectJobGroup'])->name('worker.operation.collect.select-job-group');
+            Route::get('/job-group/{jobGroupId}', [App\Http\Controllers\Worker\Operation\CollectController::class, 'setSelectJobGroup'])->name('worker.operation.collect.set-select-job-group');
+            Route::get('/{jobGroupId}/employee', [App\Http\Controllers\Worker\Operation\CollectController::class, 'selectEmployee'])->name('worker.operation.collect.select-employee');
+            Route::get('/{jobGroupId}/employee/{employeeId}', [App\Http\Controllers\Worker\Operation\CollectController::class, 'setSelectEmployee'])->name('worker.operation.collect.set-select-employee');
+            Route::get('/{jobGroupId}/submit', [App\Http\Controllers\Worker\Operation\CollectController::class, 'getSubmit'])->name('worker.operation.collect.submit');
+            Route::post('/{jobGroupId}/submit', [App\Http\Controllers\Worker\Operation\CollectController::class, 'postSubmit'])->name('worker.operation.collect.submit');
+            Route::get('/{jobGroupId}/employee-result', [App\Http\Controllers\Worker\Operation\CollectController::class, 'getEmployeeResult'])->name('worker.operation.collect.employee-result');
+            Route::post('/{jobGroupId}/employee-result', [App\Http\Controllers\Worker\Operation\CollectController::class, 'postEmployeeResult'])->name('worker.operation.collect.employee-result');
         });
     });
 
