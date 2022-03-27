@@ -27,7 +27,7 @@ class PackingController extends Controller
             ->with('pickUpEmployee')
             ->with('packingEmployee')
             ->with('collectEmployee')
-            ->whereIn('operation_status', [WorkerOperationStatus::PickUp(), WorkerOperationStatus::Packing()])
+            ->whereIn('operation_status', [JobGroupStatus::PickUp(), JobGroupStatus::Packing(), JobGroupStatus::Progress()])
             ->get();
 
         $customers = [];

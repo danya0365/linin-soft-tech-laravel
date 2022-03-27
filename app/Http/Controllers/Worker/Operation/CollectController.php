@@ -28,7 +28,7 @@ class CollectController extends Controller
             ->with('pickUpEmployee')
             ->with('packingEmployee')
             ->with('collectEmployee')
-            ->whereIn('operation_status', [WorkerOperationStatus::Packing(), WorkerOperationStatus::Collect()])
+            ->whereIn('operation_status', [JobGroupStatus::Packing(), JobGroupStatus::Collect()])
             ->get();
 
         $customers = [];
