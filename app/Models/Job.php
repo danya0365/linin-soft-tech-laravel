@@ -109,4 +109,34 @@ class Job extends Model
 
     return $array;
   }
+
+  function washSummaryReport()
+  {
+    $linenTypes = LinenType::with('linenProducts')->get();
+    $summaryReports = [];
+    $totalValue = 0;
+    $summaryReports = [];
+    foreach ($linenTypes as $linenType) {
+      $value = Job::where('wash_employee_id', $this->wash_employee_id)->where('linen_type_id', $linenType->id)->sum('wet_weight');
+      $totalValue += $value;
+      $summaryReports[] = ['title' => $linenType->name, 'value' => $value];
+    }
+    $summaryReports[] = ['title' => 'จำนวนที่ซักแล้ว', 'value' => $totalValue];
+    return $summaryReports;
+  }
+
+  function drySummaryReport()
+  {
+    $linenTypes = LinenType::with('linenProducts')->get();
+    $summaryReports = [];
+    $totalValue = 0;
+    $summaryReports = [];
+    foreach ($linenTypes as $linenType) {
+      $value = Job::where('dry_employee_id', $this->dry_employee_id)->where('linen_type_id', $linenType->id)->sum('wet_weight');
+      $totalValue += $value;
+      $summaryReports[] = ['title' => $linenType->name, 'value' => $value];
+    }
+    $summaryReports[] = ['title' => 'จำนวนที่อบแล้ว', 'value' => $totalValue];
+    return $summaryReports;
+  }
 }

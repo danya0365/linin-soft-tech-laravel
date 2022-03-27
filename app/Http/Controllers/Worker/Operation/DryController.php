@@ -118,18 +118,7 @@ class DryController extends Controller
         $linenTypes = LinenType::with('linenProducts')->get();
         $job = Job::with('employee')->with('customer')->with('jobGroup')->with('washingMachine')->with('dryerMachine')->with('linenType')->with('washEmployee')->with('dryEmployee')->where('id', $jobId)->first();
 
-        $summaryReports = (function () use ($linenTypes, $job) {
-            $totalValue = 0;
-            $summaryReports = [];
-            foreach ($linenTypes as $linenType) {
-                $value = Job::where('dry_employee_id', $job->dry_employee_id)->where('linen_type_id', $linenType->id)->sum('wet_weight');
-                $totalValue += $value;
-                $summaryReports[] = ['title' => $linenType->name, 'value' => $value];
-            }
-            $summaryReports[] = ['title' => 'จำนวนที่อบแล้ว', 'value' => $totalValue];
-            return $summaryReports;
-        })();
-
+        $summaryReports = $job->drySummaryReport();
         $workingDuration = $job->dryEmployee->getTotalTimeDurationOfWorkingTime();
 
         return view('worker.operations.dry.employee-result', ['job' => $job->toArray(), 'summaryReports' => $summaryReports, 'workingDuration' => $workingDuration]);

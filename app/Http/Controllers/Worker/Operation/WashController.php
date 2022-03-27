@@ -158,21 +158,9 @@ class WashController extends Controller
 
     public function getEmployeeResult($jobId)
     {
-        $linenTypes = LinenType::with('linenProducts')->get();
         $job = Job::with('employee')->with('customer')->with('jobGroup')->with('washingMachine')->with('linenType')->with('washEmployee')->where('id', $jobId)->first();
 
-        $summaryReports = (function () use ($linenTypes, $job) {
-            $totalValue = 0;
-            $summaryReports = [];
-            foreach ($linenTypes as $linenType) {
-                $value = Job::where('wash_employee_id', $job->wash_employee_id)->where('linen_type_id', $linenType->id)->sum('wet_weight');
-                $totalValue += $value;
-                $summaryReports[] = ['title' => $linenType->name, 'value' => $value];
-            }
-            $summaryReports[] = ['title' => 'จำนวนที่ซักแล้ว', 'value' => $totalValue];
-            return $summaryReports;
-        })();
-
+        $summaryReports = $job->washSummaryReport();
         $workingDuration = $job->washEmployee->getTotalTimeDurationOfWorkingTime();
 
         return view('worker.operations.wash.employee-result', ['job' => $job->toArray(), 'summaryReports' => $summaryReports, 'workingDuration' => $workingDuration]);
