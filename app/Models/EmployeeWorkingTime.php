@@ -19,22 +19,19 @@ use Illuminate\Database\Eloquent\Model;
  */
 class EmployeeWorkingTime extends Model
 {
-    
-    static $rules = [
-		'employee_id' => 'required',
-		'working_date' => 'required',
-		'time_duration' => 'required',
-    ];
 
-    protected $perPage = 20;
+  static $rules = [
+    'employee_id' => 'required',
+    'working_date' => 'required',
+    'time_duration' => 'required',
+  ];
 
-    /**
-     * Attributes that should be mass-assignable.
-     *
-     * @var array
-     */
-    protected $fillable = ['employee_id','working_date','time_duration'];
+  protected $perPage = 20;
 
-
-
+  /**
+   * Attributes that should be mass-assignable.
+   *
+   * @var array
+   */
+  protected $fillable = ['employee_id', 'working_date', 'time_duration'];
 }

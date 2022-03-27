@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Translations\Translator;
+use Carbon\CarbonInterval;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -43,5 +45,14 @@ class Employee extends Model
   public function department()
   {
     return $this->belongsTo(Department::class);
+  }
+
+  function getTotalTimeDurationOfWorkingTime()
+  {
+    $totalTimeDurationOfWorkingTime = EmployeeWorkingTime::where('employee_id', $this->id)->sum('time_duration');
+    $interval = CarbonInterval::seconds($totalTimeDurationOfWorkingTime)->cascade();
+    $translator = new Translator();
+    $interval->setLocalTranslator($translator);
+    return $interval->forHumans();
   }
 }

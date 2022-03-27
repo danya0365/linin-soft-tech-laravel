@@ -11,11 +11,8 @@ use Illuminate\Http\Request;
 use App\Models\Department;
 use App\Models\DryerMachine;
 use App\Models\Job;
-use App\Models\EmployeeOperationLog;
 use App\Models\LinenType;
 use App\Models\WashingMachine;
-use Carbon\CarbonInterval;
-use App\Translations\Translator;
 
 class DryController extends Controller
 {
@@ -133,37 +130,7 @@ class DryController extends Controller
             return $summaryReports;
         })();
 
-        $workingDuration = (function () use ($job) {
-            // $second = 1;
-            // $minute = 60 * $second;
-            // $hours  = 60 * $minute;
-            // $day    = 24 * $hours;
-            // $week   = 7  * $day;
-            // $month  = 4  * $week;
-            // $year   = 12 * $month;
-
-            // $sum      = $second + $minute + $hours + $day + $week + $month + $year;
-            $interval = 0;
-            $start = EmployeeOperationLog::where('operation_type', WorkerOperationStatus::Dry())
-                ->where('action_type', EmployeeOperationActionType::Start())
-                ->where('employee_id', $job->dry_employee_id)
-                ->orderBy('id', 'desc')
-                ->first();
-            if ($start) {
-                $end = EmployeeOperationLog::where('operation_type', WorkerOperationStatus::Dry())
-                    ->where('employee_id', $job->dry_employee_id)
-                    ->orderBy('id', 'desc')
-                    ->first();
-                $diff = $start->created_at->diff($end->created_at);
-                $interval = (function (\DateInterval $interval) {
-                    return $interval->days * 86400 + $interval->h * 3600 + $interval->i * 60 + $interval->s;
-                })($diff);
-            }
-            $interval = CarbonInterval::seconds($interval)->cascade();
-
-            $interval->setLocalTranslator(new Translator());
-            return $interval->forHumans();
-        })();
+        $workingDuration = $job->dryEmployee->getTotalTimeDurationOfWorkingTime();
 
         return view('worker.operations.dry.employee-result', ['job' => $job->toArray(), 'summaryReports' => $summaryReports, 'workingDuration' => $workingDuration]);
     }

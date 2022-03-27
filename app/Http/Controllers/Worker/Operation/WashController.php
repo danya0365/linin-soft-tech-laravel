@@ -15,11 +15,8 @@ use App\Models\JobGroup;
 use App\Models\Job;
 use App\Models\JobCase;
 use App\Models\WashingMachine;
-use App\Models\EmployeeOperationLog;
 use App\Models\LinenProduct;
 use App\Models\LinenType;
-use Carbon\CarbonInterval;
-use App\Translations\Translator;
 
 class WashController extends Controller
 {
@@ -176,37 +173,7 @@ class WashController extends Controller
             return $summaryReports;
         })();
 
-        $workingDuration = (function () use ($job) {
-            // $second = 1;
-            // $minute = 60 * $second;
-            // $hours  = 60 * $minute;
-            // $day    = 24 * $hours;
-            // $week   = 7  * $day;
-            // $month  = 4  * $week;
-            // $year   = 12 * $month;
-
-            // $sum      = $second + $minute + $hours + $day + $week + $month + $year;
-            $interval = 0;
-            $start = EmployeeOperationLog::where('operation_type', WorkerOperationStatus::Wash())
-                ->where('action_type', EmployeeOperationActionType::Start())
-                ->where('employee_id', $job->wash_employee_id)
-                ->orderBy('id', 'desc')
-                ->first();
-            if ($start) {
-                $end = EmployeeOperationLog::where('operation_type', WorkerOperationStatus::Wash())
-                    ->where('employee_id', $job->wash_employee_id)
-                    ->orderBy('id', 'desc')
-                    ->first();
-                $diff = $start->created_at->diff($end->created_at);
-                $interval = (function (\DateInterval $interval) {
-                    return $interval->days * 86400 + $interval->h * 3600 + $interval->i * 60 + $interval->s;
-                })($diff);
-            }
-            $interval = CarbonInterval::seconds($interval)->cascade();
-
-            $interval->setLocalTranslator(new Translator());
-            return $interval->forHumans();
-        })();
+        $workingDuration = $job->washEmployee->getTotalTimeDurationOfWorkingTime();
 
         return view('worker.operations.wash.employee-result', ['job' => $job->toArray(), 'summaryReports' => $summaryReports, 'workingDuration' => $workingDuration]);
     }
