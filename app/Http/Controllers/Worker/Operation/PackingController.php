@@ -83,4 +83,28 @@ class PackingController extends Controller
 
         return redirect(route('worker.operation.packing.submit', ['jobGroupId' => $jobGroup->id]));
     }
+
+    public function getSubmit(Request $request, $jobGroupId)
+    {
+        $jobGroup = JobGroup::with('employee')
+            ->with('customer')
+            ->with('jobs')
+            ->with('pickUpEmployee')
+            ->with('packingEmployee')
+            ->with('collectEmployee')
+            ->where('id', $jobGroupId)->first();
+        return view('worker.operations.packing.submit', ['jobGroup' => $jobGroup->toArray()]);
+    }
+
+    public function postSubmit(Request $request, $jobGroupId)
+    {
+        request()->validate(['total_pieces' => 'required']);
+        $jobGroup = JobGroup::find($jobGroupId);
+        $jobGroup->total_pieces = $request->get('total_pieces');
+        $jobGroup->save();
+
+        EmployeeManager::createEmployeeOperationLog($jobGroup->packing_employee_id, WorkerOperationStatus::Packing(), EmployeeOperationActionType::Progress());
+
+        return redirect(route('worker.operation.packing.employee-result', ['jobGroupId' => $jobGroup->id]));
+    }
 }
