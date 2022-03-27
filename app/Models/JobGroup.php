@@ -50,4 +50,24 @@ class JobGroup extends Model
   {
     return $this->belongsTo(Customer::class);
   }
+
+  public function jobs()
+  {
+    return $this->hasMany(Job::class);
+  }
+
+  public function pickUpEmployee()
+  {
+    return $this->belongsTo(Employee::class, 'pickup_employee_id');
+  }
+
+  public function packingEmployee()
+  {
+    return $this->belongsTo(Employee::class, 'packing_employee_id');
+  }
+
+  public function collectEmployee()
+  {
+    return $this->belongsTo(Employee::class, 'collect_employee_id');
+  }
 }

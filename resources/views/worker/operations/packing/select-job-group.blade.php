@@ -7,7 +7,7 @@
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="{{ route('worker') }}">Worker</a></li>
           <li class="breadcrumb-item"><a href="{{ route('worker.operation') }}">ปฏิบัติการ</a></li>
-          <li class="breadcrumb-item active" aria-current="page">รีด - เลือกรถเข็น</li>
+          <li class="breadcrumb-item active" aria-current="page">พับแพ็ค - เลือกรถเข็น</li>
         </ol>
     </nav>
     <div class="row justify-content-center">
@@ -17,15 +17,15 @@
                 <div class="card-header">ลูกค้า: {{ $customer['name'] }}</div>
                 <div class="card-body">
                     <div class="row g-2">
-                        @foreach ($customer['jobs'] as $job)
+                        @foreach ($customer['job_groups'] as $jobGroup)
                         <div class="col-12">
-                            <a href="{{ route('worker.operation.iron.set-select-job', ['jobId' => $job['id']]) }}" class="text-decoration-none">
+                            <a href="{{ route('worker.operation.packing.set-select-job-group', ['jobGroupId' => $jobGroup['id']]) }}" class="text-decoration-none">
                                 <div class="card" style="width: 100%">
+                                    <div class="card-header text-center">น้ำหนักเปียก: {{ $jobGroup['wet_weight'] }} กก., พนักงานไปรับ: {{ $jobGroup['pick_up_employee']['name'] }}, สถานะ: {{ $jobGroup['operation_status'] }}</div>
                                     <ul class="list-group list-group-flush">
-                                      <li class="list-group-item">น้ำหนักเปียก: {{ $job['wet_weight'] }} กก.</li>
-                                      <li class="list-group-item" style="color: {{ $job['color'] }}">สี: {{ $job['color'] }}</li>
-                                      <li class="list-group-item">พนักงานซัก: {{ $job['wash_employee']['name'] }}</li>
-                                      <li class="list-group-item">สถานะ: {{ $job['status_text'] }}</li>
+                                        @foreach ($jobGroup['jobs'] as $job)
+                                        <li class="list-group-item">น้ำหนักเปียก: {{ $job['wet_weight'] }}, จำนวน: {{ $job['piece'] }} ชิ้น, <span style="color: {{ $job['color'] }}">สี: {{ $job['color'] }}</span>, สถานะ: {{ $job['status_text'] }}</li>
+                                        @endforeach
                                     </ul>
                                 </div>
                             </a>

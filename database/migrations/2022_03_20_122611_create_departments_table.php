@@ -15,7 +15,8 @@ return new class extends Migration
     {
         Schema::create('departments', function (Blueprint $table) {
             $table->id();
-            $table->string('name'); // (ซัก, อบ, รีด, พับแพ็ค, จัดเก็บ)
+            $table->string('var_name'); // ('pickup','wash','dry','iron','packing','collect')
+            $table->string('name'); // (รับสินค้า, ซัก, อบ, รีด, พับแพ็ค, จัดเก็บ)
             $table->enum('input_unit', ['weight', 'piece']); //หน่วยในการจัดเก็บข้อมูลที่แสดง ในหน้าสถิติพนักงาน
             $table->timestamps();
         });
