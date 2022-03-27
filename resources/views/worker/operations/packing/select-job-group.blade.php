@@ -21,7 +21,7 @@
                         <div class="col-12">
                             <a href="{{ route('worker.operation.packing.set-select-job-group', ['jobGroupId' => $jobGroup['id']]) }}" class="text-decoration-none">
                                 <div class="card" style="width: 100%">
-                                    <div class="card-header text-center">น้ำหนักเปียก: {{ $jobGroup['wet_weight'] }} กก., พนักงานไปรับ: {{ $jobGroup['pick_up_employee']['name'] }}, สถานะ: {{ $jobGroup['operation_status'] }}</div>
+                                    <div class="card-header text-center">น้ำหนักเปียก: {{ $jobGroup['wet_weight'] }} กก., พนักงานไปรับ: {{ $jobGroup['pick_up_employee']['name'] }}, สถานะ: {{ $jobGroup['operation_status_text'] }}</div>
                                     <ul class="list-group list-group-flush">
                                         @foreach ($jobGroup['jobs'] as $job)
                                         <li class="list-group-item">น้ำหนักเปียก: {{ $job['wet_weight'] }}, จำนวน: {{ $job['piece'] }} ชิ้น, <span style="color: {{ $job['color'] }}">สี: {{ $job['color'] }}</span>, สถานะ: {{ $job['status_text'] }}</li>

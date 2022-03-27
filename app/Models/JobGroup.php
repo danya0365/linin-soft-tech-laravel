@@ -70,4 +70,26 @@ class JobGroup extends Model
   {
     return $this->belongsTo(Employee::class, 'collect_employee_id');
   }
+
+  /**
+   * Convert the model instance to an array.
+   *
+   * @return array
+   */
+  public function toArray()
+  {
+    $array = parent::toArray();
+
+    $array['operation_status_text'] = (function ($jobStatus) {
+      $statusTexts = ['pickup' => 'รับสินค้า', 'progress' => 'ซัก, อบ, รีด', 'packing' => 'พับแพ็ค', 'collect' => 'จัดเก็บ'];
+      foreach ($statusTexts as $status => $text) {
+        if (strtolower($status) == strtolower($jobStatus)) {
+          return $text;
+        }
+      }
+      return ucfirst($jobStatus);
+    })($array['operation_status']);
+
+    return $array;
+  }
 }
