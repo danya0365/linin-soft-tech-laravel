@@ -100,6 +100,8 @@ Route::group(['prefix' => 'worker', 'middleware' => ['auth']], function () {
             Route::get('/', [App\Http\Controllers\Worker\Operation\IronController::class, 'index'])->name('worker.operation.iron');
             Route::get('/job', [App\Http\Controllers\Worker\Operation\IronController::class, 'selectJob'])->name('worker.operation.iron.select-job');
             Route::get('/job/{jobId}', [App\Http\Controllers\Worker\Operation\IronController::class, 'setSelectJob'])->name('worker.operation.iron.set-select-job');
+            Route::get('/{jobId}/employee', [App\Http\Controllers\Worker\Operation\IronController::class, 'selectEmployee'])->name('worker.operation.iron.select-employee');
+            Route::get('/{jobId}/employee/{employeeId}', [App\Http\Controllers\Worker\Operation\IronController::class, 'setSelectEmployee'])->name('worker.operation.iron.set-select-employee');
         });
 
         Route::group(['prefix' => 'packing'], function () {
