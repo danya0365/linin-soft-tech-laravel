@@ -107,4 +107,20 @@ class PackingController extends Controller
 
         return redirect(route('worker.operation.packing.employee-result', ['jobGroupId' => $jobGroup->id]));
     }
+
+    public function getEmployeeResult($jobGroupId)
+    {
+        $jobGroup = JobGroup::with('employee')
+            ->with('customer')
+            ->with('jobs')
+            ->with('pickUpEmployee')
+            ->with('packingEmployee')
+            ->with('collectEmployee')
+            ->where('id', $jobGroupId)->first();
+
+        $summaryReports = $jobGroup->packingSummaryReport();
+        $workingDuration = $jobGroup->packingEmployee->getTotalTimeDurationOfWorkingTime();
+
+        return view('worker.operations.packing.employee-result', ['jobGroup' => $jobGroup->toArray(), 'summaryReports' => $summaryReports, 'workingDuration' => $workingDuration]);
+    }
 }

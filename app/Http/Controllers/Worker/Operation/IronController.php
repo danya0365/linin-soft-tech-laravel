@@ -13,7 +13,7 @@ use App\Models\DryerMachine;
 use App\Models\Job;
 use App\Models\WashingMachine;
 
-class IronController extends Controller
+class PackingControllerIronController extends Controller
 {
     public function index()
     {

@@ -92,4 +92,12 @@ class JobGroup extends Model
 
     return $array;
   }
+
+  public function packingSummaryReport()
+  {
+    $summaryReports = [];
+    $totalValue = JobGroup::where('packing_employee_id', $this->packing_employee_id)->sum('total_pieces');
+    $summaryReports[] = ['title' => 'จำนวนที่พับแพ็คแล้ว', 'value' => $totalValue];
+    return $summaryReports;
+  }
 }
