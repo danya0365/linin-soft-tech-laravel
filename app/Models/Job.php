@@ -85,6 +85,11 @@ class Job extends Model
   {
     return $this->belongsTo(Employee::class, 'dry_employee_id');
   }
+
+  public function ironEmployee()
+  {
+    return $this->belongsTo(Employee::class, 'iron_employee_id');
+  }
   /**
    * Convert the model instance to an array.
    *

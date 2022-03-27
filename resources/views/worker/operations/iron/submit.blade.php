@@ -7,26 +7,26 @@
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{ route('worker') }}">Worker</a></li>
             <li class="breadcrumb-item"><a href="{{ route('worker.operation') }}">ปฏิบัติการ</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.operation.dry.select-job', ['jobId' => $job['id']]) }}">ลูกค้า: {{ $job['customer']['name'] }}</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.operation.dry.select-job', ['jobId' => $job['id']]) }}">ตู้เก็บน้ำหนัก: {{ $job['job_group']['wet_weight'] }}</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.operation.dry.select-job', ['jobId' => $job['id']]) }}">รถเข็นน้ำหนัก: {{ $job['wet_weight'] }}</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.operation.dry.select-job', ['jobId' => $job['id']]) }}" style="color: {{ $job['color'] }}">สี: {{ $job['color'] }}</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.operation.dry.select-job', ['jobId' => $job['id']]) }}">{{ $job['job_case']['name'] }}</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.operation.dry.select-job', ['jobId' => $job['id']]) }}">{{ $job['washing_machine']['name'] }}</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.operation.dry.select-job', ['jobId' => $job['id']]) }}">{{ $job['linen_type']['name'] }}</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.operation.dry.select-employee', ['jobId' => $job['id']]) }}">พนักงาน: {{ $job['employee']['name'] }}</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.operation.dry.select-dryer-machine', ['jobId' => $job['id']]) }}">{{ $job['dryer_machine']['name'] }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('worker.operation.iron.select-job', ['jobId' => $job['id']]) }}">ลูกค้า: {{ $job['customer']['name'] }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('worker.operation.iron.select-job', ['jobId' => $job['id']]) }}">ตู้เก็บน้ำหนัก: {{ $job['job_group']['wet_weight'] }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('worker.operation.iron.select-job', ['jobId' => $job['id']]) }}">รถเข็นน้ำหนัก: {{ $job['wet_weight'] }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('worker.operation.iron.select-job', ['jobId' => $job['id']]) }}" style="color: {{ $job['color'] }}">สี: {{ $job['color'] }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('worker.operation.iron.select-job', ['jobId' => $job['id']]) }}">{{ $job['job_case']['name'] }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('worker.operation.iron.select-job', ['jobId' => $job['id']]) }}">{{ $job['washing_machine']['name'] }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('worker.operation.iron.select-job', ['jobId' => $job['id']]) }}">{{ $job['linen_type']['name'] }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('worker.operation.iron.select-job', ['jobId' => $job['id']]) }}">{{ $job['dryer_machine']['name'] }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('worker.operation.iron.select-employee', ['jobId' => $job['id']]) }}">พนักงาน: {{ $job['employee']['name'] }}</a></li>
             <li class="breadcrumb-item active" aria-current="page">อบ - แบบฟอร์ม Submit</li>
         </ol>
     </nav>
     <div class="row justify-content-center">
         <div class="col-md-12 m-2">
             <div class="card">
-                <div class="card-header">น้ำหนักเปียกและสี</div>
+                <div class="card-header">จำนวนชิ้นและสี</div>
                 <div class="card-body">
-                    <form method="POST" action="{{ route('worker.operation.dry.submit', ['jobId' => $job['id'] ]) }}"  role="form" enctype="multipart/form-data">
+                    <form method="POST" action="{{ route('worker.operation.iron.submit', ['jobId' => $job['id'] ]) }}"  role="form" enctype="multipart/form-data">
                         @csrf
-                        {{ Form::hidden('wet_weight', $job['wet_weight']) }}
+                        {{ Form::hidden('piece', $job['piece']) }}
                         {{ Form::hidden('color', $job['color']) }}
                         <div class="box box-info padding-1">
                             <div class="box-body">
@@ -35,7 +35,7 @@
                                     <div class="col-sm-6">
                                         <div class="row g-2">
                                             <div class="col-12 text-center">
-                                                <h2>น้ำหนักกิโลกรัม</h2>
+                                                <h2>จำนวนชิ้น</h2>
                                             </div>
                                             <div class="col-12">
                                                 <div class="p-3 border bg-light" style="width: 100%">
@@ -108,7 +108,7 @@
 </div>
 <script type="text/javascript">
 $(function(){
-    var number = $('[name=wet_weight]').val();
+    var number = $('[name=piece]').val();
     var selectColor = $('[name=color]').val();
     var setPadResult = function(number){
         var numbers = number.split('.');
@@ -124,7 +124,7 @@ $(function(){
             number = 0;
         }
         $("#pad-result").html(number.toLocaleString());
-        $('[name=wet_weight]').val(number);
+        $('[name=piece]').val(number);
     }
     setPadResult(number);
     $('.pad-number').click(function(){

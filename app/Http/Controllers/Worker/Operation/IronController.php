@@ -87,4 +87,32 @@ class IronController extends Controller
 
         return redirect(route('worker.operation.iron.submit', ['jobId' => $job->id]));
     }
+
+    public function getSubmit(Request $request, $jobId)
+    {
+        $job = Job::with('employee')
+            ->with('customer')
+            ->with('jobGroup')
+            ->with('washingMachine')
+            ->with('dryerMachine')
+            ->with('linenType')
+            ->with('washEmployee')
+            ->with('dryEmployee')
+            ->with('ironEmployee')
+            ->where('id', $jobId)->first();
+        return view('worker.operations.iron.submit', ['job' => $job->toArray()]);
+    }
+
+    public function postSubmit(Request $request, $jobId)
+    {
+        request()->validate(['piece' => 'required', 'color' => 'required']);
+        $job = Job::find($jobId);
+        $job->piece = $request->get('piece');
+        $job->color = $request->get('color');
+        $job->save();
+
+        EmployeeManager::createEmployeeOperationLog($job->dry_employee_id, WorkerOperationStatus::Iron(), EmployeeOperationActionType::Progress());
+
+        return redirect(route('worker.operation.iron.employee-result', ['jobId' => $job->id]));
+    }
 }
