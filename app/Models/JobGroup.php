@@ -100,4 +100,12 @@ class JobGroup extends Model
     $summaryReports[] = ['title' => 'จำนวนที่พับแพ็คแล้ว', 'value' => $totalValue];
     return $summaryReports;
   }
+
+  public function collectSummaryReport()
+  {
+    $summaryReports = [];
+    $totalValue = JobGroup::where('collect_employee_id', $this->collect_employee_id)->sum('dry_weight');
+    $summaryReports[] = ['title' => 'จำนวนที่จัดเก็บแล้ว', 'value' => $totalValue];
+    return $summaryReports;
+  }
 }

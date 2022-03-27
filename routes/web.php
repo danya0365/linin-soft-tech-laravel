@@ -126,6 +126,8 @@ Route::group(['prefix' => 'worker', 'middleware' => ['auth']], function () {
             Route::get('/{jobGroupId}/employee/{employeeId}', [App\Http\Controllers\Worker\Operation\CollectController::class, 'setSelectEmployee'])->name('worker.operation.collect.set-select-employee');
             Route::get('/{jobGroupId}/submit', [App\Http\Controllers\Worker\Operation\CollectController::class, 'getSubmit'])->name('worker.operation.collect.submit');
             Route::post('/{jobGroupId}/submit', [App\Http\Controllers\Worker\Operation\CollectController::class, 'postSubmit'])->name('worker.operation.collect.submit');
+            Route::get('/{jobGroupId}/employee-result', [App\Http\Controllers\Worker\Operation\CollectController::class, 'getEmployeeResult'])->name('worker.operation.collect.employee-result');
+            Route::post('/{jobGroupId}/employee-result', [App\Http\Controllers\Worker\Operation\CollectController::class, 'postEmployeeResult'])->name('worker.operation.collect.employee-result');
         });
     });
 

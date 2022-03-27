@@ -11,6 +11,7 @@ use App\Managers\EmployeeManager;
 use App\Models\Department;
 use App\Models\JobGroup;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class CollectController extends Controller
 {
@@ -98,7 +99,36 @@ class CollectController extends Controller
         $jobGroup->dry_weight = $request->get('dry_weight');
         $jobGroup->save();
 
-        EmployeeManager::createEmployeeOperationLog($jobGroup->packing_employee_id, WorkerOperationStatus::Collect(), EmployeeOperationActionType::Progress());
+        EmployeeManager::createEmployeeOperationLog($jobGroup->collect_employee_id, WorkerOperationStatus::Collect(), EmployeeOperationActionType::Progress());
+
+        return redirect(route('worker.operation.collect.employee-result', ['jobGroupId' => $jobGroup->id]));
+    }
+
+    public function getEmployeeResult(Request $request, $jobGroupId)
+    {
+        $jobGroup = JobGroup::with('employee')
+            ->with('customer')
+            ->with('jobs')
+            ->with('pickUpEmployee')
+            ->with('packingEmployee')
+            ->with('collectEmployee')
+            ->where('id', $jobGroupId)->first();
+
+        $summaryReports = $jobGroup->collectSummaryReport();
+        $workingDuration = $jobGroup->collectEmployee->getTotalTimeDurationOfWorkingTime();
+
+        return view('worker.operations.collect.employee-result', ['jobGroup' => $jobGroup->toArray(), 'summaryReports' => $summaryReports, 'workingDuration' => $workingDuration]);
+    }
+
+    public function postEmployeeResult(Request $request, $jobGroupId)
+    {
+        if ($request->get('operation_status') == JobGroupStatus::Close()) {
+            $jobGroup = JobGroup::find($jobGroupId);
+            $jobGroup->operation_status = $request->get('operation_status');
+            $jobGroup->save();
+
+            EmployeeManager::createEmployeeOperationLog($jobGroup->collect_employee_id, WorkerOperationStatus::Collect(), EmployeeOperationActionType::Stop());
+        }
 
         return redirect(route('worker.operation.collect.employee-result', ['jobGroupId' => $jobGroup->id]));
     }

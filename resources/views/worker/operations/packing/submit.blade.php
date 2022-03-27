@@ -9,7 +9,8 @@
             <li class="breadcrumb-item"><a href="{{ route('worker.operation') }}">ปฏิบัติการ</a></li>
             <li class="breadcrumb-item"><a href="{{ route('worker.operation.packing.select-job-group', ['jobGroupId' => $jobGroup['id']]) }}">ลูกค้า: {{ $jobGroup['customer']['name'] }}</a></li>
             <li class="breadcrumb-item"><a href="{{ route('worker.operation.packing.select-job-group', ['jobGroupId' => $jobGroup['id']]) }}">น้ำหนักเปียก: {{ $jobGroup['wet_weight'] }}</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.operation.packing.select-employee', ['jobGroupId' => $jobGroup['id']]) }}">พนักงาน: {{ $jobGroup['pick_up_employee']['name'] }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('worker.operation.collect.select-job-group', ['jobGroupId' => $jobGroup['id']]) }}">สถานะ: {{ $jobGroup['operation_status_text'] }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('worker.operation.packing.select-employee', ['jobGroupId' => $jobGroup['id']]) }}">พนักงานพับแพ็ค: {{ $jobGroup['pick_up_employee']['name'] }}</a></li>
             <li class="breadcrumb-item active" aria-current="page">พับแพ็ค - แบบฟอร์ม Submit</li>
         </ol>
     </nav>
