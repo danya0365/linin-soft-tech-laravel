@@ -130,6 +130,6 @@ class CollectController extends Controller
             EmployeeManager::createEmployeeOperationLog($jobGroup->collect_employee_id, WorkerOperationStatus::Collect(), EmployeeOperationActionType::Stop());
         }
 
-        return redirect(route('worker.operation.collect.employee-result', ['jobGroupId' => $jobGroup->id]));
+        return redirect(route('worker.operation.collect.employee-result', ['jobGroupId' => $jobGroupId]));
     }
 }
