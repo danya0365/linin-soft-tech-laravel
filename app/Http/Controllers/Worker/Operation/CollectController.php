@@ -78,4 +78,28 @@ class CollectController extends Controller
 
         return redirect(route('worker.operation.collect.submit', ['jobGroupId' => $jobGroup->id]));
     }
+
+    public function getSubmit(Request $request, $jobGroupId)
+    {
+        $jobGroup = JobGroup::with('employee')
+            ->with('customer')
+            ->with('jobs')
+            ->with('pickUpEmployee')
+            ->with('packingEmployee')
+            ->with('collectEmployee')
+            ->where('id', $jobGroupId)->first();
+        return view('worker.operations.collect.submit', ['jobGroup' => $jobGroup->toArray()]);
+    }
+
+    public function postSubmit(Request $request, $jobGroupId)
+    {
+        request()->validate(['dry_weight' => 'required']);
+        $jobGroup = JobGroup::find($jobGroupId);
+        $jobGroup->dry_weight = $request->get('dry_weight');
+        $jobGroup->save();
+
+        EmployeeManager::createEmployeeOperationLog($jobGroup->packing_employee_id, WorkerOperationStatus::Collect(), EmployeeOperationActionType::Progress());
+
+        return redirect(route('worker.operation.collect.employee-result', ['jobGroupId' => $jobGroup->id]));
+    }
 }
