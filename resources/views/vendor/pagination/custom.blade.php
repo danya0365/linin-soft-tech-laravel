@@ -1,5 +1,20 @@
+
 @if ($paginator->hasPages())
-    <ul class="pagination justify-content-center my-2">
+<nav role="navigation" aria-label="Pagination Navigation" class="flex items-center justify-between my-2">
+
+    <div>
+        <p class="text-sm text-gray-700 leading-5">
+            Showing
+             <span class="font-medium">{{ $paginator->from() }}</span>
+                to
+                <span class="font-medium">20</span>
+                                of
+            <span class="font-medium">30</span>
+            results
+        </p>
+    </div>
+
+    <ul class="pagination justify-content-center">
        
         @if ($paginator->onFirstPage())
             <li class="page-item disabled"><span class="page-link">← Previous</span></li>
@@ -36,4 +51,5 @@
             <li class="page-item disabled"><span class="page-link">Next →</span></li>
         @endif
     </ul>
+</div>
 @endif 
