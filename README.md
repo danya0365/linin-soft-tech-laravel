@@ -163,3 +163,6 @@ References:
 - https://www.conventionalcommits.org/
 - https://seesparkbox.com/foundry/semantic_commit_messages
 - http://karma-runner.github.io/1.0/dev/git-commit-msg.html
+
+### Install tailwind with sass
+[Install Tailwind CSS & SASS with Laravel Mix (2022)](https://ralphjsmit.com/tailwind-sass-laravel)
