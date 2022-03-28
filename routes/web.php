@@ -18,8 +18,8 @@ Route::get('/', function () {
     return redirect('home');
 });
 
-Route::get('/test', function () {
-    return ['hello world'];
+Route::get('/landing', function () {
+    return view('landing');
 });
 
 Auth::routes();
