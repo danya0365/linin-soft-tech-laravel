@@ -70,7 +70,7 @@
                         </div>
                     </div>
                 </div>
-                {!! $employees->links() !!}
+                {!! $employees->links('vendor.pagination.custom') !!}
             </div>
         </div>
     </div>
