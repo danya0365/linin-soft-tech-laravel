@@ -20,6 +20,10 @@
                         <a class="btn btn-outline-secondary btn-lg" href="{{ route('customers.index') }}" role="button">{{ __('ลูกค้า') }}</a>
                         <a class="btn btn-outline-secondary btn-lg" href="{{ route('departments.index') }}" role="button">{{ __('แผนกพนักงาน') }}</a>
                         <a class="btn btn-outline-secondary btn-lg" href="{{ route('employees.index') }}" role="button">{{ __('พนักงาน') }}</a>
+                        <a class="btn btn-outline-secondary btn-lg" href="{{ route('linen-types.index') }}" role="button">{{ __('ชนิดผ้า') }}</a>
+                        <a class="btn btn-outline-secondary btn-lg" href="{{ route('linen-products.index') }}" role="button">{{ __('ผ้า') }}</a>
+                        <a class="btn btn-outline-secondary btn-lg" href="{{ route('washing-machines.index') }}" role="button">{{ __('เครื่องซักผ้า') }}</a>
+                        <a class="btn btn-outline-secondary btn-lg" href="{{ route('dryer-machines.index') }}" role="button">{{ __('เครื่องอบผ้า') }}</a>
                     </div>
                 </div>
             </div>
