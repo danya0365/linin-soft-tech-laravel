@@ -166,3 +166,4 @@ References:
 
 ### Install tailwind with sass
 [Install Tailwind CSS & SASS with Laravel Mix (2022)](https://ralphjsmit.com/tailwind-sass-laravel)
+[Tailwind Documentation](https://tailwindcss.com/docs/installation)
