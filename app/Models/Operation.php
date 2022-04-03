@@ -110,7 +110,6 @@ class Operation extends Model
   public function toArray()
   {
     $array = parent::toArray();
-
     return $array;
   }
 

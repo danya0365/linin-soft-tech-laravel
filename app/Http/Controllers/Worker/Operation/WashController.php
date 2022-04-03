@@ -11,11 +11,14 @@ use App\Http\Controllers\Controller;
 use App\Managers\EmployeeManager;
 use App\Models\CustomerGroup;
 use App\Models\Department;
+use App\Models\LinenProduct;
+use App\Models\LinenType;
 use App\Models\Operation;
 use App\Models\OperationLinenCase;
 use App\Models\OperationLinenProduct;
 use App\Models\WashingMachine;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Request;
 
 class WashController extends Controller
 {
@@ -110,6 +113,52 @@ class WashController extends Controller
 
         $operation = Operation::find($operationId);
         $operation->generateSearchTag();
-        return redirect(route('worker.operation.wash.select-linen-product', ['operation' => $operation->id, 'operationLinenProduct' => $operationLinenProduct->id]));
+        return redirect(route('worker.operation.wash.select-linen-product', ['operationId' => $operation->id, 'operationLinenProductId' => $operationLinenProduct->id]));
+    }
+
+    public function selectLinenProduct($operationId, $operationLinenProductId)
+    {
+        $operation = Operation::with('employee')->with('customer')->with('washingMachine')->with('washEmployee')->where('id', $operationId)->first();
+        $operationLinenProduct = OperationLinenProduct::find($operationLinenProductId);
+        $linenTypes = LinenType::with('linenProducts')->get();
+        $linenProducts = LinenProduct::all();
+        return view('worker.operations.wash.select-linen-product', ['operation' => $operation->toArray(), 'operationLinenProduct' => $operationLinenProduct->toArray(), 'linenTypes' => $linenTypes->toArray(), 'linenProductJson' => $linenProducts->toJson()]);
+    }
+
+    public function setSelectLinenProduct($operationId, $operationLinenProductId, $linenProductId)
+    {
+        $linenProduct = LinenProduct::find($linenProductId);
+
+        $operationLinenProduct = OperationLinenProduct::find($operationLinenProductId);
+        $operationLinenProduct->linen_product_id = $linenProduct->id;
+        $operationLinenProduct->save();
+
+        $operation = Operation::find($operationId);
+        $operation->generateSearchTag();
+
+        return redirect(route('worker.operation.wash.select-weight-and-color', ['operationId' => $operation->id, 'operationLinenProductId' => $operationLinenProduct->id]));
+    }
+
+    public function selectWeightAndColor($operationId, $operationLinenProductId)
+    {
+        $operation = Operation::with('employee')->with('customer')->with('washingMachine')->with('washEmployee')->where('id', $operationId)->first();
+        $operationLinenProduct = OperationLinenProduct::with('linenProduct')->where('id', $operationLinenProductId)->first();
+        return view('worker.operations.wash.select-weight-and-color', ['operation' => $operation->toArray(), 'operationLinenProduct' => $operationLinenProduct->toArray()]);
+    }
+
+    public function setSelectWeightAndColor($operationId, $operationLinenProductId)
+    {
+        request()->validate(['wet_weight' => 'required', 'color' => 'required']);
+
+        $operationLinenProduct = OperationLinenProduct::find($operationLinenProductId);
+        $operationLinenProduct->wet_weight = request()->get('wet_weight');
+        $operationLinenProduct->color = request()->get('color');
+        $operationLinenProduct->save();
+
+        $operation = Operation::with('employee')->with('customer')->with('washingMachine')->with('washEmployee')->where('id', $operationId)->first();
+
+        EmployeeManager::createEmployeeOperationLog($operation->wash_employee_id, WorkerOperationStatus::Wash(), EmployeeOperationActionType::Progress());
+
+        return redirect(route('worker.operation.wash.employee-summary', ['operationId' => $operation->id]));
     }
 }
