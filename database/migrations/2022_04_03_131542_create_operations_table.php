@@ -26,12 +26,12 @@ return new class extends Migration
             $table->enum('job_case', ['new', 'edit'])->nullable();
             $table->integer('washing_machine_id')->nullable();
             $table->integer('dryer_machine_id')->nullable();
+            $table->integer('total_wet_weight')->nullable();
+            $table->integer('total_dry_weight')->nullable();
+            $table->integer('total_iron_piece')->nullable();
+            $table->integer('total_packing_piece')->nullable();
+            $table->string('colors')->nullable();
             $table->string('search_tags')->nullable();
-            $table->integer('wet_weight')->nullable();
-            $table->integer('dry_weight')->nullable();
-            $table->integer('iron_piece')->nullable();
-            $table->integer('total_piece')->nullable();
-            $table->string('color')->nullable();
             $table->enum('status', ['in-progress', 'close']);
             $table->timestamps();
         });
