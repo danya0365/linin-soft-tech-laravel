@@ -100,15 +100,15 @@ class Operation extends Model
   {
     $array = parent::toArray();
 
-    $array['job_case'] = (function ($jobVar) {
-      foreach (JobCase::$list as $jobCase) {
-        if ($jobCase['var'] == $jobVar) {
-          return $jobCase;
-        }
-      }
-      return $jobVar;
-    })($array['job_case']);
-
     return $array;
+  }
+
+  public function washSummaryReport()
+  {
+    $summaryReports = [];
+    $totalValue = 0;
+    $summaryReports = [];
+    $summaryReports[] = ['title' => 'จำนวนที่ซักแล้ว', 'value' => $totalValue];
+    return $summaryReports;
   }
 }

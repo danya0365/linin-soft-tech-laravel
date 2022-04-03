@@ -17,6 +17,7 @@ return new class extends Migration
             $table->id();
             $table->integer('operation_id');
             $table->integer('linen_product_id');
+            $table->enum('linen_case', ['new', 'edit'])->nullable();
             $table->string('color')->nullable();
             $table->integer('wet_weight')->nullable();
             $table->integer('dry_weight')->nullable();

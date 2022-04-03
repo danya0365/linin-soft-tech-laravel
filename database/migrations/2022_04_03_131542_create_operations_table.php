@@ -23,7 +23,6 @@ return new class extends Migration
             $table->integer('iron_employee_id')->nullable();
             $table->integer('packing_employee_id')->nullable();
             $table->integer('collect_employee_id')->nullable();
-            $table->enum('linen_case', ['new', 'edit'])->nullable();
             $table->integer('washing_machine_id')->nullable();
             $table->integer('dryer_machine_id')->nullable();
             $table->integer('total_wet_weight')->nullable();

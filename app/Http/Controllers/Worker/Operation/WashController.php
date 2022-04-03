@@ -12,6 +12,7 @@ use App\Managers\EmployeeManager;
 use App\Models\CustomerGroup;
 use App\Models\Department;
 use App\Models\Operation;
+use App\Models\WashingMachine;
 
 class WashController extends Controller
 {
@@ -52,6 +53,35 @@ class WashController extends Controller
         $operation = Operation::find($operationId);
         $operation->customer_id = $customerId;
         $operation->save();
-        return redirect(route('worker.operation.wash.select-linen-case', ['operationId' => $operation->id]));
+        return redirect(route('worker.operation.wash.select-washing-machine', ['operationId' => $operation->id]));
+    }
+
+    public function selectWashingMachine($operationId)
+    {
+        $operation = Operation::with('employee')->with('customer')->where('id', $operationId)->first();
+        $washingMachines = WashingMachine::with('operation')->get();
+        return view('worker.operations.wash.select-washing-machine', ['operation' => $operation->toArray(), 'washingMachines' => $washingMachines->toArray()]);
+    }
+
+    public function setSelectWashingMachine($operationId, $washingMachineId)
+    {
+        $operation = Operation::find($operationId);
+        $prevWashingMachineId = $operation->washing_machine_id;
+        $operation->washing_machine_id = $washingMachineId;
+        $operation->save();
+
+        if ($prevWashingMachineId) WashingMachine::where('id', $prevWashingMachineId)->update(['operation_id' => null]);
+        WashingMachine::where('id', $washingMachineId)->update(['operation_id' => $operation->id]);
+        return redirect(route('worker.operation.wash.employee-summary', ['operationId' => $operation->id]));
+    }
+
+    public function getEmployeeSummary($operationId)
+    {
+        $operation = Operation::with('employee')->with('customer')->with('washingMachine')->with('washEmployee')->where('id', $operationId)->first();
+
+        $summaryReports = $operation->washSummaryReport();
+        $workingDuration = $operation->washEmployee->getTotalTimeDurationOfWorkingTime();
+
+        return view('worker.operations.wash.employee-summary', ['operation' => $operation->toArray(), 'summaryReports' => $summaryReports, 'workingDuration' => $workingDuration]);
     }
 }
