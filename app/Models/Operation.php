@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use App\Translations\Translator;
+use Carbon\CarbonInterval;
 
 /**
  * Class Operation
@@ -101,6 +103,7 @@ class Operation extends Model
     }
     $this->search_tags = $searchTags;
     $this->save();
+    $this->touch();
   }
 
   /**
@@ -139,5 +142,23 @@ class Operation extends Model
 
     $summaryReports[] = ['title' => 'จำนวนที่ซักแล้ว', 'value' => $totalValue];
     return $summaryReports;
+  }
+
+  public function timeDuration()
+  {
+    $timeDuration = (function () {
+      $intervalInSeconds = 0;
+      if ($this->created_at && $this->updated_at) {
+        $intervalDiff = $this->created_at->diff($this->updated_at);
+        $intervalInSeconds = (function (\DateInterval $interval) {
+          return $interval->days * 86400 + $interval->h * 3600 + $interval->i * 60 + $interval->s;
+        })($intervalDiff);
+      }
+      return $intervalInSeconds;
+    })();
+    $interval = CarbonInterval::seconds($timeDuration)->cascade();
+    $translator = new Translator();
+    $interval->setLocalTranslator($translator);
+    return $interval->forHumans();
   }
 }

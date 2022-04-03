@@ -16,7 +16,7 @@
     <div class="row justify-content-center">
         <div class="col-md-12 m-2">
             <div class="card">
-                <div class="card-header text-center">สรุปข้อมูลการซักของพนักงาน</div>
+                <div class="card-header text-center">สถานะการซัก</div>
                 <div class="card-body">
                     <div class="row g-2">
                         <div class="col-4">
@@ -31,11 +31,34 @@
                         </div>
                         <div class="col-4">
                             <div class="d-grid gap-2" style="min-height: 60px">
-                                <button class="btn btn-outline-secondary" type="button">ปิดงาน</button>
+                                @if ( $operation == "close ")
+                                <button class="btn btn-outline-secondary" type="button" onclick="window.location='{{ route('worker.operation.wash.set-close', ['operationId' => $operation['id']]) }}'">ปิดงาน</button>
+                                @else 
+                                <button class="btn btn-outline-secondary" type="button" onclick="window.location='{{ route('worker.operation.wash.set-in-progress', ['operationId' => $operation['id']]) }}'">เปิดใหม่</button>
+                                @endif
                             </div>
                         </div>
                     </div>
                 </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">สถานะ: {{ $operation['status'] }}</li>
+                    @foreach ($operationLinenProducts as $operationLinenProduct)
+                    <li class="list-group-item">
+                        {{ $operationLinenProduct['linen_case'] ? $operationLinenProduct['linen_case']['name'] : 'ยังไม่ได้เลือก' }},
+                        ชนิดผ้า: {{ $operationLinenProduct['linen_product'] ? $operationLinenProduct['linen_product']['name'] : 'ยังไม่ได้เลือก' }},
+                        น้ำหนักเปียก: {{ $operationLinenProduct['wet_weight'] ? $operationLinenProduct['wet_weight'] : 'ยังไม่ได้เลือก' }} กก.,
+                        สี: <span style="color: {{ $operationLinenProduct['color'] ? $operationLinenProduct['color'] : '' }}">{{ $operationLinenProduct['color'] ? $operationLinenProduct['color'] : 'ยังไม่ได้เลือก' }}</span>
+                    </li>
+                    @endforeach
+                </ul>
+                <div class="card-footer text-muted text-center">
+                    เวลาในการซักผ้า: {{ $operationTimeDuration }}
+                </div>
+              </div>
+        </div>
+        <div class="col-md-12 m-2">
+            <div class="card">
+                <div class="card-header text-center">สรุปข้อมูลการซักของพนักงาน</div>
                 <div class="card-body">
                     <div class="row mb-3 text-center">
                         <div class="col-12">

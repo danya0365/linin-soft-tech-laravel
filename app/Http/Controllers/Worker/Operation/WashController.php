@@ -87,8 +87,10 @@ class WashController extends Controller
 
         $summaryReports = $operation->washSummaryReport();
         $workingDuration = $operation->washEmployee->getTotalTimeDurationOfWorkingTime();
+        $operationTimeDuration = $operation->timeDuration();
+        $operationLinenProducts = OperationLinenProduct::with('linenProduct')->where('operation_id', $operationId)->get();
 
-        return view('worker.operations.wash.employee-summary', ['operation' => $operation->toArray(), 'summaryReports' => $summaryReports, 'workingDuration' => $workingDuration]);
+        return view('worker.operations.wash.employee-summary', ['operation' => $operation->toArray(), 'summaryReports' => $summaryReports, 'workingDuration' => $workingDuration, 'operationLinenProducts' => $operationLinenProducts->toArray(), 'operationTimeDuration' => $operationTimeDuration]);
     }
 
     public function selectLinenCase($operationId, $operationLinenProductId)
@@ -113,6 +115,7 @@ class WashController extends Controller
 
         $operation = Operation::find($operationId);
         $operation->generateSearchTag();
+
         return redirect(route('worker.operation.wash.select-linen-product', ['operationId' => $operation->id, 'operationLinenProductId' => $operationLinenProduct->id]));
     }
 
@@ -155,7 +158,8 @@ class WashController extends Controller
         $operationLinenProduct->color = request()->get('color');
         $operationLinenProduct->save();
 
-        $operation = Operation::with('employee')->with('customer')->with('washingMachine')->with('washEmployee')->where('id', $operationId)->first();
+        $operation = Operation::find($operationId);
+        $operation->generateSearchTag();
 
         EmployeeManager::createEmployeeOperationLog($operation->wash_employee_id, WorkerOperationStatus::Wash(), EmployeeOperationActionType::Progress());
 
@@ -173,6 +177,29 @@ class WashController extends Controller
     public function deleteOperationLinenProduct($operationId, $operationLinenProductId)
     {
         OperationLinenProduct::where('id', $operationLinenProductId)->delete();
+        $operation = Operation::find($operationId);
+        $operation->generateSearchTag();
+
         return redirect(route('worker.operation.wash.select-operation-linen-product', ['operationId' => $operationId]));
+    }
+
+    public function setClose($operationId)
+    {
+        $operation = Operation::find($operationId);
+        $operation->status = OperationStatus::Close();
+        $operation->save();
+
+        EmployeeManager::createEmployeeOperationLog($operation->wash_employee_id, WorkerOperationStatus::Wash(), EmployeeOperationActionType::Stop());
+        return redirect(route('worker.operation.wash.employee-summary', ['operationId' => $operation->id]));
+    }
+
+    public function setInProgress($operationId)
+    {
+        $operation = Operation::find($operationId);
+        $operation->status = OperationStatus::InProgress();
+        $operation->save();
+
+        EmployeeManager::createEmployeeOperationLog($operation->wash_employee_id, WorkerOperationStatus::Wash(), EmployeeOperationActionType::Progress());
+        return redirect(route('worker.operation.wash.employee-summary', ['operationId' => $operation->id]));
     }
 }

@@ -157,6 +157,8 @@ Route::group(['prefix' => 'worker', 'middleware' => ['auth']], function () {
             Route::post('/{operationId}/linen-product/{operationLinenProductId}/set-weight-and-color', [App\Http\Controllers\Worker\Operation\WashController::class, 'setSelectWeightAndColor'])->name('worker.operation.wash.set-select-weight-and-color');
             Route::get('/{operationId}/operation-linen-product', [App\Http\Controllers\Worker\Operation\WashController::class, 'selectOperationLinenProduct'])->name('worker.operation.wash.select-operation-linen-product');
             Route::get('/{operationId}/delete-operation-linen-product/{operationLinenProductId}', [App\Http\Controllers\Worker\Operation\WashController::class, 'deleteOperationLinenProduct'])->name('worker.operation.wash.delete-operation-linen-product');
+            Route::get('/{operationId}/close', [App\Http\Controllers\Worker\Operation\WashController::class, 'setClose'])->name('worker.operation.wash.set-close');
+            Route::get('/{operationId}/in-progress', [App\Http\Controllers\Worker\Operation\WashController::class, 'setInProgress'])->name('worker.operation.wash.set-in-progress');
         });
 
         Route::group(['prefix' => 'dry'], function () {
