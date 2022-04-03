@@ -10,6 +10,7 @@
             <li class="breadcrumb-item"><a href="{{ route('worker.operation.wash.select-employee') }}">พนักงาน: {{ $operation['employee']['name'] }}</a></li>
             <li class="breadcrumb-item"><a href="{{ route('worker.operation.wash.select-customer', ['operationId' => $operation['id']]) }}">ลูกค้า: {{ $operation['customer']['name'] }}</a></li>
             <li class="breadcrumb-item"><a href="{{ route('worker.operation.wash.select-washing-machine', ['operationId' => $operation['id']]) }}">{{ $operation['washing_machine']['name'] }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('worker.operation.wash.employee-summary', ['operationId' => $operation['id']]) }}">สรุปข้อมูลการซัก</a></li>
             <li class="breadcrumb-item"><a href="{{ route('worker.operation.wash.select-linen-case', ['operationId' => $operation['id'], 'operationLinenProductId' => $operationLinenProduct['id']]) }}">{{ $operationLinenProduct['linen_case']['name'] }}</a></li>
             <li class="breadcrumb-item"><a href="{{ route('worker.operation.wash.select-linen-product', ['operationId' => $operation['id'], 'operationLinenProductId' => $operationLinenProduct['id']]) }}">{{ $operationLinenProduct['linen_product']['name'] }}</a></li>
           <li class="breadcrumb-item active" aria-current="page">ซัก - แบบฟอร์ม Submit</li>
@@ -90,7 +91,7 @@
                                     </div>
                                     <div class="col-6">
                                         <div class="d-grid gap-2" style="min-height: 60px">
-                                            <button class="btn btn-danger" type="button">ยกเลิก</button>
+                                            <button class="btn btn-danger" type="button" onclick="{{ route('worker.operation.wash.delete-operation-linen-product', ['operationId' => $operation['id'], 'operationLinenProductId' => $operationLinenProduct['id']]) }}">ยกเลิก</button>
                                         </div>
                                     </div>
                                 </div>

@@ -10,23 +10,23 @@
             <li class="breadcrumb-item"><a href="{{ route('worker.operation.wash.select-employee') }}">พนักงาน: {{ $operation['employee']['name'] }}</a></li>
             <li class="breadcrumb-item"><a href="{{ route('worker.operation.wash.select-customer', ['operationId' => $operation['id']]) }}">ลูกค้า: {{ $operation['customer']['name'] }}</a></li>
             <li class="breadcrumb-item"><a href="{{ route('worker.operation.wash.select-washing-machine', ['operationId' => $operation['id']]) }}">{{ $operation['washing_machine']['name'] }}</a></li>
-          <li class="breadcrumb-item active" aria-current="page">ซัก - สรุปยอดพนักงาน</li>
+          <li class="breadcrumb-item active" aria-current="page">ซัก - สรุปข้อมูลการซัก</li>
         </ol>
     </nav>
     <div class="row justify-content-center">
         <div class="col-md-12 m-2">
             <div class="card">
-                <div class="card-header text-center">สรุปยอดพนักงาน</div>
+                <div class="card-header text-center">สรุปข้อมูลการซักของพนักงาน</div>
                 <div class="card-body">
                     <div class="row g-2">
                         <div class="col-4">
                             <div class="d-grid gap-2" style="min-height: 60px">
-                                <button class="btn btn-primary" type="submit" onclick="window.location='{{ route('worker.operation.wash.select-linen-case', ['operationId' => $operation['id'], 'operationLinenProductId' => 0]) }}'">เพิ่ม</button>
+                                <button class="btn btn-primary" type="button" onclick="window.location='{{ route('worker.operation.wash.select-linen-case', ['operationId' => $operation['id'], 'operationLinenProductId' => 0]) }}'">เพิ่ม</button>
                             </div>
                         </div>
                         <div class="col-4">
                             <div class="d-grid gap-2" style="min-height: 60px">
-                                <button class="btn btn-danger" type="button">ลบ</button>
+                                <button class="btn btn-danger" type="button" onclick="window.location='{{ route('worker.operation.wash.select-operation-linen-product', ['operationId' => $operation['id']]) }}'">แก้ไขหรือลบ</button>
                             </div>
                         </div>
                         <div class="col-4">

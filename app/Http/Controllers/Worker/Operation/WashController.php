@@ -161,4 +161,18 @@ class WashController extends Controller
 
         return redirect(route('worker.operation.wash.employee-summary', ['operationId' => $operation->id]));
     }
+
+    public function selectOperationLinenProduct($operationId)
+    {
+        $operation = Operation::with('employee')->with('customer')->with('washingMachine')->with('washEmployee')->where('id', $operationId)->first();
+        $operationLinenProducts = OperationLinenProduct::with('linenProduct')->where('operation_id', $operationId)->get();
+
+        return view('worker.operations.wash.select-operation-linen-product', ['operation' => $operation->toArray(), 'operationLinenProducts' => $operationLinenProducts->toArray()]);
+    }
+
+    public function deleteOperationLinenProduct($operationId, $operationLinenProductId)
+    {
+        OperationLinenProduct::where('id', $operationLinenProductId)->delete();
+        return redirect(route('worker.operation.wash.select-operation-linen-product', ['operationId' => $operationId]));
+    }
 }
