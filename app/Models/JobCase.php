@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-class JobCase
+class OperationLinenCase
 {
 
   static $list = [

@@ -21,7 +21,7 @@
                     <div class="row g-2">
                         <div class="col-4">
                             <div class="d-grid gap-2" style="min-height: 60px">
-                                <button class="btn btn-primary" type="submit">เพิ่ม</button>
+                                <button class="btn btn-primary" type="submit" onclick="window.location='{{ route('worker.operation.wash.select-linen-case', ['operationId' => $operation['id'], 'operationLinenProductId' => 0]) }}'">เพิ่ม</button>
                             </div>
                         </div>
                         <div class="col-4">

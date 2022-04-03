@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('operations_linen_products', function (Blueprint $table) {
             $table->id();
             $table->integer('operation_id');
-            $table->integer('linen_product_id');
+            $table->integer('linen_product_id')->nullable();
             $table->enum('linen_case', ['new', 'edit'])->nullable();
             $table->string('color')->nullable();
             $table->integer('wet_weight')->nullable();

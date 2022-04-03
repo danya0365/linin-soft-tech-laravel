@@ -12,7 +12,10 @@ use App\Managers\EmployeeManager;
 use App\Models\CustomerGroup;
 use App\Models\Department;
 use App\Models\Operation;
+use App\Models\OperationLinenCase;
+use App\Models\OperationLinenProduct;
 use App\Models\WashingMachine;
+use Illuminate\Support\Facades\DB;
 
 class WashController extends Controller
 {
@@ -83,5 +86,30 @@ class WashController extends Controller
         $workingDuration = $operation->washEmployee->getTotalTimeDurationOfWorkingTime();
 
         return view('worker.operations.wash.employee-summary', ['operation' => $operation->toArray(), 'summaryReports' => $summaryReports, 'workingDuration' => $workingDuration]);
+    }
+
+    public function selectLinenCase($operationId, $operationLinenProductId)
+    {
+        if ($operationLinenProductId == 0) {
+            $operationLinenProduct = new OperationLinenProduct;
+            $operationLinenProduct->operation_id = $operationId;
+            $operationLinenProduct->save();
+            $operationLinenProductId = $operationLinenProduct->id;
+        }
+        $operationLinenProduct = OperationLinenProduct::find($operationLinenProductId);
+        $operation = Operation::with('employee')->with('customer')->with('washingMachine')->with('washEmployee')->where('id', $operationId)->first();
+        $operationLinenCases = OperationLinenCase::$list;
+        return view('worker.operations.wash.select-linen-case', ['operation' => $operation->toArray(), 'operationLinenProduct' => $operationLinenProduct, 'operationLinenCases' => $operationLinenCases]);
+    }
+
+    public function setSelectLinenCase($operationId, $operationLinenProductId, $linenCase)
+    {
+        $operationLinenProduct = OperationLinenProduct::find($operationLinenProductId);
+        $operationLinenProduct->linen_case = $linenCase;
+        $operationLinenProduct->save();
+
+        $operation = Operation::find($operationId);
+        $operation->generateSearchTag();
+        return redirect(route('worker.operation.wash.select-linen-product', ['operation' => $operation->id, 'operationLinenProduct' => $operationLinenProduct->id]));
     }
 }

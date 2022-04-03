@@ -66,9 +66,9 @@ class Operation extends Model
     return $this->belongsTo(WashingMachine::class);
   }
 
-  public function linenType()
+  public function linenProducts()
   {
-    return $this->belongsTo(LinenType::class);
+    return $this->belongsToMany(LinenProduct::class, 'operations_linen_products')->using(OperationLinenProduct::class);
   }
 
   public function washEmployee()
@@ -89,6 +89,17 @@ class Operation extends Model
   public function ironEmployee()
   {
     return $this->belongsTo(Employee::class, 'iron_employee_id');
+  }
+
+  public function generateSearchTag()
+  {
+    $searchTags = [];
+    foreach ($this->linenProducts as $linenProduct) {
+      $searchTags[] = $linenProduct->pivot->linen_case;
+      $searchTags[] = $linenProduct->pivot->color;
+    }
+    $this->search_tags = $searchTags;
+    $this->save();
   }
 
   /**
