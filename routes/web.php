@@ -136,6 +136,33 @@ Route::group(['prefix' => 'worker', 'middleware' => ['auth']], function () {
         });
     });
 
+
+    Route::group(['prefix' => 'operation'], function () {
+        Route::get('/', [App\Http\Controllers\Worker\OperationController::class, 'index'])->name('worker.operation');
+
+        Route::group(['prefix' => 'wash'], function () {
+            Route::get('/', [App\Http\Controllers\Worker\Operation\WashController::class, 'index'])->name('worker.operation.wash');
+            Route::get('/employee', [App\Http\Controllers\Worker\Operation\WashController::class, 'selectEmployee'])->name('worker.operation.wash.select-employee');
+            Route::get('/employee/{employeeId}', [App\Http\Controllers\Worker\Operation\WashController::class, 'setSelectEmployee'])->name('worker.operation.wash.set-select-employee');
+        });
+
+        Route::group(['prefix' => 'dry'], function () {
+            Route::get('/', [App\Http\Controllers\Worker\Operation\DryController::class, 'index'])->name('worker.operation.dry');
+        });
+
+        Route::group(['prefix' => 'iron'], function () {
+            Route::get('/', [App\Http\Controllers\Worker\Operation\IronController::class, 'index'])->name('worker.operation.iron');
+        });
+
+        Route::group(['prefix' => 'packing'], function () {
+            Route::get('/', [App\Http\Controllers\Worker\Operation\PackingController::class, 'index'])->name('worker.operation.packing');
+        });
+
+        Route::group(['prefix' => 'collect'], function () {
+            Route::get('/', [App\Http\Controllers\Worker\Operation\CollectController::class, 'index'])->name('worker.operation.collect');
+        });
+    });
+
     Route::get('/energy', function () {
         return ['hello world'];
     })->name('worker.energy');
