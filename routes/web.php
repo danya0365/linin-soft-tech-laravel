@@ -55,84 +55,84 @@ Route::group(['prefix' => 'worker', 'middleware' => ['auth']], function () {
         return ['hello world'];
     })->name('worker.customer');
 
-    Route::group(['prefix' => 'operation'], function () {
-        Route::get('/', [App\Http\Controllers\Worker\OperationController::class, 'index'])->name('worker.operation');
+    Route::group(['prefix' => 'operation/v1'], function () {
+        Route::get('/', [App\Http\Controllers\Worker\OperationV1Controller::class, 'index'])->name('worker.operation-v1');
 
         Route::group(['prefix' => 'pickup'], function () {
-            Route::get('/', [App\Http\Controllers\Worker\Operation\PickupController::class, 'index'])->name('worker.operation.pick-up');
-            Route::get('/employee', [App\Http\Controllers\Worker\Operation\PickupController::class, 'selectEmployee'])->name('worker.operation.pickup.select-employee');
-            Route::get('/employee/{employeeId}', [App\Http\Controllers\Worker\Operation\PickupController::class, 'setSelectEmployee'])->name('worker.operation.pickup.set-select-employee');
-            Route::get('/{jobGroupId}/customer', [App\Http\Controllers\Worker\Operation\PickupController::class, 'selectCustomer'])->name('worker.operation.pickup.select-customer');
-            Route::get('/{jobGroupId}/customer/{customerId}', [App\Http\Controllers\Worker\Operation\PickupController::class, 'setSelectCustomer'])->name('worker.operation.pickup.set-select-customer');
-            Route::get('/{jobGroupId}/submit', [App\Http\Controllers\Worker\Operation\PickupController::class, 'getSubmit'])->name('worker.operation.pickup.submit');
-            Route::post('/{jobGroupId}/submit', [App\Http\Controllers\Worker\Operation\PickupController::class, 'postSubmit'])->name('worker.operation.pickup.submit');
+            Route::get('/', [App\Http\Controllers\Worker\OperationV1\PickupController::class, 'index'])->name('worker.operation-v1.pick-up');
+            Route::get('/employee', [App\Http\Controllers\Worker\OperationV1\PickupController::class, 'selectEmployee'])->name('worker.operation-v1.pickup.select-employee');
+            Route::get('/employee/{employeeId}', [App\Http\Controllers\Worker\OperationV1\PickupController::class, 'setSelectEmployee'])->name('worker.operation-v1.pickup.set-select-employee');
+            Route::get('/{jobGroupId}/customer', [App\Http\Controllers\Worker\OperationV1\PickupController::class, 'selectCustomer'])->name('worker.operation-v1.pickup.select-customer');
+            Route::get('/{jobGroupId}/customer/{customerId}', [App\Http\Controllers\Worker\OperationV1\PickupController::class, 'setSelectCustomer'])->name('worker.operation-v1.pickup.set-select-customer');
+            Route::get('/{jobGroupId}/submit', [App\Http\Controllers\Worker\OperationV1\PickupController::class, 'getSubmit'])->name('worker.operation-v1.pickup.submit');
+            Route::post('/{jobGroupId}/submit', [App\Http\Controllers\Worker\OperationV1\PickupController::class, 'postSubmit'])->name('worker.operation-v1.pickup.submit');
         });
 
         Route::group(['prefix' => 'wash'], function () {
-            Route::get('/', [App\Http\Controllers\Worker\Operation\WashController::class, 'index'])->name('worker.operation.wash');
-            Route::get('/employee', [App\Http\Controllers\Worker\Operation\WashController::class, 'selectEmployee'])->name('worker.operation.wash.select-employee');
-            Route::get('/employee/{employeeId}', [App\Http\Controllers\Worker\Operation\WashController::class, 'setSelectEmployee'])->name('worker.operation.wash.set-select-employee');
-            Route::get('/{jobId}/customer', [App\Http\Controllers\Worker\Operation\WashController::class, 'selectCustomer'])->name('worker.operation.wash.select-customer');
-            Route::get('/{jobId}/customer/{customerId}', [App\Http\Controllers\Worker\Operation\WashController::class, 'setSelectCustomer'])->name('worker.operation.wash.set-select-customer');
-            Route::get('/{jobId}/job-group', [App\Http\Controllers\Worker\Operation\WashController::class, 'selectJobGroup'])->name('worker.operation.wash.select-job-group');
-            Route::get('/{jobId}/job-group/{jobGroupId}', [App\Http\Controllers\Worker\Operation\WashController::class, 'setSelectJobGroup'])->name('worker.operation.wash.set-select-job-group');
-            Route::get('/{jobId}/job-case', [App\Http\Controllers\Worker\Operation\WashController::class, 'selectJobCase'])->name('worker.operation.wash.select-job-case');
-            Route::get('/{jobId}/job-case/{jobCase}', [App\Http\Controllers\Worker\Operation\WashController::class, 'setSelectJobCase'])->name('worker.operation.wash.set-select-job-case');
-            Route::get('/{jobId}/washing-machine', [App\Http\Controllers\Worker\Operation\WashController::class, 'selectWashingMachine'])->name('worker.operation.wash.select-washing-machine');
-            Route::get('/{jobId}/washing-machine/{washingMachineId}', [App\Http\Controllers\Worker\Operation\WashController::class, 'setSelectWashingMachine'])->name('worker.operation.wash.set-select-washing-machine');
-            Route::get('/{jobId}/linen-type', [App\Http\Controllers\Worker\Operation\WashController::class, 'selectLinenType'])->name('worker.operation.wash.select-linen-type');
-            Route::get('/{jobId}/linen-type/{tags}', [App\Http\Controllers\Worker\Operation\WashController::class, 'setSelectLinenType'])->name('worker.operation.wash.set-select-linen-type');
-            Route::get('/{jobId}/submit', [App\Http\Controllers\Worker\Operation\WashController::class, 'getSubmit'])->name('worker.operation.wash.submit');
-            Route::post('/{jobId}/submit', [App\Http\Controllers\Worker\Operation\WashController::class, 'postSubmit'])->name('worker.operation.wash.submit');
-            Route::get('/{jobId}/employee-result', [App\Http\Controllers\Worker\Operation\WashController::class, 'getEmployeeResult'])->name('worker.operation.wash.employee-result');
+            Route::get('/', [App\Http\Controllers\Worker\OperationV1\WashController::class, 'index'])->name('worker.operation-v1.wash');
+            Route::get('/employee', [App\Http\Controllers\Worker\OperationV1\WashController::class, 'selectEmployee'])->name('worker.operation-v1.wash.select-employee');
+            Route::get('/employee/{employeeId}', [App\Http\Controllers\Worker\OperationV1\WashController::class, 'setSelectEmployee'])->name('worker.operation-v1.wash.set-select-employee');
+            Route::get('/{jobId}/customer', [App\Http\Controllers\Worker\OperationV1\WashController::class, 'selectCustomer'])->name('worker.operation-v1.wash.select-customer');
+            Route::get('/{jobId}/customer/{customerId}', [App\Http\Controllers\Worker\OperationV1\WashController::class, 'setSelectCustomer'])->name('worker.operation-v1.wash.set-select-customer');
+            Route::get('/{jobId}/job-group', [App\Http\Controllers\Worker\OperationV1\WashController::class, 'selectJobGroup'])->name('worker.operation-v1.wash.select-job-group');
+            Route::get('/{jobId}/job-group/{jobGroupId}', [App\Http\Controllers\Worker\OperationV1\WashController::class, 'setSelectJobGroup'])->name('worker.operation-v1.wash.set-select-job-group');
+            Route::get('/{jobId}/job-case', [App\Http\Controllers\Worker\OperationV1\WashController::class, 'selectJobCase'])->name('worker.operation-v1.wash.select-job-case');
+            Route::get('/{jobId}/job-case/{jobCase}', [App\Http\Controllers\Worker\OperationV1\WashController::class, 'setSelectJobCase'])->name('worker.operation-v1.wash.set-select-job-case');
+            Route::get('/{jobId}/washing-machine', [App\Http\Controllers\Worker\OperationV1\WashController::class, 'selectWashingMachine'])->name('worker.operation-v1.wash.select-washing-machine');
+            Route::get('/{jobId}/washing-machine/{washingMachineId}', [App\Http\Controllers\Worker\OperationV1\WashController::class, 'setSelectWashingMachine'])->name('worker.operation-v1.wash.set-select-washing-machine');
+            Route::get('/{jobId}/linen-type', [App\Http\Controllers\Worker\OperationV1\WashController::class, 'selectLinenType'])->name('worker.operation-v1.wash.select-linen-type');
+            Route::get('/{jobId}/linen-type/{tags}', [App\Http\Controllers\Worker\OperationV1\WashController::class, 'setSelectLinenType'])->name('worker.operation-v1.wash.set-select-linen-type');
+            Route::get('/{jobId}/submit', [App\Http\Controllers\Worker\OperationV1\WashController::class, 'getSubmit'])->name('worker.operation-v1.wash.submit');
+            Route::post('/{jobId}/submit', [App\Http\Controllers\Worker\OperationV1\WashController::class, 'postSubmit'])->name('worker.operation-v1.wash.submit');
+            Route::get('/{jobId}/employee-result', [App\Http\Controllers\Worker\OperationV1\WashController::class, 'getEmployeeResult'])->name('worker.operation-v1.wash.employee-result');
         });
 
         Route::group(['prefix' => 'dry'], function () {
-            Route::get('/', [App\Http\Controllers\Worker\Operation\DryController::class, 'index'])->name('worker.operation.dry');
-            Route::get('/job', [App\Http\Controllers\Worker\Operation\DryController::class, 'selectJob'])->name('worker.operation.dry.select-job');
-            Route::get('/job/{jobId}', [App\Http\Controllers\Worker\Operation\DryController::class, 'setSelectJob'])->name('worker.operation.dry.set-select-job');
-            Route::get('/{jobId}/employee', [App\Http\Controllers\Worker\Operation\DryController::class, 'selectEmployee'])->name('worker.operation.dry.select-employee');
-            Route::get('/{jobId}/employee/{employeeId}', [App\Http\Controllers\Worker\Operation\DryController::class, 'setSelectEmployee'])->name('worker.operation.dry.set-select-employee');
-            Route::get('/{jobId}/dryer-machine', [App\Http\Controllers\Worker\Operation\DryController::class, 'selectDryerMachine'])->name('worker.operation.dry.select-dryer-machine');
-            Route::get('/{jobId}/dryer-machine/{dryerMachineId}', [App\Http\Controllers\Worker\Operation\DryController::class, 'setSelectDryerMachine'])->name('worker.operation.dry.set-select-dryer-machine');
-            Route::get('/{jobId}/submit', [App\Http\Controllers\Worker\Operation\DryController::class, 'getSubmit'])->name('worker.operation.dry.submit');
-            Route::post('/{jobId}/submit', [App\Http\Controllers\Worker\Operation\DryController::class, 'postSubmit'])->name('worker.operation.dry.submit');
-            Route::get('/{jobId}/employee-result', [App\Http\Controllers\Worker\Operation\DryController::class, 'getEmployeeResult'])->name('worker.operation.dry.employee-result');
+            Route::get('/', [App\Http\Controllers\Worker\OperationV1\DryController::class, 'index'])->name('worker.operation-v1.dry');
+            Route::get('/job', [App\Http\Controllers\Worker\OperationV1\DryController::class, 'selectJob'])->name('worker.operation-v1.dry.select-job');
+            Route::get('/job/{jobId}', [App\Http\Controllers\Worker\OperationV1\DryController::class, 'setSelectJob'])->name('worker.operation-v1.dry.set-select-job');
+            Route::get('/{jobId}/employee', [App\Http\Controllers\Worker\OperationV1\DryController::class, 'selectEmployee'])->name('worker.operation-v1.dry.select-employee');
+            Route::get('/{jobId}/employee/{employeeId}', [App\Http\Controllers\Worker\OperationV1\DryController::class, 'setSelectEmployee'])->name('worker.operation-v1.dry.set-select-employee');
+            Route::get('/{jobId}/dryer-machine', [App\Http\Controllers\Worker\OperationV1\DryController::class, 'selectDryerMachine'])->name('worker.operation-v1.dry.select-dryer-machine');
+            Route::get('/{jobId}/dryer-machine/{dryerMachineId}', [App\Http\Controllers\Worker\OperationV1\DryController::class, 'setSelectDryerMachine'])->name('worker.operation-v1.dry.set-select-dryer-machine');
+            Route::get('/{jobId}/submit', [App\Http\Controllers\Worker\OperationV1\DryController::class, 'getSubmit'])->name('worker.operation-v1.dry.submit');
+            Route::post('/{jobId}/submit', [App\Http\Controllers\Worker\OperationV1\DryController::class, 'postSubmit'])->name('worker.operation-v1.dry.submit');
+            Route::get('/{jobId}/employee-result', [App\Http\Controllers\Worker\OperationV1\DryController::class, 'getEmployeeResult'])->name('worker.operation-v1.dry.employee-result');
         });
 
         Route::group(['prefix' => 'iron'], function () {
-            Route::get('/', [App\Http\Controllers\Worker\Operation\IronController::class, 'index'])->name('worker.operation.iron');
-            Route::get('/job', [App\Http\Controllers\Worker\Operation\IronController::class, 'selectJob'])->name('worker.operation.iron.select-job');
-            Route::get('/job/{jobId}', [App\Http\Controllers\Worker\Operation\IronController::class, 'setSelectJob'])->name('worker.operation.iron.set-select-job');
-            Route::get('/{jobId}/employee', [App\Http\Controllers\Worker\Operation\IronController::class, 'selectEmployee'])->name('worker.operation.iron.select-employee');
-            Route::get('/{jobId}/employee/{employeeId}', [App\Http\Controllers\Worker\Operation\IronController::class, 'setSelectEmployee'])->name('worker.operation.iron.set-select-employee');
-            Route::get('/{jobId}/submit', [App\Http\Controllers\Worker\Operation\IronController::class, 'getSubmit'])->name('worker.operation.iron.submit');
-            Route::post('/{jobId}/submit', [App\Http\Controllers\Worker\Operation\IronController::class, 'postSubmit'])->name('worker.operation.iron.submit');
-            Route::get('/{jobId}/employee-result', [App\Http\Controllers\Worker\Operation\IronController::class, 'getEmployeeResult'])->name('worker.operation.iron.employee-result');
-            Route::post('/{jobId}/employee-result', [App\Http\Controllers\Worker\Operation\IronController::class, 'postEmployeeResult'])->name('worker.operation.iron.employee-result');
+            Route::get('/', [App\Http\Controllers\Worker\OperationV1\IronController::class, 'index'])->name('worker.operation-v1.iron');
+            Route::get('/job', [App\Http\Controllers\Worker\OperationV1\IronController::class, 'selectJob'])->name('worker.operation-v1.iron.select-job');
+            Route::get('/job/{jobId}', [App\Http\Controllers\Worker\OperationV1\IronController::class, 'setSelectJob'])->name('worker.operation-v1.iron.set-select-job');
+            Route::get('/{jobId}/employee', [App\Http\Controllers\Worker\OperationV1\IronController::class, 'selectEmployee'])->name('worker.operation-v1.iron.select-employee');
+            Route::get('/{jobId}/employee/{employeeId}', [App\Http\Controllers\Worker\OperationV1\IronController::class, 'setSelectEmployee'])->name('worker.operation-v1.iron.set-select-employee');
+            Route::get('/{jobId}/submit', [App\Http\Controllers\Worker\OperationV1\IronController::class, 'getSubmit'])->name('worker.operation-v1.iron.submit');
+            Route::post('/{jobId}/submit', [App\Http\Controllers\Worker\OperationV1\IronController::class, 'postSubmit'])->name('worker.operation-v1.iron.submit');
+            Route::get('/{jobId}/employee-result', [App\Http\Controllers\Worker\OperationV1\IronController::class, 'getEmployeeResult'])->name('worker.operation-v1.iron.employee-result');
+            Route::post('/{jobId}/employee-result', [App\Http\Controllers\Worker\OperationV1\IronController::class, 'postEmployeeResult'])->name('worker.operation-v1.iron.employee-result');
         });
 
         Route::group(['prefix' => 'packing'], function () {
-            Route::get('/', [App\Http\Controllers\Worker\Operation\PackingController::class, 'index'])->name('worker.operation.packing');
-            Route::get('/job-group', [App\Http\Controllers\Worker\Operation\PackingController::class, 'selectJobGroup'])->name('worker.operation.packing.select-job-group');
-            Route::get('/job-group/{jobGroupId}', [App\Http\Controllers\Worker\Operation\PackingController::class, 'setSelectJobGroup'])->name('worker.operation.packing.set-select-job-group');
-            Route::get('/{jobGroupId}/employee', [App\Http\Controllers\Worker\Operation\PackingController::class, 'selectEmployee'])->name('worker.operation.packing.select-employee');
-            Route::get('/{jobGroupId}/employee/{employeeId}', [App\Http\Controllers\Worker\Operation\PackingController::class, 'setSelectEmployee'])->name('worker.operation.packing.set-select-employee');
-            Route::get('/{jobGroupId}/submit', [App\Http\Controllers\Worker\Operation\PackingController::class, 'getSubmit'])->name('worker.operation.packing.submit');
-            Route::post('/{jobGroupId}/submit', [App\Http\Controllers\Worker\Operation\PackingController::class, 'postSubmit'])->name('worker.operation.packing.submit');
-            Route::get('/{jobGroupId}/employee-result', [App\Http\Controllers\Worker\Operation\PackingController::class, 'getEmployeeResult'])->name('worker.operation.packing.employee-result');
+            Route::get('/', [App\Http\Controllers\Worker\OperationV1\PackingController::class, 'index'])->name('worker.operation-v1.packing');
+            Route::get('/job-group', [App\Http\Controllers\Worker\OperationV1\PackingController::class, 'selectJobGroup'])->name('worker.operation-v1.packing.select-job-group');
+            Route::get('/job-group/{jobGroupId}', [App\Http\Controllers\Worker\OperationV1\PackingController::class, 'setSelectJobGroup'])->name('worker.operation-v1.packing.set-select-job-group');
+            Route::get('/{jobGroupId}/employee', [App\Http\Controllers\Worker\OperationV1\PackingController::class, 'selectEmployee'])->name('worker.operation-v1.packing.select-employee');
+            Route::get('/{jobGroupId}/employee/{employeeId}', [App\Http\Controllers\Worker\OperationV1\PackingController::class, 'setSelectEmployee'])->name('worker.operation-v1.packing.set-select-employee');
+            Route::get('/{jobGroupId}/submit', [App\Http\Controllers\Worker\OperationV1\PackingController::class, 'getSubmit'])->name('worker.operation-v1.packing.submit');
+            Route::post('/{jobGroupId}/submit', [App\Http\Controllers\Worker\OperationV1\PackingController::class, 'postSubmit'])->name('worker.operation-v1.packing.submit');
+            Route::get('/{jobGroupId}/employee-result', [App\Http\Controllers\Worker\OperationV1\PackingController::class, 'getEmployeeResult'])->name('worker.operation-v1.packing.employee-result');
         });
 
         Route::group(['prefix' => 'collect'], function () {
-            Route::get('/', [App\Http\Controllers\Worker\Operation\CollectController::class, 'index'])->name('worker.operation.collect');
-            Route::get('/job-group', [App\Http\Controllers\Worker\Operation\CollectController::class, 'selectJobGroup'])->name('worker.operation.collect.select-job-group');
-            Route::get('/job-group/{jobGroupId}', [App\Http\Controllers\Worker\Operation\CollectController::class, 'setSelectJobGroup'])->name('worker.operation.collect.set-select-job-group');
-            Route::get('/{jobGroupId}/employee', [App\Http\Controllers\Worker\Operation\CollectController::class, 'selectEmployee'])->name('worker.operation.collect.select-employee');
-            Route::get('/{jobGroupId}/employee/{employeeId}', [App\Http\Controllers\Worker\Operation\CollectController::class, 'setSelectEmployee'])->name('worker.operation.collect.set-select-employee');
-            Route::get('/{jobGroupId}/submit', [App\Http\Controllers\Worker\Operation\CollectController::class, 'getSubmit'])->name('worker.operation.collect.submit');
-            Route::post('/{jobGroupId}/submit', [App\Http\Controllers\Worker\Operation\CollectController::class, 'postSubmit'])->name('worker.operation.collect.submit');
-            Route::get('/{jobGroupId}/employee-result', [App\Http\Controllers\Worker\Operation\CollectController::class, 'getEmployeeResult'])->name('worker.operation.collect.employee-result');
-            Route::post('/{jobGroupId}/employee-result', [App\Http\Controllers\Worker\Operation\CollectController::class, 'postEmployeeResult'])->name('worker.operation.collect.employee-result');
+            Route::get('/', [App\Http\Controllers\Worker\OperationV1\CollectController::class, 'index'])->name('worker.operation-v1.collect');
+            Route::get('/job-group', [App\Http\Controllers\Worker\OperationV1\CollectController::class, 'selectJobGroup'])->name('worker.operation-v1.collect.select-job-group');
+            Route::get('/job-group/{jobGroupId}', [App\Http\Controllers\Worker\OperationV1\CollectController::class, 'setSelectJobGroup'])->name('worker.operation-v1.collect.set-select-job-group');
+            Route::get('/{jobGroupId}/employee', [App\Http\Controllers\Worker\OperationV1\CollectController::class, 'selectEmployee'])->name('worker.operation-v1.collect.select-employee');
+            Route::get('/{jobGroupId}/employee/{employeeId}', [App\Http\Controllers\Worker\OperationV1\CollectController::class, 'setSelectEmployee'])->name('worker.operation-v1.collect.set-select-employee');
+            Route::get('/{jobGroupId}/submit', [App\Http\Controllers\Worker\OperationV1\CollectController::class, 'getSubmit'])->name('worker.operation-v1.collect.submit');
+            Route::post('/{jobGroupId}/submit', [App\Http\Controllers\Worker\OperationV1\CollectController::class, 'postSubmit'])->name('worker.operation-v1.collect.submit');
+            Route::get('/{jobGroupId}/employee-result', [App\Http\Controllers\Worker\OperationV1\CollectController::class, 'getEmployeeResult'])->name('worker.operation-v1.collect.employee-result');
+            Route::post('/{jobGroupId}/employee-result', [App\Http\Controllers\Worker\OperationV1\CollectController::class, 'postEmployeeResult'])->name('worker.operation-v1.collect.employee-result');
         });
     });
 
