@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Class Operation
@@ -115,9 +116,27 @@ class Operation extends Model
 
   public function washSummaryReport()
   {
-    $summaryReports = [];
     $totalValue = 0;
     $summaryReports = [];
+    $operationLinenProducts = DB::table('operations_linen_products')
+      ->selectRaw(
+        'SUM(wet_weight) as total_wet_weight, linen_product_id, linen_products.name as linen_product_name'
+      )
+      ->join('linen_products', function ($join) {
+        $join->on('linen_products.id', '=', 'operations_linen_products.linen_product_id');
+      })
+      ->join('operations', function ($join) {
+        $join->on('operations.id', '=', 'operations_linen_products.operation_id');
+      })
+      ->groupBy('operations_linen_products.linen_product_id')
+      ->where('operations.employee_id', $this->wash_employee_id)
+      ->orderBy('total_wet_weight', 'desc')->get();
+
+    foreach ($operationLinenProducts as $operationLinenProduct) {
+      $totalValue += $operationLinenProduct->total_wet_weight;
+      $summaryReports[] = ['title' => $operationLinenProduct->linen_product_name, 'value' => $operationLinenProduct->total_wet_weight];
+    }
+
     $summaryReports[] = ['title' => 'จำนวนที่ซักแล้ว', 'value' => $totalValue];
     return $summaryReports;
   }
