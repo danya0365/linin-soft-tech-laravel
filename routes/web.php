@@ -175,6 +175,8 @@ Route::group(['prefix' => 'worker', 'middleware' => ['auth']], function () {
             Route::get('/{operationId}/operation-linen-product', [App\Http\Controllers\Worker\Operation\DryController::class, 'selectOperationLinenProduct'])->name('worker.operation.dry.select-operation-linen-product');
             Route::get('/{operationId}/linen-product/{operationLinenProductId}/linen-case', [App\Http\Controllers\Worker\Operation\DryController::class, 'selectLinenCase'])->name('worker.operation.dry.select-linen-case');
             Route::get('/{operationId}/linen-product/{operationLinenProductId}/linen-case/{linenCase}', [App\Http\Controllers\Worker\Operation\DryController::class, 'setSelectLinenCase'])->name('worker.operation.dry.set-select-linen-case');
+            Route::get('/{operationId}/linen-product/{operationLinenProductId}/linen-product', [App\Http\Controllers\Worker\Operation\DryController::class, 'selectLinenProduct'])->name('worker.operation.dry.select-linen-product');
+            Route::get('/{operationId}/linen-product/{operationLinenProductId}/linen-product/{linenProductId}', [App\Http\Controllers\Worker\Operation\DryController::class, 'setSelectLinenProduct'])->name('worker.operation.dry.set-select-linen-product');
         });
 
         Route::group(['prefix' => 'iron'], function () {
