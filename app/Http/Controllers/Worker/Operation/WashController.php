@@ -17,8 +17,6 @@ use App\Models\Operation;
 use App\Models\OperationLinenCase;
 use App\Models\OperationLinenProduct;
 use App\Models\WashingMachine;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Request;
 
 class WashController extends Controller
 {
