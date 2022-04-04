@@ -31,7 +31,7 @@
                         </div>
                         <div class="col-4">
                             <div class="d-grid gap-2" style="min-height: 60px">
-                                @if ( $operation == "close ")
+                                @if ( $operation['status'] != "close")
                                 <button class="btn btn-outline-secondary" type="button" onclick="window.location='{{ route('worker.operation.wash.set-close', ['operationId' => $operation['id']]) }}'">ปิดงาน</button>
                                 @else 
                                 <button class="btn btn-outline-secondary" type="button" onclick="window.location='{{ route('worker.operation.wash.set-in-progress', ['operationId' => $operation['id']]) }}'">เปิดใหม่</button>
