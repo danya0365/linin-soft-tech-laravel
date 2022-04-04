@@ -11,6 +11,7 @@ use App\Http\Controllers\Controller;
 use App\Managers\EmployeeManager;
 use App\Models\CustomerGroup;
 use App\Models\Department;
+use App\Models\DryerMachine;
 use App\Models\LinenProduct;
 use App\Models\LinenType;
 use App\Models\Operation;
@@ -57,6 +58,25 @@ class DryController extends Controller
         $operation = Operation::find($operationId);
         $operation->customer_id = $customerId;
         $operation->save();
-        return redirect(route('worker.operation.dry.select-washing-machine', ['operationId' => $operation->id]));
+        return redirect(route('worker.operation.dry.select-dryer-machine', ['operationId' => $operation->id]));
+    }
+
+    public function selectDryerMachine($operationId)
+    {
+        $operation = Operation::with('employee')->with('customer')->where('id', $operationId)->first();
+        $dryerMachines = DryerMachine::with('operation')->get();
+        return view('worker.operations.dry.select-dryer-machine', ['operation' => $operation->toArray(), 'dryerMachines' => $dryerMachines->toArray()]);
+    }
+
+    public function setSelectDryerMachine($operationId, $dryerMachineId)
+    {
+        $operation = Operation::find($operationId);
+        $prevDryerMachineId = $operation->dryer_machine_id;
+        $operation->washing_machine_id = $dryerMachineId;
+        $operation->save();
+
+        if ($prevDryerMachineId) DryerMachine::where('id', $prevDryerMachineId)->update(['operation_id' => null]);
+        DryerMachine::where('id', $dryerMachineId)->update(['operation_id' => $operation->id]);
+        return redirect(route('worker.operation.dry.employee-summary', ['operationId' => $operation->id]));
     }
 }

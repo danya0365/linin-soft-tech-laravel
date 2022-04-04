@@ -37,9 +37,9 @@ class DryerMachine extends Model
    */
   protected $fillable = ['name', 'photo', 'maximum_weight'];
 
-  public function job()
+  public function operation()
   {
-    return $this->belongsTo(Job::class);
+    return $this->belongsTo(Operation::class);
   }
 
   /**
