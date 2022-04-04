@@ -4,19 +4,21 @@ namespace App\Http\Controllers\Worker\Operation;
 
 use App\Enums\DepartmentNameId;
 use App\Enums\EmployeeOperationActionType;
-use App\Enums\JobGroupStatus;
+use App\Enums\OperationStatus;
+use App\Enums\OperationType;
 use App\Enums\WorkerOperationStatus;
 use App\Http\Controllers\Controller;
 use App\Managers\EmployeeManager;
-use Illuminate\Http\Request;
 use App\Models\CustomerGroup;
 use App\Models\Department;
-use App\Models\JobGroup;
-use App\Models\Job;
-use App\Models\JobCase;
-use App\Models\WashingMachine;
 use App\Models\LinenProduct;
 use App\Models\LinenType;
+use App\Models\Operation;
+use App\Models\OperationLinenCase;
+use App\Models\OperationLinenProduct;
+use App\Models\WashingMachine;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Request;
 
 class WashController extends Controller
 {
@@ -33,141 +35,171 @@ class WashController extends Controller
 
     public function setSelectEmployee($employeeId)
     {
-        $job = new Job;
-        $job->employee_id = $employeeId;
-        $job->wash_employee_id = $employeeId;
-        $job->status = WorkerOperationStatus::Wash();
-        $job->save();
+        $operation = new Operation();
+        $operation->employee_id = $employeeId;
+        $operation->wash_employee_id = $employeeId;
+        $operation->operation_type = OperationType::Wash();
+        $operation->status = OperationStatus::InProgress();
+        $operation->save();
 
         EmployeeManager::createEmployeeOperationLog($employeeId, WorkerOperationStatus::Wash(), EmployeeOperationActionType::Start());
 
-        return redirect(route('worker.operation.wash.select-customer', ['jobId' => $job->id]));
+        return redirect(route('worker.operation.wash.select-customer', ['operationId' => $operation->id]));
     }
 
-    public function selectCustomer($jobId)
+    public function selectCustomer($operationId)
     {
-        $job = Job::with('employee')->where('id', $jobId)->first();
+        $operation = Operation::with('employee')->where('id', $operationId)->first();
         $customerGroup = CustomerGroup::with('customers')->get();
-        return view('worker.operations.wash.select-customer', ['customerGroups' => $customerGroup->toArray(), 'job' => $job->toArray()]);
+        return view('worker.operations.wash.select-customer', ['customerGroups' => $customerGroup->toArray(), 'operation' => $operation->toArray()]);
     }
 
-    public function setSelectCustomer($jobId, $customerId)
+    public function setSelectCustomer($operationId, $customerId)
     {
-        $job = Job::find($jobId);
-        $job->customer_id = $customerId;
-        $job->save();
-        return redirect(route('worker.operation.wash.select-job-group', ['jobId' => $job->id]));
+        $operation = Operation::find($operationId);
+        $operation->customer_id = $customerId;
+        $operation->save();
+        return redirect(route('worker.operation.wash.select-washing-machine', ['operationId' => $operation->id]));
     }
 
-    public function selectJobGroup($jobId)
+    public function selectWashingMachine($operationId)
     {
-        $job = Job::with('employee')->with('customer')->where('id', $jobId)->first();
-        $todayJobGroups = JobGroup::where('customer_id', $job->customer_id)->whereDate('created_at', \Carbon\Carbon::today())->get();
-        return view('worker.operations.wash.select-job-group', ['todayJobGroups' => $todayJobGroups->toArray(), 'job' => $job->toArray()]);
+        $operation = Operation::with('employee')->with('customer')->where('id', $operationId)->first();
+        $washingMachines = WashingMachine::with('operation')->get();
+        return view('worker.operations.wash.select-washing-machine', ['operation' => $operation->toArray(), 'washingMachines' => $washingMachines->toArray()]);
     }
 
-    public function setSelectJobGroup($jobId, $jobGroupId)
+    public function setSelectWashingMachine($operationId, $washingMachineId)
     {
-        $job = Job::find($jobId);
-        $job->job_group_id = $jobGroupId;
-        $job->save();
+        $operation = Operation::find($operationId);
+        $prevWashingMachineId = $operation->washing_machine_id;
+        $operation->washing_machine_id = $washingMachineId;
+        $operation->save();
 
-        $jobGroup = JobGroup::find($jobGroupId);
-        $jobGroup->operation_status = JobGroupStatus::Progress();
-        $jobGroup->save();
-
-        EmployeeManager::createEmployeeOperationLog($jobGroup->pickup_employee_id, WorkerOperationStatus::PickUp(), EmployeeOperationActionType::Stop());
-
-        return redirect(route('worker.operation.wash.select-job-case', ['jobId' => $job->id]));
+        if ($prevWashingMachineId) WashingMachine::where('id', $prevWashingMachineId)->update(['operation_id' => null]);
+        WashingMachine::where('id', $washingMachineId)->update(['operation_id' => $operation->id]);
+        return redirect(route('worker.operation.wash.employee-summary', ['operationId' => $operation->id]));
     }
 
-    public function selectJobCase($jobId)
+    public function getEmployeeSummary($operationId)
     {
-        $job = Job::with('employee')->with('customer')->with('jobGroup')->where('id', $jobId)->first();
-        $jobCases = JobCase::$list;
-        return view('worker.operations.wash.select-job-case', ['job' => $job->toArray(), 'jobCases' => $jobCases]);
+        $operation = Operation::with('employee')->with('customer')->with('washingMachine')->with('washEmployee')->where('id', $operationId)->first();
+
+        $summaryReports = $operation->washSummaryReport();
+        $workingDuration = $operation->washEmployee->getTotalTimeDurationOfWorkingTime();
+        $operationTimeDuration = $operation->timeDuration();
+        $operationLinenProducts = OperationLinenProduct::with('linenProduct')->where('operation_id', $operationId)->get();
+
+        return view('worker.operations.wash.employee-summary', ['operation' => $operation->toArray(), 'summaryReports' => $summaryReports, 'workingDuration' => $workingDuration, 'operationLinenProducts' => $operationLinenProducts->toArray(), 'operationTimeDuration' => $operationTimeDuration]);
     }
 
-    public function setSelectJobCase($jobId, $jobCase)
+    public function selectLinenCase($operationId, $operationLinenProductId)
     {
-        $job = Job::find($jobId);
-        $job->job_case = $jobCase;
-        $job->save();
-        return redirect(route('worker.operation.wash.select-washing-machine', ['jobId' => $job->id]));
+        if ($operationLinenProductId == 0) {
+            $operationLinenProduct = new OperationLinenProduct;
+            $operationLinenProduct->operation_id = $operationId;
+            $operationLinenProduct->save();
+            $operationLinenProductId = $operationLinenProduct->id;
+        }
+        $operationLinenProduct = OperationLinenProduct::find($operationLinenProductId);
+        $operation = Operation::with('employee')->with('customer')->with('washingMachine')->with('washEmployee')->where('id', $operationId)->first();
+        $operationLinenCases = OperationLinenCase::$list;
+        return view('worker.operations.wash.select-linen-case', ['operation' => $operation->toArray(), 'operationLinenProduct' => $operationLinenProduct, 'operationLinenCases' => $operationLinenCases]);
     }
 
-    public function selectWashingMachine($jobId)
+    public function setSelectLinenCase($operationId, $operationLinenProductId, $linenCase)
     {
-        $job = Job::with('employee')->with('customer')->with('jobGroup')->where('id', $jobId)->first();
-        $washingMachines = WashingMachine::with('job')->get();
-        return view('worker.operations.wash.select-washing-machine', ['job' => $job->toArray(), 'washingMachines' => $washingMachines->toArray()]);
+        $operationLinenProduct = OperationLinenProduct::find($operationLinenProductId);
+        $operationLinenProduct->linen_case = $linenCase;
+        $operationLinenProduct->save();
+
+        $operation = Operation::find($operationId);
+        $operation->updateRelateFields();
+
+        return redirect(route('worker.operation.wash.select-linen-product', ['operationId' => $operation->id, 'operationLinenProductId' => $operationLinenProduct->id]));
     }
 
-    public function setSelectWashingMachine($jobId, $washingMachineId)
+    public function selectLinenProduct($operationId, $operationLinenProductId)
     {
-        $job = Job::find($jobId);
-        $prevWashingMachineId = $job->washing_machine_id;
-        $job->washing_machine_id = $washingMachineId;
-        $job->save();
-
-        if ($prevWashingMachineId) WashingMachine::where('id', $prevWashingMachineId)->update(['job_id' => null]);
-        WashingMachine::where('id', $washingMachineId)->update(['job_id' => $job->id]);
-        return redirect(route('worker.operation.wash.select-linen-type', ['jobId' => $job->id]));
-    }
-
-    public function selectLinenType($jobId)
-    {
-        $job = Job::with('employee')->with('customer')->with('jobGroup')->with('washingMachine')->where('id', $jobId)->first();
+        $operation = Operation::with('employee')->with('customer')->with('washingMachine')->with('washEmployee')->where('id', $operationId)->first();
+        $operationLinenProduct = OperationLinenProduct::find($operationLinenProductId);
         $linenTypes = LinenType::with('linenProducts')->get();
         $linenProducts = LinenProduct::all();
-        return view('worker.operations.wash.select-linen-type', ['job' => $job->toArray(), 'linenTypes' => $linenTypes->toArray(), 'linenProductJson' => $linenProducts->toJson()]);
+        return view('worker.operations.wash.select-linen-product', ['operation' => $operation->toArray(), 'operationLinenProduct' => $operationLinenProduct->toArray(), 'linenTypes' => $linenTypes->toArray(), 'linenProductJson' => $linenProducts->toJson()]);
     }
 
-    public function setSelectLinenType($jobId, $tags)
+    public function setSelectLinenProduct($operationId, $operationLinenProductId, $linenProductId)
     {
-        $linenProductIds = explode(',', $tags);
-        $linenProducts = LinenProduct::whereIn('id', $linenProductIds)->get();
+        $linenProduct = LinenProduct::find($linenProductId);
 
-        $linenTypeId = null;
-        $tags = [];
-        foreach ($linenProducts as $linenProduct) {
-            $linenTypeId = $linenProduct->linen_type_id;
-            $tags[] = $linenProduct->name;
-        }
-        $job = Job::find($jobId);
-        $job->linen_type_id = $linenTypeId;
-        $job->tags = implode(', ', $tags);
-        $job->save();
+        $operationLinenProduct = OperationLinenProduct::find($operationLinenProductId);
+        $operationLinenProduct->linen_product_id = $linenProduct->id;
+        $operationLinenProduct->save();
 
-        return redirect(route('worker.operation.wash.submit', ['jobId' => $job->id]));
+        $operation = Operation::find($operationId);
+        $operation->updateRelateFields();
+
+        return redirect(route('worker.operation.wash.select-weight-and-color', ['operationId' => $operation->id, 'operationLinenProductId' => $operationLinenProduct->id]));
     }
 
-    public function getSubmit(Request $request, $jobId)
+    public function selectWeightAndColor($operationId, $operationLinenProductId)
     {
-        $job = Job::with('employee')->with('customer')->with('jobGroup')->with('washingMachine')->with('linenType')->where('id', $jobId)->first();
-        return view('worker.operations.wash.submit', ['job' => $job->toArray()]);
+        $operation = Operation::with('employee')->with('customer')->with('washingMachine')->with('washEmployee')->where('id', $operationId)->first();
+        $operationLinenProduct = OperationLinenProduct::with('linenProduct')->where('id', $operationLinenProductId)->first();
+        return view('worker.operations.wash.select-weight-and-color', ['operation' => $operation->toArray(), 'operationLinenProduct' => $operationLinenProduct->toArray()]);
     }
 
-    public function postSubmit(Request $request, $jobId)
+    public function setSelectWeightAndColor($operationId, $operationLinenProductId)
     {
         request()->validate(['wet_weight' => 'required', 'color' => 'required']);
-        $job = Job::find($jobId);
-        $job->wet_weight = $request->get('wet_weight');
-        $job->color = $request->get('color');
-        $job->save();
 
-        EmployeeManager::createEmployeeOperationLog($job->wash_employee_id, WorkerOperationStatus::Wash(), EmployeeOperationActionType::Progress());
+        $operationLinenProduct = OperationLinenProduct::find($operationLinenProductId);
+        $operationLinenProduct->wet_weight = request()->get('wet_weight');
+        $operationLinenProduct->color = request()->get('color');
+        $operationLinenProduct->save();
 
-        return redirect(route('worker.operation.wash.employee-result', ['jobId' => $job->id]));
+        $operation = Operation::find($operationId);
+        $operation->updateRelateFields();
+
+        EmployeeManager::createEmployeeOperationLog($operation->wash_employee_id, WorkerOperationStatus::Wash(), EmployeeOperationActionType::Progress());
+
+        return redirect(route('worker.operation.wash.employee-summary', ['operationId' => $operation->id]));
     }
 
-    public function getEmployeeResult($jobId)
+    public function selectOperationLinenProduct($operationId)
     {
-        $job = Job::with('employee')->with('customer')->with('jobGroup')->with('washingMachine')->with('linenType')->with('washEmployee')->where('id', $jobId)->first();
+        $operation = Operation::with('employee')->with('customer')->with('washingMachine')->with('washEmployee')->where('id', $operationId)->first();
+        $operationLinenProducts = OperationLinenProduct::with('linenProduct')->where('operation_id', $operationId)->get();
 
-        $summaryReports = $job->washSummaryReport();
-        $workingDuration = $job->washEmployee->getTotalTimeDurationOfWorkingTime();
+        return view('worker.operations.wash.select-operation-linen-product', ['operation' => $operation->toArray(), 'operationLinenProducts' => $operationLinenProducts->toArray()]);
+    }
 
-        return view('worker.operations.wash.employee-result', ['job' => $job->toArray(), 'summaryReports' => $summaryReports, 'workingDuration' => $workingDuration]);
+    public function deleteOperationLinenProduct($operationId, $operationLinenProductId)
+    {
+        OperationLinenProduct::where('id', $operationLinenProductId)->delete();
+        $operation = Operation::find($operationId);
+        $operation->updateRelateFields();
+
+        return redirect(route('worker.operation.wash.select-operation-linen-product', ['operationId' => $operationId]));
+    }
+
+    public function setClose($operationId)
+    {
+        $operation = Operation::find($operationId);
+        $operation->status = OperationStatus::Close();
+        $operation->save();
+
+        EmployeeManager::createEmployeeOperationLog($operation->wash_employee_id, WorkerOperationStatus::Wash(), EmployeeOperationActionType::Stop());
+        return redirect(route('worker.operation.wash.employee-summary', ['operationId' => $operation->id]));
+    }
+
+    public function setInProgress($operationId)
+    {
+        $operation = Operation::find($operationId);
+        $operation->status = OperationStatus::InProgress();
+        $operation->save();
+
+        EmployeeManager::createEmployeeOperationLog($operation->wash_employee_id, WorkerOperationStatus::Wash(), EmployeeOperationActionType::Progress());
+        return redirect(route('worker.operation.wash.employee-summary', ['operationId' => $operation->id]));
     }
 }

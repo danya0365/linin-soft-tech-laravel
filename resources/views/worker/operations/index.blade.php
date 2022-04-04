@@ -15,7 +15,6 @@
                 <div class="card-header">{{ __('ปฏิบัติการ') }}</div>
                 <div class="card-body">
                     <div class="d-grid gap-3">
-                        <a class="btn btn-outline-secondary btn-lg" href="{{ route('worker.operation.pick-up') }}" role="button">{{ __('รับสินค้า') }}</a>
                         <a class="btn btn-outline-secondary btn-lg" href="{{ route('worker.operation.wash') }}" role="button">{{ __('ซัก') }}</a>
                         <a class="btn btn-outline-secondary btn-lg" href="{{ route('worker.operation.dry') }}" role="button">{{ __('อบ') }}</a>
                         <a class="btn btn-outline-secondary btn-lg" href="{{ route('worker.operation.iron') }}" role="button">{{ __('รีด') }}</a>

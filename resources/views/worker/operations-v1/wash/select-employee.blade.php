@@ -19,7 +19,7 @@
                     <div class="row g-2">
                         @foreach ($department['employees'] as $employee)
                         <div class="col-sm-4">
-                            <a href="{{ route('worker.operation.wash.set-select-employee', ['employeeId' => $employee['id']]) }}">
+                            <a href="{{ route('worker.operation-v1.wash.set-select-employee', ['employeeId' => $employee['id']]) }}">
                                 <div class="p-3 border bg-light" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center">
                                         <div class="bi bi-person-square" style="font-size: 3em"></div>

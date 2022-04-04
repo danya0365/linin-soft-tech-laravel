@@ -1,0 +1,41 @@
+@extends('layouts.worker')
+
+@section('content')
+
+<div class="container">
+    <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{{ route('worker') }}">Worker</a></li>
+          <li class="breadcrumb-item"><a href="{{ route('worker.operation-v1') }}">ปฏิบัติการ</a></li>
+          <li class="breadcrumb-item"><a href="{{ route('worker.operation-v1.wash.select-employee') }}">พนักงาน: {{ $job['employee']['name'] }}</a></li>
+          <li class="breadcrumb-item"><a href="{{ route('worker.operation-v1.wash.select-customer', ['jobId' => $job['id']]) }}">ลูกค้า: {{ $job['customer']['name'] }}</a></li>
+          <li class="breadcrumb-item active" aria-current="page">ซัก - เลือกตู้เก็บผ้า</li>
+        </ol>
+    </nav>
+    <div class="row justify-content-center">
+        <div class="col-md-12 m-2">
+            <div class="card">
+                <div class="card-header">ตู้เก็บผ้าวันนี้ของลูกค้า: {{ $job['customer']['name'] }}</div>
+                <div class="card-body">
+                    <div class="row g-2">
+                        @foreach ($todayJobGroups as $todayJobGroup )
+                        <div class="col-sm-4">
+                            <a href="{{ route('worker.operation-v1.wash.set-select-job-group', ['jobId' => $job['id'], 'jobGroupId' => $todayJobGroup['id']]) }}">
+                                <div class="p-3 border bg-light" style="min-height: 150px">
+                                    <div class="rounded-3 d-flex align-items-center justify-content-center">
+                                        <div class="bi bi-hdd-rack" style="font-size: 3em"></div>
+                                    </div>
+                                    <div class="text-center">วันนี้ไปรับผ้า: {{ $todayJobGroup['created_at'] }}</div>
+                                    <div class="text-center">น้ำหนักเปียกรวม: {{ $todayJobGroup['wet_weight'] }}</div>
+                                    <div class="text-center">สถานะ: {{ $todayJobGroup['operation_status'] }}</div>
+                                </div>
+                            </a>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@endsection

@@ -38,4 +38,9 @@ class LinenProduct extends Model
   {
     return $this->belongsTo(LinenType::class);
   }
+
+  public function operations()
+  {
+    return $this->belongsToMany(Operation::class);
+  }
 }

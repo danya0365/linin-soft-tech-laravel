@@ -7,24 +7,25 @@
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="{{ route('worker') }}">Worker</a></li>
           <li class="breadcrumb-item"><a href="{{ route('worker.operation-v1') }}">ปฏิบัติการ</a></li>
-          <li class="breadcrumb-item active" aria-current="page">ซัก - เลือกพนักงาน</li>
+          <li class="breadcrumb-item"><a href="{{ route('worker.operation-v1.wash.select-employee') }}">พนักงาน: {{ $job['employee']['name'] }}</a></li>
+          <li class="breadcrumb-item active" aria-current="page">ซัก - เลือกลูกค้า</li>
         </ol>
     </nav>
     <div class="row justify-content-center">
-        @foreach ($departments as $department)
+        @foreach ($customerGroups as $customerGroup)
         <div class="col-md-12 m-2">
             <div class="card">
-                <div class="card-header">{{ $department['name'] }}</div>
+                <div class="card-header">{{ $customerGroup['name'] }}</div>
                 <div class="card-body">
                     <div class="row g-2">
-                        @foreach ($department['employees'] as $employee)
+                        @foreach ($customerGroup['customers'] as $customer)
                         <div class="col-sm-4">
-                            <a href="{{ route('worker.operation.wash.set-select-employee', ['employeeId' => $employee['id']]) }}">
+                            <a href="{{ route('worker.operation-v1.wash.set-select-customer', ['jobId' => $job['id'], 'customerId' => $customer['id']]) }}">
                                 <div class="p-3 border bg-light" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center">
-                                        <div class="bi bi-person-square" style="font-size: 3em"></div>
+                                        <div class="bi bi-building" style="font-size: 3em"></div>
                                     </div>
-                                    <div class="text-center">{{ $employee['name'] }}</div>
+                                    <div class="text-center">{{ $customer['name'] }}</div>
                                 </div>
                             </a>
                         </div>
