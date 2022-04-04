@@ -71,7 +71,7 @@ class Operation extends Model
 
   public function linenProducts()
   {
-    return $this->belongsToMany(LinenProduct::class, 'operations_linen_products')->using(OperationLinenProduct::class);
+    return $this->belongsToMany(LinenProduct::class, 'operations_linen_products')->using(OperationLinenProduct::class)->withPivot('linen_case', 'color', 'wet_weight', 'dry_weight', 'iron_piece', 'packing_piece');
   }
 
   public function washEmployee()
@@ -94,16 +94,28 @@ class Operation extends Model
     return $this->belongsTo(Employee::class, 'iron_employee_id');
   }
 
-  public function generateSearchTag()
+  public function updateRelateFields()
   {
+    $operation = self::with('linenProducts')->where('id', $this->id)->first();
     $searchTags = [];
-    foreach ($this->linenProducts as $linenProduct) {
+    $colors = [];
+    $totalWetWeight = $totalDryWeight = $totalIronPiece = $totalPackingPiece = 0;
+    foreach ($operation->linenProducts as $linenProduct) {
       $searchTags[] = $linenProduct->pivot->linen_case;
       $searchTags[] = $linenProduct->pivot->color;
+      $colors[] = $linenProduct->pivot->color;
+      $totalWetWeight += $linenProduct->pivot->wet_weight;
+      $totalDryWeight += $linenProduct->pivot->dry_weight;
+      $totalIronPiece += $linenProduct->pivot->iron_piece;
+      $totalPackingPiece += $linenProduct->pivot->packing_piece;
     }
     $this->search_tags = $searchTags;
+    $this->colors = $colors;
+    $this->total_wet_weight = $totalWetWeight;
+    $this->total_dry_weight = $totalDryWeight;
+    $this->total_iron_piece = $totalIronPiece;
+    $this->total_packing_piece = $totalPackingPiece;
     $this->save();
-    $this->touch();
   }
 
   /**

@@ -114,7 +114,7 @@ class WashController extends Controller
         $operationLinenProduct->save();
 
         $operation = Operation::find($operationId);
-        $operation->generateSearchTag();
+        $operation->updateRelateFields();
 
         return redirect(route('worker.operation.wash.select-linen-product', ['operationId' => $operation->id, 'operationLinenProductId' => $operationLinenProduct->id]));
     }
@@ -137,7 +137,7 @@ class WashController extends Controller
         $operationLinenProduct->save();
 
         $operation = Operation::find($operationId);
-        $operation->generateSearchTag();
+        $operation->updateRelateFields();
 
         return redirect(route('worker.operation.wash.select-weight-and-color', ['operationId' => $operation->id, 'operationLinenProductId' => $operationLinenProduct->id]));
     }
@@ -159,7 +159,7 @@ class WashController extends Controller
         $operationLinenProduct->save();
 
         $operation = Operation::find($operationId);
-        $operation->generateSearchTag();
+        $operation->updateRelateFields();
 
         EmployeeManager::createEmployeeOperationLog($operation->wash_employee_id, WorkerOperationStatus::Wash(), EmployeeOperationActionType::Progress());
 
@@ -178,7 +178,7 @@ class WashController extends Controller
     {
         OperationLinenProduct::where('id', $operationLinenProductId)->delete();
         $operation = Operation::find($operationId);
-        $operation->generateSearchTag();
+        $operation->updateRelateFields();
 
         return redirect(route('worker.operation.wash.select-operation-linen-product', ['operationId' => $operationId]));
     }
