@@ -7,23 +7,23 @@
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{ route('worker') }}">Worker</a></li>
             <li class="breadcrumb-item"><a href="{{ route('worker.operation') }}">ปฏิบัติการ</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.operation.wash.select-employee') }}">พนักงาน: {{ $operation['employee']['name'] }}</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.operation.wash.select-customer', ['operationId' => $operation['id']]) }}">ลูกค้า: {{ $operation['customer']['name'] }}</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.operation.wash.select-washing-machine', ['operationId' => $operation['id']]) }}">{{ $operation['washing_machine']['name'] }}</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.operation.wash.employee-summary', ['operationId' => $operation['id']]) }}">สรุปข้อมูลการซัก</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.operation.wash.select-linen-case', ['operationId' => $operation['id'], 'operationLinenProductId' => $operationLinenProduct['id']]) }}">{{ $operationLinenProduct['linen_case']['name'] }}</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.operation.wash.select-linen-product', ['operationId' => $operation['id'], 'operationLinenProductId' => $operationLinenProduct['id']]) }}">{{ $operationLinenProduct['linen_product']['name'] }}</a></li>
-          <li class="breadcrumb-item active" aria-current="page">ซัก - แบบฟอร์ม Submit</li>
+            <li class="breadcrumb-item"><a href="{{ route('worker.operation.dry.select-employee') }}">พนักงาน: {{ $operation['employee']['name'] }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('worker.operation.dry.select-customer', ['operationId' => $operation['id']]) }}">ลูกค้า: {{ $operation['customer']['name'] }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('worker.operation.dry.select-dryer-machine', ['operationId' => $operation['id']]) }}">{{ $operation['dryer_machine']['name'] }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('worker.operation.dry.employee-summary', ['operationId' => $operation['id']]) }}">สรุปข้อมูลการอบ</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('worker.operation.dry.select-linen-case', ['operationId' => $operation['id'], 'operationLinenProductId' => $operationLinenProduct['id']]) }}">{{ $operationLinenProduct['linen_case']['name'] }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('worker.operation.dry.select-linen-product', ['operationId' => $operation['id'], 'operationLinenProductId' => $operationLinenProduct['id']]) }}">{{ $operationLinenProduct['linen_product']['name'] }}</a></li>
+          <li class="breadcrumb-item active" aria-current="page">อบ - แบบฟอร์ม Submit</li>
         </ol>
     </nav>
     <div class="row justify-content-center">
         <div class="col-md-12 m-2">
             <div class="card">
-                <div class="card-header">น้ำหนักเปียกและสี</div>
+                <div class="card-header">น้ำหนักอบและสี</div>
                 <div class="card-body">
-                    <form method="POST" action="{{ route('worker.operation.wash.set-select-weight-and-color', ['operationId' => $operation['id'], 'operationLinenProductId' => $operationLinenProduct['id']]) }}"  role="form" enctype="multipart/form-data">
+                    <form method="POST" action="{{ route('worker.operation.dry.set-select-weight-and-color', ['operationId' => $operation['id'], 'operationLinenProductId' => $operationLinenProduct['id']]) }}"  role="form" enctype="multipart/form-data">
                         @csrf
-                        {{ Form::hidden('wet_weight', $operationLinenProduct['wet_weight']) }}
+                        {{ Form::hidden('dry_weight', $operationLinenProduct['dry_weight']) }}
                         {{ Form::hidden('color', $operationLinenProduct['color']) }}
                         <div class="box box-info padding-1">
                             <div class="box-body">
@@ -91,7 +91,7 @@
                                     </div>
                                     <div class="col-6">
                                         <div class="d-grid gap-2" style="min-height: 60px">
-                                            <button class="btn btn-danger" type="button" onclick="{{ route('worker.operation.wash.delete-operation-linen-product', ['operationId' => $operation['id'], 'operationLinenProductId' => $operationLinenProduct['id']]) }}">ลบ</button>
+                                            <button class="btn btn-danger" type="button" onclick="{{ route('worker.operation.dry.delete-operation-linen-product', ['operationId' => $operation['id'], 'operationLinenProductId' => $operationLinenProduct['id']]) }}">ลบ</button>
                                         </div>
                                     </div>
                                 </div>
@@ -105,7 +105,7 @@
 </div>
 <script type="text/javascript">
 $(function(){
-    var number = $('[name=wet_weight]').val();
+    var number = $('[name=dry_weight]').val();
     var selectColor = $('[name=color]').val();
     var setPadResult = function(number){
         var numbers = number.split('.');
@@ -121,7 +121,7 @@ $(function(){
             number = 0;
         }
         $("#pad-result").html(number.toLocaleString());
-        $('[name=wet_weight]').val(number);
+        $('[name=dry_weight]').val(number);
     }
     setPadResult(number);
     $('.pad-number').click(function(){

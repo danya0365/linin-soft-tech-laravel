@@ -17,7 +17,6 @@ use App\Models\LinenType;
 use App\Models\Operation;
 use App\Models\OperationLinenCase;
 use App\Models\OperationLinenProduct;
-use App\Models\WashingMachine;
 
 class DryController extends Controller
 {
@@ -169,5 +168,38 @@ class DryController extends Controller
         $operation->updateRelateFields();
 
         return redirect(route('worker.operation.dry.select-weight-and-color', ['operationId' => $operation->id, 'operationLinenProductId' => $operationLinenProduct->id]));
+    }
+
+    public function selectWeightAndColor($operationId, $operationLinenProductId)
+    {
+        $operation = Operation::with('employee')->with('customer')->with('dryerMachine')->with('dryerMachine')->where('id', $operationId)->first();
+        $operationLinenProduct = OperationLinenProduct::with('linenProduct')->where('id', $operationLinenProductId)->first();
+        return view('worker.operations.dry.select-weight-and-color', ['operation' => $operation->toArray(), 'operationLinenProduct' => $operationLinenProduct->toArray()]);
+    }
+
+    public function setSelectWeightAndColor($operationId, $operationLinenProductId)
+    {
+        request()->validate(['dry_weight' => 'required', 'color' => 'required']);
+
+        $operationLinenProduct = OperationLinenProduct::find($operationLinenProductId);
+        $operationLinenProduct->dry_weight = request()->get('dry_weight');
+        $operationLinenProduct->color = request()->get('color');
+        $operationLinenProduct->save();
+
+        $operation = Operation::find($operationId);
+        $operation->updateRelateFields();
+
+        EmployeeManager::createEmployeeOperationLog($operation->dry_employee_id, WorkerOperationStatus::Dry(), EmployeeOperationActionType::Progress());
+
+        return redirect(route('worker.operation.dry.employee-summary', ['operationId' => $operation->id]));
+    }
+
+    public function deleteOperationLinenProduct($operationId, $operationLinenProductId)
+    {
+        OperationLinenProduct::where('id', $operationLinenProductId)->delete();
+        $operation = Operation::find($operationId);
+        $operation->updateRelateFields();
+
+        return redirect(route('worker.operation.dry.select-operation-linen-product', ['operationId' => $operationId]));
     }
 }
