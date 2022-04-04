@@ -91,6 +91,35 @@ class WashController extends Controller
         return view('worker.operations.wash.employee-summary', ['operation' => $operation->toArray(), 'summaryReports' => $summaryReports, 'workingDuration' => $workingDuration, 'operationLinenProducts' => $operationLinenProducts->toArray(), 'operationTimeDuration' => $operationTimeDuration]);
     }
 
+
+    public function setClose($operationId)
+    {
+        $operation = Operation::find($operationId);
+        $operation->status = OperationStatus::Close();
+        $operation->save();
+
+        EmployeeManager::createEmployeeOperationLog($operation->wash_employee_id, WorkerOperationStatus::Wash(), EmployeeOperationActionType::Stop());
+        return redirect(route('worker.operation.wash.employee-summary', ['operationId' => $operation->id]));
+    }
+
+    public function setInProgress($operationId)
+    {
+        $operation = Operation::find($operationId);
+        $operation->status = OperationStatus::InProgress();
+        $operation->save();
+
+        EmployeeManager::createEmployeeOperationLog($operation->wash_employee_id, WorkerOperationStatus::Wash(), EmployeeOperationActionType::Progress());
+        return redirect(route('worker.operation.wash.employee-summary', ['operationId' => $operation->id]));
+    }
+
+    public function selectOperationLinenProduct($operationId)
+    {
+        $operation = Operation::with('employee')->with('customer')->with('washingMachine')->with('washEmployee')->where('id', $operationId)->first();
+        $operationLinenProducts = OperationLinenProduct::with('linenProduct')->where('operation_id', $operationId)->get();
+
+        return view('worker.operations.wash.select-operation-linen-product', ['operation' => $operation->toArray(), 'operationLinenProducts' => $operationLinenProducts->toArray()]);
+    }
+
     public function selectLinenCase($operationId, $operationLinenProductId)
     {
         if ($operationLinenProductId == 0) {
@@ -164,14 +193,6 @@ class WashController extends Controller
         return redirect(route('worker.operation.wash.employee-summary', ['operationId' => $operation->id]));
     }
 
-    public function selectOperationLinenProduct($operationId)
-    {
-        $operation = Operation::with('employee')->with('customer')->with('washingMachine')->with('washEmployee')->where('id', $operationId)->first();
-        $operationLinenProducts = OperationLinenProduct::with('linenProduct')->where('operation_id', $operationId)->get();
-
-        return view('worker.operations.wash.select-operation-linen-product', ['operation' => $operation->toArray(), 'operationLinenProducts' => $operationLinenProducts->toArray()]);
-    }
-
     public function deleteOperationLinenProduct($operationId, $operationLinenProductId)
     {
         OperationLinenProduct::where('id', $operationLinenProductId)->delete();
@@ -179,25 +200,5 @@ class WashController extends Controller
         $operation->updateRelateFields();
 
         return redirect(route('worker.operation.wash.select-operation-linen-product', ['operationId' => $operationId]));
-    }
-
-    public function setClose($operationId)
-    {
-        $operation = Operation::find($operationId);
-        $operation->status = OperationStatus::Close();
-        $operation->save();
-
-        EmployeeManager::createEmployeeOperationLog($operation->wash_employee_id, WorkerOperationStatus::Wash(), EmployeeOperationActionType::Stop());
-        return redirect(route('worker.operation.wash.employee-summary', ['operationId' => $operation->id]));
-    }
-
-    public function setInProgress($operationId)
-    {
-        $operation = Operation::find($operationId);
-        $operation->status = OperationStatus::InProgress();
-        $operation->save();
-
-        EmployeeManager::createEmployeeOperationLog($operation->wash_employee_id, WorkerOperationStatus::Wash(), EmployeeOperationActionType::Progress());
-        return redirect(route('worker.operation.wash.employee-summary', ['operationId' => $operation->id]));
     }
 }

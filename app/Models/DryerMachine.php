@@ -53,7 +53,7 @@ class DryerMachine extends Model
 
     $array['status_text'] = (function ($jobId) {
       return $jobId ? 'ไม่ว่าง' : 'พร้อมใช้งาน';
-    })($array['job_id']);
+    })($array['operation_id']);
 
     return $array;
   }
