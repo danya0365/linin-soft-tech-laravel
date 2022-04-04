@@ -37,9 +37,9 @@ class DryerMachine extends Model
    */
   protected $fillable = ['name', 'photo', 'maximum_weight'];
 
-  public function job()
+  public function operation()
   {
-    return $this->belongsTo(Job::class);
+    return $this->belongsTo(Operation::class);
   }
 
   /**
@@ -53,7 +53,7 @@ class DryerMachine extends Model
 
     $array['status_text'] = (function ($jobId) {
       return $jobId ? 'ไม่ว่าง' : 'พร้อมใช้งาน';
-    })($array['job_id']);
+    })($array['operation_id']);
 
     return $array;
   }

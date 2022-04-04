@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('photo');
             $table->integer('maximum_weight');
-            $table->integer('job_id')->nullable();
+            $table->integer('operation_id')->nullable();
             $table->timestamps();
         });
     }

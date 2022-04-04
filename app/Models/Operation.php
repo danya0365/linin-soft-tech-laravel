@@ -156,6 +156,33 @@ class Operation extends Model
     return $summaryReports;
   }
 
+  public function drySummaryReport()
+  {
+    $totalValue = 0;
+    $summaryReports = [];
+    $operationLinenProducts = DB::table('operations_linen_products')
+      ->selectRaw(
+        'SUM(dry_weight) as total_dry_weight, linen_product_id, linen_products.name as linen_product_name'
+      )
+      ->join('linen_products', function ($join) {
+        $join->on('linen_products.id', '=', 'operations_linen_products.linen_product_id');
+      })
+      ->join('operations', function ($join) {
+        $join->on('operations.id', '=', 'operations_linen_products.operation_id');
+      })
+      ->groupBy('operations_linen_products.linen_product_id')
+      ->where('operations.employee_id', $this->dry_employee_id)
+      ->orderBy('total_dry_weight', 'desc')->get();
+
+    foreach ($operationLinenProducts as $operationLinenProduct) {
+      $totalValue += $operationLinenProduct->total_dry_weight;
+      $summaryReports[] = ['title' => $operationLinenProduct->linen_product_name, 'value' => $operationLinenProduct->total_dry_weight];
+    }
+
+    $summaryReports[] = ['title' => 'จำนวนที่อบแล้ว', 'value' => $totalValue];
+    return $summaryReports;
+  }
+
   public function timeDuration()
   {
     $timeDuration = (function () {

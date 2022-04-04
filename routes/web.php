@@ -149,20 +149,37 @@ Route::group(['prefix' => 'worker', 'middleware' => ['auth']], function () {
             Route::get('/{operationId}/washing-machine', [App\Http\Controllers\Worker\Operation\WashController::class, 'selectWashingMachine'])->name('worker.operation.wash.select-washing-machine');
             Route::get('/{operationId}/washing-machine/{washingMachineId}', [App\Http\Controllers\Worker\Operation\WashController::class, 'setSelectWashingMachine'])->name('worker.operation.wash.set-select-washing-machine');
             Route::get('/{operationId}/employee-summary', [App\Http\Controllers\Worker\Operation\WashController::class, 'getEmployeeSummary'])->name('worker.operation.wash.employee-summary');
+            Route::get('/{operationId}/close', [App\Http\Controllers\Worker\Operation\WashController::class, 'setClose'])->name('worker.operation.wash.set-close');
+            Route::get('/{operationId}/in-progress', [App\Http\Controllers\Worker\Operation\WashController::class, 'setInProgress'])->name('worker.operation.wash.set-in-progress');
+            Route::get('/{operationId}/operation-linen-product', [App\Http\Controllers\Worker\Operation\WashController::class, 'selectOperationLinenProduct'])->name('worker.operation.wash.select-operation-linen-product');
             Route::get('/{operationId}/linen-product/{operationLinenProductId}/linen-case', [App\Http\Controllers\Worker\Operation\WashController::class, 'selectLinenCase'])->name('worker.operation.wash.select-linen-case');
             Route::get('/{operationId}/linen-product/{operationLinenProductId}/linen-case/{linenCase}', [App\Http\Controllers\Worker\Operation\WashController::class, 'setSelectLinenCase'])->name('worker.operation.wash.set-select-linen-case');
             Route::get('/{operationId}/linen-product/{operationLinenProductId}/linen-product', [App\Http\Controllers\Worker\Operation\WashController::class, 'selectLinenProduct'])->name('worker.operation.wash.select-linen-product');
             Route::get('/{operationId}/linen-product/{operationLinenProductId}/linen-product/{linenProductId}', [App\Http\Controllers\Worker\Operation\WashController::class, 'setSelectLinenProduct'])->name('worker.operation.wash.set-select-linen-product');
             Route::get('/{operationId}/linen-product/{operationLinenProductId}/weight-and-color', [App\Http\Controllers\Worker\Operation\WashController::class, 'selectWeightAndColor'])->name('worker.operation.wash.select-weight-and-color');
             Route::post('/{operationId}/linen-product/{operationLinenProductId}/set-weight-and-color', [App\Http\Controllers\Worker\Operation\WashController::class, 'setSelectWeightAndColor'])->name('worker.operation.wash.set-select-weight-and-color');
-            Route::get('/{operationId}/operation-linen-product', [App\Http\Controllers\Worker\Operation\WashController::class, 'selectOperationLinenProduct'])->name('worker.operation.wash.select-operation-linen-product');
             Route::get('/{operationId}/delete-operation-linen-product/{operationLinenProductId}', [App\Http\Controllers\Worker\Operation\WashController::class, 'deleteOperationLinenProduct'])->name('worker.operation.wash.delete-operation-linen-product');
-            Route::get('/{operationId}/close', [App\Http\Controllers\Worker\Operation\WashController::class, 'setClose'])->name('worker.operation.wash.set-close');
-            Route::get('/{operationId}/in-progress', [App\Http\Controllers\Worker\Operation\WashController::class, 'setInProgress'])->name('worker.operation.wash.set-in-progress');
         });
 
         Route::group(['prefix' => 'dry'], function () {
             Route::get('/', [App\Http\Controllers\Worker\Operation\DryController::class, 'index'])->name('worker.operation.dry');
+            Route::get('/employee', [App\Http\Controllers\Worker\Operation\DryController::class, 'selectEmployee'])->name('worker.operation.dry.select-employee');
+            Route::get('/employee/{employeeId}', [App\Http\Controllers\Worker\Operation\DryController::class, 'setSelectEmployee'])->name('worker.operation.dry.set-select-employee');
+            Route::get('/{operationId}/customer', [App\Http\Controllers\Worker\Operation\DryController::class, 'selectCustomer'])->name('worker.operation.dry.select-customer');
+            Route::get('/{operationId}/customer/{customerId}', [App\Http\Controllers\Worker\Operation\DryController::class, 'setSelectCustomer'])->name('worker.operation.dry.set-select-customer');
+            Route::get('/{operationId}/dryer-machine', [App\Http\Controllers\Worker\Operation\DryController::class, 'selectDryerMachine'])->name('worker.operation.dry.select-dryer-machine');
+            Route::get('/{operationId}/dryer-machine/{dryerMachineId}', [App\Http\Controllers\Worker\Operation\DryController::class, 'setSelectDryerMachine'])->name('worker.operation.dry.set-select-dryer-machine');
+            Route::get('/{operationId}/employee-summary', [App\Http\Controllers\Worker\Operation\DryController::class, 'getEmployeeSummary'])->name('worker.operation.dry.employee-summary');
+            Route::get('/{operationId}/close', [App\Http\Controllers\Worker\Operation\DryController::class, 'setClose'])->name('worker.operation.dry.set-close');
+            Route::get('/{operationId}/in-progress', [App\Http\Controllers\Worker\Operation\DryController::class, 'setInProgress'])->name('worker.operation.dry.set-in-progress');
+            Route::get('/{operationId}/operation-linen-product', [App\Http\Controllers\Worker\Operation\DryController::class, 'selectOperationLinenProduct'])->name('worker.operation.dry.select-operation-linen-product');
+            Route::get('/{operationId}/linen-product/{operationLinenProductId}/linen-case', [App\Http\Controllers\Worker\Operation\DryController::class, 'selectLinenCase'])->name('worker.operation.dry.select-linen-case');
+            Route::get('/{operationId}/linen-product/{operationLinenProductId}/linen-case/{linenCase}', [App\Http\Controllers\Worker\Operation\DryController::class, 'setSelectLinenCase'])->name('worker.operation.dry.set-select-linen-case');
+            Route::get('/{operationId}/linen-product/{operationLinenProductId}/linen-product', [App\Http\Controllers\Worker\Operation\DryController::class, 'selectLinenProduct'])->name('worker.operation.dry.select-linen-product');
+            Route::get('/{operationId}/linen-product/{operationLinenProductId}/linen-product/{linenProductId}', [App\Http\Controllers\Worker\Operation\DryController::class, 'setSelectLinenProduct'])->name('worker.operation.dry.set-select-linen-product');
+            Route::get('/{operationId}/linen-product/{operationLinenProductId}/weight-and-color', [App\Http\Controllers\Worker\Operation\DryController::class, 'selectWeightAndColor'])->name('worker.operation.dry.select-weight-and-color');
+            Route::post('/{operationId}/linen-product/{operationLinenProductId}/set-weight-and-color', [App\Http\Controllers\Worker\Operation\DryController::class, 'setSelectWeightAndColor'])->name('worker.operation.dry.set-select-weight-and-color');
+            Route::get('/{operationId}/delete-operation-linen-product/{operationLinenProductId}', [App\Http\Controllers\Worker\Operation\DryController::class, 'deleteOperationLinenProduct'])->name('worker.operation.dry.delete-operation-linen-product');
         });
 
         Route::group(['prefix' => 'iron'], function () {
