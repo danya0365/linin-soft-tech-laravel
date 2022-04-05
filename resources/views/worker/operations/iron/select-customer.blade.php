@@ -7,8 +7,8 @@
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="{{ route('worker') }}">Worker</a></li>
           <li class="breadcrumb-item"><a href="{{ route('worker.operation') }}">ปฏิบัติการ</a></li>
-          <li class="breadcrumb-item"><a href="{{ route('worker.operation.dry.select-employee') }}">พนักงาน: {{ $operation['employee']['name'] }}</a></li>
-          <li class="breadcrumb-item active" aria-current="page">อบ - เลือกลูกค้า</li>
+          <li class="breadcrumb-item"><a href="{{ route('worker.operation.iron.select-employee') }}">พนักงาน: {{ $operation['employee']['name'] }}</a></li>
+          <li class="breadcrumb-item active" aria-current="page">รีด - เลือกลูกค้า</li>
         </ol>
     </nav>
     <div class="row justify-content-center">
@@ -20,7 +20,7 @@
                     <div class="row g-2">
                         @foreach ($customerGroup['customers'] as $customer)
                         <div class="col-sm-4">
-                            <a href="{{ route('worker.operation.dry.set-select-customer', ['operationId' => $operation['id'], 'customerId' => $customer['id']]) }}">
+                            <a href="{{ route('worker.operation.iron.set-select-customer', ['operationId' => $operation['id'], 'customerId' => $customer['id']]) }}">
                                 <div class="p-3 border bg-light" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center">
                                         <div class="bi bi-building" style="font-size: 3em"></div>

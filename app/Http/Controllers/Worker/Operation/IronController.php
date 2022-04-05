@@ -44,4 +44,19 @@ class IronController extends Controller
 
         return redirect(route('worker.operation.iron.select-customer', ['operationId' => $operation->id]));
     }
+
+    public function selectCustomer($operationId)
+    {
+        $operation = Operation::with('employee')->where('id', $operationId)->first();
+        $customerGroup = CustomerGroup::with('customers')->get();
+        return view('worker.operations.iron.select-customer', ['customerGroups' => $customerGroup->toArray(), 'operation' => $operation->toArray()]);
+    }
+
+    public function setSelectCustomer($operationId, $customerId)
+    {
+        $operation = Operation::find($operationId);
+        $operation->customer_id = $customerId;
+        $operation->save();
+        return redirect(route('worker.operation.iron.select-dryer-machine', ['operationId' => $operation->id]));
+    }
 }
