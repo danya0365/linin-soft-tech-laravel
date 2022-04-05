@@ -10,7 +10,7 @@
             <li class="breadcrumb-item"><a href="{{ route('worker.operation.wash.select-employee') }}">พนักงาน: {{ $operation['employee']['name'] }}</a></li>
             <li class="breadcrumb-item"><a href="{{ route('worker.operation.wash.select-customer', ['operationId' => $operation['id']]) }}">ลูกค้า: {{ $operation['customer']['name'] }}</a></li>
             <li class="breadcrumb-item"><a href="{{ route('worker.operation.wash.select-washing-machine', ['operationId' => $operation['id']]) }}">{{ $operation['washing_machine']['name'] }}</a></li>
-          <li class="breadcrumb-item active" aria-current="page">ซัก - สรุปข้อมูลการซัก</li>
+            <li class="breadcrumb-item active" aria-current="page">ซัก - สรุปข้อมูลการซัก</li>
         </ol>
     </nav>
     <div class="row justify-content-center">

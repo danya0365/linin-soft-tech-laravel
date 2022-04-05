@@ -9,7 +9,7 @@
             <li class="breadcrumb-item"><a href="{{ route('worker.operation') }}">ปฏิบัติการ</a></li>
             <li class="breadcrumb-item"><a href="{{ route('worker.operation.iron.select-employee') }}">พนักงาน: {{ $operation['employee']['name'] }}</a></li>
             <li class="breadcrumb-item"><a href="{{ route('worker.operation.iron.select-customer', ['operationId' => $operation['id']]) }}">ลูกค้า: {{ $operation['customer']['name'] }}</a></li>
-          <li class="breadcrumb-item active" aria-current="page">รีด - สรุปข้อมูลการรีด</li>
+            <li class="breadcrumb-item active" aria-current="page">รีด - สรุปข้อมูลการรีด</li>
         </ol>
     </nav>
     <div class="row justify-content-center">
