@@ -125,4 +125,27 @@ class IronController extends Controller
 
         return redirect(route('worker.operation.iron.select-linen-product', ['operationId' => $operation->id, 'operationLinenProductId' => $operationLinenProduct->id]));
     }
+
+    public function selectLinenProduct($operationId, $operationLinenProductId)
+    {
+        $operation = Operation::with('employee')->with('customer')->with('ironEmployee')->where('id', $operationId)->first();
+        $operationLinenProduct = OperationLinenProduct::find($operationLinenProductId);
+        $linenTypes = LinenType::with('linenProducts')->get();
+        $linenProducts = LinenProduct::all();
+        return view('worker.operations.iron.select-linen-product', ['operation' => $operation->toArray(), 'operationLinenProduct' => $operationLinenProduct->toArray(), 'linenTypes' => $linenTypes->toArray(), 'linenProductJson' => $linenProducts->toJson()]);
+    }
+
+    public function setSelectLinenProduct($operationId, $operationLinenProductId, $linenProductId)
+    {
+        $linenProduct = LinenProduct::find($linenProductId);
+
+        $operationLinenProduct = OperationLinenProduct::find($operationLinenProductId);
+        $operationLinenProduct->linen_product_id = $linenProduct->id;
+        $operationLinenProduct->save();
+
+        $operation = Operation::find($operationId);
+        $operation->updateRelateFields();
+
+        return redirect(route('worker.operation.iron.select-weight-and-color', ['operationId' => $operation->id, 'operationLinenProductId' => $operationLinenProduct->id]));
+    }
 }
