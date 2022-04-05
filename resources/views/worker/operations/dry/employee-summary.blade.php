@@ -10,7 +10,7 @@
             <li class="breadcrumb-item"><a href="{{ route('worker.operation.dry.select-employee') }}">พนักงาน: {{ $operation['employee']['name'] }}</a></li>
             <li class="breadcrumb-item"><a href="{{ route('worker.operation.dry.select-customer', ['operationId' => $operation['id']]) }}">ลูกค้า: {{ $operation['customer']['name'] }}</a></li>
             <li class="breadcrumb-item"><a href="{{ route('worker.operation.dry.select-dryer-machine', ['operationId' => $operation['id']]) }}">{{ $operation['dryer_machine']['name'] }}</a></li>
-          <li class="breadcrumb-item active" aria-current="page">อบ - สรุปข้อมูลการอบ</li>
+            <li class="breadcrumb-item active" aria-current="page">อบ - สรุปข้อมูลการอบ</li>
         </ol>
     </nav>
     <div class="row justify-content-center">
@@ -42,7 +42,7 @@
                 </div>
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item">สถานะ: {{ $operation['status'] }}</li>
-                    <li class="list-group-item">น้ำหนักอบทั้งหมด: {{ $operation['total_dry_weight'] }}</li>
+                    <li class="list-group-item">น้ำหนักอบทั้งหมด: {{ $operation['total_dry_weight'] ? $operation['total_dry_weight'] : '-' }} กก.</li>
                     @foreach ($operationLinenProducts as $operationLinenProduct)
                     <li class="list-group-item">
                         {{ $operationLinenProduct['linen_case'] ? $operationLinenProduct['linen_case']['name'] : 'ยังไม่ได้เลือก' }},

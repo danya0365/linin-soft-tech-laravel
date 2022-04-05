@@ -91,7 +91,6 @@ class DryController extends Controller
         return view('worker.operations.dry.employee-summary', ['operation' => $operation->toArray(), 'summaryReports' => $summaryReports, 'workingDuration' => $workingDuration, 'operationLinenProducts' => $operationLinenProducts->toArray(), 'operationTimeDuration' => $operationTimeDuration]);
     }
 
-
     public function setClose($operationId)
     {
         $operation = Operation::find($operationId);
@@ -172,7 +171,7 @@ class DryController extends Controller
 
     public function selectWeightAndColor($operationId, $operationLinenProductId)
     {
-        $operation = Operation::with('employee')->with('customer')->with('dryerMachine')->with('dryerMachine')->where('id', $operationId)->first();
+        $operation = Operation::with('employee')->with('customer')->with('dryerMachine')->with('dryEmployee')->where('id', $operationId)->first();
         $operationLinenProduct = OperationLinenProduct::with('linenProduct')->where('id', $operationLinenProductId)->first();
         return view('worker.operations.dry.select-weight-and-color', ['operation' => $operation->toArray(), 'operationLinenProduct' => $operationLinenProduct->toArray()]);
     }
