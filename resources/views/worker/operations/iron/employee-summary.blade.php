@@ -46,7 +46,7 @@
                     <li class="list-group-item">
                         {{ $operationLinenProduct['linen_case'] ? $operationLinenProduct['linen_case']['name'] : 'ยังไม่ได้เลือก' }},
                         ชนิดผ้า: {{ $operationLinenProduct['linen_product'] ? $operationLinenProduct['linen_product']['name'] : 'ยังไม่ได้เลือก' }},
-                        จำนวนที่รีด: {{ $operationLinenProduct['iron_piece'] ? $operationLinenProduct['iron_piece'] : 'ยังไม่ได้เลือก' }} กก.,
+                        จำนวนที่รีด: {{ $operationLinenProduct['iron_piece'] ? $operationLinenProduct['iron_piece'] : 'ยังไม่ได้เลือก' }} ชิ้น,
                         สี: <span style="color: {{ $operationLinenProduct['color'] ? $operationLinenProduct['color'] : '' }}">{{ $operationLinenProduct['color'] ? $operationLinenProduct['color'] : 'ยังไม่ได้เลือก' }}</span>
                     </li>
                     @endforeach
@@ -73,7 +73,7 @@
                 </div>
                 <ul class="list-group list-group-flush">
                     @foreach ($summaryReports as $summaryReport)
-                    <li class="list-group-item">{{ $summaryReport['title'] }}: {{ number_format($summaryReport['value']) }} กก.</li>
+                    <li class="list-group-item">{{ $summaryReport['title'] }}: {{ number_format($summaryReport['value']) }} ชิ้น</li>
                     @endforeach
                   </ul>
                 <div class="card-footer text-muted text-center">

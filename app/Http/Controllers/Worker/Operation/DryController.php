@@ -171,7 +171,7 @@ class DryController extends Controller
 
     public function selectWeightAndColor($operationId, $operationLinenProductId)
     {
-        $operation = Operation::with('employee')->with('customer')->with('dryerMachine')->with('dryerMachine')->where('id', $operationId)->first();
+        $operation = Operation::with('employee')->with('customer')->with('dryerMachine')->with('dryEmployee')->where('id', $operationId)->first();
         $operationLinenProduct = OperationLinenProduct::with('linenProduct')->where('id', $operationLinenProductId)->first();
         return view('worker.operations.dry.select-weight-and-color', ['operation' => $operation->toArray(), 'operationLinenProduct' => $operationLinenProduct->toArray()]);
     }

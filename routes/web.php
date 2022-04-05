@@ -196,6 +196,9 @@ Route::group(['prefix' => 'worker', 'middleware' => ['auth']], function () {
             Route::get('/{operationId}/linen-product/{operationLinenProductId}/linen-case/{linenCase}', [App\Http\Controllers\Worker\Operation\IronController::class, 'setSelectLinenCase'])->name('worker.operation.iron.set-select-linen-case');
             Route::get('/{operationId}/linen-product/{operationLinenProductId}/linen-product', [App\Http\Controllers\Worker\Operation\IronController::class, 'selectLinenProduct'])->name('worker.operation.iron.select-linen-product');
             Route::get('/{operationId}/linen-product/{operationLinenProductId}/linen-product/{linenProductId}', [App\Http\Controllers\Worker\Operation\IronController::class, 'setSelectLinenProduct'])->name('worker.operation.iron.set-select-linen-product');
+            Route::get('/{operationId}/linen-product/{operationLinenProductId}/weight-and-color', [App\Http\Controllers\Worker\Operation\IronController::class, 'selectWeightAndColor'])->name('worker.operation.iron.select-weight-and-color');
+            Route::post('/{operationId}/linen-product/{operationLinenProductId}/set-weight-and-color', [App\Http\Controllers\Worker\Operation\IronController::class, 'setSelectWeightAndColor'])->name('worker.operation.iron.set-select-weight-and-color');
+            Route::get('/{operationId}/delete-operation-linen-product/{operationLinenProductId}', [App\Http\Controllers\Worker\Operation\IronController::class, 'deleteOperationLinenProduct'])->name('worker.operation.iron.delete-operation-linen-product');
         });
 
         Route::group(['prefix' => 'packing'], function () {
