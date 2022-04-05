@@ -7,34 +7,33 @@
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{ route('worker') }}">Worker</a></li>
             <li class="breadcrumb-item"><a href="{{ route('worker.operation') }}">ปฏิบัติการ</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.operation.dry.select-employee') }}">พนักงาน: {{ $operation['employee']['name'] }}</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.operation.dry.select-customer', ['operationId' => $operation['id']]) }}">ลูกค้า: {{ $operation['customer']['name'] }}</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.operation.dry.select-dryer-machine', ['operationId' => $operation['id']]) }}">{{ $operation['dryer_machine']['name'] }}</a></li>
-          <li class="breadcrumb-item active" aria-current="page">อบ - สรุปข้อมูลการอบ</li>
+            <li class="breadcrumb-item"><a href="{{ route('worker.operation.iron.select-employee') }}">พนักงาน: {{ $operation['employee']['name'] }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('worker.operation.iron.select-customer', ['operationId' => $operation['id']]) }}">ลูกค้า: {{ $operation['customer']['name'] }}</a></li>
+          <li class="breadcrumb-item active" aria-current="page">รีด - สรุปข้อมูลการรีด</li>
         </ol>
     </nav>
     <div class="row justify-content-center">
         <div class="col-md-12 m-2">
             <div class="card">
-                <div class="card-header text-center">สถานะการอบ</div>
+                <div class="card-header text-center">สถานะการรีด</div>
                 <div class="card-body">
                     <div class="row g-2">
                         <div class="col-4">
                             <div class="d-grid gap-2" style="min-height: 60px">
-                                <button class="btn btn-primary" type="button" onclick="window.location='{{ route('worker.operation.dry.select-linen-case', ['operationId' => $operation['id'], 'operationLinenProductId' => 0]) }}'">เพิ่ม</button>
+                                <button class="btn btn-primary" type="button" onclick="window.location='{{ route('worker.operation.iron.select-linen-case', ['operationId' => $operation['id'], 'operationLinenProductId' => 0]) }}'">เพิ่ม</button>
                             </div>
                         </div>
                         <div class="col-4">
                             <div class="d-grid gap-2" style="min-height: 60px">
-                                <button class="btn btn-danger" type="button" onclick="window.location='{{ route('worker.operation.dry.select-operation-linen-product', ['operationId' => $operation['id']]) }}'">แก้ไขหรือลบ</button>
+                                <button class="btn btn-danger" type="button" onclick="window.location='{{ route('worker.operation.iron.select-operation-linen-product', ['operationId' => $operation['id']]) }}'">แก้ไขหรือลบ</button>
                             </div>
                         </div>
                         <div class="col-4">
                             <div class="d-grid gap-2" style="min-height: 60px">
                                 @if ( $operation['status'] != "close")
-                                <button class="btn btn-outline-secondary" type="button" onclick="window.location='{{ route('worker.operation.dry.set-close', ['operationId' => $operation['id']]) }}'">ปิดงาน</button>
+                                <button class="btn btn-outline-secondary" type="button" onclick="window.location='{{ route('worker.operation.iron.set-close', ['operationId' => $operation['id']]) }}'">ปิดงาน</button>
                                 @else 
-                                <button class="btn btn-outline-secondary" type="button" onclick="window.location='{{ route('worker.operation.dry.set-in-progress', ['operationId' => $operation['id']]) }}'">เปิดใหม่</button>
+                                <button class="btn btn-outline-secondary" type="button" onclick="window.location='{{ route('worker.operation.iron.set-in-progress', ['operationId' => $operation['id']]) }}'">เปิดใหม่</button>
                                 @endif
                             </div>
                         </div>
@@ -42,34 +41,34 @@
                 </div>
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item">สถานะ: {{ $operation['status'] }}</li>
-                    <li class="list-group-item">น้ำหนักอบทั้งหมด: {{ $operation['total_dry_weight'] ? $operation['total_dry_weight'] : '-' }} กก.</li>
+                    <li class="list-group-item">จำนวนที่รีดทั้งหมด: {{ $operation['total_iron_piece'] ? $operation['total_iron_piece'] : '-' }} ชิ้น</li>
                     @foreach ($operationLinenProducts as $operationLinenProduct)
                     <li class="list-group-item">
                         {{ $operationLinenProduct['linen_case'] ? $operationLinenProduct['linen_case']['name'] : 'ยังไม่ได้เลือก' }},
                         ชนิดผ้า: {{ $operationLinenProduct['linen_product'] ? $operationLinenProduct['linen_product']['name'] : 'ยังไม่ได้เลือก' }},
-                        น้ำหนักอบ: {{ $operationLinenProduct['dry_weight'] ? $operationLinenProduct['dry_weight'] : 'ยังไม่ได้เลือก' }} กก.,
+                        จำนวนที่รีด: {{ $operationLinenProduct['iron_piece'] ? $operationLinenProduct['iron_piece'] : 'ยังไม่ได้เลือก' }} กก.,
                         สี: <span style="color: {{ $operationLinenProduct['color'] ? $operationLinenProduct['color'] : '' }}">{{ $operationLinenProduct['color'] ? $operationLinenProduct['color'] : 'ยังไม่ได้เลือก' }}</span>
                     </li>
                     @endforeach
                 </ul>
                 <div class="card-footer text-muted text-center">
-                    เวลาในการอบผ้า: {{ $operationTimeDuration }}
+                    เวลาในการรีดผ้า: {{ $operationTimeDuration }}
                 </div>
               </div>
         </div>
         <div class="col-md-12 m-2">
             <div class="card">
-                <div class="card-header text-center">สรุปข้อมูลการอบของพนักงาน</div>
+                <div class="card-header text-center">สรุปข้อมูลการรีดของพนักงาน</div>
                 <div class="card-body">
                     <div class="row mb-3 text-center">
                         <div class="col-12">
                             <div class="bi bi-person-circle rounded-3 d-flex align-items-center justify-content-center p-3 py-6" style="font-size: 10em"></div>
                         </div>
                     </div>
-                    <h5 class="card-title text-center">{{ $operation['dry_employee']['name'] }}</h5>
+                    <h5 class="card-title text-center">{{ $operation['iron_employee']['name'] }}</h5>
                     <dl class="row">
                         <dt class="col-sm-3">Employee Code</dt>
-                        <dd class="col-sm-9">{{ $operation['dry_employee']['code'] }}</dd>
+                        <dd class="col-sm-9">{{ $operation['iron_employee']['code'] }}</dd>
                     </dl>
                 </div>
                 <ul class="list-group list-group-flush">

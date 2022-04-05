@@ -91,7 +91,6 @@ class DryController extends Controller
         return view('worker.operations.dry.employee-summary', ['operation' => $operation->toArray(), 'summaryReports' => $summaryReports, 'workingDuration' => $workingDuration, 'operationLinenProducts' => $operationLinenProducts->toArray(), 'operationTimeDuration' => $operationTimeDuration]);
     }
 
-
     public function setClose($operationId)
     {
         $operation = Operation::find($operationId);
