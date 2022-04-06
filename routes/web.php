@@ -232,6 +232,8 @@ Route::group(['prefix' => 'worker', 'middleware' => ['auth']], function () {
             Route::get('/{operationId}/operation-linen-product', [App\Http\Controllers\Worker\Operation\CollectController::class, 'selectOperationLinenProduct'])->name('worker.operation.collect.select-operation-linen-product');
             Route::get('/{operationId}/linen-product/{operationLinenProductId}/linen-case', [App\Http\Controllers\Worker\Operation\CollectController::class, 'selectLinenCase'])->name('worker.operation.collect.select-linen-case');
             Route::get('/{operationId}/linen-product/{operationLinenProductId}/linen-case/{linenCase}', [App\Http\Controllers\Worker\Operation\CollectController::class, 'setSelectLinenCase'])->name('worker.operation.collect.set-select-linen-case');
+            Route::get('/{operationId}/linen-product/{operationLinenProductId}/linen-product', [App\Http\Controllers\Worker\Operation\CollectController::class, 'selectLinenProduct'])->name('worker.operation.collect.select-linen-product');
+            Route::get('/{operationId}/linen-product/{operationLinenProductId}/linen-product/{linenProductId}', [App\Http\Controllers\Worker\Operation\CollectController::class, 'setSelectLinenProduct'])->name('worker.operation.collect.set-select-linen-product');
         });
     });
 
