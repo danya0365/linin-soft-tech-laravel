@@ -226,6 +226,11 @@ Route::group(['prefix' => 'worker', 'middleware' => ['auth']], function () {
             Route::get('/employee/{employeeId}', [App\Http\Controllers\Worker\Operation\CollectController::class, 'setSelectEmployee'])->name('worker.operation.collect.set-select-employee');
             Route::get('/{operationId}/customer', [App\Http\Controllers\Worker\Operation\CollectController::class, 'selectCustomer'])->name('worker.operation.collect.select-customer');
             Route::get('/{operationId}/customer/{customerId}', [App\Http\Controllers\Worker\Operation\CollectController::class, 'setSelectCustomer'])->name('worker.operation.collect.set-select-customer');
+            Route::get('/{operationId}/employee-summary', [App\Http\Controllers\Worker\Operation\CollectController::class, 'getEmployeeSummary'])->name('worker.operation.collect.employee-summary');
+            Route::get('/{operationId}/close', [App\Http\Controllers\Worker\Operation\CollectController::class, 'setClose'])->name('worker.operation.collect.set-close');
+            Route::get('/{operationId}/in-progress', [App\Http\Controllers\Worker\Operation\CollectController::class, 'setInProgress'])->name('worker.operation.collect.set-in-progress');
+            Route::get('/{operationId}/operation-linen-product', [App\Http\Controllers\Worker\Operation\CollectController::class, 'selectOperationLinenProduct'])->name('worker.operation.collect.select-operation-linen-product');
+            Route::get('/{operationId}/linen-product/{operationLinenProductId}/linen-case', [App\Http\Controllers\Worker\Operation\CollectController::class, 'selectLinenCase'])->name('worker.operation.collect.select-linen-case');
         });
     });
 
