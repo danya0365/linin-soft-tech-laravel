@@ -212,6 +212,7 @@ Route::group(['prefix' => 'worker', 'middleware' => ['auth']], function () {
             Route::get('/{operationId}/in-progress', [App\Http\Controllers\Worker\Operation\PackingController::class, 'setInProgress'])->name('worker.operation.packing.set-in-progress');
             Route::get('/{operationId}/operation-linen-product', [App\Http\Controllers\Worker\Operation\PackingController::class, 'selectOperationLinenProduct'])->name('worker.operation.packing.select-operation-linen-product');
             Route::get('/{operationId}/linen-product/{operationLinenProductId}/linen-case', [App\Http\Controllers\Worker\Operation\PackingController::class, 'selectLinenCase'])->name('worker.operation.packing.select-linen-case');
+            Route::get('/{operationId}/linen-product/{operationLinenProductId}/linen-case/{linenCase}', [App\Http\Controllers\Worker\Operation\PackingController::class, 'setSelectLinenCase'])->name('worker.operation.packing.set-select-linen-case');
         });
 
         Route::group(['prefix' => 'collect'], function () {

@@ -113,4 +113,16 @@ class PackingController extends Controller
         $operationLinenCases = OperationLinenCase::$list;
         return view('worker.operations.packing.select-linen-case', ['operation' => $operation->toArray(), 'operationLinenProduct' => $operationLinenProduct, 'operationLinenCases' => $operationLinenCases]);
     }
+
+    public function setSelectLinenCase($operationId, $operationLinenProductId, $linenCase)
+    {
+        $operationLinenProduct = OperationLinenProduct::find($operationLinenProductId);
+        $operationLinenProduct->linen_case = $linenCase;
+        $operationLinenProduct->save();
+
+        $operation = Operation::find($operationId);
+        $operation->updateRelateFields();
+
+        return redirect(route('worker.operation.packing.select-linen-product', ['operationId' => $operation->id, 'operationLinenProductId' => $operationLinenProduct->id]));
+    }
 }
