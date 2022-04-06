@@ -9,6 +9,7 @@ use App\Enums\OperationType;
 use App\Enums\WorkerOperationStatus;
 use App\Http\Controllers\Controller;
 use App\Managers\EmployeeManager;
+use App\Managers\OperationManager;
 use App\Models\CustomerGroup;
 use App\Models\Department;
 use App\Models\LinenProduct;
@@ -183,11 +184,15 @@ class WashController extends Controller
         $operationLinenProduct = OperationLinenProduct::find($operationLinenProductId);
         $operationLinenProduct->wet_weight = request()->get('wet_weight');
         $operationLinenProduct->color = request()->get('color');
+        $operationLinenProductDirty = $operationLinenProduct->getOriginal();
+        $operationLinenProductOldValue = $operationLinenProduct->getDirty();
+
         $operationLinenProduct->save();
 
         $operation = Operation::find($operationId);
         $operation->updateRelateFields();
 
+        OperationManager::createOperationLog($operation->wash_employeed_id, $operation, 'set_weight_and_color', $operationLinenProductOldValue, $operationLinenProductDirty);
         EmployeeManager::createEmployeeOperationLog($operation->wash_employee_id, WorkerOperationStatus::Wash(), EmployeeOperationActionType::Progress());
 
         return redirect(route('worker.operation.wash.employee-summary', ['operationId' => $operation->id]));
