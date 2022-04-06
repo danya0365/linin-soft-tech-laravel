@@ -23,6 +23,7 @@ return new class extends Migration
             $table->integer('dry_weight')->nullable();
             $table->integer('iron_piece')->nullable();
             $table->integer('packing_piece')->nullable();
+            $table->integer('collect_weight')->nullable();
             $table->timestamps();
         });
     }
