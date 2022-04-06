@@ -1,0 +1,33 @@
+@extends('layouts.worker')
+
+@section('content')
+
+<div class="container">
+    <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ route('worker') }}">Worker</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('worker.operation') }}">ปฏิบัติการ</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('worker.operation.packing.select-employee') }}">พนักงาน: {{ $operation['employee']['name'] }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('worker.operation.packing.select-customer', ['operationId' => $operation['id']]) }}">ลูกค้า: {{ $operation['customer']['name'] }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('worker.operation.packing.employee-summary', ['operationId' => $operation['id']]) }}">สรุปข้อมูลการพับแพ็ค</a></li>
+            <li class="breadcrumb-item active" aria-current="page">พับแพ็ค - เลือกที่จะแก้ไขหรือลบ</li>
+        </ol>
+    </nav>
+    <div class="row justify-content-center">
+        @foreach ($operationLinenProducts as $operationLinenProduct)
+        <div class="col-12 m-2">
+            <a href="{{ route('worker.operation.packing.select-linen-case', ['operationId' => $operation['id'], 'operationLinenProductId' => $operationLinenProduct['id']]) }}" class="text-decoration-none">
+                <div class="card" style="width: 100%">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">{{ $operationLinenProduct['linen_case'] ? $operationLinenProduct['linen_case']['name'] : 'ยังไม่ได้เลือก' }}</li>
+                        <li class="list-group-item">ชนิดผ้า: {{ $operationLinenProduct['linen_product'] ? $operationLinenProduct['linen_product']['name'] : 'ยังไม่ได้เลือก' }}</li>
+                        <li class="list-group-item">จำนวนชิ้น: {{ $operationLinenProduct['wet_weight'] ? $operationLinenProduct['wet_weight'] : 'ยังไม่ได้เลือก' }} ชิ้น</li>
+                        <li class="list-group-item" style="color: {{ $operationLinenProduct['color'] ? $operationLinenProduct['color'] : '' }}">สี: {{ $operationLinenProduct['color'] ? $operationLinenProduct['color'] : 'ยังไม่ได้เลือก' }}</li>
+                    </ul>
+                </div>
+            </a>
+        </div>
+        @endforeach
+    </div>
+</div>
+@endsection
