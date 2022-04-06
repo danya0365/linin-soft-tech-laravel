@@ -13,13 +13,13 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('job_activity_logs', function (Blueprint $table) {
+        Schema::create('operation_logs', function (Blueprint $table) {
             $table->id();
-            $table->integer('job_id');
+            $table->integer('operation_id');
             $table->integer('employee_id');
-            $table->enum('log_type', ['status', 'washing_machine_id', 'dryer_machine_id', 'linen_type_id', 'wet_weight', 'color']);
-            $table->string('old_value');
-            $table->string('new_value');
+            $table->string('action_name');
+            $table->json('old_values');
+            $table->json('new_values');
             $table->timestamps();
         });
     }
@@ -31,6 +31,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('job_activity_logs');
+        Schema::dropIfExists('operation_logs');
     }
 };

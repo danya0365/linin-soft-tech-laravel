@@ -18,7 +18,7 @@
     <div class="row justify-content-center">
         <div class="col-md-12 m-2">
             <div class="card">
-                <div class="card-header">จำนวนที่จัดเก็บและสี</div>
+                <div class="card-header">น้ำหนักที่จัดเก็บและสี</div>
                 <div class="card-body">
                     <form method="POST" action="{{ route('worker.operation.collect.set-select-weight-and-color', ['operationId' => $operation['id'], 'operationLinenProductId' => $operationLinenProduct['id']]) }}"  role="form" enctype="multipart/form-data">
                         @csrf
@@ -31,7 +31,7 @@
                                     <div class="col-sm-6">
                                         <div class="row g-2">
                                             <div class="col-12 text-center">
-                                                <h2>น้ำหนัก</h2>
+                                                <h2>น้ำหนักกิโลกรัม</h2>
                                             </div>
                                             <div class="col-12">
                                                 <div class="p-3 border bg-light" style="width: 100%">
@@ -90,7 +90,7 @@
                                     </div>
                                     <div class="col-6">
                                         <div class="d-grid gap-2" style="min-height: 60px">
-                                            <button class="btn btn-danger" type="button" onclick="{{ route('worker.operation.collect.delete-operation-linen-product', ['operationId' => $operation['id'], 'operationLinenProductId' => $operationLinenProduct['id']]) }}">ลบ</button>
+                                            <button class="btn btn-danger" type="button" onclick="location.reload()">คืนค่า</button>
                                         </div>
                                     </div>
                                 </div>

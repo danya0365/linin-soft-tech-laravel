@@ -16,16 +16,32 @@
     <div class="row justify-content-center">
         @foreach ($operationLinenProducts as $operationLinenProduct)
         <div class="col-12 m-2">
-            <a href="{{ route('worker.operation.iron.select-linen-case', ['operationId' => $operation['id'], 'operationLinenProductId' => $operationLinenProduct['id']]) }}" class="text-decoration-none">
-                <div class="card" style="width: 100%">
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item">{{ $operationLinenProduct['linen_case'] ? $operationLinenProduct['linen_case']['name'] : 'ยังไม่ได้เลือก' }}</li>
-                        <li class="list-group-item">ชนิดผ้า: {{ $operationLinenProduct['linen_product'] ? $operationLinenProduct['linen_product']['name'] : 'ยังไม่ได้เลือก' }}</li>
-                        <li class="list-group-item">จำนวนชิ้น: {{ $operationLinenProduct['wet_weight'] ? $operationLinenProduct['wet_weight'] : 'ยังไม่ได้เลือก' }} ชิ้น</li>
-                        <li class="list-group-item" style="color: {{ $operationLinenProduct['color'] ? $operationLinenProduct['color'] : '' }}">สี: {{ $operationLinenProduct['color'] ? $operationLinenProduct['color'] : 'ยังไม่ได้เลือก' }}</li>
-                    </ul>
-                </div>
-            </a>
+            <div class="card" style="width: 100%">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">{{ $operationLinenProduct['linen_case'] ? $operationLinenProduct['linen_case']['name'] : 'ยังไม่ได้เลือก' }}</li>
+                    <li class="list-group-item">ชนิดผ้า: {{ $operationLinenProduct['linen_product'] ? $operationLinenProduct['linen_product']['name'] : 'ยังไม่ได้เลือก' }}</li>
+                    <li class="list-group-item">จำนวนชิ้น: {{ $operationLinenProduct['wet_weight'] ? $operationLinenProduct['wet_weight'] : 'ยังไม่ได้เลือก' }} ชิ้น</li>
+                    <li class="list-group-item" style="color: {{ $operationLinenProduct['color'] ? $operationLinenProduct['color'] : '' }}">สี: {{ $operationLinenProduct['color'] ? $operationLinenProduct['color'] : 'ยังไม่ได้เลือก' }}</li>
+                    <li class="list-group-item">
+                        <div class="row g-2">
+                            <div class="col-md-6 offset-md-3">
+                                <div class="row g-2">
+                                    <div class="col-6">
+                                        <div class="d-grid gap-2">
+                                            <a class="btn btn-primary" role="button" href="{{ route('worker.operation.iron.select-linen-case', ['operationId' => $operation['id'], 'operationLinenProductId' => $operationLinenProduct['id']]) }}">แก้ไข</a>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="d-grid gap-2">
+                                            <a class="btn btn-danger" role="button" href="{{ route('worker.operation.iron.delete-operation-linen-product', ['operationId' => $operation['id'], 'operationLinenProductId' => $operationLinenProduct['id']]) }}">ลบเลย</a>
+                                        </div>
+                                    </div>
+                                </div> 
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
         </div>
         @endforeach
     </div>

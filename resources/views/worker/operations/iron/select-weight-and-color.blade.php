@@ -90,7 +90,7 @@
                                     </div>
                                     <div class="col-6">
                                         <div class="d-grid gap-2" style="min-height: 60px">
-                                            <button class="btn btn-danger" type="button" onclick="{{ route('worker.operation.iron.delete-operation-linen-product', ['operationId' => $operation['id'], 'operationLinenProductId' => $operationLinenProduct['id']]) }}">ลบ</button>
+                                            <button class="btn btn-danger" type="button" onclick="location.reload()">คืนค่า</button>
                                         </div>
                                     </div>
                                 </div>

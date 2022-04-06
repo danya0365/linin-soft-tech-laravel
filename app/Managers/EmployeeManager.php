@@ -8,7 +8,6 @@ use App\Events\EmployeeOperationLogCreated;
 use App\Managers\Manager;
 use App\Models\EmployeeOperationLog;
 use App\Models\EmployeeWorkingTime;
-use Illuminate\Support\Facades\Log;
 
 class EmployeeManager extends Manager
 {
