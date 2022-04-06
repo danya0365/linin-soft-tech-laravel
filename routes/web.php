@@ -222,6 +222,8 @@ Route::group(['prefix' => 'worker', 'middleware' => ['auth']], function () {
 
         Route::group(['prefix' => 'collect'], function () {
             Route::get('/', [App\Http\Controllers\Worker\Operation\CollectController::class, 'index'])->name('worker.operation.collect');
+            Route::get('/employee', [App\Http\Controllers\Worker\Operation\CollectController::class, 'selectEmployee'])->name('worker.operation.collect.select-employee');
+            Route::get('/employee/{employeeId}', [App\Http\Controllers\Worker\Operation\CollectController::class, 'setSelectEmployee'])->name('worker.operation.collect.set-select-employee');
         });
     });
 
