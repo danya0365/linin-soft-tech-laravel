@@ -245,7 +245,7 @@ class Operation extends Model
       $summaryReports[] = ['title' => $operationLinenProduct->linen_product_name, 'value' => $operationLinenProduct->total_packing_piece];
     }
 
-    $summaryReports[] = ['title' => 'จำนวนที่รีดแล้ว', 'value' => $totalValue];
+    $summaryReports[] = ['title' => 'จำนวนที่พับแพ็คแล้ว', 'value' => $totalValue];
     return $summaryReports;
   }
 
@@ -272,7 +272,7 @@ class Operation extends Model
       $summaryReports[] = ['title' => $operationLinenProduct->linen_product_name, 'value' => $operationLinenProduct->total_collect_weight];
     }
 
-    $summaryReports[] = ['title' => 'จำนวนที่รีดแล้ว', 'value' => $totalValue];
+    $summaryReports[] = ['title' => 'จำนวนที่จัดเก็บแล้ว', 'value' => $totalValue];
     return $summaryReports;
   }
 
