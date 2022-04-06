@@ -11,7 +11,7 @@
             <li class="breadcrumb-item"><a href="{{ route('worker.operation.packing.select-customer', ['operationId' => $operation['id']]) }}">ลูกค้า: {{ $operation['customer']['name'] }}</a></li>
             <li class="breadcrumb-item active" aria-current="page">พับแพ็ค - สรุปข้อมูลการพับแพ็ค</li>
         </ol>
-    </nav>ห
+    </nav>
     <div class="row justify-content-center">
         <div class="col-md-12 m-2">
             <div class="card">
