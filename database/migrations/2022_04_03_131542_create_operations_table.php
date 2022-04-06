@@ -29,6 +29,9 @@ return new class extends Migration
             $table->integer('total_dry_weight')->nullable();
             $table->integer('total_iron_piece')->nullable();
             $table->integer('total_packing_piece')->nullable();
+            $table->integer('total_collect_weight')->nullable();
+            $table->integer('total_billing_weight')->nullable();
+            $table->float('total_billing_payment')->nullable();
             $table->string('colors')->nullable();
             $table->string('search_tags')->nullable();
             $table->enum('status', ['in-progress', 'close']);
