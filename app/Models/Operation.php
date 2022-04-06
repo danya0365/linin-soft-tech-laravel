@@ -71,7 +71,7 @@ class Operation extends Model
 
   public function linenProducts()
   {
-    return $this->belongsToMany(LinenProduct::class, 'operations_linen_products')->using(OperationLinenProduct::class)->withPivot('linen_case', 'color', 'wet_weight', 'dry_weight', 'iron_piece', 'packing_piece');
+    return $this->belongsToMany(LinenProduct::class, 'operations_linen_products')->using(OperationLinenProduct::class)->withPivot('linen_case', 'color', 'wet_weight', 'dry_weight', 'iron_piece', 'packing_piece', 'collect_weight');
   }
 
   public function washEmployee()
@@ -109,7 +109,7 @@ class Operation extends Model
     $operation = self::with('linenProducts')->where('id', $this->id)->first();
     $searchTags = [];
     $colors = [];
-    $totalWetWeight = $totalDryWeight = $totalIronPiece = $totalPackingPiece = 0;
+    $totalWetWeight = $totalDryWeight = $totalIronPiece = $totalPackingPiece = $totalCollectWeight = 0;
     foreach ($operation->linenProducts as $linenProduct) {
       $searchTags[] = $linenProduct->pivot->linen_case;
       $searchTags[] = $linenProduct->pivot->color;
@@ -118,6 +118,7 @@ class Operation extends Model
       $totalDryWeight += $linenProduct->pivot->dry_weight;
       $totalIronPiece += $linenProduct->pivot->iron_piece;
       $totalPackingPiece += $linenProduct->pivot->packing_piece;
+      $totalCollectWeight += $linenProduct->pivot->collect_weight;
     }
     $this->search_tags = $searchTags;
     $this->colors = $colors;
@@ -125,6 +126,7 @@ class Operation extends Model
     $this->total_dry_weight = $totalDryWeight;
     $this->total_iron_piece = $totalIronPiece;
     $this->total_packing_piece = $totalPackingPiece;
+    $this->total_collect_weight = $totalCollectWeight;
     $this->save();
   }
 
@@ -262,7 +264,7 @@ class Operation extends Model
         $join->on('operations.id', '=', 'operations_linen_products.operation_id');
       })
       ->groupBy('operations_linen_products.linen_product_id')
-      ->where('operations.employee_id', $this->packing_employee_id)
+      ->where('operations.employee_id', $this->collect_employee_id)
       ->orderBy('total_collect_weight', 'desc')->get();
 
     foreach ($operationLinenProducts as $operationLinenProduct) {

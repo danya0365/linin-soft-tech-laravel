@@ -148,4 +148,37 @@ class CollectController extends Controller
 
         return redirect(route('worker.operation.collect.select-weight-and-color', ['operationId' => $operation->id, 'operationLinenProductId' => $operationLinenProduct->id]));
     }
+
+    public function selectWeightAndColor($operationId, $operationLinenProductId)
+    {
+        $operation = Operation::with('employee')->with('customer')->with('collectEmployee')->where('id', $operationId)->first();
+        $operationLinenProduct = OperationLinenProduct::with('linenProduct')->where('id', $operationLinenProductId)->first();
+        return view('worker.operations.collect.select-weight-and-color', ['operation' => $operation->toArray(), 'operationLinenProduct' => $operationLinenProduct->toArray()]);
+    }
+
+    public function setSelectWeightAndColor($operationId, $operationLinenProductId)
+    {
+        request()->validate(['collect_weight' => 'required', 'color' => 'required']);
+
+        $operationLinenProduct = OperationLinenProduct::find($operationLinenProductId);
+        $operationLinenProduct->collect_weight = request()->get('collect_weight');
+        $operationLinenProduct->color = request()->get('color');
+        $operationLinenProduct->save();
+
+        $operation = Operation::find($operationId);
+        $operation->updateRelateFields();
+
+        EmployeeManager::createEmployeeOperationLog($operation->collect_employee_id, WorkerOperationStatus::Packing(), EmployeeOperationActionType::Progress());
+
+        return redirect(route('worker.operation.collect.employee-summary', ['operationId' => $operation->id]));
+    }
+
+    public function deleteOperationLinenProduct($operationId, $operationLinenProductId)
+    {
+        OperationLinenProduct::where('id', $operationLinenProductId)->delete();
+        $operation = Operation::find($operationId);
+        $operation->updateRelateFields();
+
+        return redirect(route('worker.operation.collect.select-operation-linen-product', ['operationId' => $operationId]));
+    }
 }
