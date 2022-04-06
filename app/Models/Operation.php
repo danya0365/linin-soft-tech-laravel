@@ -94,6 +94,16 @@ class Operation extends Model
     return $this->belongsTo(Employee::class, 'iron_employee_id');
   }
 
+  public function packingEmployee()
+  {
+    return $this->belongsTo(Employee::class, 'packing_employee_id');
+  }
+
+  public function collectEmployee()
+  {
+    return $this->belongsTo(Employee::class, 'collect_employee_id');
+  }
+
   public function updateRelateFields()
   {
     $operation = self::with('linenProducts')->where('id', $this->id)->first();
@@ -204,6 +214,33 @@ class Operation extends Model
     foreach ($operationLinenProducts as $operationLinenProduct) {
       $totalValue += $operationLinenProduct->total_iron_piece;
       $summaryReports[] = ['title' => $operationLinenProduct->linen_product_name, 'value' => $operationLinenProduct->total_iron_piece];
+    }
+
+    $summaryReports[] = ['title' => 'จำนวนที่รีดแล้ว', 'value' => $totalValue];
+    return $summaryReports;
+  }
+
+  public function packingSummaryReport()
+  {
+    $totalValue = 0;
+    $summaryReports = [];
+    $operationLinenProducts = DB::table('operations_linen_products')
+      ->selectRaw(
+        'SUM(packing_piece) as total_packing_piece, linen_product_id, linen_products.name as linen_product_name'
+      )
+      ->join('linen_products', function ($join) {
+        $join->on('linen_products.id', '=', 'operations_linen_products.linen_product_id');
+      })
+      ->join('operations', function ($join) {
+        $join->on('operations.id', '=', 'operations_linen_products.operation_id');
+      })
+      ->groupBy('operations_linen_products.linen_product_id')
+      ->where('operations.employee_id', $this->packing_employee_id)
+      ->orderBy('total_packing_piece', 'desc')->get();
+
+    foreach ($operationLinenProducts as $operationLinenProduct) {
+      $totalValue += $operationLinenProduct->total_packing_piece;
+      $summaryReports[] = ['title' => $operationLinenProduct->linen_product_name, 'value' => $operationLinenProduct->total_packing_piece];
     }
 
     $summaryReports[] = ['title' => 'จำนวนที่รีดแล้ว', 'value' => $totalValue];

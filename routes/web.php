@@ -207,6 +207,11 @@ Route::group(['prefix' => 'worker', 'middleware' => ['auth']], function () {
             Route::get('/employee/{employeeId}', [App\Http\Controllers\Worker\Operation\PackingController::class, 'setSelectEmployee'])->name('worker.operation.packing.set-select-employee');
             Route::get('/{operationId}/customer', [App\Http\Controllers\Worker\Operation\PackingController::class, 'selectCustomer'])->name('worker.operation.packing.select-customer');
             Route::get('/{operationId}/customer/{customerId}', [App\Http\Controllers\Worker\Operation\PackingController::class, 'setSelectCustomer'])->name('worker.operation.packing.set-select-customer');
+            Route::get('/{operationId}/employee-summary', [App\Http\Controllers\Worker\Operation\PackingController::class, 'getEmployeeSummary'])->name('worker.operation.packing.employee-summary');
+            Route::get('/{operationId}/close', [App\Http\Controllers\Worker\Operation\PackingController::class, 'setClose'])->name('worker.operation.packing.set-close');
+            Route::get('/{operationId}/in-progress', [App\Http\Controllers\Worker\Operation\PackingController::class, 'setInProgress'])->name('worker.operation.packing.set-in-progress');
+            Route::get('/{operationId}/operation-linen-product', [App\Http\Controllers\Worker\Operation\PackingController::class, 'selectOperationLinenProduct'])->name('worker.operation.packing.select-operation-linen-product');
+            Route::get('/{operationId}/linen-product/{operationLinenProductId}/linen-case', [App\Http\Controllers\Worker\Operation\PackingController::class, 'selectLinenCase'])->name('worker.operation.packing.select-linen-case');
         });
 
         Route::group(['prefix' => 'collect'], function () {
