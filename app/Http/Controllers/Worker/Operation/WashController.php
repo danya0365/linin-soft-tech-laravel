@@ -182,17 +182,16 @@ class WashController extends Controller
         request()->validate(['wet_weight' => 'required', 'color' => 'required']);
 
         $operationLinenProduct = OperationLinenProduct::find($operationLinenProductId);
+        $operationLinenProductOldValue = $operationLinenProduct->getAttributes();
         $operationLinenProduct->wet_weight = request()->get('wet_weight');
         $operationLinenProduct->color = request()->get('color');
-        $operationLinenProductDirty = $operationLinenProduct->getOriginal();
-        $operationLinenProductOldValue = $operationLinenProduct->getDirty();
-
+        $operationLinenProductNewValue = $operationLinenProduct->getDirty();
         $operationLinenProduct->save();
 
         $operation = Operation::find($operationId);
         $operation->updateRelateFields();
 
-        OperationManager::createOperationLog($operation->wash_employeed_id, $operation, 'set_weight_and_color', $operationLinenProductOldValue, $operationLinenProductDirty);
+        OperationManager::createOperationLog($operation->wash_employee_id, $operation, 'set_weight_and_color', $operationLinenProductOldValue, $operationLinenProductNewValue);
         EmployeeManager::createEmployeeOperationLog($operation->wash_employee_id, WorkerOperationStatus::Wash(), EmployeeOperationActionType::Progress());
 
         return redirect(route('worker.operation.wash.employee-summary', ['operationId' => $operation->id]));

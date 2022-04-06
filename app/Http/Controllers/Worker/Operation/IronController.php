@@ -9,6 +9,7 @@ use App\Enums\OperationType;
 use App\Enums\WorkerOperationStatus;
 use App\Http\Controllers\Controller;
 use App\Managers\EmployeeManager;
+use App\Managers\OperationManager;
 use App\Models\CustomerGroup;
 use App\Models\Department;
 use App\Models\LinenProduct;
@@ -161,13 +162,16 @@ class IronController extends Controller
         request()->validate(['iron_piece' => 'required', 'color' => 'required']);
 
         $operationLinenProduct = OperationLinenProduct::find($operationLinenProductId);
+        $operationLinenProductOldValue = $operationLinenProduct->getAttributes();
         $operationLinenProduct->iron_piece = request()->get('iron_piece');
         $operationLinenProduct->color = request()->get('color');
+        $operationLinenProductNewValue = $operationLinenProduct->getDirty();
         $operationLinenProduct->save();
 
         $operation = Operation::find($operationId);
         $operation->updateRelateFields();
 
+        OperationManager::createOperationLog($operation->iron_employee_id, $operation, 'set_weight_and_color', $operationLinenProductOldValue, $operationLinenProductNewValue);
         EmployeeManager::createEmployeeOperationLog($operation->iron_employee_id, WorkerOperationStatus::Iron(), EmployeeOperationActionType::Progress());
 
         return redirect(route('worker.operation.iron.employee-summary', ['operationId' => $operation->id]));

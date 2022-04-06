@@ -9,6 +9,7 @@ use App\Enums\OperationType;
 use App\Enums\WorkerOperationStatus;
 use App\Http\Controllers\Controller;
 use App\Managers\EmployeeManager;
+use App\Managers\OperationManager;
 use App\Models\CustomerGroup;
 use App\Models\Department;
 use App\Models\LinenProduct;
@@ -161,13 +162,16 @@ class CollectController extends Controller
         request()->validate(['collect_weight' => 'required', 'color' => 'required']);
 
         $operationLinenProduct = OperationLinenProduct::find($operationLinenProductId);
+        $operationLinenProductOldValue = $operationLinenProduct->getAttributes();
         $operationLinenProduct->collect_weight = request()->get('collect_weight');
         $operationLinenProduct->color = request()->get('color');
+        $operationLinenProductNewValue = $operationLinenProduct->getDirty();
         $operationLinenProduct->save();
 
         $operation = Operation::find($operationId);
         $operation->updateRelateFields();
 
+        OperationManager::createOperationLog($operation->collect_employee_id, $operation, 'set_weight_and_color', $operationLinenProductOldValue, $operationLinenProductNewValue);
         EmployeeManager::createEmployeeOperationLog($operation->collect_employee_id, WorkerOperationStatus::Packing(), EmployeeOperationActionType::Progress());
 
         return redirect(route('worker.operation.collect.employee-summary', ['operationId' => $operation->id]));
