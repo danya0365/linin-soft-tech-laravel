@@ -154,7 +154,7 @@ Route::group(['prefix' => 'worker', 'middleware' => ['auth']], function () {
             Route::get('/{operationId}/linen-product/{operationLinenProductId}/linen-product/{linenProductId}', [App\Http\Controllers\Worker\Operation\CollectController::class, 'setSelectLinenProduct'])->name('worker.operation.collect.set-select-linen-product');
             Route::get('/{operationId}/linen-product/{operationLinenProductId}/weight-and-color', [App\Http\Controllers\Worker\Operation\CollectController::class, 'selectWeightAndColor'])->name('worker.operation.collect.select-weight-and-color');
             Route::post('/{operationId}/linen-product/{operationLinenProductId}/set-weight-and-color', [App\Http\Controllers\Worker\Operation\CollectController::class, 'setSelectWeightAndColor'])->name('worker.operation.collect.set-select-weight-and-color');
-            Route::get('/{operationId}/delete-operation-linen-product/{operationLinenProductId}', [App\Http\Controllers\Worker\Operation\CollectControllers::class, 'deleteOperationLinenProduct'])->name('worker.operation.collect.delete-operation-linen-product');
+            Route::get('/{operationId}/delete-operation-linen-product/{operationLinenProductId}', [App\Http\Controllers\Worker\Operation\CollectController::class, 'deleteOperationLinenProduct'])->name('worker.operation.collect.delete-operation-linen-product');
         });
     });
 
