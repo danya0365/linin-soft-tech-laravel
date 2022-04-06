@@ -28,12 +28,12 @@
                                 <div class="row g-2">
                                     <div class="col-6">
                                         <div class="d-grid gap-2">
-                                            <a class="btn btn-primary" rol="button" href="{{ route('worker.operation.packing.select-linen-case', ['operationId' => $operation['id'], 'operationLinenProductId' => $operationLinenProduct['id']]) }}">แก้ไข</a>
+                                            <a class="btn btn-primary" role="button" href="{{ route('worker.operation.packing.select-linen-case', ['operationId' => $operation['id'], 'operationLinenProductId' => $operationLinenProduct['id']]) }}">แก้ไข</a>
                                         </div>
                                     </div>
                                     <div class="col-6">
                                         <div class="d-grid gap-2">
-                                            <a class="btn btn-danger" type="button" href="{{ route('worker.operation.packing.delete-operation-linen-product', ['operationId' => $operation['id'], 'operationLinenProductId' => $operationLinenProduct['id']]) }}">ลบเลย</a>
+                                            <a class="btn btn-danger" role="button" href="{{ route('worker.operation.packing.delete-operation-linen-product', ['operationId' => $operation['id'], 'operationLinenProductId' => $operationLinenProduct['id']]) }}">ลบเลย</a>
                                         </div>
                                     </div>
                                 </div> 
