@@ -38,7 +38,7 @@ class CustomerController extends Controller
             ->join('customers', 'customers.id', '=', 'operations.customer_id')
             ->groupBy('operations.customer_id');
 
-        $operations = $query->paginate(5);
+        $operations = $query->paginate();
         return view('worker.customers.get-operations-group-by-customer', ['operations' => $operations])
             ->with('i', (request()->input('page', 1) - 1) * $operations->perPage());
     }

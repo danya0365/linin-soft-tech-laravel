@@ -42,7 +42,7 @@ class ProductController extends Controller
             });
         }
 
-        $operations = $query->paginate(5);
+        $operations = $query->paginate();
         $linenTypes = LinenType::get();
 
         return view('worker.products.get-operations-by-linen-case', ['operations' => $operations, 'linenCase' => $linenCase, 'linenTypes' => $linenTypes, 'linenTypeSelected' => $linenTypeSelected])
