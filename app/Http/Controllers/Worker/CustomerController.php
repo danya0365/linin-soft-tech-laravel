@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Worker;
 
 use App\Http\Controllers\Controller;
+use App\Models\Customer;
 use App\Models\LinenType;
 use App\Models\Operation;
 use App\Models\OperationLinenCase;
@@ -40,6 +41,58 @@ class CustomerController extends Controller
 
         $operations = $query->paginate();
         return view('worker.customers.get-operations-group-by-customer', ['operations' => $operations])
+            ->with('i', (request()->input('page', 1) - 1) * $operations->perPage());
+    }
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function getOperationsByCustomer($customerId)
+    {
+        $sortOrders = [
+            ['var' => 'id-desc', 'name' => 'ใหม่ที่สุด'],
+            ['var' => 'id-asc', 'name' => 'เก่าที่สุด'],
+        ];
+        $sortOrderSelected = request()->get('sort_order', 'id-desc');
+
+        $query = OperationLinenProduct::with(['operation' => function ($query) {
+            $query->with('employee')->with('customer');
+        }])->with('linenProduct');
+
+        $query->where(function ($query) use ($customerId) {
+            $query->whereHas('operation', function ($query) use ($customerId) {
+                $query->where('customer_id', $customerId);
+            });
+        });
+
+        $dateStartAt = request()->get('date_start_at');
+        $dateEndAt = request()->get('date_end_at');
+        if ($dateStartAt && $dateEndAt) {
+            $query->whereBetween('created_at', [$dateStartAt . ' 00:00:00', $dateEndAt . ' 23:59:59']);
+        }
+        if ($sortOrderSelected) {
+            list($sort, $order) = explode('-', $sortOrderSelected);
+            $query->orderBy($sort, $order);
+        }
+
+        $operations = $query->paginate();
+        $customer = Customer::find($customerId);
+        $linenTypes = LinenType::get();
+
+        return view(
+            'worker.customers.get-operations-by-customer',
+            [
+                'operations' => $operations,
+                'customer' => $customer->toArray(),
+                'linenTypes' => $linenTypes,
+                'dateStartAt' => $dateStartAt,
+                'dateEndAt' => $dateEndAt,
+                'sortOrders' => $sortOrders,
+                'sortOrderSelected' => $sortOrderSelected
+            ]
+        )
             ->with('i', (request()->input('page', 1) - 1) * $operations->perPage());
     }
 }

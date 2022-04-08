@@ -32,7 +32,11 @@
                             <tbody>
                                 @foreach ($operations as $operation)
                                     <tr>
-                                        <td>{{ $operation->operationCustomer->name }}</td>
+                                        <td>
+                                            <a href="{{ route('worker.customer.get-operations-by-customer', ['customerId' => $operation->operationCustomer->id]) }}">
+                                                {{ $operation->operationCustomer->name }}
+                                            </a>
+                                        </td>
                                         <td class="text-center">{{ number_format($operation->total_wet_weight) }}</td>
                                         <td class="text-center">{{ number_format($operation->total_collect_weight) }}</td>
                                         <td class="text-center">{{ number_format($operation->total_edit_collect_weight) }}</td>

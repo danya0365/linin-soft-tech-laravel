@@ -56,6 +56,7 @@ Route::group(['prefix' => 'worker', 'middleware' => ['auth']], function () {
     Route::group(['prefix' => 'customer'], function () {
         Route::get('/', [App\Http\Controllers\Worker\CustomerController::class, 'index'])->name('worker.customer');
         Route::get('/operations-group-by-customer', [App\Http\Controllers\Worker\CustomerController::class, 'getOperationsGroupByCustomer'])->name('worker.customer.get-operations-group-by-customer');
+        Route::get('/operations-by-customer/{customerId}', [App\Http\Controllers\Worker\CustomerController::class, 'getOperationsByCustomer'])->name('worker.customer.get-operations-by-customer');
     });
 
     Route::group(['prefix' => 'operation'], function () {
