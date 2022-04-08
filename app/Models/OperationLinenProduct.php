@@ -25,6 +25,12 @@ class OperationLinenProduct extends Pivot
         return $this->belongsTo(Operation::class);
     }
 
+    // Need to full join with operations table first to use this function
+    public function operationCustomer()
+    {
+        return $this->belongsTo(Customer::class, 'customer_id');
+    }
+
     /**
      * Convert the model instance to an array.
      *
