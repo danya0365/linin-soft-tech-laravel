@@ -16,25 +16,47 @@
             <div class="card">
                 <div class="card-header">รายการทั้งหมดของ {{ $linenCase['name'] }}</div>
                 <div class="card-body">
-                    <form class="row row-cols-lg-auto g-3 align-items-center mb-2" action="{{ route('worker.product.get-operations-by-linen-case', ['linenCase' => $linenCase['var']]) }}" method="GET" style="display: none">
+ 
+                    <form class="row row-cols-lg-auto g-3 align-items-center mb-2" action="{{ route('worker.product.get-operations-by-linen-case', ['linenCase' => $linenCase['var']]) }}" method="GET">
+                        
                         <div class="col-12">
                             <div class="input-group">
                                 <label class="input-group-text" for="linen-type">ชนิดผ้า</label>
-                                <select class="form-select" id="linen-type" name="linenType">
-                                  <option selected>Choose...</option>
-                                  @foreach ( $linenTypes as $linenType )
-                                  <option value="{{ $linenType->id }}">{{ $linenType->name }}</option>
-                                  @endforeach
+                                <select class="form-select" id="linen-type" name="linenType" onchange="this.form.submit()">
+                                    <option value="">ไม่เลือก</option>
+                                    @foreach ( $linenTypes as $linenType )
+                                    <option value="{{ $linenType->id }}"  {{ $linenTypeSelected == $linenType->id ? 'selected' : '' }}>{{ $linenType->name }}</option>
+                                    @endforeach
                                 </select>
-                              </div>
+                            </div>
                         </div>
                         
                         <div class="col-12">
+                            <div class="input-group">
+                                <input type="date" name="date_start_at" value="{{ $dateStartAt }}" class="form-control" placeholder="วันที่เริ่ม" aria-label="วันที่เริ่ม">
+                                <span class="input-group-text"> ถึง </span>
+                                <input type="date" name="date_end_at" value="{{ $dateEndAt }}" class="form-control" placeholder="วันที่สิ้นสุด" aria-label="วันที่สิ้นสุด">
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="input-group">
+                                <label class="input-group-text" for="sort_order">เรียงโดย</label>
+                                <select class="form-select" id="sort_order" name="sort_order" onchange="this.form.submit()">
+                                    @foreach ( $sortOrders as $sortOrder )
+                                    <option value="{{ $sortOrder['var'] }}" {{ $sortOrderSelected == $sortOrder['var'] ? 'selected' : '' }}>{{ $sortOrder['name'] }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
                             <button type="submit" class="btn btn-primary">Submit</button>
+                            <a href="{{ route('worker.product.get-operations-by-linen-case', ['linenCase' => $linenCase['var']]) }}" role="button" class="btn btn-outline-secondary">Reset</a>
                         </div>
                     </form>
 
-                    <div class="row row-cols-lg-auto g-3 align-items-center mb-2">
+                    <div class="row row-cols-lg-auto g-3 align-items-center mb-2" style="display: none">
                         <div class="col-12">
                             @foreach ( $linenTypes as $linenType )
                             <a role="submit" class="btn {{ $linenTypeSelected == $linenType->id ? "btn-primary" : "btn-outline-secondary" }} btn-lg" href="{{ route('worker.product.get-operations-by-linen-case', ['linenCase' => $linenCase['var'], 'linenType' => $linenType->id]) }}">{{ $linenType->name }}</a>
