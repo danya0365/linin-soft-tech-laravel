@@ -16,55 +16,67 @@
             <div class="card">
                 <div class="card-header">รายการทั้งหมดของ {{ $linenCase['name'] }}</div>
                 <div class="card-body">
+                    <form class="row row-cols-lg-auto g-3 align-items-center mb-2" action="{{ route('worker.product.get-operations-by-linen-case', ['linenCase' => $linenCase['var']]) }}" method="GET" style="display: none">
+                        <div class="col-12">
+                            <div class="input-group">
+                                <label class="input-group-text" for="linen-type">ชนิดผ้า</label>
+                                <select class="form-select" id="linen-type" name="linenType">
+                                  <option selected>Choose...</option>
+                                  @foreach ( $linenTypes as $linenType )
+                                  <option value="{{ $linenType->id }}">{{ $linenType->name }}</option>
+                                  @endforeach
+                                </select>
+                              </div>
+                        </div>
+                        
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </div>
+                    </form>
+
+                    <div class="row row-cols-lg-auto g-3 align-items-center mb-2">
+                        <div class="col-12">
+                            @foreach ( $linenTypes as $linenType )
+                            <a role="submit" class="btn {{ $linenTypeSelected == $linenType->id ? "btn-primary" : "btn-outline-secondary" }} btn-lg" href="{{ route('worker.product.get-operations-by-linen-case', ['linenCase' => $linenCase['var'], 'linenType' => $linenType->id]) }}">{{ $linenType->name }}</a>
+                            @endforeach
+                        </div>
+                    </div>
+
                     <div class="table-responsive">
-                        <table class="table table-striped table-hover">
+                        <table class="table table-bordered table-hover">
                             <thead class="thead">
                                 <tr>
-                                    <th>No</th>
-                                    
-                                    <th>Operation Type</th>
-                                    <th>Employee Id</th>
-                                    <th>Customer Id</th>
-                                    <th>Wash Employee Id</th>
-                                    <th>Dry Employee Id</th>
-                                    <th>Iron Employee Id</th>
-                                    <th>Packing Employee Id</th>
-                                    <th>Collect Employee Id</th>
-                                    <th>Job Case</th>
-                                    <th>Washing Machine Id</th>
-                                    <th>Dryer Machine Id</th>
-                                    <th>Total Wet Weight</th>
-                                    <th>Total Dry Weight</th>
-                                    <th>Total Iron Piece</th>
-                                    <th>Total Packing Piece</th>
-                                    <th>Colors</th>
-                                    <th>Search Tags</th>
-                                    <th>Status</th>
+                                    <th>วันที่</th>
+                                    <th>ประเภทงาน</th>
+                                    <th>สินค้า</th>
+                                    <th>ชนิด</th>
+                                    <th>สี</th>
+                                    <th>ลูกค้า</th>
+                                    <th>พนักงาน</th>
+                                    <th>จำนวนที่ซัก</th>
+                                    <th>จำนวนที่อบ</th>
+                                    <th>จำนวนที่รีด</th>
+                                    <th>จำนวนที่พับแพ็ค</th>
+                                    <th>จำนวนที่จัดเก็บ</th>
+                                    <th>เวลา</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach ($operations as $operation)
                                     <tr>
-                                        <td>{{ ++$i }}</td>
-                                        
-                                        <td>{{ $operation->operation_type }}</td>
-                                        <td>{{ $operation->employee_id }}</td>
-                                        <td>{{ $operation->customer_id }}</td>
-                                        <td>{{ $operation->wash_employee_id }}</td>
-                                        <td>{{ $operation->dry_employee_id }}</td>
-                                        <td>{{ $operation->iron_employee_id }}</td>
-                                        <td>{{ $operation->packing_employee_id }}</td>
-                                        <td>{{ $operation->collect_employee_id }}</td>
-                                        <td>{{ $operation->job_case }}</td>
-                                        <td>{{ $operation->washing_machine_id }}</td>
-                                        <td>{{ $operation->dryer_machine_id }}</td>
-                                        <td>{{ $operation->total_wet_weight }}</td>
-                                        <td>{{ $operation->total_dry_weight }}</td>
-                                        <td>{{ $operation->total_iron_piece }}</td>
-                                        <td>{{ $operation->total_packing_piece }}</td>
-                                        <td>{{ $operation->colors }}</td>
-                                        <td>{{ $operation->search_tags }}</td>
-                                        <td>{{ $operation->status }}</td>
+                                        <td>{{ $operation->created_at->format('Y-m-d') }}</td>
+                                        <td>{{ $operation->operation->operation_type }}</td>
+                                        <td>{{ $operation->linenProduct->name }}</td>
+                                        <td>{{ $linenCase['name'] }}</td>
+                                        <td style="background-color: {{ $operation->color }}">{{ $operation->color }}</td>
+                                        <td>{{ $operation->operation->customer->name }}</td>
+                                        <td>{{ $operation->operation->employee->name }}</td>
+                                        <td class="text-center">{{ $operation->wet_weight }}</td>
+                                        <td class="text-center">{{ $operation->dry_weight }}</td>
+                                        <td class="text-center">{{ $operation->iron_piece }}</td>
+                                        <td class="text-center">{{ $operation->packing_piece }}</td>
+                                        <td class="text-center">{{ $operation->collect_weight }}</td>
+                                        <td class="text-center">{{ $operation->created_at->format('H:i') }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -72,7 +84,7 @@
                     </div>
                 </div>
                 <div class="card-footer">
-                    {!! $operations->links() !!}
+                    {!! $operations->withQueryString()->links() !!}
                 </div>
             </div>
         </div>
