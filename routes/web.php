@@ -47,9 +47,11 @@ Route::group(['prefix' => 'worker', 'middleware' => ['auth']], function () {
 
     Route::get('/', [App\Http\Controllers\WorkerController::class, 'index'])->name('worker');
 
-    Route::get('/product', function () {
-        return ['hello world'];
-    })->name('worker.product');
+    Route::group(['prefix' => 'product'], function () {
+        Route::get('/', [App\Http\Controllers\Worker\ProductController::class, 'index'])->name('worker.product');
+        Route::get('/linen-case', [App\Http\Controllers\Worker\ProductController::class, 'selectLinenCase'])->name('worker.product.select-linen-case');
+        Route::get('/linen-case/{linenCase}/operations', [App\Http\Controllers\Worker\ProductController::class, 'getOperationsByLinenCase'])->name('worker.product.get-operations-by-linen-case');
+    });
 
     Route::get('/customer', function () {
         return ['hello world'];
