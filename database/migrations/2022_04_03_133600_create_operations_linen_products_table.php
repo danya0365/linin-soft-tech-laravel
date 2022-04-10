@@ -24,6 +24,7 @@ return new class extends Migration
             $table->integer('iron_piece')->nullable();
             $table->integer('packing_piece')->nullable();
             $table->integer('collect_weight')->nullable();
+            $table->integer('collect_pack')->nullable();
             $table->timestamps();
         });
     }

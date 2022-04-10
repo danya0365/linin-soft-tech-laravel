@@ -28,6 +28,12 @@ class ProductController extends Controller
      */
     public function getOperationsByLinenCase($linenCaseVarName)
     {
+        $sortOrders = [
+            ['var' => 'id-desc', 'name' => 'ใหม่ที่สุด'],
+            ['var' => 'id-asc', 'name' => 'เก่าที่สุด'],
+        ];
+        $sortOrderSelected = request()->get('sort_order', 'id-desc');
+
         $linenTypeSelected = request()->get('linenType');
         $linenCase = OperationLinenCase::getByVar($linenCaseVarName);
         $query = OperationLinenProduct::with(['operation' => function ($query) {
@@ -42,10 +48,32 @@ class ProductController extends Controller
             });
         }
 
-        $operations = $query->paginate(5);
+        $dateStartAt = request()->get('date_start_at');
+        $dateEndAt = request()->get('date_end_at');
+        if ($dateStartAt && $dateEndAt) {
+            $query->whereBetween('created_at', [$dateStartAt . ' 00:00:00', $dateEndAt . ' 23:59:59']);
+        }
+        if ($sortOrderSelected) {
+            list($sort, $order) = explode('-', $sortOrderSelected);
+            $query->orderBy($sort, $order);
+        }
+
+        $operations = $query->paginate();
         $linenTypes = LinenType::get();
 
-        return view('worker.products.get-operations-by-linen-case', ['operations' => $operations, 'linenCase' => $linenCase, 'linenTypes' => $linenTypes, 'linenTypeSelected' => $linenTypeSelected])
+        return view(
+            'worker.products.get-operations-by-linen-case',
+            [
+                'operations' => $operations,
+                'linenCase' => $linenCase,
+                'linenTypes' => $linenTypes,
+                'linenTypeSelected' => $linenTypeSelected,
+                'dateStartAt' => $dateStartAt,
+                'dateEndAt' => $dateEndAt,
+                'sortOrders' => $sortOrders,
+                'sortOrderSelected' => $sortOrderSelected
+            ]
+        )
             ->with('i', (request()->input('page', 1) - 1) * $operations->perPage());
     }
 }

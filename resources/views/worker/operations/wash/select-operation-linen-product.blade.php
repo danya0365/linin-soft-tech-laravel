@@ -21,7 +21,7 @@
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item">{{ $operationLinenProduct['linen_case'] ? $operationLinenProduct['linen_case']['name'] : 'ยังไม่ได้เลือก' }}</li>
                     <li class="list-group-item">ชนิดผ้า: {{ $operationLinenProduct['linen_product'] ? $operationLinenProduct['linen_product']['name'] : 'ยังไม่ได้เลือก' }}</li>
-                    <li class="list-group-item">น้ำหนักเปียก: {{ $operationLinenProduct['wet_weight'] ? $operationLinenProduct['wet_weight'] : 'ยังไม่ได้เลือก' }} กก.</li>
+                    <li class="list-group-item">น้ำหนักเปียก: {{ $operationLinenProduct['wet_weight'] ? $operationLinenProduct['wet_weight'] : 'ยังไม่ได้เลือก' }} kg.</li>
                     <li class="list-group-item" style="color: {{ $operationLinenProduct['color'] ? $operationLinenProduct['color'] : '' }}">สี: {{ $operationLinenProduct['color'] ? $operationLinenProduct['color'] : 'ยังไม่ได้เลือก' }}</li>
                     <li class="list-group-item">
                         <div class="row g-2">

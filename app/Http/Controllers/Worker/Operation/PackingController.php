@@ -78,6 +78,8 @@ class PackingController extends Controller
         $operation->status = OperationStatus::Close();
         $operation->save();
 
+        OperationManager::createCustomerOperationDailySummary($operation);
+
         EmployeeManager::createEmployeeOperationLog($operation->packing_employee_id, WorkerOperationStatus::Packing(), EmployeeOperationActionType::Stop());
         return redirect(route('worker.operation.packing.employee-summary', ['operationId' => $operation->id]));
     }
@@ -182,6 +184,8 @@ class PackingController extends Controller
         OperationLinenProduct::where('id', $operationLinenProductId)->delete();
         $operation = Operation::find($operationId);
         $operation->updateRelateFields();
+
+        OperationManager::createCustomerOperationDailySummary($operation);
 
         return redirect(route('worker.operation.packing.select-operation-linen-product', ['operationId' => $operationId]));
     }

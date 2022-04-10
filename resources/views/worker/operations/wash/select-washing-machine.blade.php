@@ -14,6 +14,13 @@
     </nav>
     <div class="row justify-content-center">
         <div class="col-md-12 m-2">
+            @if (session('error'))
+            <div class="alert alert-danger">
+                <a href="{{ route('worker.operation.wash.employee-summary', ['operationId' => session('operation_id')]) }}">
+                {{ session('error') }}
+                </a>
+            </div>
+            @endif
             <div class="card">
                 <div class="card-header">เครื่องซักผ้า</div>
                 <div class="card-body">
@@ -26,7 +33,7 @@
                                         <div class="bi {{ $washingMachine['photo'] }}" style="font-size: 3em"></div>
                                     </div>
                                     <div class="text-center">{{ $washingMachine['name'] }}</div>
-                                    <div class="text-center">สถานะ: {{ $washingMachine['status_text'] }}</div>
+                                    <div class="text-center">สถานะ: {!! $operation['washing_machine_id'] == $washingMachine['id'] ? "<span class=\"text-success\">เลือกอยู่ - Selected</span>" : $washingMachine['status_text'] !!}</div>
                                 </div>
                             </a>
                         </div>

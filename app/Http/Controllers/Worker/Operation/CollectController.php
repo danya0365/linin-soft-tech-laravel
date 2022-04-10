@@ -78,6 +78,8 @@ class CollectController extends Controller
         $operation->status = OperationStatus::Close();
         $operation->save();
 
+        OperationManager::createCustomerOperationDailySummary($operation);
+
         EmployeeManager::createEmployeeOperationLog($operation->collect_employee_id, WorkerOperationStatus::Collect(), EmployeeOperationActionType::Stop());
         return redirect(route('worker.operation.collect.employee-summary', ['operationId' => $operation->id]));
     }
@@ -182,6 +184,8 @@ class CollectController extends Controller
         OperationLinenProduct::where('id', $operationLinenProductId)->delete();
         $operation = Operation::find($operationId);
         $operation->updateRelateFields();
+
+        OperationManager::createCustomerOperationDailySummary($operation);
 
         return redirect(route('worker.operation.collect.select-operation-linen-product', ['operationId' => $operationId]));
     }

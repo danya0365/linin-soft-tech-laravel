@@ -78,6 +78,8 @@ class IronController extends Controller
         $operation->status = OperationStatus::Close();
         $operation->save();
 
+        OperationManager::createCustomerOperationDailySummary($operation);
+
         EmployeeManager::createEmployeeOperationLog($operation->iron_employee_id, WorkerOperationStatus::Iron(), EmployeeOperationActionType::Stop());
         return redirect(route('worker.operation.iron.employee-summary', ['operationId' => $operation->id]));
     }
@@ -182,6 +184,8 @@ class IronController extends Controller
         OperationLinenProduct::where('id', $operationLinenProductId)->delete();
         $operation = Operation::find($operationId);
         $operation->updateRelateFields();
+
+        OperationManager::createCustomerOperationDailySummary($operation);
 
         return redirect(route('worker.operation.iron.select-operation-linen-product', ['operationId' => $operationId]));
     }

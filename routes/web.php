@@ -53,9 +53,12 @@ Route::group(['prefix' => 'worker', 'middleware' => ['auth']], function () {
         Route::get('/linen-case/{linenCase}/operations', [App\Http\Controllers\Worker\ProductController::class, 'getOperationsByLinenCase'])->name('worker.product.get-operations-by-linen-case');
     });
 
-    Route::get('/customer', function () {
-        return ['hello world'];
-    })->name('worker.customer');
+    Route::group(['prefix' => 'customer'], function () {
+        Route::get('/', [App\Http\Controllers\Worker\CustomerController::class, 'index'])->name('worker.customer');
+        Route::get('/operation-summary', [App\Http\Controllers\Worker\CustomerController::class, 'getOperationSummary'])->name('worker.customer.operation-summary');
+        Route::get('/operations-group-by-customer', [App\Http\Controllers\Worker\CustomerController::class, 'getOperationsGroupByCustomer'])->name('worker.customer.get-operations-group-by-customer');
+        Route::get('/operations-by-customer/{customerId}', [App\Http\Controllers\Worker\CustomerController::class, 'getOperationsByCustomer'])->name('worker.customer.get-operations-by-customer');
+    });
 
     Route::group(['prefix' => 'operation'], function () {
         Route::get('/', [App\Http\Controllers\Worker\OperationController::class, 'index'])->name('worker.operation');

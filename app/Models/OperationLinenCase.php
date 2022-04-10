@@ -19,4 +19,14 @@ class OperationLinenCase
     }
     return null;
   }
+
+  public static function getEdit()
+  {
+    foreach (self::$list as $linenCase) {
+      if ($linenCase['var'] == 'edit') {
+        return $linenCase;
+      }
+    }
+    return null;
+  }
 }

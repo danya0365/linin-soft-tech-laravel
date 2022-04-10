@@ -71,6 +71,11 @@ class WashController extends Controller
     public function setSelectWashingMachine($operationId, $washingMachineId)
     {
         $operation = Operation::find($operationId);
+        $washingMachine = WashingMachine::find($washingMachineId);
+        if ($washingMachine->operation_id && $washingMachine->operation_id != $operation->id) {
+            return back()->with('error', 'กรุณาเลือกเครื่องอื่น - Please select another device.')->with('operation_id', $washingMachine->operation_id);
+        }
+
         $prevWashingMachineId = $operation->washing_machine_id;
         $operation->washing_machine_id = $washingMachineId;
         $operation->save();
@@ -92,12 +97,14 @@ class WashController extends Controller
         return view('worker.operations.wash.employee-summary', ['operation' => $operation->toArray(), 'summaryReports' => $summaryReports, 'workingDuration' => $workingDuration, 'operationLinenProducts' => $operationLinenProducts->toArray(), 'operationTimeDuration' => $operationTimeDuration]);
     }
 
-
     public function setClose($operationId)
     {
         $operation = Operation::find($operationId);
         $operation->status = OperationStatus::Close();
         $operation->save();
+
+        if ($operation->washing_machine_id) WashingMachine::where('id', $operation->washing_machine_id)->update(['operation_id' => null]);
+        OperationManager::createCustomerOperationDailySummary($operation);
 
         EmployeeManager::createEmployeeOperationLog($operation->wash_employee_id, WorkerOperationStatus::Wash(), EmployeeOperationActionType::Stop());
         return redirect(route('worker.operation.wash.employee-summary', ['operationId' => $operation->id]));
@@ -108,6 +115,8 @@ class WashController extends Controller
         $operation = Operation::find($operationId);
         $operation->status = OperationStatus::InProgress();
         $operation->save();
+
+        if ($operation->washing_machine_id) WashingMachine::where('id', $operation->washing_machine_id)->update(['operation_id' => $operation->id]);
 
         EmployeeManager::createEmployeeOperationLog($operation->wash_employee_id, WorkerOperationStatus::Wash(), EmployeeOperationActionType::Progress());
         return redirect(route('worker.operation.wash.employee-summary', ['operationId' => $operation->id]));
@@ -203,6 +212,7 @@ class WashController extends Controller
         $operation = Operation::find($operationId);
         $operation->updateRelateFields();
 
+        OperationManager::createCustomerOperationDailySummary($operation);
         return redirect(route('worker.operation.wash.select-operation-linen-product', ['operationId' => $operationId]));
     }
 }
