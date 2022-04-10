@@ -42,12 +42,12 @@
                 </div>
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item">สถานะ: {{ $operation['status'] }}</li>
-                    <li class="list-group-item">น้ำหนักอบทั้งหมด: {{ $operation['total_wet_weight'] }}</li>
+                    <li class="list-group-item">น้ำหนักซักทั้งหมด: {{ $operation['total_wet_weight'] }} kg.</li>
                     @foreach ($operationLinenProducts as $operationLinenProduct)
                     <li class="list-group-item">
                         {{ $operationLinenProduct['linen_case'] ? $operationLinenProduct['linen_case']['name'] : 'ยังไม่ได้เลือก' }},
                         ชนิดผ้า: {{ $operationLinenProduct['linen_product'] ? $operationLinenProduct['linen_product']['name'] : 'ยังไม่ได้เลือก' }},
-                        น้ำหนักเปียก: {{ $operationLinenProduct['wet_weight'] ? $operationLinenProduct['wet_weight'] : 'ยังไม่ได้เลือก' }} กก.,
+                        น้ำหนักเปียก: {{ $operationLinenProduct['wet_weight'] ? $operationLinenProduct['wet_weight'] : 'ยังไม่ได้เลือก' }} kg.,
                         สี: <span style="color: {{ $operationLinenProduct['color'] ? $operationLinenProduct['color'] : '' }}">{{ $operationLinenProduct['color'] ? $operationLinenProduct['color'] : 'ยังไม่ได้เลือก' }}</span>
                     </li>
                     @endforeach
@@ -74,7 +74,7 @@
                 </div>
                 <ul class="list-group list-group-flush">
                     @foreach ($summaryReports as $summaryReport)
-                    <li class="list-group-item">{{ $summaryReport['title'] }}: {{ number_format($summaryReport['value']) }} กก.</li>
+                    <li class="list-group-item">{{ $summaryReport['title'] }}: {{ number_format($summaryReport['value']) }} kg.</li>
                     @endforeach
                   </ul>
                 <div class="card-footer text-muted text-center">

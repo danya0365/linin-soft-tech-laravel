@@ -16,6 +16,33 @@
                 <div class="card-header">รายการยอดรวมแต่ละลูกค้า</div>
                 <div class="card-body">
 
+                    <form class="row row-cols-lg-auto g-3 align-items-center mb-2" action="{{ route('worker.customer.get-operations-group-by-customer') }}" method="GET">
+                        
+                        <div class="col-12" style="display: none">
+                            <div class="input-group">
+                                <input type="date" name="date_start_at" value="{{ $dateStartAt }}" class="form-control" placeholder="วันที่เริ่ม" aria-label="วันที่เริ่ม">
+                                <span class="input-group-text"> ถึง </span>
+                                <input type="date" name="date_end_at" value="{{ $dateEndAt }}" class="form-control" placeholder="วันที่สิ้นสุด" aria-label="วันที่สิ้นสุด">
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="input-group">
+                                <label class="input-group-text" for="sort_order">เรียงโดย</label>
+                                <select class="form-select" id="sort_order" name="sort_order" onchange="this.form.submit()">
+                                    @foreach ( $sortOrders as $sortOrder )
+                                    <option value="{{ $sortOrder['var'] }}" {{ $sortOrderSelected == $sortOrder['var'] ? 'selected' : '' }}>{{ $sortOrder['name'] }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                            <a href="{{ route('worker.customer.get-operations-group-by-customer') }}" role="button" class="btn btn-outline-secondary">Reset</a>
+                        </div>
+                    </form>
+
                     <div class="table-responsive">
                         <table class="table table-bordered table-hover">
                             <thead class="thead">

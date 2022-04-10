@@ -13,7 +13,7 @@
             <li class="breadcrumb-item"><a href="{{ route('worker.operation.dry.employee-summary', ['operationId' => $operation['id']]) }}">สรุปข้อมูลการอบ</a></li>
             <li class="breadcrumb-item"><a href="{{ route('worker.operation.dry.select-linen-case', ['operationId' => $operation['id'], 'operationLinenProductId' => $operationLinenProduct['id']]) }}">{{ $operationLinenProduct['linen_case']['name'] }}</a></li>
             <li class="breadcrumb-item"><a href="{{ route('worker.operation.dry.select-linen-product', ['operationId' => $operation['id'], 'operationLinenProductId' => $operationLinenProduct['id']]) }}">{{ $operationLinenProduct['linen_product']['name'] }}</a></li>
-          < li class="breadcrumb-item active" aria-current="page">อบ - แบบฟอร์ม Submit</li>
+            <li class="breadcrumb-item active" aria-current="page">อบ - แบบฟอร์ม Submit</li>
         </ol>
     </nav>
     <div class="row justify-content-center">

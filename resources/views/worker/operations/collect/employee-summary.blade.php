@@ -41,12 +41,12 @@
                 </div>
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item">สถานะ: {{ $operation['status'] }}</li>
-                    <li class="list-group-item">นำ้หนักที่จัดเก็บทั้งหมด: {{ $operation['total_collect_weight'] ? $operation['total_collect_weight'] : '-' }} กก.</li>
+                    <li class="list-group-item">นำ้หนักที่จัดเก็บทั้งหมด: {{ $operation['total_collect_weight'] ? $operation['total_collect_weight'] : '-' }} kg.</li>
                     @foreach ($operationLinenProducts as $operationLinenProduct)
                     <li class="list-group-item">
                         {{ $operationLinenProduct['linen_case'] ? $operationLinenProduct['linen_case']['name'] : 'ยังไม่ได้เลือก' }},
                         ชนิดผ้า: {{ $operationLinenProduct['linen_product'] ? $operationLinenProduct['linen_product']['name'] : 'ยังไม่ได้เลือก' }},
-                        นำ้หนักที่จัดเก็บ: {{ $operationLinenProduct['collect_weight'] ? $operationLinenProduct['collect_weight'] : 'ยังไม่ได้เลือก' }} กก.,
+                        นำ้หนักที่จัดเก็บ: {{ $operationLinenProduct['collect_weight'] ? $operationLinenProduct['collect_weight'] : 'ยังไม่ได้เลือก' }} kg.,
                         สี: <span style="color: {{ $operationLinenProduct['color'] ? $operationLinenProduct['color'] : '' }}">{{ $operationLinenProduct['color'] ? $operationLinenProduct['color'] : 'ยังไม่ได้เลือก' }}</span>
                     </li>
                     @endforeach
@@ -73,7 +73,7 @@
                 </div>
                 <ul class="list-group list-group-flush">
                     @foreach ($summaryReports as $summaryReport)
-                    <li class="list-group-item">{{ $summaryReport['title'] }}: {{ number_format($summaryReport['value']) }} กก.</li>
+                    <li class="list-group-item">{{ $summaryReport['title'] }}: {{ number_format($summaryReport['value']) }} kg.</li>
                     @endforeach
                   </ul>
                 <div class="card-footer text-muted text-center">
