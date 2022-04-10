@@ -6,8 +6,8 @@ class OperationLinenCase
 {
 
   static $list = [
-    ['var' => 'new', 'name' => 'ผ้าเคสใหม่', 'icon' => 'bi-plus-circle-dotted'],
-    ['var' => 'edit', 'name' => 'ผ้าเคสแก้ไข', 'icon' => 'bi-pencil-square']
+    ['var' => 'new', 'name' => 'ผ้าเคสใหม่ - New', 'icon' => 'bi-plus-circle-dotted'],
+    ['var' => 'edit', 'name' => 'ผ้าเคสแก้ไข - Edit', 'icon' => 'bi-pencil-square']
   ];
 
   public static function getByVar($var)

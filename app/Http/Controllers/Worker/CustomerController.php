@@ -132,8 +132,8 @@ class CustomerController extends Controller
     public function getOperationsByCustomer($customerId)
     {
         $sortOrders = [
-            ['var' => 'id-desc', 'name' => 'ใหม่ที่สุด'],
-            ['var' => 'id-asc', 'name' => 'เก่าที่สุด'],
+            ['var' => 'id-desc', 'name' => 'ใหม่ที่สุด - Newest'],
+            ['var' => 'id-asc', 'name' => 'เก่าที่สุด - Oldest'],
         ];
         $sortOrderSelected = request()->get('sort_order', 'id-desc');
         $operationTypeSelected = request()->get('operation_type');
