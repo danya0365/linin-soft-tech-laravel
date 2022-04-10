@@ -14,6 +14,11 @@
     </nav>
     <div class="row justify-content-center">
         <div class="col-md-12 m-2">
+            @if (session('error'))
+            <div class="alert alert-danger">
+                {{ session('error') }}
+            </div>
+            @endif
             <div class="card">
                 <div class="card-header">เครื่องอบผ้า</div>
                 <div class="card-body">
@@ -26,7 +31,7 @@
                                         <div class="bi {{ $dryerMachine['photo'] }}" style="font-size: 3em"></div>
                                     </div>
                                     <div class="text-center">{{ $dryerMachine['name'] }}</div>
-                                    <div class="text-center">สถานะ: {{ $dryerMachine['status_text'] }}</div>
+                                    <div class="text-center">สถานะ: {!! $operation['dryer_machine_id'] == $dryerMachine['id'] ? "<span class=\"text-success\">เลือกอยู่ - Selected</span>" : $dryerMachine['status_text'] !!}</div>
                                 </div>
                             </a>
                         </div>

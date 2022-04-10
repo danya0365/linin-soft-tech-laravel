@@ -71,6 +71,11 @@ class WashController extends Controller
     public function setSelectWashingMachine($operationId, $washingMachineId)
     {
         $operation = Operation::find($operationId);
+        $washingMachine = WashingMachine::find($washingMachineId);
+        if ($washingMachine->operation_id && $washingMachine->operation_id != $operation->id) {
+            return back()->with('error', 'กรุณาเลือกเครื่องอื่น - Please select another device.');
+        }
+
         $prevWashingMachineId = $operation->washing_machine_id;
         $operation->washing_machine_id = $washingMachineId;
         $operation->save();

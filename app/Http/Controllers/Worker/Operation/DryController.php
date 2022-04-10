@@ -71,6 +71,11 @@ class DryController extends Controller
     public function setSelectDryerMachine($operationId, $dryerMachineId)
     {
         $operation = Operation::find($operationId);
+        $dryerMachine = DryerMachine::find($dryerMachineId);
+        if ($dryerMachine->operation_id && $dryerMachine->operation_id != $operation->id) {
+            return back()->with('error', 'กรุณาเลือกเครื่องอื่น - Please select another device.');
+        }
+
         $prevDryerMachineId = $operation->dryer_machine_id;
         $operation->dryer_machine_id = $dryerMachineId;
         $operation->save();
