@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Worker;
 
+use App\Enums\OperationType;
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use App\Models\CustomerOperationDailySummary;
@@ -131,19 +132,31 @@ class CustomerController extends Controller
     public function getOperationsByCustomer($customerId)
     {
         $sortOrders = [
-            ['var' => 'id-desc', 'name' => 'ใหม่ที่สุด'],
-            ['var' => 'id-asc', 'name' => 'เก่าที่สุด'],
+            ['var' => 'id-desc', 'name' => 'ใหม่ที่สุด - Newest'],
+            ['var' => 'id-asc', 'name' => 'เก่าที่สุด - Oldest'],
         ];
         $sortOrderSelected = request()->get('sort_order', 'id-desc');
+        $operationTypeSelected = request()->get('operation_type');
+        $linenProductSelected = request()->get('linen_product_id');
+        $linenCaseSelected = request()->get('linen_case');
 
         $query = OperationLinenProduct::with(['operation' => function ($query) {
             $query->with('employee')->with('customer');
         }])->with('linenProduct');
 
-        $query->where(function ($query) use ($customerId) {
-            $query->whereHas('operation', function ($query) use ($customerId) {
+        $query->where(function ($query) use ($customerId, $operationTypeSelected, $linenProductSelected, $linenCaseSelected) {
+            $query->whereHas('operation', function ($query) use ($customerId, $operationTypeSelected) {
                 $query->where('customer_id', $customerId);
+                if ($operationTypeSelected) {
+                    $query->where('operation_type', $operationTypeSelected);
+                }
             });
+            if ($linenProductSelected) {
+                $query->where('linen_product_id', $linenProductSelected);
+            }
+            if ($linenCaseSelected) {
+                $query->where('linen_case', $linenCaseSelected);
+            }
         });
 
         $dateStartAt = request()->get('date_start_at');
@@ -158,18 +171,26 @@ class CustomerController extends Controller
 
         $operations = $query->paginate();
         $customer = Customer::find($customerId);
-        $linenTypes = LinenType::get();
+        $linenTypes = LinenType::with('linenProducts')->get();
+
+        $operationTypes = OperationType::asSelectArray();
+        $linenCases = OperationLinenCase::$list;
 
         return view(
             'worker.customers.get-operations-by-customer',
             [
                 'operations' => $operations,
                 'customer' => $customer->toArray(),
-                'linenTypes' => $linenTypes,
+                'linenTypes' => $linenTypes->toArray(),
                 'dateStartAt' => $dateStartAt,
                 'dateEndAt' => $dateEndAt,
                 'sortOrders' => $sortOrders,
-                'sortOrderSelected' => $sortOrderSelected
+                'sortOrderSelected' => $sortOrderSelected,
+                'operationTypes' => $operationTypes,
+                'operationTypeSelected' => $operationTypeSelected,
+                'linenProductSelected' => $linenProductSelected,
+                'linenCases' => $linenCases,
+                'linenCaseSelected' => $linenCaseSelected,
             ]
         )
             ->with('i', (request()->input('page', 1) - 1) * $operations->perPage());

@@ -3,6 +3,7 @@
 namespace App\Enums;
 
 use BenSampo\Enum\Enum;
+use BenSampo\Enum\Contracts\LocalizedEnum;
 
 /**
  * @method static static Wash()
@@ -11,7 +12,7 @@ use BenSampo\Enum\Enum;
  * @method static static Packing()
  * @method static static Collect()
  */
-final class OperationType extends Enum
+final class OperationType extends Enum implements LocalizedEnum
 {
     const Wash = 'wash';
     const Dry = 'dry';
