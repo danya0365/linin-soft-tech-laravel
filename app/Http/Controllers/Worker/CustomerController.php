@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Worker;
 
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
+use App\Models\CustomerOperationDailySummary;
 use App\Models\LinenType;
 use App\Models\Operation;
 use App\Models\OperationLinenCase;
@@ -14,7 +15,53 @@ class CustomerController extends Controller
 {
     public function index()
     {
-        return redirect(route('worker.customer.get-operations-group-by-customer'));
+        return redirect(route('worker.customer.operation-summary'));
+    }
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function getOperationSummary()
+    {
+        $sortOrders = [
+            ['var' => 'total_wet_weight-desc', 'name' => 'ผ้าเปียกเยอะที่สุด'],
+            ['var' => 'total_wet_weight-asc', 'name' => 'ผ้าเปียกน้อยที่สุด'],
+        ];
+        $sortOrderSelected = request()->get('sort_order', $sortOrders[0]['var']);
+
+        $query = CustomerOperationDailySummary::with('customer')->select(
+            DB::raw('sum(total_wet_weight) as total_wet_weight'),
+            DB::raw('sum(total_edit_collect_weight) as total_edit_collect_weight'),
+            DB::raw('sum(total_collect_weight) as total_collect_weight'),
+            DB::raw('sum(total_billing_weight) as total_billing_weight'),
+            'customer_id'
+        );
+        $query->groupBy('customer_id');
+
+        $dateStartAt = request()->get('date_start_at');
+        $dateEndAt = request()->get('date_end_at');
+        if ($dateStartAt && $dateEndAt) {
+            $query->whereBetween('operation_date', [$dateStartAt, $dateEndAt]);
+        }
+        if ($sortOrderSelected) {
+            list($sort, $order) = explode('-', $sortOrderSelected);
+            $query->orderBy($sort, $order);
+        }
+
+        $operations = $query->paginate();
+        return view(
+            'worker.customers.operation-summary',
+            [
+                'operations' => $operations,
+                'dateStartAt' => $dateStartAt,
+                'dateEndAt' => $dateEndAt,
+                'sortOrders' => $sortOrders,
+                'sortOrderSelected' => $sortOrderSelected
+            ]
+        )
+            ->with('i', (request()->input('page', 1) - 1) * $operations->perPage());
     }
 
     /**

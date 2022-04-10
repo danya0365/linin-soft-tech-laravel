@@ -7,7 +7,7 @@
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{ route('worker') }}">Worker</a></li>
             <li class="breadcrumb-item"><a href="{{ route('worker.customer') }}">ลูกค้า</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.customer.get-operations-group-by-customer') }}">{{ $customer['name'] }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('worker.customer.operation-summary') }}">{{ $customer['name'] }}</a></li>
             <li class="breadcrumb-item active" aria-current="page">รายการทั้งหมด</li>
         </ol>
     </nav>

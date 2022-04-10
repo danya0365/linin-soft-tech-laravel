@@ -16,7 +16,7 @@
                 <div class="card-header">รายการยอดรวมแต่ละลูกค้า</div>
                 <div class="card-body">
 
-                    <form class="row row-cols-lg-auto g-3 align-items-center mb-2" action="{{ route('worker.customer.get-operations-group-by-customer') }}" method="GET">
+                    <form class="row row-cols-lg-auto g-3 align-items-center mb-2" action="{{ route('worker.customer.operation-summary') }}" method="GET">
                         
                         <div class="col-12">
                             <div class="input-group">
@@ -60,8 +60,8 @@
                                 @foreach ($operations as $operation)
                                     <tr>
                                         <td>
-                                            <a href="{{ route('worker.customer.get-operations-by-customer', ['customerId' => $operation->operationCustomer->id]) }}">
-                                                {{ $operation->operationCustomer->name }}
+                                            <a href="{{ route('worker.customer.get-operations-by-customer', ['customerId' => $operation->customer->id]) }}">
+                                                {{ $operation->customer->name }}
                                             </a>
                                         </td>
                                         <td class="text-center">{{ number_format($operation->total_wet_weight) }}</td>
