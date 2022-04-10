@@ -32,9 +32,9 @@
                         <div class="col-4">
                             <div class="d-grid gap-2" style="min-height: 60px">
                                 @if ( $operation['status'] != "close")
-                                <button class="btn btn-outline-secondary" type="button" onclick="window.location='{{ route('worker.operation.wash.set-close', ['operationId' => $operation['id']]) }}'">ปิดงาน</button>
+                                <button class="btn btn-outline-secondary" type="button" id="close-operation">ปิดงาน</button>
                                 @else 
-                                <button class="btn btn-outline-secondary" type="button" onclick="window.location='{{ route('worker.operation.wash.set-in-progress', ['operationId' => $operation['id']]) }}'">เปิดใหม่</button>
+                                <button class="btn btn-outline-secondary" type="button" id="reopen-operation">เปิดใหม่</button>
                                 @endif
                             </div>
                         </div>
@@ -85,9 +85,49 @@
     </div>
 </div>
 <script type="text/javascript">
-$(function(){
+    $(function(){
+        var operationStatus = '{{ $operation['status'] }}';
+
+        function askBeforeExit(e) {
+            if(!e) e = window.event;
+            //e.cancelBubble is supported by IE - this will kill the bubbling process.
+            e.cancelBubble = true;
+            e.returnValue = 'You sure you want to leave?'; //This is displayed on the dialog
     
-})
+            //e.stopPropagation works in Firefox.
+            if (e.stopPropagation) {
+                e.stopPropagation();
+                e.preventDefault();
+            }
+        }
+
+        function removeOnUnload(callback){
+            window.onbeforeunload = null;
+            window.pagehide = null;
+            callback()
+        }
+
+        function setUpOnUnload(){
+            window.onbeforeunload = operationStatus == 'close' ? null : askBeforeExit;
+            window.pagehide = operationStatus == 'close' ? null : askBeforeExit;
+        }
+
+        function closeOperation(){
+            removeOnUnload(function(){
+                window.location='{{ route('worker.operation.wash.set-close', ['operationId' => $operation['id']]) }}'
+            })
+        }
+
+        function reopenOperation(){
+            removeOnUnload(function(){
+                window.location='{{ route('worker.operation.wash.set-in-progress', ['operationId' => $operation['id']]) }}'
+            })
+        }
+
+        setUpOnUnload();
+        $("#close-operation").on("click", closeOperation);
+        $("#reopen-operation").on("click", reopenOperation);
+    })
 </script>
 
 @endsection

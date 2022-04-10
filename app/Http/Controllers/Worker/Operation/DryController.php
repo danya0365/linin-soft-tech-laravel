@@ -73,7 +73,7 @@ class DryController extends Controller
         $operation = Operation::find($operationId);
         $dryerMachine = DryerMachine::find($dryerMachineId);
         if ($dryerMachine->operation_id && $dryerMachine->operation_id != $operation->id) {
-            return back()->with('error', 'กรุณาเลือกเครื่องอื่น - Please select another device.');
+            return back()->with('error', 'กรุณาเลือกเครื่องอื่น - Please select another device.')->with('operation_id', $dryerMachine->operation_id);
         }
 
         $prevDryerMachineId = $operation->dryer_machine_id;
@@ -115,6 +115,8 @@ class DryController extends Controller
         $operation = Operation::find($operationId);
         $operation->status = OperationStatus::InProgress();
         $operation->save();
+
+        if ($operation->dryer_machine_id) DryerMachine::where('id', $operation->dryer_machine_id)->update(['operation_id' => $operation->id]);
 
         EmployeeManager::createEmployeeOperationLog($operation->dry_employee_id, WorkerOperationStatus::Dry(), EmployeeOperationActionType::Progress());
         return redirect(route('worker.operation.dry.employee-summary', ['operationId' => $operation->id]));

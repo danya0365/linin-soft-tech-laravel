@@ -73,7 +73,7 @@ class WashController extends Controller
         $operation = Operation::find($operationId);
         $washingMachine = WashingMachine::find($washingMachineId);
         if ($washingMachine->operation_id && $washingMachine->operation_id != $operation->id) {
-            return back()->with('error', 'กรุณาเลือกเครื่องอื่น - Please select another device.');
+            return back()->with('error', 'กรุณาเลือกเครื่องอื่น - Please select another device.')->with('operation_id', $washingMachine->operation_id);
         }
 
         $prevWashingMachineId = $operation->washing_machine_id;
@@ -115,6 +115,8 @@ class WashController extends Controller
         $operation = Operation::find($operationId);
         $operation->status = OperationStatus::InProgress();
         $operation->save();
+
+        if ($operation->washing_machine_id) WashingMachine::where('id', $operation->washing_machine_id)->update(['operation_id' => $operation->id]);
 
         EmployeeManager::createEmployeeOperationLog($operation->wash_employee_id, WorkerOperationStatus::Wash(), EmployeeOperationActionType::Progress());
         return redirect(route('worker.operation.wash.employee-summary', ['operationId' => $operation->id]));

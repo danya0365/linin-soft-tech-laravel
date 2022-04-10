@@ -74,12 +74,12 @@ class OperationManager extends Manager
             $operationLog->customer_id = $operation->customer->id;
             $operationLog->operation_date = $operationDate;
         }
-        $operationLog->total_wet_weight = $operationLinenProduct->total_wet_weight;
-        $operationLog->total_dry_weight = $operationLinenProduct->total_dry_weight;
-        $operationLog->total_iron_piece = $operationLinenProduct->total_iron_piece;
-        $operationLog->total_packing_piece = $operationLinenProduct->total_packing_piece;
+        $operationLog->total_wet_weight = $operationLinenProduct->total_wet_weight ?? 0;
+        $operationLog->total_dry_weight = $operationLinenProduct->total_dry_weight ?? 0;
+        $operationLog->total_iron_piece = $operationLinenProduct->total_iron_piece ?? 0;
+        $operationLog->total_packing_piece = $operationLinenProduct->total_packing_piece ?? 0;
         $operationLog->total_edit_collect_weight = $totalEditCollectWeightQuery->total_collect_weight ?? 0;
-        $operationLog->total_collect_weight = $operationLinenProduct->total_collect_weight;
+        $operationLog->total_collect_weight = $operationLinenProduct->total_collect_weight ?? 0;
         $operationLog->total_billing_weight = $operationLinenProduct->total_billing_weight ?? 0;
         $operationLog->save();
     }

@@ -16,7 +16,9 @@
         <div class="col-md-12 m-2">
             @if (session('error'))
             <div class="alert alert-danger">
+                <a href="{{ route('worker.operation.wash.employee-summary', ['operationId' => session('operation_id')]) }}">
                 {{ session('error') }}
+                </a>
             </div>
             @endif
             <div class="card">
