@@ -104,7 +104,7 @@
                                 @foreach ($operations as $operation)
                                     <tr>
                                         <td>{{ $operation->created_at->format('Y-m-d') }}</td>
-                                        <td>{{ $operation->operation->operation_type }}</td>
+                                        <td>{{ App\Enums\OperationType::getDescription($operation->operation->operation_type) }}</td>
                                         <td>{{ $operation->linenProduct->name }}</td>
                                         <td>{{ $operation->linen_case }}</td>
                                         <td style="background-color: {{ $operation->color }}">{{ $operation->color }}</td>
