@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\OperationType;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -15,7 +16,7 @@ return new class extends Migration
     {
         Schema::create('operations', function (Blueprint $table) {
             $table->id();
-            $table->enum('operation_type', ['wash', 'dry', 'iron', 'packing', 'collect']);
+            $table->enum('operation_type', OperationType::getValues());
             $table->integer('employee_id');
             $table->integer('customer_id')->nullable();
             $table->integer('wash_employee_id')->nullable();
