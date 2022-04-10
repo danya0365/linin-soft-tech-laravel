@@ -58,6 +58,8 @@ Route::group(['prefix' => 'worker', 'middleware' => ['auth']], function () {
         Route::get('/operation-summary', [App\Http\Controllers\Worker\CustomerController::class, 'getOperationSummary'])->name('worker.customer.operation-summary');
         Route::get('/operations-group-by-customer', [App\Http\Controllers\Worker\CustomerController::class, 'getOperationsGroupByCustomer'])->name('worker.customer.get-operations-group-by-customer');
         Route::get('/operations-by-customer/{customerId}', [App\Http\Controllers\Worker\CustomerController::class, 'getOperationsByCustomer'])->name('worker.customer.get-operations-by-customer');
+        Route::get('/new-billing/{customerId}', [App\Http\Controllers\Worker\CustomerController::class, 'getNewBilling'])->name('worker.customer.new-billing');
+        Route::get('/submit-billing/{customerId}', [App\Http\Controllers\Worker\CustomerController::class, 'submitBilling'])->name('worker.customer.submit-billing');
     });
 
     Route::group(['prefix' => 'operation'], function () {

@@ -195,4 +195,15 @@ class CustomerController extends Controller
         )
             ->with('i', (request()->input('page', 1) - 1) * $operations->perPage());
     }
+
+    public function getNewBilling($customerId)
+    {
+        $customer = Customer::find($customerId);
+        return view('worker.customers.new-billing', ['customer' => $customer]);
+    }
+
+    public function submitBilling()
+    {
+        return redirect(route('worker.customer.operation-summary'));
+    }
 }
