@@ -27,6 +27,46 @@
 
                         <div class="col-12">
                             <div class="input-group">
+                                <label class="input-group-text" for="operation_type">ประเภทงาน</label>
+                                <select class="form-select" id="operation_type" name="operation_type" onchange="this.form.submit()">
+                                    <option value="">แสดงทั้งหมด - Show All</option>
+                                    @foreach ( $operationTypes as $key => $operationType )
+                                    <option value="{{ $key }}" {{ $operationTypeSelected == $key ? 'selected' : '' }}>{{ $operationType }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="input-group">
+                                <label class="input-group-text" for="linen_product_id">สินค้า</label>
+                                <select class="form-select" id="linen_product_id" name="linen_product_id" onchange="this.form.submit()">
+                                    <option value="">แสดงทั้งหมด - Show All</option>
+                                    @foreach ( $linenTypes as $linenType )
+                                    <optgroup label="{{ $linenType['name'] }}">
+                                        @foreach ( $linenType['linen_products'] as $linenProduct )
+                                        <option value="{{ $linenProduct['id'] }}" {{ $linenProductSelected == $linenProduct['id'] ? 'selected' : '' }}>{{ $linenProduct['name'] }}</option>
+                                        @endforeach
+                                    </optgroup>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="input-group">
+                                <label class="input-group-text" for="linen_case">ชนิด</label>
+                                <select class="form-select" id="linen_case" name="linen_case" onchange="this.form.submit()">
+                                    <option value="">แสดงทั้งหมด - Show All</option>
+                                    @foreach ( $linenCases as $key => $linenCase )
+                                    <option value="{{ $linenCase['var'] }}" {{ $linenCaseSelected == $linenCase['var'] ? 'selected' : '' }}>{{ $linenCase['name'] }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="input-group">
                                 <label class="input-group-text" for="sort_order">เรียงโดย</label>
                                 <select class="form-select" id="sort_order" name="sort_order" onchange="this.form.submit()">
                                     @foreach ( $sortOrders as $sortOrder )
@@ -51,7 +91,6 @@
                                     <th>สินค้า</th>
                                     <th>ชนิด</th>
                                     <th>สี</th>
-                                    <th>ลูกค้า</th>
                                     <th>พนักงาน</th>
                                     <th>จำนวนที่ซัก</th>
                                     <th>จำนวนที่อบ</th>
@@ -69,11 +108,6 @@
                                         <td>{{ $operation->linenProduct->name }}</td>
                                         <td>{{ $operation->linen_case }}</td>
                                         <td style="background-color: {{ $operation->color }}">{{ $operation->color }}</td>
-                                        <td>
-                                            <a href="{{ route('worker.customer.get-operations-by-customer', ['customerId' => $operation->operation->customer->id]) }}">
-                                                {{ $operation->operation->customer->name }}
-                                            </a>
-                                        </td>
                                         <td>{{ $operation->operation->employee->name }}</td>
                                         <td class="text-center">{{ $operation->wet_weight }}</td>
                                         <td class="text-center">{{ $operation->dry_weight }}</td>
