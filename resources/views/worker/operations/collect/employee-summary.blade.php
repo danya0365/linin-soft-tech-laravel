@@ -113,13 +113,13 @@
 
         function closeOperation(){
             removeOnUnload(function(){
-                window.location='{{ route('worker.operation.iron.set-close', ['operationId' => $operation['id']]) }}'
+                window.location='{{ route('worker.operation.collect.set-close', ['operationId' => $operation['id']]) }}'
             })
         }
 
         function reopenOperation(){
             removeOnUnload(function(){
-                window.location='{{ route('worker.operation.iron.set-in-progress', ['operationId' => $operation['id']]) }}'
+                window.location='{{ route('worker.operation.collect.set-in-progress', ['operationId' => $operation['id']]) }}'
             })
         }
 
