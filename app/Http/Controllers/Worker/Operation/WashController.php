@@ -92,12 +92,14 @@ class WashController extends Controller
         return view('worker.operations.wash.employee-summary', ['operation' => $operation->toArray(), 'summaryReports' => $summaryReports, 'workingDuration' => $workingDuration, 'operationLinenProducts' => $operationLinenProducts->toArray(), 'operationTimeDuration' => $operationTimeDuration]);
     }
 
-
     public function setClose($operationId)
     {
         $operation = Operation::find($operationId);
         $operation->status = OperationStatus::Close();
         $operation->save();
+
+        if ($operation->washing_machine_id) WashingMachine::where('id', $operation->washing_machine_id)->update(['operation_id' => null]);
+        OperationManager::createCustomerOperationDailySummary($operation);
 
         EmployeeManager::createEmployeeOperationLog($operation->wash_employee_id, WorkerOperationStatus::Wash(), EmployeeOperationActionType::Stop());
         return redirect(route('worker.operation.wash.employee-summary', ['operationId' => $operation->id]));
@@ -203,6 +205,7 @@ class WashController extends Controller
         $operation = Operation::find($operationId);
         $operation->updateRelateFields();
 
+        OperationManager::createCustomerOperationDailySummary($operation);
         return redirect(route('worker.operation.wash.select-operation-linen-product', ['operationId' => $operationId]));
     }
 }

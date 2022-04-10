@@ -98,6 +98,9 @@ class DryController extends Controller
         $operation->status = OperationStatus::Close();
         $operation->save();
 
+        if ($operation->dryer_machine_id) DryerMachine::where('id', $operation->dryer_machine_id)->update(['operation_id' => null]);
+        OperationManager::createCustomerOperationDailySummary($operation);
+
         EmployeeManager::createEmployeeOperationLog($operation->dry_employee_id, WorkerOperationStatus::Dry(), EmployeeOperationActionType::Stop());
         return redirect(route('worker.operation.dry.employee-summary', ['operationId' => $operation->id]));
     }
@@ -202,6 +205,8 @@ class DryController extends Controller
         OperationLinenProduct::where('id', $operationLinenProductId)->delete();
         $operation = Operation::find($operationId);
         $operation->updateRelateFields();
+
+        OperationManager::createCustomerOperationDailySummary($operation);
 
         return redirect(route('worker.operation.dry.select-operation-linen-product', ['operationId' => $operationId]));
     }
