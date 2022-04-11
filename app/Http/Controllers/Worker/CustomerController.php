@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Worker;
 
 use App\Enums\OperationType;
 use App\Http\Controllers\Controller;
+use App\Managers\OperationManager;
 use App\Models\Customer;
 use App\Models\CustomerOperationDailySummary;
 use App\Models\LinenType;
@@ -92,13 +93,6 @@ class CustomerController extends Controller
             ->join('operations', 'operations.id', '=', 'operation_id')
             ->join('customers', 'customers.id', '=', 'operations.customer_id')
             ->groupBy('operations.customer_id');
-
-        // $customerIds = [];
-
-        // $query = OperationLinenProduct::query()
-        //     ->join('operations o', 'o.id', '=', 'operation_id');
-
-        // $query->whereIn('o.customer_id', $customerIds);
 
         $dateStartAt = request()->get('date_start_at');
         $dateEndAt = request()->get('date_end_at');
@@ -194,5 +188,26 @@ class CustomerController extends Controller
             ]
         )
             ->with('i', (request()->input('page', 1) - 1) * $operations->perPage());
+    }
+
+    public function getNewBilling($customerId)
+    {
+        $customer = Customer::find($customerId);
+        return view('worker.customers.new-billing', ['customer' => $customer]);
+    }
+
+    public function submitBilling($customerId)
+    {
+        request()->validate(['total_billing_weight' => 'required', 'total_billing_payment' => 'required']);
+
+        $operation = new Operation();
+        $operation->operation_type = OperationType::Payment();
+        $operation->customer_id = $customerId;
+        $operation->total_billing_weight = request()->get('total_billing_weight');
+        $operation->total_billing_payment = request()->get('total_billing_payment');
+        $operation->save();
+
+        OperationManager::createCustomerOperationDailySummary($operation);
+        return redirect(route('worker.customer.operation-summary'));
     }
 }

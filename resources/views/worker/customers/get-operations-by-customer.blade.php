@@ -14,7 +14,20 @@
     <div class="row justify-content-center">
         <div class="col-md-12 m-2">
             <div class="card">
-                <div class="card-header">รายการทั้งหมดของ {{ $customer['name'] }}</div>
+                <div class="card-header">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+
+                        <span id="card_title">
+                            รายการทั้งหมดของ {{ $customer['name'] }}
+                        </span>
+
+                         <div class="float-right">
+                            <a href="{{ route('worker.customer.new-billing', ['customerId' => $customer['id']]) }}" class="btn btn-primary btn-sm float-right"  data-placement="left">
+                              {{ __('Submit Billing') }}
+                            </a>
+                          </div>
+                    </div>
+                </div>
                 <div class="card-body">
                     <form class="row row-cols-lg-auto g-3 align-items-center mb-2" action="{{ route('worker.customer.get-operations-by-customer', ['customerId' => $customer['id']]) }}" method="GET">
                         <div class="col-12">

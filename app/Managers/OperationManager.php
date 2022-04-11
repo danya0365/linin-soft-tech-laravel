@@ -56,17 +56,24 @@ class OperationManager extends Manager
             DB::raw('sum(dry_weight) as total_dry_weight'),
             DB::raw('sum(iron_piece) as total_iron_piece'),
             DB::raw('sum(packing_piece) as total_packing_piece'),
-            DB::raw('sum(collect_weight) as total_collect_weight'),
-            DB::raw('sum(operations.total_billing_weight) as total_billing_weight')
+            DB::raw('sum(collect_weight) as total_collect_weight')
         )
             ->join('operations', 'operations.id', '=', 'operation_id');
         $query->where('operations.customer_id', $operation->customer->id);
         $query->whereBetween('operations_linen_products.created_at', [$operationDate . ' 00:00:00', $operationDate . ' 23:59:59']);
         $queryEdit = clone $query;
-        $operationLinenProduct = $query->first();
+        $operationLinenProductSummary = $query->first();
 
         $operationLinenCase = OperationLinenCase::getEdit();
         $totalEditCollectWeightQuery = $queryEdit->where('operations_linen_products.linen_case', $operationLinenCase['var'])->first();
+
+        $query = Operation::query()->select(
+            DB::raw('sum(total_billing_weight) as total_billing_weight'),
+            DB::raw('sum(total_billing_payment) as total_billing_payment'),
+        );
+        $query->where('customer_id', $operation->customer->id);
+        $query->whereBetween('created_at', [$operationDate . ' 00:00:00', $operationDate . ' 23:59:59']);
+        $operationSummary = $query->first();
 
         $operationLog = CustomerOperationDailySummary::where(['customer_id' => $operation->customer->id, 'operation_date' => $operationDate])->first();
         if (!$operationLog) {
@@ -74,13 +81,14 @@ class OperationManager extends Manager
             $operationLog->customer_id = $operation->customer->id;
             $operationLog->operation_date = $operationDate;
         }
-        $operationLog->total_wet_weight = $operationLinenProduct->total_wet_weight ?? 0;
-        $operationLog->total_dry_weight = $operationLinenProduct->total_dry_weight ?? 0;
-        $operationLog->total_iron_piece = $operationLinenProduct->total_iron_piece ?? 0;
-        $operationLog->total_packing_piece = $operationLinenProduct->total_packing_piece ?? 0;
+        $operationLog->total_wet_weight = $operationLinenProductSummary->total_wet_weight ?? 0;
+        $operationLog->total_dry_weight = $operationLinenProductSummary->total_dry_weight ?? 0;
+        $operationLog->total_iron_piece = $operationLinenProductSummary->total_iron_piece ?? 0;
+        $operationLog->total_packing_piece = $operationLinenProductSummary->total_packing_piece ?? 0;
         $operationLog->total_edit_collect_weight = $totalEditCollectWeightQuery->total_collect_weight ?? 0;
-        $operationLog->total_collect_weight = $operationLinenProduct->total_collect_weight ?? 0;
-        $operationLog->total_billing_weight = $operationLinenProduct->total_billing_weight ?? 0;
+        $operationLog->total_collect_weight = $operationLinenProductSummary->total_collect_weight ?? 0;
+        $operationLog->total_billing_weight = $operationSummary->total_billing_weight ?? 0;
+        $operationLog->total_billing_payment = $operationSummary->total_billing_payment ?? 0;
         $operationLog->save();
     }
 }
