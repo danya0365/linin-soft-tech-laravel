@@ -11,6 +11,7 @@ use BenSampo\Enum\Contracts\LocalizedEnum;
  * @method static static Iron()
  * @method static static Packing()
  * @method static static Collect()
+ * @method static static Payment()
  */
 final class OperationType extends Enum implements LocalizedEnum
 {
@@ -19,4 +20,5 @@ final class OperationType extends Enum implements LocalizedEnum
     const Iron = 'iron';
     const Packing = 'packing';
     const Collect = 'collect';
+    const Payment = 'payment';
 }

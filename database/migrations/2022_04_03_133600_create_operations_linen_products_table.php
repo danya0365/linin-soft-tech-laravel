@@ -19,11 +19,11 @@ return new class extends Migration
             $table->integer('linen_product_id')->nullable();
             $table->enum('linen_case', ['new', 'edit'])->nullable();
             $table->string('color')->nullable();
-            $table->integer('wet_weight')->nullable();
-            $table->integer('dry_weight')->nullable();
+            $table->float('wet_weight')->nullable();
+            $table->float('dry_weight')->nullable();
             $table->integer('iron_piece')->nullable();
             $table->integer('packing_piece')->nullable();
-            $table->integer('collect_weight')->nullable();
+            $table->float('collect_weight')->nullable();
             $table->integer('collect_pack')->nullable();
             $table->timestamps();
         });

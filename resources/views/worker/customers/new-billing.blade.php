@@ -31,15 +31,15 @@
                                             </div>
                                             <div class="col-12">
                                                 <div class="p-3 border bg-light" style="width: 100%">
-                                                    <div class="rounded-3" style="text-align: right; font-size: 48px" id="pad-result">
+                                                    <div class="rounded-3" style="text-align: right; font-size: 48px" id="total_billing_weight-result">
                                                         0
                                                     </div>
                                                 </div>
                                             </div>
         
-                                            @foreach ([7, 8, 9, 4, 5, 6, 1, 2, 3, '', 0, 'ลบ'] as $pad)
+                                            @foreach ([7, 8, 9, 4, 5, 6, 1, 2, 3, '.', 0, 'ลบ'] as $pad)
                                             <div class="col-4">
-                                                <div class="border bg-light" style="width: 100%">
+                                                <div class="border bg-light" style="width: 100%" id="total_billing_weight">
                                                     <div class="rounded-3 d-flex align-items-center justify-content-center pad-number" style="font-size: 48px">
                                                         {{ $pad }}
                                                     </div>
@@ -55,15 +55,15 @@
                                             </div>
                                             <div class="col-12">
                                                 <div class="p-3 border bg-light" style="width: 100%">
-                                                    <div class="rounded-3" style="text-align: right; font-size: 48px" id="pad-result">
+                                                    <div class="rounded-3" style="text-align: right; font-size: 48px" id="total_billing_payment-result">
                                                         0
                                                     </div>
                                                 </div>
                                             </div>
         
-                                            @foreach ([7, 8, 9, 4, 5, 6, 1, 2, 3, '', 0, 'ลบ'] as $pad)
+                                            @foreach ([7, 8, 9, 4, 5, 6, 1, 2, 3, '.', 0, 'ลบ'] as $pad)
                                             <div class="col-4">
-                                                <div class="border bg-light" style="width: 100%">
+                                                <div class="border bg-light" style="width: 100%" id="total_billing_payment">
                                                     <div class="rounded-3 d-flex align-items-center justify-content-center pad-number" style="font-size: 48px">
                                                         {{ $pad }}
                                                     </div>
@@ -99,36 +99,52 @@
 </div>
 <script type="text/javascript">
 $(function(){
-    var number = $('[name=collect_weight]').val();
-    var setPadResult = function(number){
+    var total_billing_weight = $('[name=total_billing_weight]').val();
+    var total_billing_payment = $('[name=total_billing_payment]').val();
+    
+    var setPadResult = function(number, targetValue, targetResult){
         var numbers = number.split('.');
         if (numbers.length == 2) {
             number = numbers[0] + '.' + numbers[1];
             number = parseFloat(number);
-            //numbers = `${number}`.split('.');
-            //number = numbers[0].toLocaleString() + (numbers[1] ? '.' + numbers[1] : '');
         } else {
             number = parseInt(number);
         }
         if (isNaN(number)) {
             number = 0;
         }
-        $("#pad-result").html(number.toLocaleString());
-        $('[name=collect_weight]').val(number);
+        $(targetResult).html(number.toLocaleString());
+        $(targetValue).val(number);
     }
-    setPadResult(number);
-    $('.pad-number').click(function(){
+    
+    $('#total_billing_payment .pad-number').click(function(){
         var padNumber =  $.trim($(this).text())
         padNumber = padNumber.replace(',', '');
         if ( padNumber == '') {
             return
         }
-        number = number != '0' ? number + '' + padNumber : padNumber;
+        total_billing_payment = total_billing_payment != '0' ? total_billing_payment + '' + padNumber : padNumber;
         if ( padNumber == 'ลบ') {
-            number = '0';
+            total_billing_payment = '0';
         }
-        setPadResult(number);
+        setPadResult(total_billing_payment, $('[name=total_billing_payment]'), $("#total_billing_payment-result"));
     })
+
+    $('#total_billing_weight .pad-number').click(function(){
+        var padNumber =  $.trim($(this).text())
+        padNumber = padNumber.replace(',', '');
+        if ( padNumber == '') {
+            return
+        }
+        total_billing_weight = total_billing_weight != '0' ? total_billing_weight + '' + padNumber : padNumber;
+        if ( padNumber == 'ลบ') {
+            total_billing_weight = '0';
+        }
+        setPadResult(total_billing_weight, $('[name=total_billing_weight]'), $("#total_billing_weight-result"));
+    })
+
+    setPadResult(total_billing_weight, $('[name=total_billing_weight]'), $("#total_billing_weight-result"));
+    setPadResult(total_billing_payment, $('[name=total_billing_payment]'), $("#total_billing_payment-result"));
 })
 </script>
 
