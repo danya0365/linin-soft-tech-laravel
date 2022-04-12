@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Worker;
 
+use App\Enums\OperationType;
 use App\Http\Controllers\Controller;
 use App\Models\LinenType;
 use App\Models\Operation;
@@ -35,17 +36,25 @@ class ProductController extends Controller
         ];
 
         $sortOrderSelected = request()->get('sort_order', 'id-desc');
-
+        $operationTypeSelected = request()->get('operation_type');
         $linenTypeSelected = request()->get('linenType');
+
         $linenCase = OperationLinenCase::getByVar($linenCaseVarName);
         $query = OperationLinenProduct::with(['operation' => function ($query) {
             $query->with('employee')->with('customer');
         }])->with('linenProduct')->where('linen_case', $linenCase['var']);
 
-        if ($linenTypeSelected) {
-            $query->where(function ($query) use ($linenTypeSelected) {
+        if ($linenTypeSelected || $operationTypeSelected) {
+            $query->where(function ($query) use ($linenTypeSelected, $operationTypeSelected) {
                 $query->whereHas('linenProduct', function ($query) use ($linenTypeSelected) {
-                    $query->where('linen_type_id', $linenTypeSelected);
+                    if ($linenTypeSelected) {
+                        $query->where('linen_type_id', $linenTypeSelected);
+                    }
+                });
+                $query->whereHas('operation', function ($query) use ($operationTypeSelected) {
+                    if ($operationTypeSelected) {
+                        $query->where('operation_type', $operationTypeSelected);
+                    }
                 });
             });
         }
@@ -83,6 +92,8 @@ class ProductController extends Controller
             return $query->get();
         })($linenCase);
 
+        $operationTypes = OperationType::asSelectArray();
+
         return view(
             'worker.products.get-operations-by-linen-case',
             [
@@ -90,6 +101,8 @@ class ProductController extends Controller
                 'linenCase' => $linenCase,
                 'linenTypes' => $linenTypes,
                 'linenTypeSelected' => $linenTypeSelected,
+                'operationTypes' => $operationTypes,
+                'operationTypeSelected' => $operationTypeSelected,
                 'dateStartAt' => $dateStartAt,
                 'dateEndAt' => $dateEndAt,
                 'sortOrders' => $sortOrders,

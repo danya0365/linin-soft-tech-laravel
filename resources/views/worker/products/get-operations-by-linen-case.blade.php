@@ -30,6 +30,18 @@
                                 </select>
                             </div>
                         </div>
+
+                        <div class="col-12">
+                            <div class="input-group">
+                                <label class="input-group-text" for="operation_type">ประเภทงาน</label>
+                                <select class="form-select" id="operation_type" name="operation_type" onchange="this.form.submit()">
+                                    <option value="">แสดงทั้งหมด - Show All</option>
+                                    @foreach ( $operationTypes as $key => $operationType )
+                                    <option value="{{ $key }}" {{ $operationTypeSelected == $key ? 'selected' : '' }}>{{ $operationType }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
                         
                         <div class="col-12">
                             <div class="input-group">
@@ -71,7 +83,6 @@
                                     <th>วันที่</th>
                                     <th>ประเภทงาน</th>
                                     <th>สินค้า</th>
-                                    <th>ชนิด</th>
                                     <th>สี</th>
                                     <th>ลูกค้า</th>
                                     <th>พนักงาน</th>
@@ -90,7 +101,6 @@
                                         <td>{{ $operation->created_at->format('Y-m-d') }}</td>
                                         <td>{{ App\Enums\OperationType::getDescription($operation->operation->operation_type) }}</td>
                                         <td>{{ $operation->linenProduct->name }}</td>
-                                        <td>{{ $linenCase['name'] }}</td>
                                         <td style="background-color: {{ $operation->color }}">{{ $operation->color }}</td>
                                         <td>{{ $operation->operation->customer->name }}</td>
                                         <td>{{ $operation->operation->employee->name }}</td>
