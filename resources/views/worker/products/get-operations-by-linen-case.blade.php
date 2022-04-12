@@ -106,6 +106,35 @@
                             </tbody>
                         </table>
                     </div>
+
+                    <div class="table-responsive mt-2">
+                        <table class="table table-bordered table-hover">
+                            <thead class="thead">
+                                <tr>
+                                    <th>สินค้า</th>
+                                    <th>จำนวนที่ซัก (kg.)</th>
+                                    <th>จำนวนที่อบ (kg.)</th>
+                                    <th>จำนวนที่รีด (piece)</th>
+                                    <th>จำนวนที่พับแพ็ค (piece)</th>
+                                    <th>น้ำหนักที่จัดเก็บ (kg.)</th>
+                                    <th>จำนวนที่จัดเก็บ (pack)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($linenProductSummaries as $linenProductSummary)
+                                    <tr>
+                                        <td>{{ $linenProductSummary->linenProduct->name }}</td>
+                                        <td class="text-center">{{ $linenProductSummary->total_wet_weight }}</td>
+                                        <td class="text-center">{{ $linenProductSummary->total_dry_weight }}</td>
+                                        <td class="text-center">{{ $linenProductSummary->total_iron_piece }}</td>
+                                        <td class="text-center">{{ $linenProductSummary->total_packing_piece }}</td>
+                                        <td class="text-center">{{ $linenProductSummary->total_collect_weight }}</td>
+                                        <td class="text-center">{{ $linenProductSummary->total_collect_pack }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
                 <div class="card-footer">
                     {!! $operations->withQueryString()->links() !!}

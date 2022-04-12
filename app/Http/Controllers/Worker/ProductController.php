@@ -7,6 +7,7 @@ use App\Models\LinenType;
 use App\Models\Operation;
 use App\Models\OperationLinenCase;
 use App\Models\OperationLinenProduct;
+use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
@@ -62,6 +63,26 @@ class ProductController extends Controller
         $operations = $query->paginate();
         $linenTypes = LinenType::get();
 
+        $linenProductSummaries = (function ($linenCase) {
+            $query = OperationLinenProduct::with('linenProduct')->select(
+                DB::raw('sum(wet_weight) as total_wet_weight'),
+                DB::raw('sum(dry_weight) as total_dry_weight'),
+                DB::raw('sum(iron_piece) as total_iron_piece'),
+                DB::raw('sum(packing_piece) as total_packing_piece'),
+                DB::raw('sum(collect_weight) as total_collect_weight'),
+                'linen_product_id'
+            )
+                ->where('linen_case', $linenCase['var'])
+                ->groupBy('linen_product_id');
+
+            $dateStartAt = request()->get('date_start_at');
+            $dateEndAt = request()->get('date_end_at');
+            if ($dateStartAt && $dateEndAt) {
+                $query->whereBetween('created_at', [$dateStartAt . ' 00:00:00', $dateEndAt . ' 23:59:59']);
+            }
+            return $query->get();
+        })($linenCase);
+
         return view(
             'worker.products.get-operations-by-linen-case',
             [
@@ -72,7 +93,8 @@ class ProductController extends Controller
                 'dateStartAt' => $dateStartAt,
                 'dateEndAt' => $dateEndAt,
                 'sortOrders' => $sortOrders,
-                'sortOrderSelected' => $sortOrderSelected
+                'sortOrderSelected' => $sortOrderSelected,
+                'linenProductSummaries' => $linenProductSummaries
             ]
         )
             ->with('i', (request()->input('page', 1) - 1) * $operations->perPage());
