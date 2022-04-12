@@ -30,6 +30,18 @@
                                 </select>
                             </div>
                         </div>
+
+                        <div class="col-12">
+                            <div class="input-group">
+                                <label class="input-group-text" for="operation_type">ประเภทงาน</label>
+                                <select class="form-select" id="operation_type" name="operation_type" onchange="this.form.submit()">
+                                    <option value="">แสดงทั้งหมด - Show All</option>
+                                    @foreach ( $operationTypes as $key => $operationType )
+                                    <option value="{{ $key }}" {{ $operationTypeSelected == $key ? 'selected' : '' }}>{{ $operationType }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
                         
                         <div class="col-12">
                             <div class="input-group">
@@ -71,7 +83,6 @@
                                     <th>วันที่</th>
                                     <th>ประเภทงาน</th>
                                     <th>สินค้า</th>
-                                    <th>ชนิด</th>
                                     <th>สี</th>
                                     <th>ลูกค้า</th>
                                     <th>พนักงาน</th>
@@ -90,7 +101,6 @@
                                         <td>{{ $operation->created_at->format('Y-m-d') }}</td>
                                         <td>{{ App\Enums\OperationType::getDescription($operation->operation->operation_type) }}</td>
                                         <td>{{ $operation->linenProduct->name }}</td>
-                                        <td>{{ $linenCase['name'] }}</td>
                                         <td style="background-color: {{ $operation->color }}">{{ $operation->color }}</td>
                                         <td>{{ $operation->operation->customer->name }}</td>
                                         <td>{{ $operation->operation->employee->name }}</td>
@@ -101,6 +111,35 @@
                                         <td class="text-center">{{ $operation->collect_weight }}</td>
                                         <td class="text-center">{{ $operation->collect_pack }}</td>
                                         <td class="text-center">{{ $operation->created_at->format('H:i') }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="table-responsive mt-2">
+                        <table class="table table-bordered table-hover">
+                            <thead class="thead">
+                                <tr>
+                                    <th>สินค้า</th>
+                                    <th>จำนวนที่ซัก (kg.)</th>
+                                    <th>จำนวนที่อบ (kg.)</th>
+                                    <th>จำนวนที่รีด (piece)</th>
+                                    <th>จำนวนที่พับแพ็ค (piece)</th>
+                                    <th>น้ำหนักที่จัดเก็บ (kg.)</th>
+                                    <th>จำนวนที่จัดเก็บ (pack)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($linenProductSummaries as $linenProductSummary)
+                                    <tr>
+                                        <td>{{ $linenProductSummary->linenProduct->name }}</td>
+                                        <td class="text-center">{{ $linenProductSummary->total_wet_weight }}</td>
+                                        <td class="text-center">{{ $linenProductSummary->total_dry_weight }}</td>
+                                        <td class="text-center">{{ $linenProductSummary->total_iron_piece }}</td>
+                                        <td class="text-center">{{ $linenProductSummary->total_packing_piece }}</td>
+                                        <td class="text-center">{{ $linenProductSummary->total_collect_weight }}</td>
+                                        <td class="text-center">{{ $linenProductSummary->total_collect_pack }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>
