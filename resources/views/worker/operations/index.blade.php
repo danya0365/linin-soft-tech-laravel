@@ -10,16 +10,71 @@
         </ol>
     </nav>
     <div class="row justify-content-center">
-        <div class="col-md-8">
+        <div class="col-md-12 m-2">
             <div class="card">
                 <div class="card-header">{{ __('ปฏิบัติการ') }}</div>
                 <div class="card-body">
-                    <div class="d-grid gap-3">
-                        <a class="btn btn-outline-secondary btn-lg" href="{{ route('worker.operation.wash') }}" role="button">{{ __('ซัก') }}</a>
-                        <a class="btn btn-outline-secondary btn-lg" href="{{ route('worker.operation.dry') }}" role="button">{{ __('อบ') }}</a>
-                        <a class="btn btn-outline-secondary btn-lg" href="{{ route('worker.operation.iron') }}" role="button">{{ __('รีด') }}</a>
-                        <a class="btn btn-outline-secondary btn-lg" href="{{ route('worker.operation.packing') }}" role="button">{{ __('พับแพ็ค') }}</a>
-                        <a class="btn btn-outline-secondary btn-lg" href="{{ route('worker.operation.collect') }}" role="button">{{ __('จัดเก็บ') }}</a>
+                    <div class="row g-2">
+                        <div class="col-sm-4">
+                            <a href="{{ route('worker.operation.wash') }}">
+                                <div class="p-3 border bg-light" style="min-height: 150px">
+                                    <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 150px">
+                                        <div class="text-center">
+                                            <div class="fa-solid fa-sink" style="font-size: 3em"></div>
+                                            <div class="text-center mt-3">{{ __('ซัก - Wash') }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-sm-4">
+                            <a href="{{ route('worker.operation.dry') }}">
+                                <div class="p-3 border bg-light" style="min-height: 150px">
+                                    <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 150px">
+                                        <div class="text-center">
+                                            <div class="fa-solid fa-sink" style="font-size: 3em"></div>
+                                            <div class="text-center mt-3">{{ __('อบ - Dry') }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-sm-4">
+                            <a href="{{ route('worker.operation.iron') }}">
+                                <div class="p-3 border bg-light" style="min-height: 150px">
+                                    <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 150px">
+                                        <div class="text-center">
+                                            <div class="fa-solid fa-sink" style="font-size: 3em"></div>
+                                            <div class="text-center mt-3">{{ __('รีด - Iron') }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-sm-4">
+                            <a href="{{ route('worker.operation.packing') }}">
+                                <div class="p-3 border bg-light" style="min-height: 150px">
+                                    <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 150px">
+                                        <div class="text-center">
+                                            <div class="fa-solid fa-sink" style="font-size: 3em"></div>
+                                            <div class="text-center mt-3">{{ __('พับแพ็ค - Packing') }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-sm-4">
+                            <a href="{{ route('worker.operation.collect') }}">
+                                <div class="p-3 border bg-light" style="min-height: 150px">
+                                    <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 150px">
+                                        <div class="text-center">
+                                            <div class="bi bi-people-fill" style="font-size: 3em"></div>
+                                            <div class="text-center mt-3">{{ __('จัดเก็บ - Collect') }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>

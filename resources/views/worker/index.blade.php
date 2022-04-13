@@ -68,10 +68,12 @@
                         <div class="col-sm-4">
                             <a href="{{ route('worker.stock') }}">
                                 <div class="p-3 border bg-light" style="min-height: 150px">
-                                    <div class="rounded-3 d-flex align-items-center justify-content-center">
-                                        <div class="bi bi-shop" style="font-size: 3em"></div>
+                                    <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 110px">
+                                        <div class="text-center">
+                                            <div class="fa-solid fa-warehouse" style="font-size: 3em"></div>
+                                            <div class="text-center mt-3">{{ __('สต๊อก - Stock') }}</div>
+                                        </div>
                                     </div>
-                                    <div class="text-center">{{ __('สต๊อก') }}</div>
                                 </div>
                             </a>
                         </div>
