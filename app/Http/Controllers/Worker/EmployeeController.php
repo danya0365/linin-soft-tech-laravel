@@ -44,7 +44,9 @@ class EmployeeController extends Controller
     {
         $employee = Employee::with('department')->find($employeeId);
         $operationType = $employee->department->var_name;
-        $summaryReports = (function () use ($employeeId, $operationType) {
+        $dateStartAt = request()->get('date_start_at');
+        $dateEndAt = request()->get('date_end_at');
+        $summaryReports = (function () use ($employeeId, $operationType, $dateStartAt, $dateEndAt) {
             $query = OperationLinenProduct::with('linenProduct')->select(
                 DB::raw('sum(wet_weight) as total_wet_weight'),
                 DB::raw('sum(dry_weight) as total_dry_weight'),
@@ -60,10 +62,8 @@ class EmployeeController extends Controller
                 ->where('operations.employee_id', $employeeId)
                 ->groupBy('linen_product_id');
 
-            $dateStartAt = request()->get('date_start_at');
-            $dateEndAt = request()->get('date_end_at');
             if ($dateStartAt && $dateEndAt) {
-                $query->whereBetween('created_at', [$dateStartAt . ' 00:00:00', $dateEndAt . ' 23:59:59']);
+                $query->whereBetween('operations_linen_products.created_at', [$dateStartAt . ' 00:00:00', $dateEndAt . ' 23:59:59']);
             }
             $rows = $query->get();
 
@@ -133,7 +133,9 @@ class EmployeeController extends Controller
             [
                 'summaryReports' => $summaryReports,
                 'workingDuration' => $workingDuration,
-                'employee' => $employee->toArray()
+                'employee' => $employee->toArray(),
+                'dateStartAt' => $dateStartAt,
+                'dateEndAt' => $dateEndAt,
             ]
         );
     }

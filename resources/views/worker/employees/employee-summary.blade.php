@@ -16,6 +16,22 @@
             <div class="card">
                 <div class="card-header text-center">สรุปข้อมูลของพนักงาน</div>
                 <div class="card-body">
+                    <form class="row row-cols-lg-auto g-3 align-items-center mb-2" action="{{ route('worker.employee.employee-summary', ['employeeId' => $employee['id']]) }}" method="GET">
+                        
+                        <div class="col-12">
+                            <div class="input-group">
+                                <input type="date" name="date_start_at" value="{{ $dateStartAt }}" class="form-control" placeholder="วันที่เริ่ม" aria-label="วันที่เริ่ม">
+                                <span class="input-group-text"> ถึง </span>
+                                <input type="date" name="date_end_at" value="{{ $dateEndAt }}" class="form-control" placeholder="วันที่สิ้นสุด" aria-label="วันที่สิ้นสุด">
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                            <a href="{{ route('worker.employee.employee-summary', ['employeeId' => $employee['id']]) }}" role="button" class="btn btn-outline-secondary">Reset</a>
+                        </div>
+                    </form>
+
                     <div class="row mb-3 text-center">
                         <div class="col-12">
                             <div class="bi bi-person-circle rounded-3 d-flex align-items-center justify-content-center p-3 py-6" style="font-size: 10em"></div>
@@ -59,6 +75,11 @@
                     @endforeach
                 @endif
                 </ul>
+                <div class="card-body text-center">
+                    <div id="employee-plot-chart" style="min-width: 400px; height: 400px; margin: 0 auto">
+
+                    </div>
+                </div>
                 <div class="card-footer text-muted text-center">
                     เวลาการทำงานทั้งหมด: {{ $workingDuration }}
                 </div>
