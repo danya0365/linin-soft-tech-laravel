@@ -10,17 +10,73 @@
         </ol>
     </nav>
     <div class="row justify-content-center">
-        <div class="col-md-8">
+        <div class="col-md-12 m-2">
             <div class="card">
                 <div class="card-header">{{ __('Worker Menu') }}</div>
                 <div class="card-body">
-                    <div class="d-grid gap-3">
-                        <a class="btn btn-outline-secondary btn-lg" href="{{ route('worker.product') }}" role="button">{{ __('สินค้า') }}</a>
-                        <a class="btn btn-outline-secondary btn-lg" href="{{ route('worker.customer') }}" role="button">{{ __('ลูกค้า') }}</a>
-                        <a class="btn btn-outline-secondary btn-lg" href="{{ route('worker.operation') }}" role="button">{{ __('ปฏิบัติการ') }}</a>
-                        <a class="btn btn-outline-secondary btn-lg" href="{{ route('worker.energy') }}" role="button">{{ __('พลังงาน') }}</a>
-                        <a class="btn btn-outline-secondary btn-lg" href="{{ route('worker.employee') }}" role="button">{{ __('พนักงาน') }}</a>
-                        <a class="btn btn-outline-secondary btn-lg" href="{{ route('worker.stock') }}" role="button">{{ __('สต๊อก') }}</a>
+                    <div class="row g-2">
+                        <div class="col-sm-4">
+                            <a href="{{ route('worker.product') }}">
+                                <div class="p-3 border bg-light" style="min-height: 150px">
+                                    <div class="rounded-3 d-flex align-items-center justify-content-center">
+                                        <div class="bi bi-stack" style="font-size: 3em"></div>
+                                    </div>
+                                    <div class="text-center">{{ __('สินค้า') }}</div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-sm-4">
+                            <a href="{{ route('worker.customer') }}">
+                                <div class="p-3 border bg-light" style="min-height: 150px">
+                                    <div class="rounded-3 d-flex align-items-center justify-content-center">
+                                        <div class="bi bi-building" style="font-size: 3em"></div>
+                                    </div>
+                                    <div class="text-center">{{ __('ลูกค้า') }}</div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-sm-4">
+                            <a href="{{ route('worker.operation') }}">
+                                <div class="p-3 border bg-light" style="min-height: 150px">
+                                    <div class="rounded-3 d-flex align-items-center justify-content-center">
+                                        <div class="bi bi-journals" style="font-size: 3em"></div>
+                                    </div>
+                                    <div class="text-center">{{ __('ปฏิบัติการ') }}</div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-sm-4">
+                            <a href="{{ route('worker.energy') }}">
+                                <div class="p-3 border bg-light" style="min-height: 150px">
+                                    <div class="rounded-3 d-flex align-items-center justify-content-center">
+                                        <div class="bi bi-battery-charging" style="font-size: 3em"></div>
+                                    </div>
+                                    <div class="text-center">{{ __('พลังงาน') }}</div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-sm-4">
+                            <a href="{{ route('worker.employee') }}">
+                                <div class="p-3 border bg-light" style="min-height: 150px">
+                                    <div class="rounded-3 d-flex align-items-center justify-content-center">
+                                        <div class="bi bi-people-fill" style="font-size: 3em"></div>
+                                    </div>
+                                    <div class="text-center">{{ __('พนักงาน') }}</div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-sm-4">
+                            <a href="{{ route('worker.stock') }}">
+                                <div class="p-3 border bg-light" style="min-height: 150px">
+                                    <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 110px">
+                                        <div class="text-center">
+                                            <div class="fa-solid fa-warehouse" style="font-size: 3em"></div>
+                                            <div class="text-center mt-3">{{ __('สต๊อก - Stock') }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
