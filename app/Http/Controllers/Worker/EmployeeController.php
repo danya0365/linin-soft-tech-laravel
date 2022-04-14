@@ -11,6 +11,7 @@ use App\Models\LinenType;
 use App\Models\Operation;
 use App\Models\OperationLinenCase;
 use App\Models\OperationLinenProduct;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class EmployeeController extends Controller
@@ -46,6 +47,7 @@ class EmployeeController extends Controller
         $operationType = $employee->department->var_name;
         $dateStartAt = request()->get('date_start_at');
         $dateEndAt = request()->get('date_end_at');
+
         $summaryReports = (function () use ($employeeId, $operationType, $dateStartAt, $dateEndAt) {
             $query = OperationLinenProduct::with('linenProduct')->select(
                 DB::raw('sum(wet_weight) as total_wet_weight'),
@@ -126,6 +128,48 @@ class EmployeeController extends Controller
             return $summaryReports;
         })();
 
+        $weekDayReports = (function () use ($employeeId) {
+            $query = Operation::select(
+                'total_wet_weight',
+                'total_dry_weight',
+                'total_iron_piece',
+                'total_packing_piece',
+                'total_collect_weight',
+                'total_collect_pack',
+                'created_at'
+            )->where('employee_id', $employeeId);
+
+            $dateEndAt = Carbon::today();
+            $dateStartAt = clone $dateEndAt;
+            $dateStartAt->subDays(7);
+            if ($dateStartAt && $dateEndAt) {
+                $query->whereBetween('created_at', [$dateStartAt->format('Y-m-d') . ' 00:00:00', $dateEndAt->format('Y-m-d') . ' 23:59:59']);
+            }
+            $rows = $query->orderBy('created_at', 'asc')->get();
+            $weekDayReports = [];
+
+            foreach ($rows as $key => $row) {
+                $date = Carbon::parse($row->created_at)->format('Y-m-d');
+                if (!isset($weekDayReports[$date])) {
+                    $weekDayReports[$date] = [];
+                }
+                $weekDayReports[$date][] =  $row;
+            }
+
+            $weekDayDataTemplate = [];
+            $_date = clone $dateEndAt;
+            for ($i = 0; $i < 7; $i++) {
+                $date = $_date->subDays(1);
+                $weekDayDataTemplate[$date->format('Y-m-d')] = [];
+            }
+
+            foreach ($weekDayDataTemplate as $key => $value) {
+                $weekDayDataTemplate[$key] = isset($weekDayReports[$key]) ? $weekDayReports[$key] : [];
+            }
+
+            return $weekDayDataTemplate;
+        })();
+
         $workingDuration = $employee->getTotalTimeDurationOfWorkingTime();
 
         return view(
@@ -136,6 +180,7 @@ class EmployeeController extends Controller
                 'employee' => $employee->toArray(),
                 'dateStartAt' => $dateStartAt,
                 'dateEndAt' => $dateEndAt,
+                'weekDayReports' => $weekDayReports
             ]
         );
     }
