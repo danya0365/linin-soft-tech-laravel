@@ -153,13 +153,32 @@ class EmployeeController extends Controller
                 if (!isset($weekDayReports[$date])) {
                     $weekDayReports[$date] = [];
                 }
+                $row = $row->toArray();
+                $row['value'] = (function () use ($row) {
+                    if ($row['total_wet_weight']) {
+                        return $row['total_wet_weight'];
+                    }
+                    if ($row['total_dry_weight']) {
+                        return $row['total_dry_weight'];
+                    }
+                    if ($row['total_iron_piece']) {
+                        return $row['total_iron_piece'];
+                    }
+                    if ($row['total_packing_piece']) {
+                        return $row['total_packing_piece'];
+                    }
+                    if ($row['total_collect_weight']) {
+                        return $row['total_collect_weight'];
+                    }
+                    return 0;
+                })();
                 $weekDayReports[$date][] =  $row;
             }
 
             $weekDayDataTemplate = [];
             $_date = clone $dateEndAt;
             for ($i = 0; $i < 7; $i++) {
-                $date = $_date->subDays(1);
+                $date = $i > 0 ? $_date->subDays(1) : $_date;
                 $weekDayDataTemplate[$date->format('Y-m-d')] = [];
             }
 
