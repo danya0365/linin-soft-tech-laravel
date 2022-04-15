@@ -165,9 +165,13 @@ Route::group(['prefix' => 'worker', 'middleware' => ['auth']], function () {
         });
     });
 
-    Route::get('/energy', function () {
-        return ['hello world'];
-    })->name('worker.energy');
+    Route::group(['prefix' => 'energy-resource'], function () {
+        Route::get('/', [App\Http\Controllers\Worker\EnergyResourceLogController::class, 'index'])->name('worker.energy-resource');
+        Route::get('/employee', [App\Http\Controllers\Worker\Operation\EnergyResourceLogController::class, 'selectEmployee'])->name('worker.energy-resource.select-employee');
+        Route::get('/employee/{employeeId}', [App\Http\Controllers\Worker\Operation\EnergyResourceLogController::class, 'setSelectEmployee'])->name('worker.energy-resource.set-select-employee');
+        Route::get('/{operationId}/energy-resource', [App\Http\Controllers\Worker\Operation\EnergyResourceLogController::class, 'selectEnergyResource'])->name('worker.energy-resource.select-energy-resource');
+        Route::get('/{operationId}/energy-resource/{customerId}', [App\Http\Controllers\Worker\Operation\EnergyResourceLogController::class, 'setSelectEnergyResource'])->name('worker.energy-resource.set-select-energy-resource');
+    });
 
     Route::group(['prefix' => 'employee'], function () {
         Route::get('/', [App\Http\Controllers\Worker\EmployeeController::class, 'index'])->name('worker.employee');
