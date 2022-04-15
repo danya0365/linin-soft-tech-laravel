@@ -48,7 +48,7 @@
                             <a class="nav-link" href="{{ route('worker.operation') }}">{{ __('Operation') }}</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('worker.energy') }}">{{ __('Energy') }}</a>
+                            <a class="nav-link" href="{{ route('worker.energy-resource') }}">{{ __('Energy') }}</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('worker.employee') }}">{{ __('Employee') }}</a>

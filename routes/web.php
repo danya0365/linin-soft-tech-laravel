@@ -166,11 +166,16 @@ Route::group(['prefix' => 'worker', 'middleware' => ['auth']], function () {
     });
 
     Route::group(['prefix' => 'energy-resource'], function () {
-        Route::get('/', [App\Http\Controllers\Worker\EnergyResourceLogController::class, 'index'])->name('worker.energy-resource');
-        Route::get('/employee', [App\Http\Controllers\Worker\Operation\EnergyResourceLogController::class, 'selectEmployee'])->name('worker.energy-resource.select-employee');
-        Route::get('/employee/{employeeId}', [App\Http\Controllers\Worker\Operation\EnergyResourceLogController::class, 'setSelectEmployee'])->name('worker.energy-resource.set-select-employee');
-        Route::get('/{operationId}/energy-resource', [App\Http\Controllers\Worker\Operation\EnergyResourceLogController::class, 'selectEnergyResource'])->name('worker.energy-resource.select-energy-resource');
-        Route::get('/{operationId}/energy-resource/{customerId}', [App\Http\Controllers\Worker\Operation\EnergyResourceLogController::class, 'setSelectEnergyResource'])->name('worker.energy-resource.set-select-energy-resource');
+        Route::get('/', [App\Http\Controllers\Worker\EnergyResourceController::class, 'index'])->name('worker.energy-resource');
+        Route::get('/log/create/{energyResourceId}', [App\Http\Controllers\Worker\EnergyResourceController::class, 'setSelectEnergyResource'])->name('worker.energy-resource.log.select-energy-resource');
+        Route::get('/{energyResourceLogId}/employee', [App\Http\Controllers\Worker\EnergyResourceController::class, 'selectEmployee'])->name('worker.energy-resource.select-employee');
+        Route::get('/{energyResourceLogId}/employee/{employeeId}', [App\Http\Controllers\Worker\EnergyResourceController::class, 'setSelectEmployee'])->name('worker.energy-resource.set-select-employee');
+        Route::match(array('GET', 'POST'), '/log/water', [App\Http\Controllers\Worker\Operation\EnergyResourceLogController::class, 'createWaterLog'])->name('worker.energy-resource.log.water');
+        Route::match(array('GET', 'POST'), '/log/electricity', [App\Http\Controllers\Worker\Operation\EnergyResourceLogController::class, 'createElectricityLog'])->name('worker.energy-resource.log.electricity');
+        Route::match(array('GET', 'POST'), '/log/gas', [App\Http\Controllers\Worker\Operation\EnergyResourceLogController::class, 'createGasLog'])->name('worker.energy-resource.log.gas');
+        Route::match(array('GET', 'POST'), '/log/biomass', [App\Http\Controllers\Worker\Operation\EnergyResourceLogController::class, 'createBiomassLog'])->name('worker.energy-resource.log.biomass');
+        Route::match(array('GET', 'POST'), '/log/fuel-oil', [App\Http\Controllers\Worker\Operation\EnergyResourceLogController::class, 'createFuelOilLog'])->name('worker.energy-resource.log.fuel-oil');
+        Route::get('/logs', [App\Http\Controllers\Worker\Operation\EnergyResourceLogController::class, 'getLogs'])->name('worker.energy-resource.logs');
     });
 
     Route::group(['prefix' => 'employee'], function () {
