@@ -169,9 +169,11 @@ Route::group(['prefix' => 'worker', 'middleware' => ['auth']], function () {
         return ['hello world'];
     })->name('worker.energy');
 
-    Route::get('/employee', function () {
-        return ['hello world'];
-    })->name('worker.employee');
+    Route::group(['prefix' => 'employee'], function () {
+        Route::get('/', [App\Http\Controllers\Worker\EmployeeController::class, 'index'])->name('worker.employee');
+        Route::get('/employees', [App\Http\Controllers\Worker\EmployeeController::class, 'selectEmployee'])->name('worker.employee.select-employee');
+        Route::get('/employee-summary/{employeeId}', [App\Http\Controllers\Worker\EmployeeController::class, 'getEmployeeSummary'])->name('worker.employee.employee-summary');
+    });
 
     Route::get('/report', function () {
         return ['hello world'];

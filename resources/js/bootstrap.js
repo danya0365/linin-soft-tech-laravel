@@ -38,3 +38,13 @@ try {
 try {
     window.Swal = require('sweetalert2');
 } catch (e) {}
+
+// Load Highcharts
+var Highcharts = require('highcharts');
+window.Highcharts = Highcharts;
+// Alternatively, this is how to load Highcharts Stock. The Maps and Gantt
+// packages are similar.
+// var Highcharts = require('highcharts/highstock');
+
+// Load the exporting module, and initialize it.
+require('highcharts/modules/exporting')(Highcharts);
