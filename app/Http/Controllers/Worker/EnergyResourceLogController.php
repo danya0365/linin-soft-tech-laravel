@@ -44,21 +44,49 @@ class EnergyResourceLogController extends Controller
         $energyResourceLog->save();
 
         switch ($energyResourceLog->energy_resource_id) {
-            case EnergyResourceNameId::Water():
+            case EnergyResourceNameId::Water()->value:
                 return redirect(route('worker.energy-resource.log.submit-water', ['energyResourceLogId' => $energyResourceLog->id]));
 
-            case EnergyResourceNameId::Electricity():
+            case EnergyResourceNameId::Electricity()->value:
                 return redirect(route('worker.energy-resource.log.submit-electricity', ['energyResourceLogId' => $energyResourceLog->id]));
 
-            case EnergyResourceNameId::Gas():
+            case EnergyResourceNameId::Gas()->value:
                 return redirect(route('worker.energy-resource.log.submit-gas', ['energyResourceLogId' => $energyResourceLog->id]));
 
-            case EnergyResourceNameId::Biomass():
+            case EnergyResourceNameId::Biomass()->value:
                 return redirect(route('worker.energy-resource.log.submit-biomass', ['energyResourceLogId' => $energyResourceLog->id]));
 
-            case EnergyResourceNameId::FuelOil():
+            case EnergyResourceNameId::FuelOil()->value:
                 return redirect(route('worker.energy-resource.log.submit-fuel-oil', ['energyResourceLogId' => $energyResourceLog->id]));
         }
         return redirect(route('worker.energy-resource'));
+    }
+
+    public function submitWaterLog($energyResourceLogId)
+    {
+        $energyResourceLog = EnergyResourceLog::find($energyResourceLogId);
+        $dateStartAt = request()->get('date_start_at');
+        $dateEndAt = request()->get('date_end_at');
+
+        if (request()->isMethod('post')) {
+
+            request()->validate(['value' => 'required', 'log_date' => 'required']);
+
+            $energyResourceLog->log_date = request()->get('log_date');
+            $energyResourceLog->value = request()->get('value');
+            $energyResourceLog->unit = "ลิตร/Litre";
+            $energyResourceLog->save();
+
+            return redirect(route('worker.energy-resource.logs'));
+        }
+
+        return view(
+            'worker.energy-resources.submit-water',
+            [
+                'energyResourceLog' => $energyResourceLog,
+                'dateStartAt' => $dateStartAt,
+                'dateEndAt' => $dateEndAt
+            ]
+        );
     }
 }

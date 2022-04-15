@@ -17,6 +17,7 @@ return new class extends Migration
             $table->id();
             $table->integer('employee_id')->nullable();
             $table->integer('energy_resource_id')->nullable();
+            $table->date('log_date')->nullable();
             $table->integer('value')->nullable();
             $table->string('unit')->nullable();
             $table->string('lot_number')->nullable();
