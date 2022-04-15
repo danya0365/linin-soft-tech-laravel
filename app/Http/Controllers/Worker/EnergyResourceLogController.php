@@ -12,16 +12,18 @@ use App\Models\EnergyResourceLog;
 class EnergyResourceLogController extends Controller
 {
 
-    public function selectEmployee($energyResourceLogId, $energyResourceId)
+    public function setSelectEnergyResource($energyResourceId)
     {
-        if ($energyResourceLogId == 0) {
-            $energyResourceLog = new EnergyResourceLog();
-            $energyResourceLog->energy_resource_id = $energyResourceId;
-            $energyResourceLog->save();
-            $energyResourceLogId = $energyResourceLog->id;
-        }
-        $energyResourceLog = EnergyResourceLog::find($energyResourceLogId);
+        $energyResourceLog = new EnergyResourceLog();
+        $energyResourceLog->energy_resource_id = $energyResourceId;
+        $energyResourceLog->save();
 
+        return redirect(route('worker.energy-resource.select-employee', ['energyResourceLogId' => $energyResourceLog->id]));
+    }
+
+    public function selectEmployee($energyResourceLogId)
+    {
+        $energyResourceLog = EnergyResourceLog::find($energyResourceLogId);
         $departments = Department::with('employees')->whereIn(
             'id',
             [
@@ -32,7 +34,7 @@ class EnergyResourceLogController extends Controller
                 DepartmentNameId::Collect(),
             ]
         )->get();
-        return view('worker.energy-resource.select-employee', ['departments' => $departments, 'energyResourceLog' => $energyResourceLog]);
+        return view('worker.energy-resources.select-employee', ['departments' => $departments, 'energyResourceLog' => $energyResourceLog]);
     }
 
     public function setSelectEmployee($energyResourceLogId, $employeeId)
@@ -43,36 +45,20 @@ class EnergyResourceLogController extends Controller
 
         switch ($energyResourceLog->energy_resource_id) {
             case EnergyResourceNameId::Water():
-                return redirect(route('worker.energy-resource.submit-water-form', ['energyResourceLogId' => $energyResourceLog->id]));
+                return redirect(route('worker.energy-resource.log.submit-water', ['energyResourceLogId' => $energyResourceLog->id]));
 
             case EnergyResourceNameId::Electricity():
-                return redirect(route('worker.energy-resource.submit-electricity-form', ['energyResourceLogId' => $energyResourceLog->id]));
+                return redirect(route('worker.energy-resource.log.submit-electricity', ['energyResourceLogId' => $energyResourceLog->id]));
 
             case EnergyResourceNameId::Gas():
-                return redirect(route('worker.energy-resource.submit-gas-form', ['energyResourceLogId' => $energyResourceLog->id]));
+                return redirect(route('worker.energy-resource.log.submit-gas', ['energyResourceLogId' => $energyResourceLog->id]));
 
             case EnergyResourceNameId::Biomass():
-                return redirect(route('worker.energy-resource.submit-biomass-form', ['energyResourceLogId' => $energyResourceLog->id]));
+                return redirect(route('worker.energy-resource.log.submit-biomass', ['energyResourceLogId' => $energyResourceLog->id]));
 
             case EnergyResourceNameId::FuelOil():
-                return redirect(route('worker.energy-resource.submit-fuel-oil-form', ['energyResourceLogId' => $energyResourceLog->id]));
+                return redirect(route('worker.energy-resource.log.submit-fuel-oil', ['energyResourceLogId' => $energyResourceLog->id]));
         }
-        return redirect(route('worker.energy-resource.index', ['energyResourceLogId' => $energyResourceLog->id]));
-    }
-
-    public function setSelectEnergyResource($energyResourceLogId, $energyResourceId)
-    {
-        if ($energyResourceLogId == 0) {
-            $energyResourceLog = new EnergyResourceLog();
-            $energyResourceLog->energy_resource_id = $energyResourceId;
-            $energyResourceLog->save();
-            $energyResourceLogId = $energyResourceLog->id;
-        }
-
-        $energyResourceLog = EnergyResourceLog::find($energyResourceLogId);
-        $energyResourceLog->energy_resource_id = $energyResourceId;
-        $energyResourceLog->save();
-
-        return redirect(route('worker.energy-resource.select-employee', ['energyResourceLogId' => $energyResourceLog->id]));
+        return redirect(route('worker.energy-resource'));
     }
 }
