@@ -39,13 +39,15 @@
                         <div class="col-12">
                             <label for="log_date" class="form-label">วันที่ - Date</label>
                             <input type="date" name="log_date" class="form-control" id="log_date">
-                            {!! $errors->first('log_date', '<div class="invalid-feedback">:message</div>') !!}
+                            {!! $errors->first('log_date', '<div class="text-danger">:message</div>') !!}
                         </div>
 
                         <div class="col-12">
                             <label for="value" class="form-label">ปริมาณน้ำที่ใช้ - Value</label>
                             <input type="text" name="value" class="form-control" id="value">
-                            {!! $errors->first('value', '<div class="invalid-feedback">:message</div>') !!}
+                            @error('value')
+                                <div class="text-danger">{{ $message }}</div>
+                            @enderror
                         </div>
 
                         <div class="col-12">
