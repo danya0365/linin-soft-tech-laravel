@@ -21,9 +21,8 @@ use Illuminate\Database\Eloquent\Model;
  */
 class EnergyResourceLog extends Model
 {
-    
-    static $rules = [
-    ];
+
+    static $rules = [];
 
     protected $perPage = 20;
 
@@ -32,8 +31,11 @@ class EnergyResourceLog extends Model
      *
      * @var array
      */
-    protected $fillable = ['energy_resource_id','employee_id','value','unit','lot_number'];
+    protected $fillable = ['energy_resource_id', 'employee_id', 'value', 'unit', 'lot_number'];
 
 
-
+    public function employee()
+    {
+        return $this->belongsTo(Employee::class);
+    }
 }

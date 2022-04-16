@@ -7,7 +7,7 @@
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{ route('worker') }}">Worker</a></li>
             <li class="breadcrumb-item"><a href="{{ route('worker.energy-resource') }}">{{ __('Energy Resource') }}</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.energy-resource.select-employee', ['energyResourceLogId' => $energyResourceLog->id]) }}">{{ __('Energy Resource') }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('worker.energy-resource.select-employee', ['energyResourceLogId' => $energyResourceLog->id]) }}">พนักงาน: {{$energyResourceLog->employee->name }}</a></li>
             <li class="breadcrumb-item active" aria-current="page">บันทึกการใช้น้ำ</li>
         </ol>
     </nav>

@@ -64,7 +64,7 @@ class EnergyResourceLogController extends Controller
 
     public function submitWaterLog($energyResourceLogId)
     {
-        $energyResourceLog = EnergyResourceLog::find($energyResourceLogId);
+        $energyResourceLog = EnergyResourceLog::with('employee')->find($energyResourceLogId);
         $dateStartAt = request()->get('date_start_at');
         $dateEndAt = request()->get('date_end_at');
 
