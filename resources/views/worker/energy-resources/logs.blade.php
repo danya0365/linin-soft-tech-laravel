@@ -55,6 +55,12 @@
                         </div>
                     </form>
 
+                    @if ($message = Session::get('success'))
+                        <div class="alert alert-success mb-2">
+                            <p>{{ $message }}</p>
+                        </div>
+                    @endif
+
                     <div class="table-responsive">
                         <table class="table table-bordered table-hover">
                             <thead class="thead">
@@ -65,6 +71,7 @@
                                     <th>จำนวน</th>
                                     <th>หน่วย</th>
                                     <th>พนักงาน</th>
+                                    <th></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -76,7 +83,12 @@
                                         <td class="text-end">{{ $energyResourceLog->value }}</td>
                                         <td class="text-start">{{ $energyResourceLog->unit }}</td>
                                         <td>{{ $energyResourceLog->employee->name }}</td>
-                                        
+                                        <td>
+                                            <form class="delete-form" action="{{ route('worker.energy-resource.logs.delete', $energyResourceLog->id) }}" method="POST">
+                                                @csrf
+                                                <button type="submit" class="btn btn-danger btn-sm"><i class="fa fa-fw fa-trash"></i> Delete</button>
+                                            </form>
+                                        </td>
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -90,4 +102,14 @@
         </div>
     </div>
 </div>
+<script>
+$(function(){
+    $('.delete-form').on('submit', function(e){
+        if (!confirm("Are you sure?")) {
+            return false;
+        }
+        return true
+    })
+});
+ </script>
 @endsection

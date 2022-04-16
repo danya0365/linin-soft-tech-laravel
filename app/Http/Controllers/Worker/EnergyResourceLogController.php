@@ -70,6 +70,14 @@ class EnergyResourceLogController extends Controller
         );
     }
 
+    public function deleteLog($energyResourceLogId)
+    {
+        EnergyResourceLog::find($energyResourceLogId)->delete();
+
+        return redirect()->route('worker.energy-resource.logs')
+            ->with('success', 'EnergyResourceLog deleted successfully');
+    }
+
     public function selectEmployee($energyResourceLogId)
     {
         $energyResourceLog = EnergyResourceLog::find($energyResourceLogId);
