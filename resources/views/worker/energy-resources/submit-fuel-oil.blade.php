@@ -8,13 +8,13 @@
             <li class="breadcrumb-item"><a href="{{ route('worker') }}">Worker</a></li>
             <li class="breadcrumb-item"><a href="{{ route('worker.energy-resource') }}">{{ __('Energy Resource') }}</a></li>
             <li class="breadcrumb-item"><a href="{{ route('worker.energy-resource.select-employee', ['energyResourceLogId' => $energyResourceLog->id]) }}">พนักงาน: {{$energyResourceLog->employee->name }}</a></li>
-            <li class="breadcrumb-item active" aria-current="page">บันทึกการใช้แก็ส</li>
+            <li class="breadcrumb-item active" aria-current="page">บันทึกการใช้น้ำมันเตา</li>
         </ol>
     </nav>
     <div class="row justify-content-center">
         <div class="col-md-12 m-2">
             <div class="card">
-                <div class="card-header">เพิ่มบันทึกการใช้แก็ส</div>
+                <div class="card-header">เพิ่มบันทึกการใช้น้ำมันเตา</div>
                 <div class="card-body">
  
                     <form class="row g-3 mb-3" action="{{ request()->url() }}" method="POST" role="form" enctype="multipart/form-data">
@@ -27,7 +27,7 @@
                         </div>
 
                         <div class="col-12">
-                            <label for="value" class="form-label">ปริมาณกิโลกรัมแก๊สที่ใช้ (kg/gas)</label>
+                            <label for="value" class="form-label">ปริมาณน้ำมันเตา (Litre)</label>
                             <input type="text" name="value" class="form-control" id="value">
                             @error('value')
                                 <div class="text-danger">{{ $message }}</div>
@@ -44,7 +44,7 @@
         </div>
         <div class="col-md-12 m-2">
             <div class="card">
-                <div class="card-header">ปริมาณการใช้แก๊สล่าสุด -</div>
+                <div class="card-header">ปริมาณการใช้น้ำมันเตาล่าสุด -</div>
                 <div class="card-body">
  
                     <form class="row row-cols-lg-auto g-3 align-items-center mb-2" action="{{ request()->url() }}" method="GET">

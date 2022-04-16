@@ -27,7 +27,7 @@
                         </div>
 
                         <div class="col-12">
-                            <label for="value" class="form-label">ปริมาณที่ใช้ไฟฟ้า (kw/hour) - Value</label>
+                            <label for="value" class="form-label">ปริมาณที่ใช้ไฟฟ้า (kw/hour)</label>
                             <input type="text" name="value" class="form-control" id="value">
                             @error('value')
                                 <div class="text-danger">{{ $message }}</div>
