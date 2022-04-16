@@ -12,10 +12,12 @@ use App\Models\EnergyResourceLog;
 class EnergyResourceLogController extends Controller
 {
 
-    public function setSelectEnergyResource($energyResourceId)
+    public function setSelectEnergyResource($energyResourceVarName)
     {
+        $energyResource = EnergyResource::where('var_name', $energyResourceVarName)->orWhere('id', $energyResourceVarName)->first();
+
         $energyResourceLog = new EnergyResourceLog();
-        $energyResourceLog->energy_resource_id = $energyResourceId;
+        $energyResourceLog->energy_resource_id = $energyResource->id;
         $energyResourceLog->save();
 
         return redirect(route('worker.energy-resource.select-employee', ['energyResourceLogId' => $energyResourceLog->id]));

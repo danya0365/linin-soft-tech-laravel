@@ -16,7 +16,7 @@
                 <div class="card-body">
                     <div class="row g-2">
                         <div class="col-sm-4">
-                            <a href="{{ route('worker.energy-resource.log.select-energy-resource', ['energyResourceId' => 1]) }}">
+                            <a href="{{ route('worker.energy-resource.log.select-energy-resource', ['energyResourceVarName' => 'water']) }}">
                                 <div class="p-3 border bg-light" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 150px">
                                         <div class="text-center">
@@ -28,7 +28,7 @@
                             </a>
                         </div>
                         <div class="col-sm-4">
-                            <a href="{{ route('worker.energy-resource.log.select-energy-resource', ['energyResourceId' => 2]) }}">
+                            <a href="{{ route('worker.energy-resource.log.select-energy-resource', ['energyResourceVarName' => 'electricity']) }}">
                                 <div class="p-3 border bg-light" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 150px">
                                         <div class="text-center">
@@ -40,7 +40,7 @@
                             </a>
                         </div>
                         <div class="col-sm-4">
-                            <a href="{{ route('worker.energy-resource.log.select-energy-resource', ['energyResourceId' => 3]) }}">
+                            <a href="{{ route('worker.energy-resource.log.select-energy-resource', ['energyResourceVarName' => 'gas']) }}">
                                 <div class="p-3 border bg-light" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 150px">
                                         <div class="text-center">
@@ -52,7 +52,7 @@
                             </a>
                         </div>
                         <div class="col-sm-4">
-                            <a href="{{ route('worker.energy-resource.log.select-energy-resource', ['energyResourceId' => 4]) }}">
+                            <a href="{{ route('worker.energy-resource.log.select-energy-resource', ['energyResourceVarName' => 'biomass']) }}">
                                 <div class="p-3 border bg-light" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 150px">
                                         <div class="text-center">
@@ -64,7 +64,7 @@
                             </a>
                         </div>
                         <div class="col-sm-4">
-                            <a href="{{ route('worker.energy-resource.log.select-energy-resource', ['energyResourceId' => 5]) }}">
+                            <a href="{{ route('worker.energy-resource.log.select-energy-resource', ['energyResourceVarName' => 'fuel_oil']) }}">
                                 <div class="p-3 border bg-light" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 150px">
                                         <div class="text-center">
