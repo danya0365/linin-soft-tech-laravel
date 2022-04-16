@@ -14,7 +14,7 @@
     <div class="row justify-content-center">
         <div class="col-md-12 m-2">
             <div class="card">
-                <div class="card-header">เพิ่มบันทึกการใช้น้ำ</div>
+                <div class="card-header">เพิ่มบันทึกการใช้ไฟฟ้า</div>
                 <div class="card-body">
  
                     <form class="row g-3 mb-3" action="{{ request()->url() }}" method="POST" role="form" enctype="multipart/form-data">
@@ -27,7 +27,7 @@
                         </div>
 
                         <div class="col-12">
-                            <label for="value" class="form-label">ปริมาณน้ำที่ใช้ - Value</label>
+                            <label for="value" class="form-label">ปริมาณที่ใช้ไฟฟ้า - Value</label>
                             <input type="text" name="value" class="form-control" id="value">
                             @error('value')
                                 <div class="text-danger">{{ $message }}</div>
@@ -44,7 +44,7 @@
         </div>
         <div class="col-md-12 m-2">
             <div class="card">
-                <div class="card-header">ปริมาณการใช้น้ำล่าสุด -</div>
+                <div class="card-header">ปริมาณการใช้ไฟฟ้าล่าสุด -</div>
                 <div class="card-body">
  
                     <form class="row row-cols-lg-auto g-3 align-items-center mb-2" action="{{ request()->url() }}" method="GET">
