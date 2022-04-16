@@ -27,7 +27,7 @@
                         </div>
 
                         <div class="col-12">
-                            <label for="value" class="form-label">น้ำหนักชีวมวล (kg.) - Value</label>
+                            <label for="value" class="form-label">น้ำหนักชีวมวล (kg.)</label>
                             <input type="text" name="value" class="form-control" id="value">
                             @error('value')
                                 <div class="text-danger">{{ $message }}</div>
@@ -44,7 +44,7 @@
         </div>
         <div class="col-md-12 m-2">
             <div class="card">
-                <div class="card-header">ปริมาณการใช้ไฟฟ้าล่าสุด -</div>
+                <div class="card-header">ปริมาณการใช้ชีวะมวลล่าสุด -</div>
                 <div class="card-body">
  
                     <form class="row row-cols-lg-auto g-3 align-items-center mb-2" action="{{ request()->url() }}" method="GET">
