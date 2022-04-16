@@ -165,9 +165,18 @@ Route::group(['prefix' => 'worker', 'middleware' => ['auth']], function () {
         });
     });
 
-    Route::get('/energy', function () {
-        return ['hello world'];
-    })->name('worker.energy');
+    Route::group(['prefix' => 'energy-resource'], function () {
+        Route::get('/', [App\Http\Controllers\Worker\EnergyResourceController::class, 'index'])->name('worker.energy-resource');
+        Route::get('/log/create/{energyResourceId}', [App\Http\Controllers\Worker\EnergyResourceLogController::class, 'setSelectEnergyResource'])->name('worker.energy-resource.log.select-energy-resource');
+        Route::get('/log/{energyResourceLogId}/employee', [App\Http\Controllers\Worker\EnergyResourceLogController::class, 'selectEmployee'])->name('worker.energy-resource.select-employee');
+        Route::get('/log/{energyResourceLogId}/employee/{employeeId}', [App\Http\Controllers\Worker\EnergyResourceLogController::class, 'setSelectEmployee'])->name('worker.energy-resource.set-select-employee');
+        Route::match(array('GET', 'POST'), '/log/{energyResourceLogId}/water', [App\Http\Controllers\Worker\EnergyResourceLogController::class, 'submitWaterLog'])->name('worker.energy-resource.log.submit-water');
+        Route::match(array('GET', 'POST'), '/log/{energyResourceLogId}/electricity', [App\Http\Controllers\Worker\EnergyResourceLogController::class, 'submitElectricityLog'])->name('worker.energy-resource.log.submit-electricity');
+        Route::match(array('GET', 'POST'), '/log/{energyResourceLogId}/gas', [App\Http\Controllers\Worker\EnergyResourceLogController::class, 'submitGasLog'])->name('worker.energy-resource.log.submit-gas');
+        Route::match(array('GET', 'POST'), '/log/{energyResourceLogId}/biomass', [App\Http\Controllers\Worker\EnergyResourceLogController::class, 'submitBiomassLog'])->name('worker.energy-resource.log.submit-biomass');
+        Route::match(array('GET', 'POST'), '/log/{energyResourceLogId}/fuel-oil', [App\Http\Controllers\Worker\EnergyResourceLogController::class, 'submitFuelOilLog'])->name('worker.energy-resource.log.submit-fuel-oil');
+        Route::get('/logs', [App\Http\Controllers\Worker\Operation\EnergyResourceLogController::class, 'getLogs'])->name('worker.energy-resource.logs');
+    });
 
     Route::group(['prefix' => 'employee'], function () {
         Route::get('/', [App\Http\Controllers\Worker\EmployeeController::class, 'index'])->name('worker.employee');

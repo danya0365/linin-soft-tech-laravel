@@ -15,10 +15,12 @@ return new class extends Migration
     {
         Schema::create('energy_resource_logs', function (Blueprint $table) {
             $table->id();
-            $table->integer('energy_resource_id');
-            $table->integer('value');
-            $table->string('unit');
-            $table->string('lot_number');
+            $table->integer('employee_id')->nullable();
+            $table->integer('energy_resource_id')->nullable();
+            $table->date('log_date')->nullable();
+            $table->integer('value')->nullable();
+            $table->string('unit')->nullable();
+            $table->string('lot_number')->nullable();
             $table->timestamps();
         });
     }

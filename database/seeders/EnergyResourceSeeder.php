@@ -35,5 +35,10 @@ class EnergyResourceSeeder extends Seeder
             'created_at' =>  \Carbon\Carbon::now(),
             'updated_at' => \Carbon\Carbon::now()
         ]);
+        DB::table('energy_resources')->insert([
+            'name' => 'น้ำมันเตา',
+            'created_at' =>  \Carbon\Carbon::now(),
+            'updated_at' => \Carbon\Carbon::now()
+        ]);
     }
 }
