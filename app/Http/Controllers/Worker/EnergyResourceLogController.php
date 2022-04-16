@@ -117,4 +117,60 @@ class EnergyResourceLogController extends Controller
             ]
         );
     }
+
+    public function submitGasLog($energyResourceLogId)
+    {
+        $energyResourceLog = EnergyResourceLog::with('employee')->find($energyResourceLogId);
+        $dateStartAt = request()->get('date_start_at');
+        $dateEndAt = request()->get('date_end_at');
+
+        if (request()->isMethod('post')) {
+
+            request()->validate(['value' => 'required', 'log_date' => 'required']);
+
+            $energyResourceLog->log_date = request()->get('log_date');
+            $energyResourceLog->value = request()->get('value');
+            $energyResourceLog->unit = "kg/gas";
+            $energyResourceLog->save();
+
+            return redirect(route('worker.energy-resource.logs'));
+        }
+
+        return view(
+            'worker.energy-resources.submit-gas',
+            [
+                'energyResourceLog' => $energyResourceLog,
+                'dateStartAt' => $dateStartAt,
+                'dateEndAt' => $dateEndAt
+            ]
+        );
+    }
+
+    public function submitBiomassLog($energyResourceLogId)
+    {
+        $energyResourceLog = EnergyResourceLog::with('employee')->find($energyResourceLogId);
+        $dateStartAt = request()->get('date_start_at');
+        $dateEndAt = request()->get('date_end_at');
+
+        if (request()->isMethod('post')) {
+
+            request()->validate(['value' => 'required', 'log_date' => 'required']);
+
+            $energyResourceLog->log_date = request()->get('log_date');
+            $energyResourceLog->value = request()->get('value');
+            $energyResourceLog->unit = "kg";
+            $energyResourceLog->save();
+
+            return redirect(route('worker.energy-resource.logs'));
+        }
+
+        return view(
+            'worker.energy-resources.submit-biomass',
+            [
+                'energyResourceLog' => $energyResourceLog,
+                'dateStartAt' => $dateStartAt,
+                'dateEndAt' => $dateEndAt
+            ]
+        );
+    }
 }
