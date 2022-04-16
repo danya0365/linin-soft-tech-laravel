@@ -20,7 +20,7 @@
                                 <div class="p-3 border bg-light" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 150px">
                                         <div class="text-center">
-                                            <div class="fa-solid fa-sink" style="font-size: 3em"></div>
+                                            <div class="fa-solid fa-water" style="font-size: 3em"></div>
                                             <div class="text-center mt-3">{{ __('น้ำ - Water') }}</div>
                                         </div>
                                     </div>
@@ -32,7 +32,7 @@
                                 <div class="p-3 border bg-light" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 150px">
                                         <div class="text-center">
-                                            <div class="fa-solid fa-sink" style="font-size: 3em"></div>
+                                            <div class="fa fa-bolt" style="font-size: 3em"></div>
                                             <div class="text-center mt-3">{{ __('ไฟฟ้า - Electricity') }}</div>
                                         </div>
                                     </div>
@@ -44,7 +44,7 @@
                                 <div class="p-3 border bg-light" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 150px">
                                         <div class="text-center">
-                                            <div class="fa-solid fa-sink" style="font-size: 3em"></div>
+                                            <div class="fa-solid fa-fire-flame-simple" style="font-size: 3em"></div>
                                             <div class="text-center mt-3">{{ __('แก๊ส - Gas') }}</div>
                                         </div>
                                     </div>
@@ -56,7 +56,7 @@
                                 <div class="p-3 border bg-light" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 150px">
                                         <div class="text-center">
-                                            <div class="fa-solid fa-sink" style="font-size: 3em"></div>
+                                            <div class="fa-brands fa-pagelines" style="font-size: 3em"></div>
                                             <div class="text-center mt-3">{{ __('ชีวมวล - Biomass') }}</div>
                                         </div>
                                     </div>
@@ -68,7 +68,7 @@
                                 <div class="p-3 border bg-light" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 150px">
                                         <div class="text-center">
-                                            <div class="fa-solid fa-cube" style="font-size: 3em"></div>
+                                            <div class="fa-solid fa-oil-can" style="font-size: 3em"></div>
                                             <div class="text-center mt-3">{{ __('น้ำมันเตา - Fuel Oil') }}</div>
                                         </div>
                                     </div>
@@ -80,7 +80,7 @@
                                 <div class="p-3 border bg-light" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 150px">
                                         <div class="text-center">
-                                            <div class="fa-solid fa-cube" style="font-size: 3em"></div>
+                                            <div class="fa-solid fa-history" style="font-size: 3em"></div>
                                             <div class="text-center mt-3">{{ __('ประวัติการบันทึก - Logs') }}</div>
                                         </div>
                                     </div>

@@ -38,4 +38,9 @@ class EnergyResourceLog extends Model
     {
         return $this->belongsTo(Employee::class);
     }
+
+    public function energyResource()
+    {
+        return $this->belongsTo(EnergyResource::class);
+    }
 }

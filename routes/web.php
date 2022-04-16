@@ -175,7 +175,7 @@ Route::group(['prefix' => 'worker', 'middleware' => ['auth']], function () {
         Route::match(array('GET', 'POST'), '/log/{energyResourceLogId}/gas', [App\Http\Controllers\Worker\EnergyResourceLogController::class, 'submitGasLog'])->name('worker.energy-resource.log.submit-gas');
         Route::match(array('GET', 'POST'), '/log/{energyResourceLogId}/biomass', [App\Http\Controllers\Worker\EnergyResourceLogController::class, 'submitBiomassLog'])->name('worker.energy-resource.log.submit-biomass');
         Route::match(array('GET', 'POST'), '/log/{energyResourceLogId}/fuel-oil', [App\Http\Controllers\Worker\EnergyResourceLogController::class, 'submitFuelOilLog'])->name('worker.energy-resource.log.submit-fuel-oil');
-        Route::get('/logs', [App\Http\Controllers\Worker\Operation\EnergyResourceLogController::class, 'getLogs'])->name('worker.energy-resource.logs');
+        Route::get('/logs', [App\Http\Controllers\Worker\EnergyResourceLogController::class, 'getLogs'])->name('worker.energy-resource.logs');
     });
 
     Route::group(['prefix' => 'employee'], function () {

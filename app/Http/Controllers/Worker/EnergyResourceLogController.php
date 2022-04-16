@@ -21,6 +21,54 @@ class EnergyResourceLogController extends Controller
         return redirect(route('worker.energy-resource.select-employee', ['energyResourceLogId' => $energyResourceLog->id]));
     }
 
+    public function getLogs()
+    {
+        $sortOrders = [
+            ['var' => 'id-desc', 'name' => 'ใหม่ที่สุด - Newest'],
+            ['var' => 'id-asc', 'name' => 'เก่าที่สุด - Oldest'],
+        ];
+
+        $sortOrderSelected = request()->get('sort_order', 'id-desc');
+        $energyResourceSelected = request()->get('energy_resource');
+
+        $query = EnergyResourceLog::with('energyResource')->with('employee');
+
+        if ($energyResourceSelected) {
+            $query->where(function ($query) use ($energyResourceSelected) {
+                $query->where('energy_resource_id', $energyResourceSelected);
+            });
+        }
+
+        $dateStartAt = request()->get('date_start_at');
+        $dateEndAt = request()->get('date_end_at');
+        if ($dateStartAt && $dateEndAt) {
+            $query->whereBetween('created_at', [$dateStartAt . ' 00:00:00', $dateEndAt . ' 23:59:59']);
+        }
+        if ($sortOrderSelected) {
+            list($sort, $order) = explode('-', $sortOrderSelected);
+            $query->orderBy($sort, $order);
+        }
+
+        $energyResourceLogs = $query->paginate();
+
+        //dd($energyResourceLogs->toArray());
+
+        $energyResources = EnergyResource::get();
+
+        return view(
+            'worker.energy-resources.logs',
+            [
+                'energyResources' => $energyResources,
+                'energyResourceLogs' => $energyResourceLogs,
+                'sortOrders' => $sortOrders,
+                'sortOrderSelected' => $sortOrderSelected,
+                'energyResourceSelected' => $energyResourceSelected,
+                'dateStartAt' => $dateStartAt,
+                'dateEndAt' => $dateEndAt,
+            ]
+        );
+    }
+
     public function selectEmployee($energyResourceLogId)
     {
         $energyResourceLog = EnergyResourceLog::find($energyResourceLogId);
