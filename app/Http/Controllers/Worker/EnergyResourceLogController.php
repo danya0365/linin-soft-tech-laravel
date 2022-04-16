@@ -32,6 +32,7 @@ class EnergyResourceLogController extends Controller
         $energyResourceSelected = request()->get('energy_resource');
 
         $query = EnergyResourceLog::with('energyResource')->with('employee');
+        $query->whereNotNull("energy_resource_id")->whereNotNull("value")->whereNotNull("unit");
 
         if ($energyResourceSelected) {
             $query->where(function ($query) use ($energyResourceSelected) {
@@ -50,8 +51,6 @@ class EnergyResourceLogController extends Controller
         }
 
         $energyResourceLogs = $query->paginate();
-
-        //dd($energyResourceLogs->toArray());
 
         $energyResources = EnergyResource::get();
 

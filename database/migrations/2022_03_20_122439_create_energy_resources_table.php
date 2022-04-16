@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::create('energy_resources', function (Blueprint $table) {
             $table->id();
+            $table->string('var_name');
             $table->string('name');
             $table->timestamps();
         });

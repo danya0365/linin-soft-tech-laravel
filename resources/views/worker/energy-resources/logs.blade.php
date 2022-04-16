@@ -60,7 +60,7 @@
                             <thead class="thead">
                                 <tr>
                                     <th>วันที่</th>
-                                    <th>เวลา</th>
+                                    <th>บันทึกเมื่อ</th>
                                     <th>พลังงาน</th>
                                     <th>จำนวน</th>
                                     <th>หน่วย</th>
@@ -70,8 +70,8 @@
                             <tbody>
                                 @foreach ($energyResourceLogs as $energyResourceLog)
                                     <tr>
-                                        <td>{{ $energyResourceLog->created_at->format('Y-m-d') }}</td>
-                                        <td class="text-center">{{ $energyResourceLog->created_at->format('H:i') }}</td>
+                                        <td>{{ $energyResourceLog->log_date }}</td>
+                                        <td class="text-center">{{ $energyResourceLog->created_at->format('Y-m-d H:i') }}</td>
                                         <td class="text-center">{{ $energyResourceLog->energyResource->name }}</td>
                                         <td class="text-end">{{ $energyResourceLog->value }}</td>
                                         <td class="text-start">{{ $energyResourceLog->unit }}</td>

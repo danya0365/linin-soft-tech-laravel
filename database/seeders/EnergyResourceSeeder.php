@@ -17,26 +17,31 @@ class EnergyResourceSeeder extends Seeder
     {
         DB::table('energy_resources')->insert([
             'name' => 'น้ำ',
+            'var_name' => 'water',
             'created_at' =>  \Carbon\Carbon::now(),
             'updated_at' => \Carbon\Carbon::now()
         ]);
         DB::table('energy_resources')->insert([
             'name' => 'ไฟฟ้า',
+            'var_name' => 'electricity',
             'created_at' =>  \Carbon\Carbon::now(),
             'updated_at' => \Carbon\Carbon::now()
         ]);
         DB::table('energy_resources')->insert([
             'name' => 'แก๊ส',
+            'var_name' => 'gas',
             'created_at' =>  \Carbon\Carbon::now(),
             'updated_at' => \Carbon\Carbon::now()
         ]);
         DB::table('energy_resources')->insert([
             'name' => 'ชีวมวล',
+            'var_name' => 'biomass',
             'created_at' =>  \Carbon\Carbon::now(),
             'updated_at' => \Carbon\Carbon::now()
         ]);
         DB::table('energy_resources')->insert([
             'name' => 'น้ำมันเตา',
+            'name' => 'fuel_oil',
             'created_at' =>  \Carbon\Carbon::now(),
             'updated_at' => \Carbon\Carbon::now()
         ]);
