@@ -21,7 +21,7 @@
                                     <div class="rounded-3 d-flex align-items-center justify-content-center">
                                         <div class="bi bi-stack" style="font-size: 3em"></div>
                                     </div>
-                                    <div class="text-center">{{ __('สินค้า') }}</div>
+                                    <div class="text-center">{{ __('สินค้า - Product') }}</div>
                                 </div>
                             </a>
                         </div>
@@ -31,17 +31,19 @@
                                     <div class="rounded-3 d-flex align-items-center justify-content-center">
                                         <div class="bi bi-building" style="font-size: 3em"></div>
                                     </div>
-                                    <div class="text-center">{{ __('ลูกค้า') }}</div>
+                                    <div class="text-center">{{ __('ลูกค้า - Customer') }}</div>
                                 </div>
                             </a>
                         </div>
                         <div class="col-sm-4">
                             <a href="{{ route('worker.operation') }}">
                                 <div class="p-3 border bg-light" style="min-height: 150px">
-                                    <div class="rounded-3 d-flex align-items-center justify-content-center">
-                                        <div class="bi bi-journals" style="font-size: 3em"></div>
+                                    <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 110px">
+                                        <div class="text-center">
+                                            <div class="fa-solid fa-people-carry-box" style="font-size: 3em"></div>
+                                            <div class="text-center mt-3">{{ __('ปฏิบัติการ - Operations') }}</div>
+                                        </div>
                                     </div>
-                                    <div class="text-center">{{ __('ปฏิบัติการ') }}</div>
                                 </div>
                             </a>
                         </div>
@@ -51,7 +53,7 @@
                                     <div class="rounded-3 d-flex align-items-center justify-content-center">
                                         <div class="bi bi-battery-charging" style="font-size: 3em"></div>
                                     </div>
-                                    <div class="text-center">{{ __('พลังงาน') }}</div>
+                                    <div class="text-center">{{ __('พลังงาน - Energy Resource') }}</div>
                                 </div>
                             </a>
                         </div>
@@ -61,7 +63,7 @@
                                     <div class="rounded-3 d-flex align-items-center justify-content-center">
                                         <div class="bi bi-people-fill" style="font-size: 3em"></div>
                                     </div>
-                                    <div class="text-center">{{ __('พนักงาน') }}</div>
+                                    <div class="text-center">{{ __('พนักงาน - Employee') }}</div>
                                 </div>
                             </a>
                         </div>
