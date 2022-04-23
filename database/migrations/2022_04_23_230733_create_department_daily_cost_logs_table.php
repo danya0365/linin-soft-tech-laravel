@@ -13,13 +13,10 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('inventories', function (Blueprint $table) {
+        Schema::create('department_daily_cost_logs', function (Blueprint $table) {
             $table->id();
-            $table->integer('inventory_group_id');
-            $table->string('name');
-            $table->string('unit');
-            $table->integer('total_quantity');
-            $table->integer('remain_quantity');
+            $table->integer('department_id');
+            $table->date('daily_date');
             $table->float('cost')->default(0.0);
             $table->timestamps();
         });
@@ -32,6 +29,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('inventories');
+        Schema::dropIfExists('department_daily_cost_logs');
     }
 };

@@ -70,6 +70,7 @@
                                     <th>พลังงาน</th>
                                     <th>จำนวน</th>
                                     <th>หน่วย</th>
+                                    <th>ค่าใช้จ่าย</th>
                                     <th>พนักงาน</th>
                                     <th></th>
                                 </tr>
@@ -82,6 +83,7 @@
                                         <td class="text-center">{{ $energyResourceLog->energyResource->name }}</td>
                                         <td class="text-end">{{ $energyResourceLog->value }}</td>
                                         <td class="text-start">{{ $energyResourceLog->unit }}</td>
+                                        <td class="text-start">{{ number_format($energyResourceLog->cost) }} Thai Baht</td>
                                         <td>{{ $energyResourceLog->employee->name }}</td>
                                         <td>
                                             <form class="delete-form" action="{{ route('worker.energy-resource.logs.delete', $energyResourceLog->id) }}" method="POST">

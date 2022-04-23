@@ -35,6 +35,14 @@
                         </div>
 
                         <div class="col-12">
+                            <label for="cost" class="form-label">จำนวนเงิน - Cost (Thai Baht)</label>
+                            <input type="text" name="cost" class="form-control" id="cost">
+                            @error('cost')
+                                <div class="text-danger">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="col-12">
                             <button type="submit" class="btn btn-primary">Submit</button>
                             <button type="reset" class="btn btn-outline-secondary">Reset</button>
                         </div>
