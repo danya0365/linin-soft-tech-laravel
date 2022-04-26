@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Worker;
 use App\Enums\EnergyResourceNameId;
 use App\Http\Controllers\Controller;
 use App\Models\EnergyResource;
+use App\Models\EnergyResourceLog;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class EnergyResourceController extends Controller
 {
@@ -23,12 +26,39 @@ class EnergyResourceController extends Controller
         switch ($energyResource->id) {
             case EnergyResourceNameId::Water()->value:
 
+                $weekDayReports = (function () use ($dateStartAt, $dateEndAt) {
+                    $query = EnergyResourceLog::with('energyResource')->select(
+                        DB::raw('SUM(cost) as total_cost'),
+                        DB::raw('DATE(created_at) as date'),
+                        'energy_resource_id'
+                    )
+                        ->groupBy('date', 'energy_resource_id');
+
+                    if ($dateStartAt && $dateEndAt) {
+                        $query->whereBetween('created_at', [$dateStartAt . ' 00:00:00', $dateEndAt . ' 23:59:59']);
+                    }
+                    $rows = $query->get();
+
+                    $weekDayReports = [];
+                    foreach ($rows as $row) {
+                        $date = $row->date;
+                        if (!isset($weekDayReports[$date])) {
+                            $weekDayReports[$date] = [];
+                        }
+                        $row = $row->toArray();
+                        $energyResourceId = $row['energy_resource_id'];
+                        $weekDayReports[$date][$energyResourceId] = $row;
+                    }
+                    return $weekDayReports;
+                })();
+
                 return view(
                     'worker.energy-resources.summaries.water',
                     [
                         'energyResource' => $energyResource,
                         'dateStartAt' => $dateStartAt,
                         'dateEndAt' => $dateEndAt,
+                        'weekDayReports' => $weekDayReports,
                     ]
                 );
 
