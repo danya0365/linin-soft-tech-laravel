@@ -191,10 +191,6 @@ Route::group(['prefix' => 'worker', 'middleware' => ['auth']], function () {
         return ['hello world'];
     })->name('worker.report');
 
-    Route::get('/stock', function () {
-        return ['hello world'];
-    })->name('worker.stock');
-
     Route::group(['prefix' => 'stock'], function () {
         Route::get('/', [App\Http\Controllers\Worker\StockController::class, 'index'])->name('worker.stock');
         Route::get('/inventory-group', [App\Http\Controllers\Worker\StockController::class, 'selectInventoryGroup'])->name('worker.stock.select-inventory-group');
