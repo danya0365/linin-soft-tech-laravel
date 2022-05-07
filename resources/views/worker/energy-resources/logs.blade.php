@@ -70,6 +70,7 @@
                                     <th>พลังงาน</th>
                                     <th>จำนวน</th>
                                     <th>หน่วย</th>
+                                    <th>ค่าใช้จ่าย</th>
                                     <th>พนักงาน</th>
                                     <th></th>
                                 </tr>
@@ -82,6 +83,7 @@
                                         <td class="text-center">{{ $energyResourceLog->energyResource->name }}</td>
                                         <td class="text-end">{{ $energyResourceLog->value }}</td>
                                         <td class="text-start">{{ $energyResourceLog->unit }}</td>
+                                        <td class="text-start">{{ number_format($energyResourceLog->cost) }} Thai Baht</td>
                                         <td>{{ $energyResourceLog->employee->name }}</td>
                                         <td>
                                             <form class="delete-form" action="{{ route('worker.energy-resource.logs.delete', $energyResourceLog->id) }}" method="POST">
@@ -97,6 +99,75 @@
                 </div>
                 <div class="card-footer">
                     {!! $energyResourceLogs->withQueryString()->links() !!}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12 m-2">
+            <div class="card">
+                <div class="card-header">สถิติ</div>
+                <div class="card-body">
+                    <div class="row g-2">
+                        <div class="col-sm-4">
+                            <a href="{{ route('worker.energy-resource.summary', ['energyResourceVarName' => 'water']) }}">
+                                <div class="p-3 border bg-light" style="min-height: 150px">
+                                    <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 150px">
+                                        <div class="text-center">
+                                            <div class="fa-solid fa-water" style="font-size: 3em"></div>
+                                            <div class="text-center mt-3">{{ __('น้ำ - Water') }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-sm-4">
+                            <a href="{{ route('worker.energy-resource.summary', ['energyResourceVarName' => 'electricity']) }}">
+                                <div class="p-3 border bg-light" style="min-height: 150px">
+                                    <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 150px">
+                                        <div class="text-center">
+                                            <div class="fa fa-bolt" style="font-size: 3em"></div>
+                                            <div class="text-center mt-3">{{ __('ไฟฟ้า - Electricity') }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-sm-4">
+                            <a href="{{ route('worker.energy-resource.summary', ['energyResourceVarName' => 'gas']) }}">
+                                <div class="p-3 border bg-light" style="min-height: 150px">
+                                    <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 150px">
+                                        <div class="text-center">
+                                            <div class="fa-solid fa-fire-flame-simple" style="font-size: 3em"></div>
+                                            <div class="text-center mt-3">{{ __('แก๊ส - Gas') }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-sm-4">
+                            <a href="{{ route('worker.energy-resource.summary', ['energyResourceVarName' => 'biomass']) }}">
+                                <div class="p-3 border bg-light" style="min-height: 150px">
+                                    <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 150px">
+                                        <div class="text-center">
+                                            <div class="fa-brands fa-pagelines" style="font-size: 3em"></div>
+                                            <div class="text-center mt-3">{{ __('ชีวมวล - Biomass') }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-sm-4">
+                            <a href="{{ route('worker.energy-resource.summary', ['energyResourceVarName' => 'fuel_oil']) }}">
+                                <div class="p-3 border bg-light" style="min-height: 150px">
+                                    <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 150px">
+                                        <div class="text-center">
+                                            <div class="fa-solid fa-oil-can" style="font-size: 3em"></div>
+                                            <div class="text-center mt-3">{{ __('น้ำมันเตา - Fuel Oil') }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

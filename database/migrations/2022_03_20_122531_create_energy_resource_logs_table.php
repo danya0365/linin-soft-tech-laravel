@@ -21,6 +21,7 @@ return new class extends Migration
             $table->integer('value')->nullable();
             $table->string('unit')->nullable();
             $table->string('lot_number')->nullable();
+            $table->float('cost')->nullable();
             $table->timestamps();
         });
     }

@@ -20,7 +20,7 @@
                                 <div class="p-3 border bg-light" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 150px">
                                         <div class="text-center">
-                                            <div class="fa-solid fa-sink" style="font-size: 3em"></div>
+                                            <div class="fa-solid fa-droplet" style="font-size: 3em"></div>
                                             <div class="text-center mt-3">{{ __('ซัก - Wash') }}</div>
                                         </div>
                                     </div>
@@ -32,7 +32,7 @@
                                 <div class="p-3 border bg-light" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 150px">
                                         <div class="text-center">
-                                            <div class="fa-solid fa-sink" style="font-size: 3em"></div>
+                                            <div class="fa-solid fa-fire" style="font-size: 3em"></div>
                                             <div class="text-center mt-3">{{ __('อบ - Dry') }}</div>
                                         </div>
                                     </div>
@@ -44,7 +44,7 @@
                                 <div class="p-3 border bg-light" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 150px">
                                         <div class="text-center">
-                                            <div class="fa-solid fa-sink" style="font-size: 3em"></div>
+                                            <div class="fa-solid fa-print" style="font-size: 3em"></div>
                                             <div class="text-center mt-3">{{ __('รีด - Iron') }}</div>
                                         </div>
                                     </div>
@@ -56,7 +56,7 @@
                                 <div class="p-3 border bg-light" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 150px">
                                         <div class="text-center">
-                                            <div class="fa-solid fa-sink" style="font-size: 3em"></div>
+                                            <div class="fa-solid fa-people-carry-box" style="font-size: 3em"></div>
                                             <div class="text-center mt-3">{{ __('พับแพ็ค - Packing') }}</div>
                                         </div>
                                     </div>
@@ -68,7 +68,7 @@
                                 <div class="p-3 border bg-light" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 150px">
                                         <div class="text-center">
-                                            <div class="fa-solid fa-cube" style="font-size: 3em"></div>
+                                            <div class="fa-solid fa-check-to-slot" style="font-size: 3em"></div>
                                             <div class="text-center mt-3">{{ __('จัดเก็บ - Collect') }}</div>
                                         </div>
                                     </div>
