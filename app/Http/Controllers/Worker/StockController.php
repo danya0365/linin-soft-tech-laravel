@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Worker;
 use App\Http\Controllers\Controller;
 use App\Models\Inventory;
 use App\Models\InventoryGroup;
+use App\Models\InventoryStockLog;
 use Illuminate\Support\Facades\DB;
 
 class StockController extends Controller
@@ -62,6 +63,53 @@ class StockController extends Controller
             'worker.stocks.create-inventory-by-group',
             [
                 'inventoryGroup' => $inventoryGroup,
+                'inventory' => $inventory
+            ]
+        );
+    }
+
+    public function getInventoryIncreaseStock($inventoryId)
+    {
+        $inventory = Inventory::with('inventoryGroup')->find($inventoryId);
+
+        if (request()->isMethod('post')) {
+
+            request()->validate(
+                [
+                    'increase_quantity' => 'required|numeric'
+                ]
+            );
+
+            $increaseQuantity = request()->get('increase_quantity');
+
+            $inventoryStockLog = new InventoryStockLog;
+            $inventoryStockLog->inventory_id = $inventoryId;
+            $inventoryStockLog->type = 'import';
+            $inventoryStockLog->quantity = $increaseQuantity;
+            $inventoryStockLog->employee_id = null; // TODO: add select employee screen
+            $inventoryStockLog->save();
+
+            $inventory->total_quantity += $increaseQuantity;
+            $inventory->remain_quantity += $increaseQuantity;
+            $inventory->save();
+
+            return redirect(route('worker.stock.show-inventory-by-group', ['inventoryGroupId' => $inventory->inventoryGroup->id]));
+        }
+
+        return view(
+            'worker.stocks.inventory-increase-stock',
+            [
+                'inventory' => $inventory
+            ]
+        );
+    }
+
+    public function getInventoryDecreaseStock($inventoryId)
+    {
+        $inventory = Inventory::with('inventoryGroup')->find($inventoryId);
+        return view(
+            'worker.stocks.inventory-decrease-stock',
+            [
                 'inventory' => $inventory
             ]
         );

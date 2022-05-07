@@ -38,6 +38,7 @@
                                     <th>สต๊อกทั้งหมด</th>
                                     <th>สต๊อกคงเหลือ</th>
                                     <th>Unit</th>
+                                    <th></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -48,6 +49,14 @@
                                         <td class="text-center">{{ $inventory->total_quantity }}</td>
                                         <td class="text-center">{{ $inventory->remain_quantity }}</td>
                                         <td class="text-center">{{ $inventory->unit }}</td>
+                                        <td class="text-center">
+                                            <a class="btn btn-primary" href="{{ route('worker.stock.inventory.increase-stock', ['inventoryId' => $inventory->id]) }}" role="button">
+                                                <i class="fa-solid fa-plus"></i>
+                                            </a>
+                                            <a class="btn btn-danger" href="{{ route('worker.stock.inventory.decrease-stock', ['inventoryId' => $inventory->id]) }}" role="button">
+                                                <i class="fa-solid fa-minus"></i>
+                                            </a>
+                                        </td>
                                     </tr>
                                 @endforeach
                             </tbody>
