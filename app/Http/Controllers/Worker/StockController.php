@@ -137,4 +137,17 @@ class StockController extends Controller
             ]
         );
     }
+
+    public function showInventoryLogs($inventoryId)
+    {
+        $inventory = Inventory::with('inventoryGroup')->find($inventoryId);
+        $inventoryLogs = InventoryStockLog::where("inventory_id", $inventory->id)->orderBy('id', 'desc')->paginate();
+        return view(
+            'worker.stocks.inventory-logs',
+            [
+                'inventory' => $inventory,
+                'inventoryLogs' => $inventoryLogs
+            ]
+        );
+    }
 }

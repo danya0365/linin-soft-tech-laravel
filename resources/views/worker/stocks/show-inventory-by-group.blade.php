@@ -6,7 +6,7 @@
     <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{ route('worker') }}">Worker</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.stock.select-inventory-group') }}">Stocks</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('worker.stock') }}">Stocks</a></li>
             <li class="breadcrumb-item active" aria-current="page">รายการทั้งหมดของ {{ $inventoryGroup->name }} - Show Inventory by {{ $inventoryGroup->name }}</li>
         </ol>
     </nav>
@@ -55,6 +55,9 @@
                                             </a>
                                             <a class="btn btn-danger" href="{{ route('worker.stock.inventory.decrease-stock', ['inventoryId' => $inventory->id]) }}" role="button">
                                                 <i class="fa-solid fa-minus"></i>
+                                            </a>
+                                            <a class="btn btn-info" href="{{ route('worker.stock.inventory.logs', ['inventoryId' => $inventory->id]) }}" role="button">
+                                                <i class="fa-solid fa-history"></i>
                                             </a>
                                         </td>
                                     </tr>
