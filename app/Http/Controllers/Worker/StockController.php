@@ -20,7 +20,7 @@ class StockController extends Controller
         return view('worker.stocks.select-inventory-group', ['inventoryGroups' => $inventoryGroups]);
     }
 
-    public function setSelectInventoryGroup($inventoryGroupId)
+    public function showInventoryByGroup($inventoryGroupId)
     {
         $inventoryGroup = InventoryGroup::find($inventoryGroupId);
         $inventories = Inventory::where("inventory_group_id", $inventoryGroup->id)->paginate();

@@ -17,7 +17,7 @@
                     <div class="row g-2">
                         @foreach ( $inventoryGroups as $inventoryGroup )
                         <div class="col-sm-4">
-                            <a href="#">
+                            <a href="{{ route('worker.stock.show-inventory-by-group', ['inventoryGroupId' => $inventoryGroup->id]) }}">
                                 <div class="p-3 border bg-light" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 150px">
                                         <div class="text-center">

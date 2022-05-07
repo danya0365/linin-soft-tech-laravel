@@ -197,6 +197,6 @@ Route::group(['prefix' => 'worker', 'middleware' => ['auth']], function () {
     Route::group(['prefix' => 'stock'], function () {
         Route::get('/', [App\Http\Controllers\Worker\StockController::class, 'index'])->name('worker.stock');
         Route::get('/inventory-group', [App\Http\Controllers\Worker\StockController::class, 'selectInventoryGroup'])->name('worker.stock.select-inventory-group');
-        Route::get('/inventory-group/{inventoryGroupId}', [App\Http\Controllers\Worker\StockController::class, 'setSelectInventoryGroup'])->name('worker.stock.set-select-inventory-group');
+        Route::get('/inventory-group/{inventoryGroupId}', [App\Http\Controllers\Worker\StockController::class, 'showInventoryByGroup'])->name('worker.stock.show-inventory-by-group');
     });
 });

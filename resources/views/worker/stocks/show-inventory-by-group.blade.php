@@ -1,0 +1,52 @@
+@extends('layouts.worker')
+
+@section('content')
+
+<div class="container">
+    <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ route('worker') }}">Worker</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('worker.stock.select-inventory-group') }}">Stocks</a></li>
+            <li class="breadcrumb-item active" aria-current="page">รายการทั้งหมดของ {{ $inventoryGroup->name }} - Show Inventory by {{ $inventoryGroup->name }}</li>
+        </ol>
+    </nav>
+    <div class="row justify-content-center">
+        <div class="col-md-12 m-2">
+            <div class="card">
+                <div class="card-header">รายการทั้งหมดของ {{ $inventoryGroup->name }} - Show Inventory by {{ $inventoryGroup->name }}</div>
+                <div class="card-body">
+
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover">
+                            <thead class="thead">
+                                <tr>
+                                    <th>วันที่อัพเดต</th>
+                                    <th>สินค้า</th>
+                                    <th>สต๊อกทั้งหมด</th>
+                                    <th>สต๊อกคงเหลือ</th>
+                                    <th>Unit</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($inventories as $inventory)
+                                    <tr>
+                                        <td>{{ $inventory->updated_at->format('Y-m-d') }}</td>
+                                        <td class="text-center">{{ $inventory->name }}</td>
+                                        <td class="text-center">{{ $inventory->total_quantity }}</td>
+                                        <td class="text-center">{{ $inventory->remain_quantity }}</td>
+                                        <td class="text-center">{{ $inventory->unit }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+                <div class="card-footer">
+                    {!! $inventories->withQueryString()->links() !!}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@endsection
