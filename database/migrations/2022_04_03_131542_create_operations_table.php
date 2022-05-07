@@ -32,6 +32,7 @@ return new class extends Migration
             $table->integer('total_packing_piece')->nullable();
             $table->float('total_collect_weight')->nullable();
             $table->integer('total_collect_pack')->nullable();
+            $table->integer('total_deliver_pack')->nullable();
             $table->float('total_billing_weight')->nullable();
             $table->float('total_billing_payment')->nullable();
             $table->string('colors')->nullable();

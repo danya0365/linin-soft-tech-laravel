@@ -57,5 +57,12 @@ class DepartmentSeeder extends Seeder
             'created_at' =>  \Carbon\Carbon::now(),
             'updated_at' => \Carbon\Carbon::now()
         ]);
+        DB::table('departments')->insert([
+            'var_name' => 'deliver',
+            'name' => 'จัดส่ง',
+            'input_unit' => 'pack',
+            'created_at' =>  \Carbon\Carbon::now(),
+            'updated_at' => \Carbon\Carbon::now()
+        ]);
     }
 }

@@ -164,6 +164,12 @@ Route::group(['prefix' => 'worker', 'middleware' => ['auth']], function () {
             Route::post('/{operationId}/linen-product/{operationLinenProductId}/set-weight-and-color', [App\Http\Controllers\Worker\Operation\CollectController::class, 'setSelectWeightAndColor'])->name('worker.operation.collect.set-select-weight-and-color');
             Route::get('/{operationId}/delete-operation-linen-product/{operationLinenProductId}', [App\Http\Controllers\Worker\Operation\CollectController::class, 'deleteOperationLinenProduct'])->name('worker.operation.collect.delete-operation-linen-product');
         });
+
+        Route::group(['prefix' => 'deliver'], function () {
+            Route::get('/', [App\Http\Controllers\Worker\Operation\DeliverController::class, 'index'])->name('worker.operation.deliver');
+            Route::get('/employee', [App\Http\Controllers\Worker\Operation\DeliverController::class, 'selectEmployee'])->name('worker.operation.deliver.select-employee');
+            Route::get('/employee/{employeeId}', [App\Http\Controllers\Worker\Operation\DeliverController::class, 'setSelectEmployee'])->name('worker.operation.deliver.set-select-employee');
+        });
     });
 
     Route::group(['prefix' => 'energy-resource'], function () {

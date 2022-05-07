@@ -127,9 +127,8 @@ class EnergyResourceLogController extends Controller
 
         if (request()->isMethod('post')) {
 
-            request()->validate(['value' => 'required', 'log_date' => 'required', 'cost' => 'required']);
+            request()->validate(['value' => 'required', 'cost' => 'required']);
 
-            $energyResourceLog->log_date = request()->get('log_date');
             $energyResourceLog->value = request()->get('value');
             $energyResourceLog->cost = request()->get('cost');
             $energyResourceLog->unit = "ลิตร/Litre";
@@ -156,9 +155,8 @@ class EnergyResourceLogController extends Controller
 
         if (request()->isMethod('post')) {
 
-            request()->validate(['value' => 'required', 'log_date' => 'required', 'cost' => 'required']);
+            request()->validate(['value' => 'required', 'cost' => 'required']);
 
-            $energyResourceLog->log_date = request()->get('log_date');
             $energyResourceLog->value = request()->get('value');
             $energyResourceLog->cost = request()->get('cost');
             $energyResourceLog->unit = "kw/hour";
@@ -185,9 +183,8 @@ class EnergyResourceLogController extends Controller
 
         if (request()->isMethod('post')) {
 
-            request()->validate(['value' => 'required', 'log_date' => 'required', 'cost' => 'required']);
+            request()->validate(['value' => 'required', 'cost' => 'required']);
 
-            $energyResourceLog->log_date = request()->get('log_date');
             $energyResourceLog->value = request()->get('value');
             $energyResourceLog->cost = request()->get('cost');
             $energyResourceLog->unit = "kg/gas";
@@ -214,9 +211,8 @@ class EnergyResourceLogController extends Controller
 
         if (request()->isMethod('post')) {
 
-            request()->validate(['value' => 'required', 'log_date' => 'required', 'cost' => 'required']);
+            request()->validate(['value' => 'required', 'cost' => 'required']);
 
-            $energyResourceLog->log_date = request()->get('log_date');
             $energyResourceLog->value = request()->get('value');
             $energyResourceLog->cost = request()->get('cost');
             $energyResourceLog->unit = "kg";
@@ -243,9 +239,8 @@ class EnergyResourceLogController extends Controller
 
         if (request()->isMethod('post')) {
 
-            request()->validate(['value' => 'required', 'log_date' => 'required', 'cost' => 'required']);
+            request()->validate(['value' => 'required', 'cost' => 'required']);
 
-            $energyResourceLog->log_date = request()->get('log_date');
             $energyResourceLog->value = request()->get('value');
             $energyResourceLog->cost = request()->get('cost');
             $energyResourceLog->unit = "kg";

@@ -25,6 +25,7 @@ return new class extends Migration
             $table->integer('packing_piece')->nullable();
             $table->float('collect_weight')->nullable();
             $table->integer('collect_pack')->nullable();
+            $table->integer('deliver_pack')->nullable();
             $table->timestamps();
         });
     }

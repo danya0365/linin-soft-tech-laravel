@@ -20,11 +20,6 @@
                     <form class="row g-3 mb-3" action="{{ request()->url() }}" method="POST" role="form" enctype="multipart/form-data">
                         
                         @csrf
-                        <div class="col-12">
-                            <label for="log_date" class="form-label">วันที่ - Date</label>
-                            <input type="date" name="log_date" class="form-control" id="log_date">
-                            {!! $errors->first('log_date', '<div class="text-danger">:message</div>') !!}
-                        </div>
 
                         <div class="col-12">
                             <label for="value" class="form-label">ปริมาณกิโลกรัมแก๊สที่ใช้ (kg/gas)</label>

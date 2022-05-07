@@ -21,12 +21,6 @@
                         
                         @csrf
                         <div class="col-12">
-                            <label for="log_date" class="form-label">วันที่ - Date</label>
-                            <input type="date" name="log_date" class="form-control" id="log_date">
-                            {!! $errors->first('log_date', '<div class="text-danger">:message</div>') !!}
-                        </div>
-
-                        <div class="col-12">
                             <label for="value" class="form-label">ปริมาณน้ำมันเตา (Litre)</label>
                             <input type="text" name="value" class="form-control" id="value">
                             @error('value')
