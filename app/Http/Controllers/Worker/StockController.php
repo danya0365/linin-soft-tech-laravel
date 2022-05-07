@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Worker;
 use App\Http\Controllers\Controller;
 use App\Models\Inventory;
 use App\Models\InventoryGroup;
+use App\Models\InventoryStockLog;
 use Illuminate\Support\Facades\DB;
 
 class StockController extends Controller
@@ -45,15 +46,14 @@ class StockController extends Controller
                     'inventory_group_id' => 'required',
                     'name' => 'required',
                     'unit' => 'required',
-                    'total_quantity' => 'required',
                 ]
             );
 
             $inventory->inventory_group_id = request()->get('inventory_group_id');
             $inventory->name = request()->get('name');
             $inventory->unit = request()->get('unit');
-            $inventory->total_quantity = request()->get('total_quantity');
-            $inventory->remain_quantity = request()->get('total_quantity');
+            $inventory->total_quantity = 0;
+            $inventory->remain_quantity = 0;
             $inventory->save();
 
             return redirect(route('worker.stock.show-inventory-by-group', ['inventoryGroupId' => $inventoryGroup->id]));
@@ -63,6 +63,90 @@ class StockController extends Controller
             [
                 'inventoryGroup' => $inventoryGroup,
                 'inventory' => $inventory
+            ]
+        );
+    }
+
+    public function getInventoryIncreaseStock($inventoryId)
+    {
+        $inventory = Inventory::with('inventoryGroup')->find($inventoryId);
+
+        if (request()->isMethod('post')) {
+
+            request()->validate(
+                [
+                    'increase_quantity' => 'required|numeric'
+                ]
+            );
+
+            $increaseQuantity = request()->get('increase_quantity');
+
+            $inventoryStockLog = new InventoryStockLog;
+            $inventoryStockLog->inventory_id = $inventoryId;
+            $inventoryStockLog->type = 'import';
+            $inventoryStockLog->quantity = $increaseQuantity;
+            $inventoryStockLog->employee_id = null; // TODO: add select employee screen
+            $inventoryStockLog->save();
+
+            $inventory->total_quantity += $increaseQuantity;
+            $inventory->remain_quantity += $increaseQuantity;
+            $inventory->save();
+
+            return redirect(route('worker.stock.show-inventory-by-group', ['inventoryGroupId' => $inventory->inventoryGroup->id]));
+        }
+
+        return view(
+            'worker.stocks.inventory-increase-stock',
+            [
+                'inventory' => $inventory
+            ]
+        );
+    }
+
+    public function getInventoryDecreaseStock($inventoryId)
+    {
+        $inventory = Inventory::with('inventoryGroup')->find($inventoryId);
+
+        if (request()->isMethod('post')) {
+
+            request()->validate(
+                [
+                    'decrease_quantity' => 'required|numeric'
+                ]
+            );
+
+            $decreaseQuantity = request()->get('decrease_quantity');
+
+            $inventoryStockLog = new InventoryStockLog;
+            $inventoryStockLog->inventory_id = $inventoryId;
+            $inventoryStockLog->type = 'export';
+            $inventoryStockLog->quantity = $decreaseQuantity;
+            $inventoryStockLog->employee_id = null; // TODO: add select employee screen
+            $inventoryStockLog->save();
+
+            $inventory->remain_quantity -= $decreaseQuantity;
+            $inventory->save();
+
+            return redirect(route('worker.stock.show-inventory-by-group', ['inventoryGroupId' => $inventory->inventoryGroup->id]));
+        }
+
+        return view(
+            'worker.stocks.inventory-decrease-stock',
+            [
+                'inventory' => $inventory
+            ]
+        );
+    }
+
+    public function showInventoryLogs($inventoryId)
+    {
+        $inventory = Inventory::with('inventoryGroup')->find($inventoryId);
+        $inventoryLogs = InventoryStockLog::where("inventory_id", $inventory->id)->orderBy('id', 'desc')->paginate();
+        return view(
+            'worker.stocks.inventory-logs',
+            [
+                'inventory' => $inventory,
+                'inventoryLogs' => $inventoryLogs
             ]
         );
     }
