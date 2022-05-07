@@ -36,13 +36,6 @@
                                 {!! $errors->first('unit', '<div class="invalid-feedback">:message</div>') !!}
                             </div>
                         </div>
-                        <div class="col-12">
-                            <div class="input-group">
-                                {{ Form::label('total_quantity', 'จำนวนสต๊อกทั้งหมด - Total Quantity', ['class' => "input-group-text"]) }}
-                                {{ Form::text('total_quantity', $inventory->total_quantity, ['class' => 'form-control' . ($errors->has('total_quantity') ? ' is-invalid' : ''), 'placeholder' => 'Total Quantity']) }}
-                                {!! $errors->first('total_quantity', '<div class="invalid-feedback">:message</div>') !!}
-                            </div>
-                        </div>
                     </div>
                     
                 </div>

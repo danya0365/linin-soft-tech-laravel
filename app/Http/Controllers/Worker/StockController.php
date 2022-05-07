@@ -46,15 +46,14 @@ class StockController extends Controller
                     'inventory_group_id' => 'required',
                     'name' => 'required',
                     'unit' => 'required',
-                    'total_quantity' => 'required',
                 ]
             );
 
             $inventory->inventory_group_id = request()->get('inventory_group_id');
             $inventory->name = request()->get('name');
             $inventory->unit = request()->get('unit');
-            $inventory->total_quantity = request()->get('total_quantity');
-            $inventory->remain_quantity = request()->get('total_quantity');
+            $inventory->total_quantity = 0;
+            $inventory->remain_quantity = 0;
             $inventory->save();
 
             return redirect(route('worker.stock.show-inventory-by-group', ['inventoryGroupId' => $inventoryGroup->id]));
@@ -107,6 +106,30 @@ class StockController extends Controller
     public function getInventoryDecreaseStock($inventoryId)
     {
         $inventory = Inventory::with('inventoryGroup')->find($inventoryId);
+
+        if (request()->isMethod('post')) {
+
+            request()->validate(
+                [
+                    'decrease_quantity' => 'required|numeric'
+                ]
+            );
+
+            $decreaseQuantity = request()->get('decrease_quantity');
+
+            $inventoryStockLog = new InventoryStockLog;
+            $inventoryStockLog->inventory_id = $inventoryId;
+            $inventoryStockLog->type = 'export';
+            $inventoryStockLog->quantity = $decreaseQuantity;
+            $inventoryStockLog->employee_id = null; // TODO: add select employee screen
+            $inventoryStockLog->save();
+
+            $inventory->remain_quantity -= $decreaseQuantity;
+            $inventory->save();
+
+            return redirect(route('worker.stock.show-inventory-by-group', ['inventoryGroupId' => $inventory->inventoryGroup->id]));
+        }
+
         return view(
             'worker.stocks.inventory-decrease-stock',
             [
