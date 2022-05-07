@@ -13,7 +13,20 @@
     <div class="row justify-content-center">
         <div class="col-md-12 m-2">
             <div class="card">
-                <div class="card-header">รายการทั้งหมดของ {{ $inventoryGroup->name }} - Show Inventory by {{ $inventoryGroup->name }}</div>
+                <div class="card-header">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+
+                        <span id="card_title">
+                            รายการทั้งหมดของ {{ $inventoryGroup->name }} - Show Inventory by {{ $inventoryGroup->name }}
+                        </span>
+
+                         <div class="float-right">
+                            <a href="{{ route('worker.stock.create-inventory-by-group', ['inventoryGroupId' => $inventoryGroup->id]) }}" class="btn btn-primary btn-sm float-right"  data-placement="left">
+                              {{ __('Create New') }}
+                            </a>
+                          </div>
+                    </div>
+                </div>
                 <div class="card-body">
 
                     <div class="table-responsive">
