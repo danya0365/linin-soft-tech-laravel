@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\OperationType;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -16,7 +17,7 @@ return new class extends Migration
         Schema::create('employee_operation_logs', function (Blueprint $table) {
             $table->id();
             $table->integer('employee_id');
-            $table->enum('operation_type', ['pickup', 'wash', 'dry', 'iron', 'packing', 'collect']);
+            $table->enum('operation_type', OperationType::getValues());
             $table->enum('action_type', ['start', 'progress', 'stop']);
             $table->timestamps();
         });
