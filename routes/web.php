@@ -169,6 +169,8 @@ Route::group(['prefix' => 'worker', 'middleware' => ['auth']], function () {
             Route::get('/', [App\Http\Controllers\Worker\Operation\DeliverController::class, 'index'])->name('worker.operation.deliver');
             Route::get('/employee', [App\Http\Controllers\Worker\Operation\DeliverController::class, 'selectEmployee'])->name('worker.operation.deliver.select-employee');
             Route::get('/employee/{employeeId}', [App\Http\Controllers\Worker\Operation\DeliverController::class, 'setSelectEmployee'])->name('worker.operation.deliver.set-select-employee');
+            Route::get('/{operationId}/collect-operation', [App\Http\Controllers\Worker\Operation\CollectController::class, 'selectCollectOperation'])->name('worker.operation.deliver.select-collect-operation');
+            Route::get('/{operationId}/collect-operation/{collectOperationId}', [App\Http\Controllers\Worker\Operation\CollectController::class, 'setSelectCollectOperation'])->name('worker.operation.deliver.set-select-collect-operation');
         });
     });
 

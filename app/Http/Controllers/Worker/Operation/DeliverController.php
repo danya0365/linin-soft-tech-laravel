@@ -36,6 +36,26 @@ class DeliverController extends Controller
 
         EmployeeManager::createEmployeeOperationLog($employeeId, WorkerOperationStatus::Deliver(), EmployeeOperationActionType::Start());
 
-        return redirect(route('worker.operation.deliver.select-customer', ['operationId' => $operation->id]));
+        return redirect(route('worker.operation.deliver.select-collect-operation', ['operationId' => $operation->id]));
+    }
+
+    public function selectCollectOperation()
+    {
+        $departments = Department::with('employees')->where('id', DepartmentNameId::Deliver())->get();
+        return view('worker.operations.deliver.select-employee', ['departments' => $departments->toArray()]);
+    }
+
+    public function setSelectCollectOperation($employeeId)
+    {
+        $operation = new Operation();
+        $operation->employee_id = $employeeId;
+        $operation->collect_employee_id = $employeeId;
+        $operation->operation_type = OperationType::Deliver();
+        $operation->status = OperationStatus::InProgress();
+        $operation->save();
+
+        EmployeeManager::createEmployeeOperationLog($employeeId, WorkerOperationStatus::Deliver(), EmployeeOperationActionType::Start());
+
+        return redirect(route('worker.operation.deliver.select-collect-operation', ['operationId' => $operation->id]));
     }
 }
