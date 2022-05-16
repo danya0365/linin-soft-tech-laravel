@@ -104,6 +104,11 @@ class Operation extends Model
     return $this->belongsTo(Employee::class, 'collect_employee_id');
   }
 
+  public function deliverEmployee()
+  {
+    return $this->belongsTo(Employee::class, 'deliver_employee_id');
+  }
+
   public function updateRelateFields()
   {
     $operation = self::with('linenProducts')->where('id', $this->id)->first();
