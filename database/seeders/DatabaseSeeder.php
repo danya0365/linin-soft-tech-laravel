@@ -9,6 +9,7 @@ use App\Models\Customer;
 use App\Models\Department;
 use App\Models\DryerMachine;
 use App\Models\Employee;
+use App\Models\Truck;
 use App\Models\WashingMachine;
 
 class DatabaseSeeder extends Seeder
@@ -22,10 +23,6 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        DryerMachine::factory()
-            ->count(30)
-            ->sequence(fn ($sequence) => ['name' => 'เครื่องอบผ้า ' . $sequence->index + 1, 'photo' => 'bi-server'])
-            ->create();
         $this->call([
             UserSeeder::class,
             DepartmentSeeder::class,
@@ -59,6 +56,11 @@ class DatabaseSeeder extends Seeder
         DryerMachine::factory()
             ->count(30)
             ->sequence(fn ($sequence) => ['name' => 'เครื่องอบผ้า ' . $sequence->index + 1, 'photo' => 'bi-server'])
+            ->create();
+
+        Truck::factory()
+            ->count(30)
+            ->sequence(fn ($sequence) => ['name' => 'รถบรรทุก ' . $sequence->index + 1, 'photo' => 'bi-truck', 'plate_number' => sprintf('%06d', $sequence->index + 1)])
             ->create();
     }
 }

@@ -12,6 +12,7 @@ use App\Managers\EmployeeManager;
 use App\Models\Department;
 use App\Models\Operation;
 use App\Models\OperationLinenProduct;
+use App\Models\Truck;
 
 class DeliverController extends Controller
 {
@@ -86,5 +87,30 @@ class DeliverController extends Controller
         $operations = $query->paginate();
 
         return view('worker.operations.deliver.select-collect-operation', ['operations' => $operations, 'operation' => $operation->toArray()]);
+    }
+
+    public function selectTruck($operationId)
+    {
+        $operation = Operation::withSum('deliverOperationLinenProducts', 'deliver_pack')->with('employee')->with('deliverEmployee')->where('id', $operationId)->first();
+        $trucks = Truck::with('operation')->get();
+        return view('worker.operations.deliver.select-truck', ['trucks' => $trucks->toArray(), 'operation' => $operation->toArray()]);
+    }
+
+    public function setSelectTruck($operationId, $truckId)
+    {
+        $operation = Operation::find($operationId);
+        $truck = Truck::find($truckId);
+        if ($truck->operation_id && $truck->operation_id != $operation->id) {
+            return back()->with('error', 'กรุณาเลือกรถคันอื่น - Please select another truck.')->with('operation_id', $truck->operation_id);
+        }
+
+        $prevTruckId = $operation->truck_id;
+        $operation->truck_id = $truckId;
+        $operation->save();
+
+        if ($prevTruckId) Truck::where('id', $prevTruckId)->update(['operation_id' => null]);
+        Truck::where('id', $truckId)->update(['operation_id' => $operation->id]);
+
+        return redirect(route('worker.operation.deliver.employee-summary', ['operationId' => $operation->id]));
     }
 }

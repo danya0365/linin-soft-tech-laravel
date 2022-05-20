@@ -109,6 +109,11 @@ class Operation extends Model
     return $this->belongsTo(Employee::class, 'deliver_employee_id');
   }
 
+  public function deliverOperationLinenProducts()
+  {
+    return $this->hasMany(OperationLinenProduct::class, 'deliver_operation_id');
+  }
+
   public function updateRelateFields()
   {
     $operation = self::with('linenProducts')->where('id', $this->id)->first();

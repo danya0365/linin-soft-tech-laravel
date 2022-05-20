@@ -7,7 +7,7 @@
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{ route('worker') }}">Worker</a></li>
             <li class="breadcrumb-item"><a href="{{ route('worker.operation') }}">ปฏิบัติการ</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.operation') }}">พนักงาน  {{ $operation['employee']['name'] }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('worker.operation.deliver.select-employee') }}">พนักงาน  {{ $operation['employee']['name'] }}</a></li>
             <li class="breadcrumb-item active" aria-current="page">ขนส่ง - เลือก Packing</li>
         </ol>
     </nav>
