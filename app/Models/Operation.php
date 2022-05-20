@@ -84,6 +84,11 @@ class Operation extends Model
     return $this->belongsTo(DryerMachine::class);
   }
 
+  public function truck()
+  {
+    return $this->belongsTo(Truck::class);
+  }
+
   public function dryEmployee()
   {
     return $this->belongsTo(Employee::class, 'dry_employee_id');
@@ -283,6 +288,33 @@ class Operation extends Model
     }
 
     $summaryReports[] = ['title' => 'จำนวนที่จัดเก็บแล้ว', 'value' => $totalValue];
+    return $summaryReports;
+  }
+
+  public function deliverSummaryReport()
+  {
+    $totalValue = 0;
+    $summaryReports = [];
+    $operationLinenProducts = DB::table('operations_linen_products')
+      ->selectRaw(
+        'SUM(deliver_pack) as total_deliver_pack, linen_product_id, linen_products.name as linen_product_name'
+      )
+      ->join('linen_products', function ($join) {
+        $join->on('linen_products.id', '=', 'operations_linen_products.linen_product_id');
+      })
+      ->join('operations', function ($join) {
+        $join->on('operations.id', '=', 'operations_linen_products.deliver_operation_id');
+      })
+      ->groupBy('operations_linen_products.linen_product_id')
+      ->where('operations.employee_id', $this->deliver_employee_id)
+      ->orderBy('total_deliver_pack', 'desc')->get();
+
+    foreach ($operationLinenProducts as $operationLinenProduct) {
+      $totalValue += $operationLinenProduct->total_deliver_pack;
+      $summaryReports[] = ['title' => $operationLinenProduct->linen_product_name, 'value' => $operationLinenProduct->total_deliver_pack];
+    }
+
+    $summaryReports[] = ['title' => 'จำนวนที่ขนส่งแล้ว', 'value' => $totalValue];
     return $summaryReports;
   }
 

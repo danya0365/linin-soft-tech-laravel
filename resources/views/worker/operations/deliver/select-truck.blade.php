@@ -8,7 +8,6 @@
             <li class="breadcrumb-item"><a href="{{ route('worker') }}">Worker</a></li>
             <li class="breadcrumb-item"><a href="{{ route('worker.operation') }}">ปฏิบัติการ</a></li>
             <li class="breadcrumb-item"><a href="{{ route('worker.operation.deliver.select-employee') }}">พนักงาน  {{ $operation['employee']['name'] }}</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.operation.deliver.select-collect-operation', ['operationId' => $operation['id']]) }}">จำนวน {{ $operation['deliver_operation_linen_products_sum_deliver_pack'] }} แพ็ค</a></li>
             <li class="breadcrumb-item active" aria-current="page">ขนส่ง - เลือกรถบรรทุก</li>
         </ol>
     </nav>
@@ -26,6 +25,7 @@
                                         <div class="bi {{ $truck['photo'] ?? 'bi-truck' }}" style="font-size: 3em"></div>
                                     </div>
                                     <div class="text-center">{{ $truck['name'] }}</div>
+                                    <div class="text-center">ทะเบียน: {{ $truck['plate_number'] }}</div>
                                     <div class="text-center">สถานะ: {!! $operation['truck_id'] == $truck['id'] ? "<span class=\"text-success\">เลือกอยู่ - Selected</span>" : $truck['status_text'] !!}</div>
                                 </div>
                             </a>
