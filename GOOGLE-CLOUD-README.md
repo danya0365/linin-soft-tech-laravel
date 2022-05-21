@@ -11,7 +11,8 @@ then you can run
 
 ## Access to docker console container
 
-`docker exec -it <CONTAINER_ID> bash`
+`docker ps`
+`docker exec -it fa51a3472315 bash`
 
 Ref: [รวม Docker command line พื้นฐาน](https://medium.com/quintuples/%E0%B8%A3%E0%B8%A7%E0%B8%A1-docker-command-line-%E0%B8%9E%E0%B8%B7%E0%B9%89%E0%B8%99%E0%B8%90%E0%B8%B2%E0%B8%99-74b61101effa)
 

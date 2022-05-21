@@ -67,7 +67,7 @@
                                         <td class="text-center">{{ number_format($operation->total_wet_weight) }}</td>
                                         <td class="text-center">{{ number_format($operation->total_collect_weight) }}</td>
                                         <td class="text-center">{{ number_format($operation->total_edit_collect_weight) }}</td>
-                                        <td class="text-center">{{ number_format($operation->total_edit_collect_weight*100/$operation->total_collect_weight) }}%</td>
+                                        <td class="text-center">{{ number_format($operation->total_collect_weight > 0 ? $operation->total_edit_collect_weight*100/$operation->total_collect_weight : 100) }}%</td>
                                         <td class="text-center">{{ number_format($operation->total_billing_weight) }}</td>
                                         <td class="text-center">{{ number_format($operation->total_billing_weight-$operation->total_collect_weight) }}</td>
                                     </tr>
