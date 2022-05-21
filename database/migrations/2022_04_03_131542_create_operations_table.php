@@ -24,14 +24,17 @@ return new class extends Migration
             $table->integer('iron_employee_id')->nullable();
             $table->integer('packing_employee_id')->nullable();
             $table->integer('collect_employee_id')->nullable();
+            $table->integer('deliver_employee_id')->nullable();
             $table->integer('washing_machine_id')->nullable();
             $table->integer('dryer_machine_id')->nullable();
+            $table->integer('truck_id')->nullable();
             $table->float('total_wet_weight')->nullable();
             $table->float('total_dry_weight')->nullable();
             $table->integer('total_iron_piece')->nullable();
             $table->integer('total_packing_piece')->nullable();
             $table->float('total_collect_weight')->nullable();
             $table->integer('total_collect_pack')->nullable();
+            $table->integer('total_deliver_pack')->nullable();
             $table->float('total_billing_weight')->nullable();
             $table->float('total_billing_payment')->nullable();
             $table->string('colors')->nullable();

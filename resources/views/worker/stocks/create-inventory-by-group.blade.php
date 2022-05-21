@@ -7,7 +7,7 @@
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{ route('worker') }}">Worker</a></li>
             <li class="breadcrumb-item"><a href="{{ route('worker.stock') }}">Stocks</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.stock.show-inventory-by-group', ['inventoryGroupId' => $inventoryGroup->id]) }}">รายการทั้งหมดของ {{ $inventoryGroup->name }} - Show Inventory by {{ $inventory->inventoryGroup->name }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('worker.stock.show-inventory-by-group', ['inventoryGroupId' => $inventoryGroup->id]) }}">รายการทั้งหมดของ {{ $inventoryGroup->name }} - Show Inventory by {{ $inventoryGroup->name }}</a></li>
             <li class="breadcrumb-item active" aria-current="page">เพิ่มรายการของ {{ $inventoryGroup->name }} - Create new Inventory by {{ $inventoryGroup->name }}</li>
         </ol>
     </nav>

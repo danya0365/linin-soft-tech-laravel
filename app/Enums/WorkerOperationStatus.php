@@ -20,5 +20,6 @@ final class WorkerOperationStatus extends Enum
     const Iron = 'iron';
     const Packing = 'packing';
     const Collect = 'collect';
+    const Deliver = 'deliver';
     const Close = 'close';
 }

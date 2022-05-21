@@ -17,40 +17,37 @@ class InventorySeeder extends Seeder
     {
         $insertGetId = DB::table('inventory_groups')->insertGetId([
             'name' => 'เคมี/ผงซักฟอก',
-            'created_at' =>  \Carbon\Carbon::now(),
-            'updated_at' => \Carbon\Carbon::now()
-        ]);
-        DB::table('inventories')->insert([
-            'name' => 'ผงซักฟอก 200 ลิตร',
-            'inventory_group_id' => $insertGetId,
-            'unit'  => 'ถัง',
-            'total_quantity' => 100,
-            'remain_quantity' => 100,
+            'icon' => 'fa-solid fa-cubes-stacked',
             'created_at' =>  \Carbon\Carbon::now(),
             'updated_at' => \Carbon\Carbon::now()
         ]);
         DB::table('inventory_groups')->insert([
             'name' => 'ถุงพลาสติก',
+            'icon' => 'fa-solid fa-cubes-stacked',
             'created_at' =>  \Carbon\Carbon::now(),
             'updated_at' => \Carbon\Carbon::now()
         ]);
         DB::table('inventory_groups')->insert([
             'name' => 'วัสดุทั่วไป',
+            'icon' => 'fa-solid fa-cubes-stacked',
             'created_at' =>  \Carbon\Carbon::now(),
             'updated_at' => \Carbon\Carbon::now()
         ]);
         DB::table('inventory_groups')->insert([
             'name' => 'แผนกซ่อมบำรุง',
+            'icon' => 'fa-solid fa-cubes-stacked',
             'created_at' =>  \Carbon\Carbon::now(),
             'updated_at' => \Carbon\Carbon::now()
         ]);
         DB::table('inventory_groups')->insert([
             'name' => 'แก๊ส',
+            'icon' => 'fa-solid fa-cubes-stacked',
             'created_at' =>  \Carbon\Carbon::now(),
             'updated_at' => \Carbon\Carbon::now()
         ]);
         DB::table('inventory_groups')->insert([
             'name' => 'ชีวมวล',
+            'icon' => 'fa-solid fa-cubes-stacked',
             'created_at' =>  \Carbon\Carbon::now(),
             'updated_at' => \Carbon\Carbon::now()
         ]);

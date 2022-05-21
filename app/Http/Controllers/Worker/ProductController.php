@@ -79,6 +79,8 @@ class ProductController extends Controller
                 DB::raw('sum(iron_piece) as total_iron_piece'),
                 DB::raw('sum(packing_piece) as total_packing_piece'),
                 DB::raw('sum(collect_weight) as total_collect_weight'),
+                DB::raw('sum(collect_pack) as total_collect_pack'),
+                DB::raw('sum(deliver_pack) as total_deliver_pack'),
                 'linen_product_id'
             )
                 ->where('linen_case', $linenCase['var'])

@@ -20,5 +20,6 @@ final class OperationType extends Enum implements LocalizedEnum
     const Iron = 'iron';
     const Packing = 'packing';
     const Collect = 'collect';
+    const Deliver = 'deliver';
     const Payment = 'payment';
 }

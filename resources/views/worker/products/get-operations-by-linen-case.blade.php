@@ -92,6 +92,7 @@
                                     <th>จำนวนที่พับแพ็ค (piece)</th>
                                     <th>น้ำหนักที่จัดเก็บ (kg.)</th>
                                     <th>จำนวนที่จัดเก็บ (pack)</th>
+                                    <th>จำนวนที่ขนส่ง (pack)</th>
                                     <th>เวลา</th>
                                 </tr>
                             </thead>
@@ -110,6 +111,7 @@
                                         <td class="text-center">{{ $operation->packing_piece }}</td>
                                         <td class="text-center">{{ $operation->collect_weight }}</td>
                                         <td class="text-center">{{ $operation->collect_pack }}</td>
+                                        <td class="text-center">{{ $operation->deliver_pack }}</td>
                                         <td class="text-center">{{ $operation->created_at->format('H:i') }}</td>
                                     </tr>
                                 @endforeach
@@ -128,6 +130,7 @@
                                     <th>จำนวนที่พับแพ็ค (piece)</th>
                                     <th>น้ำหนักที่จัดเก็บ (kg.)</th>
                                     <th>จำนวนที่จัดเก็บ (pack)</th>
+                                    <th>จำนวนที่ขนส่ง (pack)</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -140,6 +143,7 @@
                                         <td class="text-center">{{ $linenProductSummary->total_packing_piece }}</td>
                                         <td class="text-center">{{ $linenProductSummary->total_collect_weight }}</td>
                                         <td class="text-center">{{ $linenProductSummary->total_collect_pack }}</td>
+                                        <td class="text-center">{{ $linenProductSummary->total_deliver_pack }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>

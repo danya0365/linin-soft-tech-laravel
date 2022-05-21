@@ -19,11 +19,12 @@ return new class extends Migration
             $table->date('operation_date');
             $table->float('total_wet_weight')->default(0.0);
             $table->float('total_dry_weight')->default(0.0);
-            $table->integer('total_iron_piece')->default(0.0);
-            $table->integer('total_packing_piece')->default(0.0);
+            $table->integer('total_iron_piece')->default(0);
+            $table->integer('total_packing_piece')->default(0);
             $table->float('total_edit_collect_weight')->default(0.0);
             $table->float('total_collect_weight')->default(0.0);
-            $table->integer('total_collect_pack')->default(0.0);
+            $table->integer('total_collect_pack')->default(0);
+            $table->integer('total_delivery_pack')->default(0);
             $table->float('total_billing_weight')->default(0.0);
             $table->float('total_billing_payment')->default(0.0);
             $table->timestamps();
