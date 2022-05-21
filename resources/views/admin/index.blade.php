@@ -24,6 +24,7 @@
                         <a class="btn btn-outline-secondary btn-lg" href="{{ route('linen-products.index') }}" role="button">{{ __('ผ้า') }}</a>
                         <a class="btn btn-outline-secondary btn-lg" href="{{ route('washing-machines.index') }}" role="button">{{ __('เครื่องซักผ้า') }}</a>
                         <a class="btn btn-outline-secondary btn-lg" href="{{ route('dryer-machines.index') }}" role="button">{{ __('เครื่องอบผ้า') }}</a>
+                        <a class="btn btn-outline-secondary btn-lg" href="{{ route('trucks.index') }}" role="button">{{ __('รถบรรทุก') }}</a>
                     </div>
                 </div>
             </div>
