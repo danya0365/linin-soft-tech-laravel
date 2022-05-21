@@ -42,6 +42,7 @@ Route::group(['middleware' => ['admin']], function () {
     Route::resource('washing-machines', App\Http\Controllers\WashingMachineController::class);
     Route::resource('dryer-machines', App\Http\Controllers\DryerMachineController::class);
     Route::resource('inventories', App\Http\Controllers\InventoryController::class);
+    Route::resource('trucks', App\Http\Controllers\TruckController::class);
 });
 
 Route::group(['prefix' => 'worker', 'middleware' => ['auth']], function () {
