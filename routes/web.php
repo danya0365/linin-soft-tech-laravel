@@ -38,7 +38,7 @@ Route::group(['middleware' => ['admin']], function () {
     Route::resource('departments', App\Http\Controllers\DepartmentController::class);
     Route::resource('employees', App\Http\Controllers\EmployeeController::class);
     Route::resource('linen-types', App\Http\Controllers\LinenTypeController::class);
-    Route::resource('linen-products', App\Http\Controllers\LinenProductControllers::class);
+    Route::resource('linen-products', App\Http\Controllers\LinenProductController::class);
     Route::resource('washing-machines', App\Http\Controllers\WashingMachineController::class);
     Route::resource('dryer-machines', App\Http\Controllers\DryerMachineController::class);
     Route::resource('inventories', App\Http\Controllers\InventoryController::class);
