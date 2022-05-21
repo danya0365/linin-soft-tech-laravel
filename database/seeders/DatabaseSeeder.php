@@ -57,10 +57,5 @@ class DatabaseSeeder extends Seeder
             ->count(30)
             ->sequence(fn ($sequence) => ['name' => 'เครื่องอบผ้า ' . $sequence->index + 1, 'photo' => 'bi-server'])
             ->create();
-
-        Truck::factory()
-            ->count(30)
-            ->sequence(fn ($sequence) => ['name' => 'รถบรรทุก ' . $sequence->index + 1, 'photo' => 'bi-truck', 'plate_number' => sprintf('%06d', $sequence->index + 1)])
-            ->create();
     }
 }

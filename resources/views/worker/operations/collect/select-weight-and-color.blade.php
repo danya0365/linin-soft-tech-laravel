@@ -23,19 +23,20 @@
                     <form method="POST" action="{{ route('worker.operation.collect.set-select-weight-and-color', ['operationId' => $operation['id'], 'operationLinenProductId' => $operationLinenProduct['id']]) }}"  role="form" enctype="multipart/form-data">
                         @csrf
                         {{ Form::hidden('collect_weight', $operationLinenProduct['collect_weight']) }}
+                        {{ Form::hidden('collect_pack', $operationLinenProduct['collect_pack']) }}
                         {{ Form::hidden('color', $operationLinenProduct['color']) }}
                         <div class="box box-info padding-1">
                             <div class="box-body">
                                 
                                 <div class="row g-2">
-                                    <div class="col-sm-6">
+                                    <div class="col-sm-4">
                                         <div class="row g-2">
                                             <div class="col-12 text-center">
                                                 <h2>น้ำหนักกิโลกรัม</h2>
                                             </div>
                                             <div class="col-12">
                                                 <div class="p-3 border bg-light" style="width: 100%">
-                                                    <div class="rounded-3" style="text-align: right; font-size: 48px" id="pad-result">
+                                                    <div class="rounded-3" style="text-align: right; font-size: 48px" id="pad-weight-result">
                                                         0
                                                     </div>
                                                 </div>
@@ -44,7 +45,7 @@
                                             @foreach ([7, 8, 9, 4, 5, 6, 1, 2, 3, '', 0, 'ลบ'] as $pad)
                                             <div class="col-4">
                                                 <div class="border bg-light" style="width: 100%">
-                                                    <div class="rounded-3 d-flex align-items-center justify-content-center pad-number" style="font-size: 48px">
+                                                    <div class="rounded-3 d-flex align-items-center justify-content-center pad-weight-number" style="font-size: 48px">
                                                         {{ $pad }}
                                                     </div>
                                                 </div>
@@ -52,7 +53,31 @@
                                             @endforeach
                                         </div>
                                     </div>
-                                    <div class="col-sm-6">
+                                    <div class="col-sm-4">
+                                        <div class="row g-2">
+                                            <div class="col-12 text-center">
+                                                <h2>จำนวนแพ็ค</h2>
+                                            </div>
+                                            <div class="col-12">
+                                                <div class="p-3 border bg-light" style="width: 100%">
+                                                    <div class="rounded-3" style="text-align: right; font-size: 48px" id="pad-pack-result">
+                                                        0
+                                                    </div>
+                                                </div>
+                                            </div>
+        
+                                            @foreach ([7, 8, 9, 4, 5, 6, 1, 2, 3, '', 0, 'ลบ'] as $pad)
+                                            <div class="col-4">
+                                                <div class="border bg-light" style="width: 100%">
+                                                    <div class="rounded-3 d-flex align-items-center justify-content-center pad-pack-number" style="font-size: 48px">
+                                                        {{ $pad }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
                                         <div class="row g-2">
 
                                             <div class="col-12 text-center">
@@ -104,36 +129,64 @@
 </div>
 <script type="text/javascript">
 $(function(){
-    var number = $('[name=collect_weight]').val();
+    var collect_weight = $('[name=collect_weight]').val();
+    var collect_pack = $('[name=collect_pack]').val();
     var selectColor = $('[name=color]').val();
-    var setPadResult = function(number){
+    var setPadWeightResult = function(number){
         var numbers = number.split('.');
         if (numbers.length == 2) {
             number = numbers[0] + '.' + numbers[1];
             number = parseFloat(number);
-            //numbers = `${number}`.split('.');
-            //number = numbers[0].toLocaleString() + (numbers[1] ? '.' + numbers[1] : '');
         } else {
             number = parseInt(number);
         }
         if (isNaN(number)) {
             number = 0;
         }
-        $("#pad-result").html(number.toLocaleString());
+        $("#pad-weight-result").html(number.toLocaleString());
         $('[name=collect_weight]').val(number);
     }
-    setPadResult(number);
-    $('.pad-number').click(function(){
+    setPadWeightResult(collect_weight);
+    $('.pad-weight-number').click(function(){
         var padNumber =  $.trim($(this).text())
         padNumber = padNumber.replace(',', '');
         if ( padNumber == '') {
             return
         }
-        number = number != '0' ? number + '' + padNumber : padNumber;
+        collect_weight = collect_weight != '0' ? collect_weight + '' + padNumber : padNumber;
         if ( padNumber == 'ลบ') {
-            number = '0';
+            collect_weight = '0';
         }
-        setPadResult(number);
+        setPadWeightResult(collect_weight);
+    })
+
+
+    var setPadPackResult = function(number){
+        var numbers = number.split('.');
+        if (numbers.length == 2) {
+            number = numbers[0] + '.' + numbers[1];
+            number = parseFloat(number);
+        } else {
+            number = parseInt(number);
+        }
+        if (isNaN(number)) {
+            number = 0;
+        }
+        $("#pad-pack-result").html(number.toLocaleString());
+        $('[name=collect_pack]').val(number);
+    }
+    setPadPackResult(collect_pack);
+    $('.pad-pack-number').click(function(){
+        var padNumber =  $.trim($(this).text())
+        padNumber = padNumber.replace(',', '');
+        if ( padNumber == '') {
+            return
+        }
+        collect_pack = collect_pack != '0' ? collect_pack + '' + padNumber : padNumber;
+        if ( padNumber == 'ลบ') {
+            collect_pack = '0';
+        }
+        setPadPackResult(collect_pack);
     })
 
     var setColorResult = (color) => {

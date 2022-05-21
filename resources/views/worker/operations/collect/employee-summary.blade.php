@@ -47,6 +47,7 @@
                         {{ $operationLinenProduct['linen_case'] ? $operationLinenProduct['linen_case']['name'] : 'ยังไม่ได้เลือก' }},
                         ชนิดผ้า: {{ $operationLinenProduct['linen_product'] ? $operationLinenProduct['linen_product']['name'] : 'ยังไม่ได้เลือก' }},
                         นำ้หนักที่จัดเก็บ: {{ $operationLinenProduct['collect_weight'] ? $operationLinenProduct['collect_weight'] : 'ยังไม่ได้เลือก' }} kg.,
+                        จำนวนแพ็คที่จัดเก็บ: {{ $operationLinenProduct['collect_pack'] ? $operationLinenProduct['collect_pack'] : 'ยังไม่ได้เลือก' }} packs,
                         สี: <span style="color: {{ $operationLinenProduct['color'] ? $operationLinenProduct['color'] : '' }}">{{ $operationLinenProduct['color'] ? $operationLinenProduct['color'] : 'ยังไม่ได้เลือก' }}</span>
                     </li>
                     @endforeach

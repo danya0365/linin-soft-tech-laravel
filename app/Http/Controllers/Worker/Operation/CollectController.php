@@ -161,11 +161,12 @@ class CollectController extends Controller
 
     public function setSelectWeightAndColor($operationId, $operationLinenProductId)
     {
-        request()->validate(['collect_weight' => 'required', 'color' => 'required']);
+        request()->validate(['collect_weight' => 'required', 'collect_pack' => 'required', 'color' => 'required']);
 
         $operationLinenProduct = OperationLinenProduct::find($operationLinenProductId);
         $operationLinenProductOldValue = $operationLinenProduct->getAttributes();
         $operationLinenProduct->collect_weight = request()->get('collect_weight');
+        $operationLinenProduct->collect_pack = request()->get('collect_pack');
         $operationLinenProduct->color = request()->get('color');
         $operationLinenProductNewValue = $operationLinenProduct->getDirty();
         $operationLinenProduct->save();
