@@ -41,7 +41,7 @@
                                         <tr>
                                             <td>{{ $operation->created_at->format('Y-m-d') }}</td>
                                             <td>{{ App\Enums\OperationType::getDescription($operation->operation->operation_type) }}</td>
-                                            <td>{{ $operation->linenProduct->name }}</td>
+                                            <td>{{ $operation->linenProduct ? $operation->linenProduct->name : '-' }}</td>
                                             <td style="background-color: {{ $operation->color }}">{{ $operation->color }}</td>
                                             <td>{{ $operation->operation->customer->name }}</td>
                                             <td>{{ $operation->operation->employee->name }}</td>

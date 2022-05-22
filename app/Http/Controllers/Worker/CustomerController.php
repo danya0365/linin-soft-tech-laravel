@@ -138,6 +138,8 @@ class CustomerController extends Controller
             $query->with('employee')->with('customer');
         }])->with('linenProduct');
 
+        $query->whereNotNull('linen_product_id');
+
         $query->where(function ($query) use ($customerId, $operationTypeSelected, $linenProductSelected, $linenCaseSelected) {
             $query->whereHas('operation', function ($query) use ($customerId, $operationTypeSelected) {
                 $query->where('customer_id', $customerId);
