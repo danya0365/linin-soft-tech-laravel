@@ -71,7 +71,7 @@ class Operation extends Model
 
   public function linenProducts()
   {
-    return $this->belongsToMany(LinenProduct::class, 'operations_linen_products')->using(OperationLinenProduct::class)->withPivot('linen_case', 'color', 'wet_weight', 'dry_weight', 'iron_piece', 'packing_piece', 'collect_weight');
+    return $this->belongsToMany(LinenProduct::class, 'operations_linen_products')->using(OperationLinenProduct::class)->withPivot('linen_case', 'color', 'wet_weight', 'dry_weight', 'iron_piece', 'packing_piece', 'collect_weight', 'collect_pack', 'deliver_pack');
   }
 
   public function washEmployee()
@@ -124,7 +124,7 @@ class Operation extends Model
     $operation = self::with('linenProducts')->where('id', $this->id)->first();
     $searchTags = [];
     $colors = [];
-    $totalWetWeight = $totalDryWeight = $totalIronPiece = $totalPackingPiece = $totalCollectWeight = 0;
+    $totalWetWeight = $totalDryWeight = $totalIronPiece = $totalPackingPiece = $totalCollectWeight = $totalCollectPack = $totalDeliverPack = 0;
     foreach ($operation->linenProducts as $linenProduct) {
       $searchTags[] = $linenProduct->pivot->linen_case;
       $searchTags[] = $linenProduct->pivot->color;
@@ -134,6 +134,8 @@ class Operation extends Model
       $totalIronPiece += $linenProduct->pivot->iron_piece;
       $totalPackingPiece += $linenProduct->pivot->packing_piece;
       $totalCollectWeight += $linenProduct->pivot->collect_weight;
+      $totalCollectPack += $linenProduct->pivot->collect_pack;
+      $totalDeliverPack += $linenProduct->pivot->deliver_pack;
     }
     $this->search_tags = $searchTags;
     $this->colors = $colors;
@@ -142,6 +144,8 @@ class Operation extends Model
     $this->total_iron_piece = $totalIronPiece;
     $this->total_packing_piece = $totalPackingPiece;
     $this->total_collect_weight = $totalCollectWeight;
+    $this->total_collect_pack = $totalCollectPack;
+    $this->total_deliver_pack = $totalDeliverPack;
     $this->save();
   }
 
@@ -266,11 +270,14 @@ class Operation extends Model
 
   public function collectSummaryReport()
   {
-    $totalValue = 0;
+    $totalWeightValue = $totalPackValue = 0;
     $summaryReports = [];
     $operationLinenProducts = DB::table('operations_linen_products')
       ->selectRaw(
-        'SUM(collect_weight) as total_collect_weight, linen_product_id, linen_products.name as linen_product_name'
+        'SUM(collect_weight) as total_collect_weight, 
+        SUM(collect_pack) as total_collect_pack, 
+        linen_product_id, 
+        linen_products.name as linen_product_name'
       )
       ->join('linen_products', function ($join) {
         $join->on('linen_products.id', '=', 'operations_linen_products.linen_product_id');
@@ -283,11 +290,15 @@ class Operation extends Model
       ->orderBy('total_collect_weight', 'desc')->get();
 
     foreach ($operationLinenProducts as $operationLinenProduct) {
-      $totalValue += $operationLinenProduct->total_collect_weight;
-      $summaryReports[] = ['title' => $operationLinenProduct->linen_product_name, 'value' => $operationLinenProduct->total_collect_weight];
+      $totalWeightValue += $operationLinenProduct->total_collect_weight;
+      $summaryReports[] = ['title' => $operationLinenProduct->linen_product_name, 'value' => $operationLinenProduct->total_collect_weight, 'unit' => 'ชิ้น'];
+
+      $totalPackValue += $operationLinenProduct->total_collect_pack;
+      $summaryReports[] = ['title' => $operationLinenProduct->linen_product_name, 'value' => $operationLinenProduct->total_collect_pack, 'unit' => 'packs'];
     }
 
-    $summaryReports[] = ['title' => 'จำนวนที่จัดเก็บแล้ว', 'value' => $totalValue];
+    $summaryReports[] = ['title' => 'จำนวนที่จัดเก็บแล้ว', 'value' => $totalWeightValue, 'unit' => 'kg.'];
+    $summaryReports[] = ['title' => 'จำนวนที่จัดเก็บแล้ว', 'value' => $totalPackValue, 'unit' => 'packs'];
     return $summaryReports;
   }
 
