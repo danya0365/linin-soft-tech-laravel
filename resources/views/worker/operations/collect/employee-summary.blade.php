@@ -20,12 +20,12 @@
                     <div class="row g-2">
                         <div class="col-4">
                             <div class="d-grid gap-2" style="min-height: 60px">
-                                <button class="btn btn-primary" type="button" onclick="window.location='{{ route('worker.operation.collect.select-linen-case', ['operationId' => $operation['id'], 'operationLinenProductId' => 0]) }}'">เพิ่ม</button>
+                                <button class="btn btn-primary" type="button" id="add-operation">เพิ่ม</button>
                             </div>
                         </div>
                         <div class="col-4">
                             <div class="d-grid gap-2" style="min-height: 60px">
-                                <button class="btn btn-danger" type="button" onclick="window.location='{{ route('worker.operation.collect.select-operation-linen-product', ['operationId' => $operation['id']]) }}'">แก้ไขหรือลบ</button>
+                                <button class="btn btn-danger" type="button" id="edit-operation">แก้ไขหรือลบ</button>
                             </div>
                         </div>
                         <div class="col-4">
@@ -42,6 +42,7 @@
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item">สถานะ: {{ $operation['status'] }}</li>
                     <li class="list-group-item">นำ้หนักที่จัดเก็บทั้งหมด: {{ $operation['total_collect_weight'] ? $operation['total_collect_weight'] : '-' }} kg.</li>
+                    <li class="list-group-item">แพ็คที่จัดเก็บทั้งหมด: {{ $operation['total_collect_pack'] ? $operation['total_collect_pack'] : '-' }} packs</li>
                     @foreach ($operationLinenProducts as $operationLinenProduct)
                     <li class="list-group-item">
                         {{ $operationLinenProduct['linen_case'] ? $operationLinenProduct['linen_case']['name'] : 'ยังไม่ได้เลือก' }},
@@ -74,7 +75,7 @@
                 </div>
                 <ul class="list-group list-group-flush">
                     @foreach ($summaryReports as $summaryReport)
-                    <li class="list-group-item">{{ $summaryReport['title'] }}: {{ number_format($summaryReport['value']) }} kg.</li>
+                    <li class="list-group-item">{{ $summaryReport['title'] }}: {{ number_format($summaryReport['value']) }} {{ $summaryReport['unit'] }}</li>
                     @endforeach
                   </ul>
                 <div class="card-footer text-muted text-center">
@@ -124,9 +125,23 @@
             })
         }
 
+        function addOperation(){
+            removeOnUnload(function(){
+                window.location='{{ route('worker.operation.collect.select-linen-case', ['operationId' => $operation['id'], 'operationLinenProductId' => 0]) }}'
+            })
+        }
+
+        function editOperation(){
+            removeOnUnload(function(){
+                window.location='{{ route('worker.operation.collect.select-operation-linen-product', ['operationId' => $operation['id']]) }}'
+            })
+        }
+
         setUpOnUnload();
         $("#close-operation").on("click", closeOperation);
         $("#reopen-operation").on("click", reopenOperation);
+        $("#add-operation").on("click", addOperation);
+        $("#edit-operation").on("click", editOperation);
     })
 </script>
 

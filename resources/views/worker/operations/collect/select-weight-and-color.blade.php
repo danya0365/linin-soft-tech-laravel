@@ -95,7 +95,7 @@
                                             <div class="col-4">
                                                 <div class="border color-number" style="width: 100%; background-color: {{ $color }}">
                                                     <div class="rounded-3 d-flex align-items-center justify-content-center" style="font-size: 48px; opacity: 0">
-                                                        {{ $color }}
+                                                        &nbsp;
                                                     </div>
                                                 </div>
                                             </div>
