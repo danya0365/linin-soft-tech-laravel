@@ -17,4 +17,5 @@ final class ExpenseType extends Enum
     const Biomass = 'biomass';
     const FuelOil = 'fuel_oil';
     const Petrol = 'petrol';
+    const DepartmentSalary = 'department-salary';
 }
