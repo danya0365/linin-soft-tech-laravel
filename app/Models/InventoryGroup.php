@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class InventoryGroup
@@ -17,20 +18,18 @@ use Illuminate\Database\Eloquent\Model;
  */
 class InventoryGroup extends Model
 {
-    
-    static $rules = [
-		'name' => 'required',
-    ];
+  use SoftDeletes;
 
-    protected $perPage = 20;
+  static $rules = [
+    'name' => 'required',
+  ];
 
-    /**
-     * Attributes that should be mass-assignable.
-     *
-     * @var array
-     */
-    protected $fillable = ['name'];
+  protected $perPage = 20;
 
-
-
+  /**
+   * Attributes that should be mass-assignable.
+   *
+   * @var array
+   */
+  protected $fillable = ['name'];
 }

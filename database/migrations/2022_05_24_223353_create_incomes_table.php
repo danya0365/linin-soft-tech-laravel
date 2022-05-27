@@ -13,12 +13,14 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('customer_billing_payment_logs', function (Blueprint $table) {
+        Schema::create('incomes', function (Blueprint $table) {
             $table->id();
-            $table->integer('customer_id');
-            $table->float('dry_weight');
-            $table->float('payment_paid');
+            $table->string('type_name')->nullable();
+            $table->string('table_name')->nullable();
+            $table->unsignedInteger('table_id')->nullable();
+            $table->decimal('amount', 15, 2)->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
@@ -29,6 +31,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('customer_billing_payment_logs');
+        Schema::dropIfExists('incomes');
     }
 };

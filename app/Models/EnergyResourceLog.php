@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class EnergyResourceLog
@@ -21,6 +22,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class EnergyResourceLog extends Model
 {
+    use SoftDeletes;
 
     static $rules = [];
 

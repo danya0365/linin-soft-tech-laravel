@@ -21,6 +21,7 @@ return new class extends Migration
             $table->dateTime('ended_at')->nullable();
             $table->integer('time_duration')->default(0);
             $table->timestamps();
+            $table->softDeletes();
 
             $table->unique(['employee_id', 'working_date']);
         });

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use App\Translations\Translator;
 use Carbon\CarbonInterval;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class Operation
@@ -37,6 +38,7 @@ use Carbon\CarbonInterval;
  */
 class Operation extends Model
 {
+  use SoftDeletes;
 
   static $rules = [
     'operation_type' => 'required',

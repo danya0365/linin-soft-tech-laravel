@@ -101,6 +101,16 @@ class EnergyResourceController extends Controller
                         'dateEndAt' => $dateEndAt,
                     ]
                 );
+
+            case EnergyResourceNameId::Petrol()->value:
+                return view(
+                    'worker.energy-resources.summaries.petrol',
+                    [
+                        'energyResource' => $energyResource,
+                        'dateStartAt' => $dateStartAt,
+                        'dateEndAt' => $dateEndAt,
+                    ]
+                );
         }
         return redirect(route('worker.energy-resource'));
     }

@@ -45,6 +45,18 @@ Route::group(['middleware' => ['admin']], function () {
     Route::resource('trucks', App\Http\Controllers\TruckController::class);
 });
 
+Route::group(['prefix' => 'supervisor', 'middleware' => ['auth']], function () {
+
+    Route::get('/', [App\Http\Controllers\SupervisorController::class, 'index'])->name('supervisor');
+
+    Route::group(['prefix' => 'department'], function () {
+        Route::get('/', [App\Http\Controllers\Supervisor\DepartmentController::class, 'index'])->name('supervisor.department');
+        Route::match(array('GET', 'POST'), '/submit-daily-expense', [App\Http\Controllers\Supervisor\DepartmentController::class, 'submitDailyExpense'])->name('supervisor.department.submit-daily-expense');
+        Route::match(array('GET', 'POST'), '/daily-expense-logs', [App\Http\Controllers\Supervisor\DepartmentController::class, 'dailyExpenseLogs'])->name('supervisor.department.daily-expense-log');
+        Route::match(array('GET', 'POST'), '/daily-expense-log/{id}/delete', [App\Http\Controllers\Supervisor\DepartmentController::class, 'deleteDailyExpenseLog'])->name('supervisor.department.delete-daily-expense-log');
+    });
+});
+
 Route::group(['prefix' => 'worker', 'middleware' => ['auth']], function () {
 
     Route::get('/', [App\Http\Controllers\WorkerController::class, 'index'])->name('worker');
@@ -189,6 +201,7 @@ Route::group(['prefix' => 'worker', 'middleware' => ['auth']], function () {
         Route::match(array('GET', 'POST'), '/log/{energyResourceLogId}/gas', [App\Http\Controllers\Worker\EnergyResourceLogController::class, 'submitGasLog'])->name('worker.energy-resource.log.submit-gas');
         Route::match(array('GET', 'POST'), '/log/{energyResourceLogId}/biomass', [App\Http\Controllers\Worker\EnergyResourceLogController::class, 'submitBiomassLog'])->name('worker.energy-resource.log.submit-biomass');
         Route::match(array('GET', 'POST'), '/log/{energyResourceLogId}/fuel-oil', [App\Http\Controllers\Worker\EnergyResourceLogController::class, 'submitFuelOilLog'])->name('worker.energy-resource.log.submit-fuel-oil');
+        Route::match(array('GET', 'POST'), '/log/{energyResourceLogId}/petrol', [App\Http\Controllers\Worker\EnergyResourceLogController::class, 'submitPetrolLog'])->name('worker.energy-resource.log.submit-petrol');
         Route::get('/logs', [App\Http\Controllers\Worker\EnergyResourceLogController::class, 'getLogs'])->name('worker.energy-resource.logs');
         Route::post('/logs/{energyResourceLogId}/delete', [App\Http\Controllers\Worker\EnergyResourceLogController::class, 'deleteLog'])->name('worker.energy-resource.logs.delete');
         Route::get('/summary/{energyResourceVarName}', [App\Http\Controllers\Worker\EnergyResourceController::class, 'getSummary'])->name('worker.energy-resource.summary');

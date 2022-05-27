@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers\Worker;
 
+use App\Enums\IncomeType;
 use App\Enums\OperationType;
 use App\Http\Controllers\Controller;
+use App\Managers\IncomeManager;
 use App\Managers\OperationManager;
 use App\Models\Customer;
 use App\Models\CustomerOperationDailySummary;
+use App\Models\Income;
 use App\Models\LinenType;
 use App\Models\Operation;
 use App\Models\OperationLinenCase;
@@ -210,6 +213,7 @@ class CustomerController extends Controller
         $operation->save();
 
         OperationManager::createCustomerOperationDailySummary($operation);
+        IncomeManager::create(IncomeType::CustomerBilling(), $operation, $operation->total_billing_payment);
         return redirect(route('worker.customer.operation-summary'));
     }
 }

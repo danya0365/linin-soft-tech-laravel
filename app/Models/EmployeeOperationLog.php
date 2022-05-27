@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class EmployeeOperationLog
@@ -19,22 +20,20 @@ use Illuminate\Database\Eloquent\Model;
  */
 class EmployeeOperationLog extends Model
 {
-    
-    static $rules = [
-		'employee_id' => 'required',
-		'operation_type' => 'required',
-		'action_type' => 'required',
-    ];
+  use SoftDeletes;
 
-    protected $perPage = 20;
+  static $rules = [
+    'employee_id' => 'required',
+    'operation_type' => 'required',
+    'action_type' => 'required',
+  ];
 
-    /**
-     * Attributes that should be mass-assignable.
-     *
-     * @var array
-     */
-    protected $fillable = ['employee_id','operation_type','action_type'];
+  protected $perPage = 20;
 
-
-
+  /**
+   * Attributes that should be mass-assignable.
+   *
+   * @var array
+   */
+  protected $fillable = ['employee_id', 'operation_type', 'action_type'];
 }

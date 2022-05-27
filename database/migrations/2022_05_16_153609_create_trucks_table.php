@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('plate_number')->nullable();
             $table->integer('operation_id')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

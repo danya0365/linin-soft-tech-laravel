@@ -57,6 +57,13 @@
                                 {!! $errors->first('decrease_quantity', '<div class="invalid-feedback">:message</div>') !!}
                             </div>
                         </div>
+                        <div class="col-12">
+                            <div class="input-group">
+                                {{ Form::label('cost', 'ค่าใช้จ่าย - Cost', ['class' => "input-group-text"]) }}
+                                {{ Form::text('cost', 0, ['class' => 'form-control' . ($errors->has('cost') ? ' is-invalid' : ''), 'placeholder' => '']) }}
+                                {!! $errors->first('cost', '<div class="invalid-feedback">:message</div>') !!}
+                            </div>
+                        </div>
                     </div>
                     
                 </div>

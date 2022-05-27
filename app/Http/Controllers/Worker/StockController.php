@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Worker;
 
+use App\Enums\ExpenseType;
 use App\Http\Controllers\Controller;
+use App\Managers\ExpenseManager;
 use App\Models\Inventory;
 use App\Models\InventoryGroup;
 use App\Models\InventoryStockLog;
@@ -86,6 +88,7 @@ class StockController extends Controller
             $inventoryStockLog->type = 'import';
             $inventoryStockLog->quantity = $increaseQuantity;
             $inventoryStockLog->employee_id = null; // TODO: add select employee screen
+            $inventoryStockLog->cost = 0;
             $inventoryStockLog->save();
 
             $inventory->total_quantity += $increaseQuantity;
@@ -111,7 +114,8 @@ class StockController extends Controller
 
             request()->validate(
                 [
-                    'decrease_quantity' => 'required|numeric'
+                    'decrease_quantity' => 'required|numeric',
+                    'cost' => 'required|numeric'
                 ]
             );
 
@@ -122,10 +126,13 @@ class StockController extends Controller
             $inventoryStockLog->type = 'export';
             $inventoryStockLog->quantity = $decreaseQuantity;
             $inventoryStockLog->employee_id = null; // TODO: add select employee screen
+            $inventoryStockLog->cost = request()->get('cost');
             $inventoryStockLog->save();
 
             $inventory->remain_quantity -= $decreaseQuantity;
             $inventory->save();
+
+            ExpenseManager::create(ExpenseType::Inventory(), $inventoryStockLog, $inventoryStockLog->cost);
 
             return redirect(route('worker.stock.show-inventory-by-group', ['inventoryGroupId' => $inventory->inventoryGroup->id]));
         }

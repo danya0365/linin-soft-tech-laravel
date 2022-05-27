@@ -23,6 +23,7 @@ return new class extends Migration
             $table->float('total_edit_weight')->default(0);
             $table->float('total_billing_payment')->default(0.0);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

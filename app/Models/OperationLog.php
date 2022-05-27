@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class OperationLog
@@ -21,24 +22,22 @@ use Illuminate\Database\Eloquent\Model;
  */
 class OperationLog extends Model
 {
-    
-    static $rules = [
-		'operation_id' => 'required',
-		'employee_id' => 'required',
-		'action_name' => 'required',
-		'old_values' => 'required',
-		'new_values' => 'required',
-    ];
+  use SoftDeletes;
 
-    protected $perPage = 20;
+  static $rules = [
+    'operation_id' => 'required',
+    'employee_id' => 'required',
+    'action_name' => 'required',
+    'old_values' => 'required',
+    'new_values' => 'required',
+  ];
 
-    /**
-     * Attributes that should be mass-assignable.
-     *
-     * @var array
-     */
-    protected $fillable = ['operation_id','employee_id','action_name','old_values','new_values'];
+  protected $perPage = 20;
 
-
-
+  /**
+   * Attributes that should be mass-assignable.
+   *
+   * @var array
+   */
+  protected $fillable = ['operation_id', 'employee_id', 'action_name', 'old_values', 'new_values'];
 }

@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('name'); // (รับสินค้า, ซัก, อบ, รีด, พับแพ็ค, จัดเก็บ)
             $table->enum('input_unit', ['weight', 'piece', 'pack']); //หน่วยในการจัดเก็บข้อมูลที่แสดง ในหน้าสถิติพนักงาน
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

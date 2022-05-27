@@ -36,9 +36,11 @@
                                     <tr>
                                         <th>No</th>
                                         
+										<th>Employee Id</th>
 										<th>Inventory Id</th>
 										<th>Type</th>
 										<th>Quantity</th>
+										<th>Cost</th>
 
                                         <th></th>
                                     </tr>
@@ -48,9 +50,11 @@
                                         <tr>
                                             <td>{{ ++$i }}</td>
                                             
+											<td>{{ $inventoryStockLog->employee_id }}</td>
 											<td>{{ $inventoryStockLog->inventory_id }}</td>
 											<td>{{ $inventoryStockLog->type }}</td>
 											<td>{{ $inventoryStockLog->quantity }}</td>
+											<td>{{ $inventoryStockLog->cost }}</td>
 
                                             <td>
                                                 <form action="{{ route('inventory-stock-logs.destroy',$inventoryStockLog->id) }}" method="POST">

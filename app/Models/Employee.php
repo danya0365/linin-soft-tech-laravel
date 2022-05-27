@@ -6,6 +6,7 @@ use App\Translations\Translator;
 use Carbon\CarbonInterval;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class Employee
@@ -24,6 +25,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  */
 class Employee extends Model
 {
+  use SoftDeletes;
   use HasFactory;
 
   static $rules = [

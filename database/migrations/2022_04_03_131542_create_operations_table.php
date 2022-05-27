@@ -41,6 +41,7 @@ return new class extends Migration
             $table->string('search_tags')->nullable();
             $table->enum('status', ['in-progress', 'close']);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
