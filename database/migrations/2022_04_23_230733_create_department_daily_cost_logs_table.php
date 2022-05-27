@@ -19,6 +19,7 @@ return new class extends Migration
             $table->date('daily_date');
             $table->float('cost')->default(0.0);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

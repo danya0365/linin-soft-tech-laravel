@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('var_name')->nullable();
             $table->string('name');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

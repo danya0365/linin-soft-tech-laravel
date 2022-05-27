@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('photo');
             $table->integer('department_id');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

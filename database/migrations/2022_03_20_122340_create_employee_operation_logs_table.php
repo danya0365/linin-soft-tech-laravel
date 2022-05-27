@@ -20,6 +20,7 @@ return new class extends Migration
             $table->enum('operation_type', OperationType::getValues());
             $table->enum('action_type', ['start', 'progress', 'stop']);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

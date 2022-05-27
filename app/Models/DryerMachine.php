@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class DryerMachine
@@ -20,6 +21,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  */
 class DryerMachine extends Model
 {
+  use SoftDeletes;
   use HasFactory;
 
   static $rules = [

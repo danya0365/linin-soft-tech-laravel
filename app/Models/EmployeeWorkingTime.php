@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class EmployeeWorkingTime
@@ -19,6 +20,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class EmployeeWorkingTime extends Model
 {
+  use SoftDeletes;
 
   static $rules = [
     'employee_id' => 'required',

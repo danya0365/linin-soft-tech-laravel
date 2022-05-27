@@ -20,6 +20,7 @@ return new class extends Migration
             $table->enum('type', ['export', 'import'])->nullable();
             $table->integer('quantity')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

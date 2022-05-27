@@ -22,6 +22,7 @@ return new class extends Migration
             $table->integer('remain_quantity');
             $table->float('cost')->default(0.0);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

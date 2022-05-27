@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class LinenProduct
@@ -18,6 +19,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class LinenProduct extends Model
 {
+  use SoftDeletes;
 
   static $rules = [
     'linen_type_id' => 'required',

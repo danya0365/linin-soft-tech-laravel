@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class InventoryStockLog
@@ -19,22 +20,20 @@ use Illuminate\Database\Eloquent\Model;
  */
 class InventoryStockLog extends Model
 {
-    
-    static $rules = [
-		'inventory_id' => 'required',
-		'type' => 'required',
-		'quantity' => 'required',
-    ];
+  use SoftDeletes;
 
-    protected $perPage = 20;
+  static $rules = [
+    'inventory_id' => 'required',
+    'type' => 'required',
+    'quantity' => 'required',
+  ];
 
-    /**
-     * Attributes that should be mass-assignable.
-     *
-     * @var array
-     */
-    protected $fillable = ['inventory_id','type','quantity'];
+  protected $perPage = 20;
 
-
-
+  /**
+   * Attributes that should be mass-assignable.
+   *
+   * @var array
+   */
+  protected $fillable = ['inventory_id', 'type', 'quantity'];
 }

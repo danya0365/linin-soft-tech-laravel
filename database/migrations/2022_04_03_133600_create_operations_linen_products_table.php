@@ -28,6 +28,7 @@ return new class extends Migration
             $table->integer('deliver_pack')->nullable();
             $table->integer('deliver_operation_id')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

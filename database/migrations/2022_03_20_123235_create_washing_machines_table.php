@@ -20,6 +20,7 @@ return new class extends Migration
             $table->integer('maximum_weight');
             $table->integer('operation_id')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
