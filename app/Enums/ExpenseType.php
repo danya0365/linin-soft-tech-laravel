@@ -18,4 +18,5 @@ final class ExpenseType extends Enum
     const FuelOil = 'fuel_oil';
     const Petrol = 'petrol';
     const DepartmentSalary = 'department-salary';
+    const Inventory = 'inventory';
 }

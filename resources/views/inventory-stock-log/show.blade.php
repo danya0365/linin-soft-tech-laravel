@@ -21,6 +21,10 @@
                     <div class="card-body">
                         
                         <div class="form-group">
+                            <strong>Employee Id:</strong>
+                            {{ $inventoryStockLog->employee_id }}
+                        </div>
+                        <div class="form-group">
                             <strong>Inventory Id:</strong>
                             {{ $inventoryStockLog->inventory_id }}
                         </div>
@@ -31,6 +35,10 @@
                         <div class="form-group">
                             <strong>Quantity:</strong>
                             {{ $inventoryStockLog->quantity }}
+                        </div>
+                        <div class="form-group">
+                            <strong>Cost:</strong>
+                            {{ $inventoryStockLog->cost }}
                         </div>
 
                     </div>

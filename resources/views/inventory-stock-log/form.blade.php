@@ -2,6 +2,11 @@
     <div class="box-body">
         
         <div class="form-group">
+            {{ Form::label('employee_id') }}
+            {{ Form::text('employee_id', $inventoryStockLog->employee_id, ['class' => 'form-control' . ($errors->has('employee_id') ? ' is-invalid' : ''), 'placeholder' => 'Employee Id']) }}
+            {!! $errors->first('employee_id', '<div class="invalid-feedback">:message</div>') !!}
+        </div>
+        <div class="form-group">
             {{ Form::label('inventory_id') }}
             {{ Form::text('inventory_id', $inventoryStockLog->inventory_id, ['class' => 'form-control' . ($errors->has('inventory_id') ? ' is-invalid' : ''), 'placeholder' => 'Inventory Id']) }}
             {!! $errors->first('inventory_id', '<div class="invalid-feedback">:message</div>') !!}
@@ -15,6 +20,11 @@
             {{ Form::label('quantity') }}
             {{ Form::text('quantity', $inventoryStockLog->quantity, ['class' => 'form-control' . ($errors->has('quantity') ? ' is-invalid' : ''), 'placeholder' => 'Quantity']) }}
             {!! $errors->first('quantity', '<div class="invalid-feedback">:message</div>') !!}
+        </div>
+        <div class="form-group">
+            {{ Form::label('cost') }}
+            {{ Form::text('cost', $inventoryStockLog->cost, ['class' => 'form-control' . ($errors->has('cost') ? ' is-invalid' : ''), 'placeholder' => 'Cost']) }}
+            {!! $errors->first('cost', '<div class="invalid-feedback">:message</div>') !!}
         </div>
 
     </div>

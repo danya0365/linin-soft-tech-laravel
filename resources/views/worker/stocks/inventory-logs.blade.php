@@ -23,9 +23,10 @@
                         <table class="table table-bordered table-hover">
                             <thead class="thead">
                                 <tr>
-                                    <th>วันที่ทำรายการ</th>
+                                    <th>วันที่ทำรายการ - Entry Date</th>
                                     <th>Import/Export</th>
-                                    <th>จำนวน</th>
+                                    <th>จำนวน - Count</th>
+                                    <th>ค่าใช้จ่าย - Cost (Thai Baht)</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -34,6 +35,7 @@
                                         <td>{{ $inventoryLog->updated_at->format('Y-m-d') }}</td>
                                         <td class="text-center">{{ $inventoryLog->type }}</td>
                                         <td class="text-center">{{ $inventoryLog->quantity }}</td>
+                                        <td class="text-center">{{ number_format($inventoryLog->cost) }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>

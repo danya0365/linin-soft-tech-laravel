@@ -19,6 +19,7 @@ return new class extends Migration
             $table->integer('inventory_id')->nullable();
             $table->enum('type', ['export', 'import'])->nullable();
             $table->integer('quantity')->nullable();
+            $table->decimal('cost', 15, 2)->nullable();
             $table->timestamps();
             $table->softDeletes();
         });
