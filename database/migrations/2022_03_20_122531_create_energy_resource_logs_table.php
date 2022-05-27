@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('lot_number')->nullable();
             $table->float('cost')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

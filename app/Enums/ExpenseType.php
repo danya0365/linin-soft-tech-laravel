@@ -11,10 +11,10 @@ use BenSampo\Enum\Enum;
  */
 final class ExpenseType extends Enum
 {
-    const Water = 0;
-    const Electricity =   1;
-    const Gas = 2;
-    const Biomass = 3;
-    const FuelOil = 4;
-    const Petrol = 5;
+    const Water = 'water';
+    const Electricity = 'electricity';
+    const Gas = 'gas';
+    const Biomass = 'biomass';
+    const FuelOil = 'fuel_oil';
+    const Petrol = 'petrol';
 }

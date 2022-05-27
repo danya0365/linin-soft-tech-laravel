@@ -9,5 +9,5 @@ use BenSampo\Enum\Enum;
  */
 final class IncomeType extends Enum
 {
-    const CustomerBilling = 0;
+    const CustomerBilling = 'customer_billing';
 }

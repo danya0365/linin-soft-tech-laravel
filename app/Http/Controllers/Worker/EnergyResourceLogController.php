@@ -4,10 +4,13 @@ namespace App\Http\Controllers\Worker;
 
 use App\Enums\DepartmentNameId;
 use App\Enums\EnergyResourceNameId;
+use App\Enums\ExpenseType;
 use App\Http\Controllers\Controller;
+use App\Managers\ExpenseManager;
 use App\Models\Department;
 use App\Models\EnergyResource;
 use App\Models\EnergyResourceLog;
+use App\Models\Expense;
 
 class EnergyResourceLogController extends Controller
 {
@@ -72,7 +75,9 @@ class EnergyResourceLogController extends Controller
 
     public function deleteLog($energyResourceLogId)
     {
-        EnergyResourceLog::find($energyResourceLogId)->delete();
+        $energyResourceLog = EnergyResourceLog::find($energyResourceLogId);
+        $energyResourceLog->delete();
+        ExpenseManager::delete($energyResourceLog);
 
         return redirect()->route('worker.energy-resource.logs')
             ->with('success', 'EnergyResourceLog deleted successfully');
@@ -89,6 +94,7 @@ class EnergyResourceLogController extends Controller
                 DepartmentNameId::Iron(),
                 DepartmentNameId::Packing(),
                 DepartmentNameId::Collect(),
+                DepartmentNameId::Deliver(),
             ]
         )->get();
         return view('worker.energy-resources.select-employee', ['departments' => $departments, 'energyResourceLog' => $energyResourceLog]);
@@ -115,6 +121,9 @@ class EnergyResourceLogController extends Controller
 
             case EnergyResourceNameId::FuelOil()->value:
                 return redirect(route('worker.energy-resource.log.submit-fuel-oil', ['energyResourceLogId' => $energyResourceLog->id]));
+
+            case EnergyResourceNameId::Petrol()->value:
+                return redirect(route('worker.energy-resource.log.submit-petrol', ['energyResourceLogId' => $energyResourceLog->id]));
         }
         return redirect(route('worker.energy-resource'));
     }
@@ -131,8 +140,10 @@ class EnergyResourceLogController extends Controller
 
             $energyResourceLog->value = request()->get('value');
             $energyResourceLog->cost = request()->get('cost');
-            $energyResourceLog->unit = "ลิตร/Litre";
+            $energyResourceLog->unit = "litre";
             $energyResourceLog->save();
+
+            ExpenseManager::create(ExpenseType::Water(), $energyResourceLog, $energyResourceLog->cost);
 
             return redirect(route('worker.energy-resource.logs'));
         }
@@ -162,6 +173,8 @@ class EnergyResourceLogController extends Controller
             $energyResourceLog->unit = "kw/hour";
             $energyResourceLog->save();
 
+            ExpenseManager::create(ExpenseType::Electricity(), $energyResourceLog, $energyResourceLog->cost);
+
             return redirect(route('worker.energy-resource.logs'));
         }
 
@@ -189,6 +202,8 @@ class EnergyResourceLogController extends Controller
             $energyResourceLog->cost = request()->get('cost');
             $energyResourceLog->unit = "kg/gas";
             $energyResourceLog->save();
+
+            ExpenseManager::create(ExpenseType::Gas(), $energyResourceLog, $energyResourceLog->cost);
 
             return redirect(route('worker.energy-resource.logs'));
         }
@@ -218,6 +233,8 @@ class EnergyResourceLogController extends Controller
             $energyResourceLog->unit = "kg";
             $energyResourceLog->save();
 
+            ExpenseManager::create(ExpenseType::Biomass(), $energyResourceLog, $energyResourceLog->cost);
+
             return redirect(route('worker.energy-resource.logs'));
         }
 
@@ -243,14 +260,46 @@ class EnergyResourceLogController extends Controller
 
             $energyResourceLog->value = request()->get('value');
             $energyResourceLog->cost = request()->get('cost');
-            $energyResourceLog->unit = "kg";
+            $energyResourceLog->unit = "litre";
             $energyResourceLog->save();
+
+            ExpenseManager::create(ExpenseType::FuelOil(), $energyResourceLog, $energyResourceLog->cost);
 
             return redirect(route('worker.energy-resource.logs'));
         }
 
         return view(
             'worker.energy-resources.submit-fuel-oil',
+            [
+                'energyResourceLog' => $energyResourceLog,
+                'dateStartAt' => $dateStartAt,
+                'dateEndAt' => $dateEndAt
+            ]
+        );
+    }
+
+    public function submitPetrolLog($energyResourceLogId)
+    {
+        $energyResourceLog = EnergyResourceLog::with('employee')->find($energyResourceLogId);
+        $dateStartAt = request()->get('date_start_at');
+        $dateEndAt = request()->get('date_end_at');
+
+        if (request()->isMethod('post')) {
+
+            request()->validate(['value' => 'required', 'cost' => 'required']);
+
+            $energyResourceLog->value = request()->get('value');
+            $energyResourceLog->cost = request()->get('cost');
+            $energyResourceLog->unit = "litre";
+            $energyResourceLog->save();
+
+            ExpenseManager::create(ExpenseType::Petrol(), $energyResourceLog, $energyResourceLog->cost);
+
+            return redirect(route('worker.energy-resource.logs'));
+        }
+
+        return view(
+            'worker.energy-resources.submit-petrol',
             [
                 'energyResourceLog' => $energyResourceLog,
                 'dateStartAt' => $dateStartAt,

@@ -16,4 +16,11 @@ class IncomeManager extends Manager
         $income->amount = $amount;
         $income->save();
     }
+
+    public static function delete($modelInstance)
+    {
+        $tableName = $modelInstance->getTable();
+        $tableId = $modelInstance->id;
+        Income::where('table_name', $tableName)->where('table_id', $tableId)->delete();
+    }
 }
