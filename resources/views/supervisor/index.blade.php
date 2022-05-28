@@ -70,7 +70,7 @@
                             </a>
                         </div>
                         <div class="col-sm-12">
-                            <a href="{{ route('worker.report') }}">
+                            <a href="{{ route('supervisor.report') }}">
                                 <div class="p-3 border bg-light" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 110px">
                                         <div class="text-center">
