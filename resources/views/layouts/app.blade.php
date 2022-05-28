@@ -53,13 +53,13 @@
                             @endif
                         @else
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ route('worker') }}">{{ __('Worker') }}</a>
+                                <a class="nav-link" href="{{ route('worker') }}">{{ __('คนงาน - Worker') }}</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ route('supervisor') }}">{{ __('Supervisor') }}</a>
+                                <a class="nav-link" href="{{ route('supervisor') }}">{{ __('ผู้คุม - Supervisor') }}</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ route('admin') }}">{{ __('Admin') }}</a>
+                                <a class="nav-link" href="{{ route('admin') }}">{{ __('ตั้งค่า - Setting') }}</a>
                             </li>
                             <li class="nav-item dropdown">
                                 <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>

@@ -45,7 +45,7 @@ Route::group(['middleware' => ['admin']], function () {
     Route::resource('trucks', App\Http\Controllers\TruckController::class);
 });
 
-Route::group(['prefix' => 'supervisor', 'middleware' => ['auth']], function () {
+Route::group(['prefix' => 'supervisor', 'middleware' => ['supervisor']], function () {
 
     Route::get('/', [App\Http\Controllers\SupervisorController::class, 'index'])->name('supervisor');
 
