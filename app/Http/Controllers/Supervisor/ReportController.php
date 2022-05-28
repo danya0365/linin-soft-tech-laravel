@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Supervisor;
 
 use App\Http\Controllers\Controller;
+use App\Models\EnergyResource;
+use App\Models\EnergyResourceLog;
 use Illuminate\Support\Facades\DB;
 
 class ReportController extends Controller
@@ -12,9 +14,33 @@ class ReportController extends Controller
         return view(
             'supervisor.reports.index',
             [
-                'salesYearSummary' => $this->salesYearSummary()
+                'salesYearSummary' => $this->salesYearSummary(),
+                'energySummary' => $this->energySummary()
             ]
         );
+    }
+
+    public function energySummary(): array
+    {
+        $energySummary = [];
+
+        $query = EnergyResourceLog::select(
+            DB::raw('SUM(cost) as total_cost'),
+            DB::raw('energy_resource_id'),
+        )->with('energyResource');
+
+        $query->groupBy('energy_resource_id');
+
+        $energyResourceLogs = $query->get();
+
+        foreach ($energyResourceLogs as $key => $energyResourceLog) {
+            $energySummary[$energyResourceLog->energyResource->id] = [
+                'name' => $energyResourceLog->energyResource->name,
+                'value' => $energyResourceLog->total_cost,
+            ];
+        }
+
+        return $energySummary;
     }
 
     private function profitYearSummary($incomeYearSummary, $expenseYearSummary): array

@@ -34,7 +34,8 @@
 </div>
 <script>
 
-var salesYearSummary = @json($salesYearSummary)
+var salesYearSummary = @json($salesYearSummary);
+var energySummary = @json($energySummary);
 
 function salesChart(){
     var categories = salesYearSummary.monthYearTitles;
@@ -108,6 +109,33 @@ function salesChart(){
 
 function energyPieChart(){
 
+    console.log('energySummary', energySummary);
+
+
+    var data = [];
+
+    for (const [key, value] of Object.entries(energySummary)) {
+        if (data.length == 0) {
+            data.push({
+                name: value.name,
+                y: parseFloat(value.value),
+                sliced: true,
+                selected: true
+            });
+        } else {
+            data.push({
+                name: value.name,
+                y: parseFloat(value.value),
+            });
+        }
+    }
+
+    var series = [{
+        name: 'พลังงาน',
+        colorByPoint: true,
+        data: data
+    }];
+
     Highcharts.chart('energy-pie-chart', {
         chart: {
             plotBackgroundColor: null,
@@ -116,10 +144,10 @@ function energyPieChart(){
             type: 'pie'
         },
         title: {
-            text: 'พลังงานที่ใช้'
+            text: 'พลังงานที่ใช้ (บาท)'
         },
         tooltip: {
-            pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+            pointFormat: '{series.name}: <b>{point.y} บาท</b>'
         },
         accessibility: {
             point: {
@@ -136,22 +164,7 @@ function energyPieChart(){
                 }
             }
         },
-        series: [{
-            name: 'พลังงาน',
-            colorByPoint: true,
-            data: [{
-                name: 'แก๊ส',
-                y: 71.5,
-                sliced: true,
-                selected: true
-            }, {
-                name: 'น้ำ',
-                y: 16.3
-            }, {
-                name: 'ไฟฟ้า',
-                y: 12.2
-            }]
-        }]
+        series: series
     });
 }
 
