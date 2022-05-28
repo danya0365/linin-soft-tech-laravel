@@ -49,7 +49,7 @@
                             </a>
                         </div>
                         <div class="col-sm-4">
-                            <a href="{{ route('admin') }}">
+                            <a href="{{ route('setting') }}">
                                 <div class="p-3 border bg-light" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 110px">
                                         <div class="text-center">
