@@ -39,22 +39,7 @@
                     <!-- Right Side Of Navbar -->
                     <ul class="navbar-nav ms-auto">
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('worker.product') }}">{{ __('Product') }}</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('worker.customer') }}">{{ __('Customer') }}</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('worker.operation') }}">{{ __('Operation') }}</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('worker.energy-resource') }}">{{ __('Energy') }}</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('worker.employee') }}">{{ __('Employee') }}</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('worker.stock') }}">{{ __('Stock') }}</a>
+                            <a class="nav-link" href="{{ route('home') }}">{{ __('Home') }}</a>
                         </li>
                     </ul>
                 </div>

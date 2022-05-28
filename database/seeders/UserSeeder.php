@@ -21,6 +21,9 @@ class UserSeeder extends Seeder
             'email' => 'admin.lininsofttech@gmail.com',
             'password' => Hash::make('12345678'),
             'role' => 'admin',
+            'is_can_access_admin' => 1,
+            'is_can_access_supervisor' => 1,
+            'is_can_access_customer' => 1,
             'created_at' =>  \Carbon\Carbon::now(),
             'updated_at' => \Carbon\Carbon::now()
         ]);
@@ -36,6 +39,7 @@ class UserSeeder extends Seeder
             'name' => 'Customer',
             'email' => 'customer.lininsofttech@gmail.com',
             'role' => 'customer',
+            'is_can_access_customer' => 1,
             'password' => Hash::make('12345678'),
             'created_at' =>  \Carbon\Carbon::now(),
             'updated_at' => \Carbon\Carbon::now()
