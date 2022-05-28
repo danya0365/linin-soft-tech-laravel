@@ -55,6 +55,10 @@ Route::group(['prefix' => 'supervisor', 'middleware' => ['supervisor']], functio
         Route::match(array('GET', 'POST'), '/daily-expense-logs', [App\Http\Controllers\Supervisor\DepartmentController::class, 'dailyExpenseLogs'])->name('supervisor.department.daily-expense-log');
         Route::match(array('GET', 'POST'), '/daily-expense-log/{id}/delete', [App\Http\Controllers\Supervisor\DepartmentController::class, 'deleteDailyExpenseLog'])->name('supervisor.department.delete-daily-expense-log');
     });
+
+    Route::group(['prefix' => 'report'], function () {
+        Route::get('/', [App\Http\Controllers\Supervisor\ReportController::class, 'index'])->name('supervisor.report');
+    });
 });
 
 Route::group(['prefix' => 'worker', 'middleware' => ['auth']], function () {
@@ -221,9 +225,5 @@ Route::group(['prefix' => 'worker', 'middleware' => ['auth']], function () {
         Route::match(array('GET', 'POST'), '/inventory/{inventoryId}/increase-stock', [App\Http\Controllers\Worker\StockController::class, 'getInventoryIncreaseStock'])->name('worker.stock.inventory.increase-stock');
         Route::match(array('GET', 'POST'), '/inventory/{inventoryId}/decrease-stock', [App\Http\Controllers\Worker\StockController::class, 'getInventoryDecreaseStock'])->name('worker.stock.inventory.decrease-stock');
         Route::get('/inventory/{inventoryId}/logs', [App\Http\Controllers\Worker\StockController::class, 'showInventoryLogs'])->name('worker.stock.inventory.logs');
-    });
-
-    Route::group(['prefix' => 'report'], function () {
-        Route::get('/', [App\Http\Controllers\Worker\ReportController::class, 'index'])->name('worker.report');
     });
 });
