@@ -4,7 +4,7 @@
             {
                 data: null,
                 renderTo: null,
-                tickInterval: 1 * 3600 * 1000, // 3 hours
+                tickInterval: 1 * 3600 * 1000, // 1 hours
                 pointInterval: 3600 * 1000, // one day (in milisec.)
             },
             options
