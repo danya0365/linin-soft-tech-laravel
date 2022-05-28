@@ -13,7 +13,7 @@
     <div class="row justify-content-center">
         @if ($message = Session::get('success'))
         <div class="alert alert-success mb-2">
-            <p>{{ $message }}</p>
+            {{ $message }}
         </div>
     @endif
         <div class="col-md-12 m-2">

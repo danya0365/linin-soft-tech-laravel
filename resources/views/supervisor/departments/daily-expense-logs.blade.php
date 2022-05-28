@@ -57,7 +57,7 @@
 
                     @if ($message = Session::get('success'))
                         <div class="alert alert-success mb-2">
-                            <p>{{ $message }}</p>
+                            {{ $message }}
                         </div>
                     @endif
 
