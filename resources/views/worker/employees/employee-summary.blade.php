@@ -102,13 +102,14 @@
 
         var dates = Object.keys(settings.data).map(function(key, item) { 
             var date = key.split('-');
+            var min = new Date(date[0], date[1]-1, date[2], 0, 0, 0, 1);
+            var max = new Date(date[0], date[1]-1, date[2], 23, 59, 59)
             return {
-                'min': Date.UTC(date[0], date[1], date[2], 0, 0, 0, 1), 
-                'max': Date.UTC(date[0], date[1], date[2], 23, 59, 59)
+                'min': min.getTime(), 
+                'max': max.getTime()
             };
         });
 
-        //console.log('dates', dates);
         var xAxis = dates.map(function(date, key) {
             var labelEnabled = key == 0 ? true : false;
             return {
@@ -128,7 +129,6 @@
             };
         });
 
-        //console.log('xAxis', xAxis);
         var colors = [
             "rgba(223, 83, 83, .5)", 
             "rgba(235, 146, 52, .5)", 
@@ -144,7 +144,7 @@
             var items = settings.data[key];
             var data = items.map(function(item, index) {
                 var date = new Date(item.created_at);
-                return [date.getTime(), item.value];
+                return [date.getTime(), parseFloat(item.value), {'y': date.getTime(), 'x': parseFloat(item.value), 'dateTime': date}];
             });
 
             return {
@@ -161,247 +161,11 @@
             };
         });
 
-        console.log('series', series);
-
-        var demoSeries = [
-            {
-                pointInterval: 3600 * 1000, // one day (in milisec.)
-                name: "Sunday",
-                color: "rgba(223, 83, 83, .5)",
-                xAxis: 0,
-                data: [
-                    [Date.UTC(2013, 3, 7, 10), 70],
-                    [Date.UTC(2013, 3, 7, 11, 30), 140],
-                    [Date.UTC(2013, 3, 7, 12, 15), 110],
-                    [Date.UTC(2013, 3, 7, 14, 45), 100],
-                    [Date.UTC(2013, 3, 7, 16, 1), 160],
-                ],
-                marker: {
-                    symbol: "circle",
-                    fillColor: "rgba(223, 83, 83, .5)",
-                    radius: 5,
-                },
-            },
-            {
-                pointInterval: 3600 * 1000, // one day (in milisec.)
-                name: "Monday",
-                color: "rgba(235, 146, 52, .5)",
-                xAxis: 1,
-                data: [
-                    [Date.UTC(2013, 3, 6, 10, 9), 60],
-                    [Date.UTC(2013, 3, 6, 11, 11), 110],
-                    [Date.UTC(2013, 3, 6, 12, 21), 160],
-                    [Date.UTC(2013, 3, 6, 14, 41), 120],
-                    [Date.UTC(2013, 3, 6, 16), 90],
-                ],
-                marker: {
-                    symbol: "circle",
-                    fillColor: "rgba(235, 146, 52, .5)",
-                    radius: 5,
-                },
-            },
-            {
-                pointInterval: 3600 * 1000, // one day (in milisec.)
-                name: "Tuesday",
-                color: "rgba(137, 235, 52, .5)",
-                xAxis: 2,
-                data: [
-                    [Date.UTC(2013, 3, 5, 8, 11), 120],
-                    [Date.UTC(2013, 3, 5, 9, 13), 130],
-                    [Date.UTC(2013, 3, 5, 17, 31), 160],
-                    [Date.UTC(2013, 3, 5, 18, 20), 130],
-                ],
-                marker: {
-                    symbol: "circle",
-                    fillColor: "rgba(137, 235, 52, .5)",
-                    radius: 5,
-                },
-            },
-            {
-                pointInterval: 3600 * 1000, // one day (in milisec.)
-                name: "Wednesday",
-                color: "rgba(52, 235, 174, .5)",
-                xAxis: 3,
-                data: [
-                    [Date.UTC(2013, 3, 4, 7, 16), 100],
-                    [Date.UTC(2013, 3, 4, 9, 30), 120],
-                    [Date.UTC(2013, 3, 4, 11, 34), 130],
-                    [Date.UTC(2013, 3, 4, 17, 41), 160],
-                    [Date.UTC(2013, 3, 4, 20, 53), 130],
-                ],
-                marker: {
-                    symbol: "circle",
-                    fillColor: "rgba(52, 235, 174, .5)",
-                    radius: 5,
-                },
-            },
-            {
-                pointInterval: 3600 * 1000, // one day (in milisec.)
-                name: "Thursday",
-                color: "rgba(52, 220, 235, .5)",
-                xAxis: 4,
-                data: [
-                    [Date.UTC(2013, 3, 3, 7, 16), 130],
-                    [Date.UTC(2013, 3, 3, 9, 30), 100],
-                    [Date.UTC(2013, 3, 3, 11, 34), 90],
-                    [Date.UTC(2013, 3, 3, 17, 41), 160],
-                    [Date.UTC(2013, 3, 3, 20, 53), 120],
-                ],
-                marker: {
-                    symbol: "circle",
-                    fillColor: "rgba(52, 220, 235, .5)",
-                    radius: 5,
-                },
-            },
-            {
-                pointInterval: 3600 * 1000, // one day (in milisec.)
-                name: "Friday",
-                color: "rgba(52, 128, 235, .5)",
-                xAxis: 5,
-                data: [
-                    [Date.UTC(2013, 3, 2, 7, 16), 80],
-                    [Date.UTC(2013, 3, 2, 9, 30), 130],
-                    [Date.UTC(2013, 3, 2, 11, 34), 150],
-                    [Date.UTC(2013, 3, 2, 17, 41), 110],
-                    [Date.UTC(2013, 3, 2, 20, 53), 90],
-                ],
-                marker: {
-                    symbol: "circle",
-                    fillColor: "rgba(52, 128, 235, .5)",
-                    radius: 5,
-                },
-            },
-            {
-                pointInterval: 3600 * 1000, // one day (in milisec.)
-                name: "Saturday",
-                color: "rgba(162, 52, 235, .5)",
-                xAxis: 6,
-                data: [
-                    [Date.UTC(2013, 3, 1, 7, 16), 96],
-                    [Date.UTC(2013, 3, 1, 9, 30), 150],
-                    [Date.UTC(2013, 3, 1, 11, 34), 100],
-                    [Date.UTC(2013, 3, 1, 17, 41), 120],
-                    [Date.UTC(2013, 3, 1, 20, 53), 140],
-                ],
-                marker: {
-                    symbol: "circle",
-                    fillColor: "rgba(162, 52, 235,.5)",
-                    radius: 5,
-                },
-            },
-        ];
-
-
-        var demoXAxis = [
-            {
-                type: "datetime",
-                tickInterval: 3 * 3600 * 1000, // 3 hours
-                min: Date.UTC(2013, 3, 7, 0, 0, 0, 1),
-                max: Date.UTC(2013, 3, 7, 23, 59, 59),
-                startOnTick: false,
-                lineWidth: 0,
-                minorGridLineWidth: 0,
-                lineColor: "transparent",
-                labels: {
-                    enabled: false,
-                },
-                minorTickLength: 0,
-                tickLength: 0,
-            },
-            {
-                type: "datetime",
-                tickInterval: 3 * 3600 * 1000, // 3 hours
-                min: Date.UTC(2013, 3, 6, 0, 0, 0, 1),
-                max: Date.UTC(2013, 3, 6, 23, 59, 59),
-                startOnTick: false,
-                lineWidth: 0,
-                minorGridLineWidth: 0,
-                lineColor: "transparent",
-                labels: {
-                    enabled: false,
-                },
-                minorTickLength: 0,
-                tickLength: 0,
-            },
-            {
-                type: "datetime",
-                tickInterval: 3 * 3600 * 1000, // 3 hours
-                min: Date.UTC(2013, 3, 5, 0, 0, 0, 1),
-                max: Date.UTC(2013, 3, 5, 23, 59, 59),
-                startOnTick: false,
-                lineWidth: 0,
-                minorGridLineWidth: 0,
-                lineColor: "transparent",
-                labels: {
-                    enabled: false,
-                },
-                minorTickLength: 0,
-                tickLength: 0,
-            },
-            {
-                type: "datetime",
-                tickInterval: 3 * 3600 * 1000, // 3 hours
-                min: Date.UTC(2013, 3, 4, 0, 0, 0, 1),
-                max: Date.UTC(2013, 3, 4, 23, 59, 59),
-                startOnTick: false,
-                lineWidth: 0,
-                minorGridLineWidth: 0,
-                lineColor: "transparent",
-                labels: {
-                    enabled: false,
-                },
-                minorTickLength: 0,
-                tickLength: 0,
-            },
-            {
-                type: "datetime",
-                tickInterval: 3 * 3600 * 1000, // 3 hours
-                min: Date.UTC(2013, 3, 3, 0, 0, 0, 1),
-                max: Date.UTC(2013, 3, 3, 23, 59, 59),
-                startOnTick: false,
-                lineWidth: 0,
-                minorGridLineWidth: 0,
-                lineColor: "transparent",
-                labels: {
-                    enabled: false,
-                },
-                minorTickLength: 0,
-                tickLength: 0,
-            },
-            {
-                type: "datetime",
-                tickInterval: 3 * 3600 * 1000, // 3 hours
-                min: Date.UTC(2013, 3, 2, 0, 0, 0, 1),
-                max: Date.UTC(2013, 3, 2, 23, 59, 59),
-                startOnTick: false,
-                lineWidth: 0,
-                minorGridLineWidth: 0,
-                lineColor: "transparent",
-                labels: {
-                    enabled: false,
-                },
-                minorTickLength: 0,
-                tickLength: 0,
-            },
-            {
-                type: "datetime",
-                tickInterval: 3 * 3600 * 1000, // 3 hours
-                min: Date.UTC(2013, 3, 1, 0, 0, 0, 1),
-                max: Date.UTC(2013, 3, 1, 23, 59, 59),
-                startOnTick: false,
-                lineWidth: 0,
-                minorGridLineWidth: 0,
-                lineColor: "transparent",
-                labels: {
-                    enabled: true,
-                },
-                minorTickLength: 0,
-                tickLength: 0,
-            },
-        ];
-
-        console.log('demoXAxis', demoXAxis);
-        console.log('demoSeries', demoSeries);
+        Highcharts.setOptions({
+            time: {
+                timezoneOffset: -(7 * 60)
+            }
+        });
 
         chart = new Highcharts.Chart({
             chart: {
@@ -412,22 +176,28 @@
             title: {
                 text: "Performance per hour",
             },
+            tooltip: {
+                formatter: function() {
+                return  '<b>' + this.series.name + '</b><br/>' 
+                        + '<b>Time:</b> ' + Highcharts.dateFormat('%H:%M:%S', new Date(this.x)) + '<br />'
+                        + '<b>x:</b> ' + this.y + '';
+                }
+            },
             subtitle: {
                 text: "last 7 days",
             },
-            xAxis: demoXAxis,
+            xAxis: xAxis,
             yAxis: {
                 title: {
                     text: "จำนวนที่ทำได้ - Total",
                 },
             },
-            series: demoSeries,
+            series: series,
         });
     };
 })(jQuery);
 
 var weekDayReports = @json($weekDayReports);
-console.log('weekDayReports', weekDayReports);
 
 $(function(){
     $.employeeSummaryScatterPlotsChart({

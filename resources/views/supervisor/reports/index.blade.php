@@ -109,9 +109,6 @@ function salesChart(){
 
 function energyPieChart(){
 
-    console.log('energySummary', energySummary);
-
-
     var data = [];
 
     for (const [key, value] of Object.entries(energySummary)) {
