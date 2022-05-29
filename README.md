@@ -1,173 +1,143 @@
-# LininSoftTech!
+# Installation
 
-ซอฟท์แวร์จัดการบันทึกประวัติการทำงานของพนักงานในแต่ละวัน รวมทั้งบันทึกข้อมูลวัตถุดิบและพลังงานทั้งหมดที่ใช้ด้วย และสามารถดูข้อมูลสถิติทั้งหมดที่เกิดขึ้นกับพนักงาน วัตถุดิบ และพลังงาน
+install docker-desktop on your mac
 
+## Alias sail in your bash_profile
 
-# หน้าแรก
+`alias sail='[ -f sail ] && bash sail || bash vendor/bin/sail'`
 
-1.  สินค้า
-	1. ผ้าทั่วไป
-	2. ผ้าแก้ไข
-2.  ลูกค้า
-	1. ใส่ข้อมูลผ้าสะอาดและจำนวนเงิน
-3.  ปฏิบัติการ
-	1. รับสินค้า
-	2. ซัก
-	3. อบ
-	4. รีด
-	5. พับแพค
-	6. จัดเก็บ
-4.  พลังงาน
-	1. บันทึกพลังงานที่ใช้
-5.  พนักงาน
-	1.  เลือกแผนก
-		1. เลือกพนักงาน
-			1. กรองวันที่ข้อมูล Jobs ที่ทำได้
-			2. แสดงกราฟจำนวนผ้าที่ทำได้ในแต่ละ ชม ของทุกวันรวมกัน
-6.  วิเคราะห์
-7.  สต๊อก
-	1. เลือกประเภทของวัตถุดิบ
-		1. วัตถุดิบ
-8.  ตั้งค่า
+the you can run
+`./vendor/bin/sail up`
 
-## สินค้า
-แสดงรายการ
- 1. ผ้าทั่วไป
- 2. ผ้าแก้ไข
+or
+`sail up`
 
-เมื่อกดเข้าไปจะแสดงรายการจาก  table jobs
- 1. มีฟิลเตอร์กรองข้อมูลตามวันที่
- 2. มีฟิลเตอร์กรองตามชนิดผ้า
- 3. มี Sort Order
- 4. แสดง Summary สรุปยอด
-	 1. จำนวนชิ้น
-	 2. น้ำหนัก
- 5. ไฮไลต์ข้อความ Text Color ตามสีของผ้า
+## start sail
 
-## ลูกค้า
-แสดงรายการลูกค้า
-สร้าง Database table customers 
-`{ fields: { id, name } }`
+### start on normally
 
-พร้อมกับ sum ข้อมูลจาก  `table jobs`
-มี column ยอดรวมน้ำหนักผ้าเปียก, ยอดรวมผ้าสะอาด, ยอดรวมน้ำหนักแก้ไข
- 1. โรงพยาบาล A
- 2. โรงพยาบาล B
- 3. โรงพยาบาล C
- 4. ...
+`./vendor/bin/sail up`
 
-เมื่อเลือกแล้ว ให้แสดงรายการ `table jobs` ของลูกค้านั้นๆ
-- ป้อนข้อมูลผ้าสะอาด และจำนวนเงิน
+### start in background
 
-## ปฏิบัติการ
+`./vendor/bin/sail up -d`
 
- 1. รับสินค้า (สร้าง Job Group)
-สร้าง Database table job_groups 
-`{ fields: { id, customer_id, wet_weight, employee_id, dry_weight, total_pieces } }`
-สร้าง Database table job_group_activity_logs 
-`{ fields: { id, job_group_id, log_type, employee_id, old_value, new_value } }`
-	 1. เลือกชื่อลูกค้า
-	 2. ใส่จำนวนน้ำหนัก
- 2. ซัก (สร้าง Job ID Status = ซัก)
- สร้าง Database table jobs 
- `{ fields: { id, job_group_id {customer_id, weight}, employee_id, job_type = enum(new, edit), washing_machine_id, dryer_machine_id, laundry_type_id, laundry_id, weight, color } `
- สร้าง Database table job_activity_logs 
-`{ fields: { id, job_id, log_type, employee_id, old_value, new_value } }`
-	 2. ต้องเลือกพนังงานคนที่เบิกพร้อมใส่ Password ส่วนตัวเพื่อป้องกันการแกล้ง
-	 3. ผ้าทั่วไป ผ้าแก้ไข
-	 4. เครื่องซักผ้า (เลือกตามน้ำหนักผ้า)
-	 5. เลือกกองผ้าจากลูกค้าที่รับมาช่วงเช้า เช่น กองผ้า Customer A ขนาด 100กก. (เลือก Job Group)
-	 6. ชนิดผ้า (ผ้าขน)
-	 7. ผ้าเช็ดมือ
-	 8. ใส่จำนวนกี่โลที่หยิบจากกองผ้าลูกค้า (ต้องไม่เกิน 100กก และไม่เกินขนาดตความจุ เครื่องซักผ้า)
-	 9. เลือกสี 
-	 10. ยืนยัน 
- 3. อบ  (เลือก Job ID Status = ซัก เปลี่ยนเป็น Status = อบ)
-	 1. เลือก Job ทำงานต่อจาก การซัก แต่เปลี่ยนพนักงาน ขั้นตอนคล้ายกันหมด แต่ต้องเลือก dryer_machines
- 4. รีด (เลือก Job รอยืนยันอีกที)
-	 1. ถ้าเลือก Job (ผ้า 20กก จาก  100กก) ทำงานต่อจากการ อบ แต่เปลี่ยนพนักงาน นับจำนวนผ้า แทนนับตามน้ำหนัก
- 5. พับแพ็ค (เลือก Job Group)
-	 1. ถ้าเลือก Job Group (หยิบผ้าที่รีดแล้ว จาก 100กก) จะเป็นการเอาผ้าที่รีด ทั้งหมดจาก Job Group มาพับแพค ใส่จำนวนชิ้น
- 6. จัดเก็บ (เลือก Job Group)
-	 7. เลือกผ้าจาก Job Group แล้วเอาไปชั่งน้ำหนักตอนแห้ง
+Once the application's Docker containers have been started, you can access the application in your web browser at: http://localhost.
 
-## พลังงาน
-บันทึกประวัติการใช้งานพลังงานในแต่ละวันหรือสัปดาห์หรือเดือนตามตกลง
-สร้าง Database table energy_resources
-`{ fields: { id, name } }`	
+[Full Laravel Sail](https://laravel.com/docs/9.x/sail)
 
-สร้าง Database table energy_resource_logs
-`{ fields: { id, energy_resource_id, value, unit, lot_number } }`	
+### stop sail
 
-แสดงรายการพลังงาน และสร้างหน้ารายการบันทึกในแต่ละหน้าแบบละเอียด
- 1. น้ำ
- 2. ไฟฟ้า
- 3. แก็ส
- 4. ชีวมวล
- 5. น้ำมันเตา
- 6. ประวัติ
-	 1. แสดงประวัติการบันทึกการใช้งาน
+`./vendor/bin/sail stop`
 
-## พนักงาน
-แสดงรายการแผนกของพนักงาน
-สร้าง Database table departments (ซัก, อบ,  รีด, พับแพ็ค, จัดเก็บ)
-`{ fields: { id, name } }`
+### Execute NPM
 
-เลือกแผนกแล้ว แสดงรายการพนักงาน
-สร้าง Database table employees
-`{ fields: { id, name, department} }`
+Install dependency
+`sail yarn`
 
-เลือกพนักงาน
- 1. กรองวันที่ข้อมูล Jobs ที่ทำได้
- 2. แสดงกราฟจำนวนผ้าที่ทำได้ในแต่ละ ชม ของทุกวันรวมกัน
+Add new package
+`sail yarn add {packageName}`
 
-## วิเคราะห์
-แสดงสถิติอย่างละเอียด 
-					
-## สต๊อก
+Build Js/css
+`sail yarn dev`
 
-สร้าง Database table inventory_groups
-`{ fields: { id, name } }`	
-แสดงรายการกลุ่มต้นทุนการผลิต  
+### DB Seeder
 
- 1. เคมี/ผงซักฟอก
- 2. ถุงพลาสติก
- 3. วัสดุทั่วไป
- 4. ...
+`sail php artisan migrate:fresh --seed`
 
-เมื่อกดเข้าไปในแต่ละเมนู จะเจอไอเท็มย่อยของเมนูนั้นๆ
-สร้าง Database table inventories
-`{ fields: { id, name, material_resource_group_id, unit, total_quantity, remain_quantity } }`	
+### Database Management
 
-สร้าง Database table material_resource_stock_logs
-`{ fields: { id, material_resource_id, quantity, type = export, import } }`	
+[PhpMyAdmin](http://localhost:8081/)
 
-ต้องเลือกพนังงานคนที่เบิกพร้อมใส่ Password ส่วนตัวเพื่อป้องกันการแกล้ง
+### Generate CRUD
 
- 1. สามารถเพิ่มหรือลบได้
- 2. สามารถเพิ่มหรือลบจำนวนได้
- 3. บันทึกประวัติการเพิ่มหรือลดจำนวน
+[awais-vteams/laravel-crud-generator](https://github.com/awais-vteams/laravel-crud-generator)
 
-## ตั้งค่า
+Add migration file to create `table` first
+`sail php artisan make:migration create_banks_table`
 
- 1. เครื่องซักผ้า
-สร้าง Database table washing_machines
-`{ fields: { id, name, maximum_weight} }`
- 2. เครื่องอบ
-สร้าง Database table dryer_machines
-`{ fields: { id, name, maximum_weight} }`
- 3. ชนิดผ้า
- สร้าง Database table linen_types
-`{ fields: { id, name } }`
- 4. ผ้า
-สร้าง Database table linen_products
-`{ fields: { id, name, laundry_type_d} }`
- 5. จัดการพนักงาน table employees
+Then generate CRUD
+`sail php artisan make:crud banks`
 
+Add route.php
+`Route::resource('banks', 'BankController');`
 
-## Integrate CRUD Generator
-โดยจะใช้ Lib [appzcoder/crud-generator](https://github.com/appzcoder/crud-generator)
+### ทุกครั้งที่มีการเพิ่ม Lib ด้วย NodeJS
 
+ต้องทำการติดตั้งและ Generate css และ js ไปที่ public folder ด้วยคำสั่ง
+
+`yarn && yarn dev`
+
+### Generate Enum
+
+สร้าง enum UserType
+
+```
+php artisan make:enum UserType
+```
+
+### Generate Event & Listener
+
+```
+sail php artisan make:event EmployeeOperationLogCreated
+sail php artisan make:listener CalculateUserWorkingTimeNotification  --event=EmployeeOperationLogCreated
+```
+
+### CronJob Schedule
+
+add new command
+`sail php artisan make:command DaillyReportCron --command=dailyReport:cron`
+
+open `app/Console/Commands/DaillyReportCron.php`
+
+search for `function handle()`
+
+add below code
+
+```
+use Illuminate\Support\Facades\Log;
+...
+
+function handle() {
+    Log::info("Cron is working fine!");
+}
+```
+
+open `app/Console/Kernel.php`
+
+add below code in `function schedule(Schedule $schedule)`
+
+`$schedule->command(DaillyReportCron::class)->daily();`
+
+test to force run schedule
+
+`sail php artisan schedule:run`
+
+\*\*\*only for local server to force cronjob running
+`sail php artisan schedule:work`
+
+### Set up your server to run crontab every second
+
+At last you can manage this command on scheduling task, you have to add a single entry to your server’s crontab file:
+`* * * * * cd /path-to-your-project && php artisan schedule:run >> /dev/null 2>&1`
+
+## Executing Commands
+
+When using Laravel Sail, your application is executing within a Docker container and is isolated from your local computer. However, Sail provides a convenient way to run various commands against your application such as arbitrary PHP commands, Artisan commands, Composer commands, and Node / NPM commands.
+
+When reading the Laravel documentation, you will often see references to Composer, Artisan, and Node / NPM commands that do not reference Sail. Those examples assume that these tools are installed on your local computer. If you are using Sail for your local Laravel development environment, you should execute those commands using Sail:
+
+### Running Artisan commands locally...
+
+`php artisan queue:work`
+
+### Running Artisan commands within Laravel Sail...
+
+`./vendor/bin/sail artisan queue:work`
+
+### Show PHP version on your sail
+
+`./vendor/bin/sail php --version`
 
 # Semantic Commit Messages
 
@@ -190,16 +160,21 @@ feat: add hat wobble
 
 More Examples:
 
-- `feat`: (new feature for the user, not a new feature for build script)
-- `fix`: (bug fix for the user, not a fix to a build script)
-- `docs`: (changes to the documentation)
-- `style`: (formatting, missing semi colons, etc; no production code change)
-- `refactor`: (refactoring production code, eg. renaming a variable)
-- `test`: (adding missing tests, refactoring tests; no production code change)
-- `chore`: (updating grunt tasks etc; no production code change)
+-   `feat`: (new feature for the user, not a new feature for build script)
+-   `fix`: (bug fix for the user, not a fix to a build script)
+-   `docs`: (changes to the documentation)
+-   `style`: (formatting, missing semi colons, etc; no production code change)
+-   `refactor`: (refactoring production code, eg. renaming a variable)
+-   `test`: (adding missing tests, refactoring tests; no production code change)
+-   `chore`: (updating grunt tasks etc; no production code change)
 
 References:
 
-- https://www.conventionalcommits.org/
-- https://seesparkbox.com/foundry/semantic_commit_messages
-- http://karma-runner.github.io/1.0/dev/git-commit-msg.html
+-   https://www.conventionalcommits.org/
+-   https://seesparkbox.com/foundry/semantic_commit_messages
+-   http://karma-runner.github.io/1.0/dev/git-commit-msg.html
+
+### Install tailwind with sass
+
+[Install Tailwind CSS & SASS with Laravel Mix (2022)](https://ralphjsmit.com/tailwind-sass-laravel)
+[Tailwind Documentation](https://tailwindcss.com/docs/installation)
