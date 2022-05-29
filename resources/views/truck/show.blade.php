@@ -5,7 +5,7 @@
 @endsection
 
 @section('content')
-    <section class="content container-fluid">
+    <section class="content container">
         <div class="row">
             <div class="col-md-12">
                 <div class="card">
@@ -14,6 +14,7 @@
                             <span class="card-title">Show Truck</span>
                         </div>
                         <div class="float-right">
+                            <a class="btn btn-primary" href="{{ route('trucks.create-note') }}"> Add Note</a>
                             <a class="btn btn-primary" href="{{ route('trucks.index') }}"> Back</a>
                         </div>
                     </div>
