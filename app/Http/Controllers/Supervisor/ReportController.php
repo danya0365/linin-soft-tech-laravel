@@ -82,7 +82,7 @@ class ReportController extends Controller
 
     private function incomeYearSummary(): array
     {
-        $incomeRows = DB::table('incomes')->select(DB::raw("DATE_FORMAT(created_at, '%Y-%m') as month_year"), DB::raw('SUM(amount) as total_amount'))->groupBy('month_year')->get();
+        $incomeRows = DB::table('incomes')->select(DB::raw("DATE_FORMAT(created_at, '%Y-%m') as month_year"), DB::raw('SUM(amount) as total_amount'))->whereYear('created_at', date('Y'))->groupBy('month_year')->get();
         $result = $this->generateYearSummaryStructure();
 
         foreach ($incomeRows as $key => $incomeRow) {
@@ -96,7 +96,7 @@ class ReportController extends Controller
 
     private function expenseYearSummary(): array
     {
-        $incomeRows = DB::table('expenses')->select(DB::raw("DATE_FORMAT(created_at, '%Y-%m') as month_year"), DB::raw('SUM(amount) as total_amount'))->groupBy('month_year')->get();
+        $incomeRows = DB::table('expenses')->select(DB::raw("DATE_FORMAT(created_at, '%Y-%m') as month_year"), DB::raw('SUM(amount) as total_amount'))->whereYear('created_at', date('Y'))->groupBy('month_year')->get();
         $result = $this->generateYearSummaryStructure();
 
         foreach ($incomeRows as $key => $incomeRow) {

@@ -11,6 +11,7 @@ use App\Models\Department;
 use App\Models\EnergyResource;
 use App\Models\EnergyResourceLog;
 use App\Models\Expense;
+use Illuminate\Support\Facades\DB;
 
 class EnergyResourceLogController extends Controller
 {
@@ -68,7 +69,7 @@ class EnergyResourceLogController extends Controller
                 'sortOrderSelected' => $sortOrderSelected,
                 'energyResourceSelected' => $energyResourceSelected,
                 'dateStartAt' => $dateStartAt,
-                'dateEndAt' => $dateEndAt,
+                'dateEndAt' => $dateEndAt
             ]
         );
     }
