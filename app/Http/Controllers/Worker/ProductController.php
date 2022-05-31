@@ -46,11 +46,11 @@ class ProductController extends Controller
         }])->with('linenProduct')->where('linen_case', $linenCase['var']);
 
         $query->whereNotNull('linen_product_id');
-        // $query->where(function ($query) {
-        //     $query->whereHas('operation', function ($query) {
-        //         $query->where('status', OperationStatus::Close());
-        //     });
-        // });
+        $query->where(function ($query) {
+            $query->whereHas('operation', function ($query) {
+                $query->where('status', OperationStatus::Close());
+            });
+        });
 
         if ($linenTypeSelected || $operationTypeSelected) {
             $query->where(function ($query) use ($linenTypeSelected, $operationTypeSelected) {
