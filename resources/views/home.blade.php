@@ -30,7 +30,7 @@
                                     <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 110px">
                                         <div class="text-center">
                                             <div class="fa-solid fa-person-digging" style="font-size: 3em"></div>
-                                            <div class="text-center mt-3">{{ __('คนงาน - Worker') }}</div>
+                                            <div class="text-center mt-3">{{ __('พนักงาน - Worker') }}</div>
                                         </div>
                                     </div>
                                 </div>

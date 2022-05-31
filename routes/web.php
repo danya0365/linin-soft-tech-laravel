@@ -82,6 +82,8 @@ Route::group(['prefix' => 'worker', 'middleware' => ['auth']], function () {
 
     Route::group(['prefix' => 'operation'], function () {
         Route::get('/', [App\Http\Controllers\Worker\OperationController::class, 'index'])->name('worker.operation');
+        Route::get('/in-progress', [App\Http\Controllers\Worker\OperationController::class, 'getOperationsInProgress'])->name('worker.operation.in-progress');
+        Route::get('/checkout-in-progress/{operationId}', [App\Http\Controllers\Worker\OperationController::class, 'checkOutOperationInProgress'])->name('worker.operation.checkout-in-progress');
 
         Route::group(['prefix' => 'wash'], function () {
             Route::get('/', [App\Http\Controllers\Worker\Operation\WashController::class, 'index'])->name('worker.operation.wash');

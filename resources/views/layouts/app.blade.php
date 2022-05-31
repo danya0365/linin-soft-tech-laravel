@@ -53,7 +53,7 @@
                             @endif
                         @else
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ route('worker') }}">{{ __('คนงาน - Worker') }}</a>
+                                <a class="nav-link" href="{{ route('worker') }}">{{ __('พนักงาน - Worker') }}</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="{{ route('supervisor') }}">{{ __('ผู้คุม - Supervisor') }}</a>
