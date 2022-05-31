@@ -46,11 +46,11 @@ class ProductController extends Controller
         }])->with('linenProduct')->where('linen_case', $linenCase['var']);
 
         $query->whereNotNull('linen_product_id');
-        // $query->where(function ($query) {
-        //     $query->whereHas('operation', function ($query) {
-        //         $query->where('status', OperationStatus::Close());
-        //     });
-        // });
+        $query->where(function ($query) {
+            $query->whereHas('operation', function ($query) {
+                $query->where('status', OperationStatus::Close());
+            });
+        });
 
         if ($linenTypeSelected || $operationTypeSelected) {
             $query->where(function ($query) use ($linenTypeSelected, $operationTypeSelected) {
@@ -92,6 +92,7 @@ class ProductController extends Controller
                 'linen_product_id'
             )
                 ->where('linen_case', $linenCase['var'])
+                ->whereNotNull('linen_product_id')
                 ->groupBy('linen_product_id');
 
             $dateStartAt = request()->get('date_start_at');
