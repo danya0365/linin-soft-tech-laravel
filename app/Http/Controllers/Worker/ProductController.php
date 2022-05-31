@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Worker;
 
+use App\Enums\OperationStatus;
 use App\Enums\OperationType;
 use App\Http\Controllers\Controller;
 use App\Models\LinenType;
@@ -43,6 +44,13 @@ class ProductController extends Controller
         $query = OperationLinenProduct::with(['operation' => function ($query) {
             $query->with('employee')->with('customer');
         }])->with('linenProduct')->where('linen_case', $linenCase['var']);
+
+        $query->whereNotNull('linen_product_id');
+        // $query->where(function ($query) {
+        //     $query->whereHas('operation', function ($query) {
+        //         $query->where('status', OperationStatus::Close());
+        //     });
+        // });
 
         if ($linenTypeSelected || $operationTypeSelected) {
             $query->where(function ($query) use ($linenTypeSelected, $operationTypeSelected) {
