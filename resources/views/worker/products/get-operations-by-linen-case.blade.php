@@ -94,6 +94,7 @@
                                     <th>จำนวนที่จัดเก็บ (pack)</th>
                                     <th>จำนวนที่ขนส่ง (pack)</th>
                                     <th>เวลา</th>
+                                    <th>สถานะ</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -107,11 +108,11 @@
                                         <td>{{ $operation->operation->employee->name }}</td>
                                         <td class="text-center">
                                             {{ $operation->wet_weight }}
-                                            (#{{ $operation->washing_machine_id }})
+                                            (#{{ $operation->operation->washing_machine_id }})
                                         </td>
                                         <td class="text-center">
                                             {{ $operation->dry_weight }}
-                                            (#{{ $operation->dryer_machine_id }})
+                                            (#{{ $operation->operation->dryer_machine_id }})
                                         </td>
                                         <td class="text-center">{{ $operation->iron_piece }}</td>
                                         <td class="text-center">{{ $operation->packing_piece }}</td>
@@ -119,9 +120,10 @@
                                         <td class="text-center">{{ $operation->collect_pack }}</td>
                                         <td class="text-center">
                                             {{ $operation->deliver_pack }}
-                                            (#{{ $operation->truck_id }})
+                                            (#{{ $operation->operation->truck_id }})
                                         </td>
                                         <td class="text-center">{{ $operation->created_at->format('H:i') }}</td>
+                                        <td class="text-center">{{ $operation->operation->status }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -145,7 +147,7 @@
                             <tbody>
                                 @foreach ($linenProductSummaries as $linenProductSummary)
                                     <tr>
-                                        <td>{{ $linenProductSummary->linenProduct->name }}</td>
+                                        <td>{{ $linenProductSummary->linenProduct ? $linenProductSummary->linenProduct->name : '-' }}</td>
                                         <td class="text-center">{{ $linenProductSummary->total_wet_weight }}</td>
                                         <td class="text-center">{{ $linenProductSummary->total_dry_weight }}</td>
                                         <td class="text-center">{{ $linenProductSummary->total_iron_piece }}</td>
