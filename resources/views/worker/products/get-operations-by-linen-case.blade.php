@@ -94,7 +94,6 @@
                                     <th>จำนวนที่จัดเก็บ (pack)</th>
                                     <th>จำนวนที่ขนส่ง (pack)</th>
                                     <th>เวลา</th>
-                                    <th>สถานะ</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -123,7 +122,6 @@
                                             (#{{ $operation->operation->truck_id }})
                                         </td>
                                         <td class="text-center">{{ $operation->created_at->format('H:i') }}</td>
-                                        <td class="text-center">{{ $operation->operation->status }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>

@@ -92,6 +92,7 @@ class ProductController extends Controller
                 'linen_product_id'
             )
                 ->where('linen_case', $linenCase['var'])
+                ->whereNotNull('linen_product_id')
                 ->groupBy('linen_product_id');
 
             $dateStartAt = request()->get('date_start_at');
