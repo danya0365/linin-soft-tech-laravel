@@ -12,7 +12,7 @@ class HighChartManager extends Manager
     public static function getEnergyWeekSummary()
     {
         $currentDate = \Carbon\Carbon::now();
-        $totalDays = 10;
+        $totalDays = 7;
         $agoDate = $currentDate->subDays($totalDays);
 
         $energyResourceData = (function ($energyResourceId) use ($agoDate) {
