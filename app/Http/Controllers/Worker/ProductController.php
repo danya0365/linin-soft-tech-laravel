@@ -95,6 +95,12 @@ class ProductController extends Controller
                 ->whereNotNull('linen_product_id')
                 ->groupBy('linen_product_id');
 
+            $query->where(function ($query) {
+                $query->whereHas('operation', function ($query) {
+                    $query->where('status', OperationStatus::Close());
+                });
+            });
+
             $dateStartAt = request()->get('date_start_at');
             $dateEndAt = request()->get('date_end_at');
             if ($dateStartAt && $dateEndAt) {
