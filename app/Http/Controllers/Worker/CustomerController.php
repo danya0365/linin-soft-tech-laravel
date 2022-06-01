@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Worker;
 
 use App\Enums\IncomeType;
+use App\Enums\OperationStatus;
 use App\Enums\OperationType;
 use App\Http\Controllers\Controller;
 use App\Managers\IncomeManager;
@@ -96,6 +97,12 @@ class CustomerController extends Controller
             ->join('operations', 'operations.id', '=', 'operation_id')
             ->join('customers', 'customers.id', '=', 'operations.customer_id')
             ->groupBy('operations.customer_id');
+
+        $query->where(function ($query) {
+            $query->whereHas('operation', function ($query) {
+                $query->where('status', OperationStatus::Close());
+            });
+        });
 
         $dateStartAt = request()->get('date_start_at');
         $dateEndAt = request()->get('date_end_at');

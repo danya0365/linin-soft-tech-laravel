@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\EnergyResourceLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
@@ -39,3 +40,35 @@ Route::get('/query', function () {
 });
 
 Route::get('/test', [App\Http\Controllers\Supervisor\ReportController::class, 'salesYearSummary']);
+
+Route::get('/test-2', function () {
+
+    $currentDate = \Carbon\Carbon::now();
+    $agoDate = $currentDate->subDays(7);
+    $energyResourceData = (function ($energyResourceId) use ($agoDate) {
+        $query = EnergyResourceLog::query();
+        $query->select(
+            DB::raw('SUM(cost) as total_cost'),
+            DB::raw("DATE_FORMAT(created_at, '%Y-%m-%d') as date"),
+        );
+
+        $query->where('energy_resource_id', $energyResourceId)->where('created_at', '>=', $agoDate);
+        $query->groupBy('date');
+
+        $rows = $query->get();
+
+        $weekDayReports = [];
+        foreach ($rows as $key => $row) {
+            $date = \Carbon\Carbon::parse($row->date)->format('Y-m-d');
+            if (!isset($weekDayReports[$date])) {
+                $weekDayReports[$date] = [];
+            }
+            $row = $row->toArray();
+            $weekDayReports[$date] =  $row['total_cost'];
+        }
+
+        return $weekDayReports;
+    });
+
+    return $energyResourceData(1);
+});
