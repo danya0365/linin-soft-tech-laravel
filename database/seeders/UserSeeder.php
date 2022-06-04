@@ -18,7 +18,7 @@ class UserSeeder extends Seeder
     {
         DB::table('users')->insert([
             'name' => 'Admin',
-            'email' => 'admin.lininsofttech@gmail.com',
+            'email' => 'admin.linensofttech@gmail.com',
             'password' => Hash::make('12345678'),
             'role' => 'admin',
             'is_can_access_admin' => 1,
@@ -29,7 +29,7 @@ class UserSeeder extends Seeder
         ]);
         DB::table('users')->insert([
             'name' => 'Employee',
-            'email' => 'employee.lininsofttech@gmail.com',
+            'email' => 'employee.linensofttech@gmail.com',
             'role' => 'employee',
             'password' => Hash::make('12345678'),
             'created_at' =>  \Carbon\Carbon::now(),
@@ -37,7 +37,7 @@ class UserSeeder extends Seeder
         ]);
         DB::table('users')->insert([
             'name' => 'Customer',
-            'email' => 'customer.lininsofttech@gmail.com',
+            'email' => 'customer.linensofttech@gmail.com',
             'role' => 'customer',
             'is_can_access_customer' => 1,
             'password' => Hash::make('12345678'),

@@ -7,7 +7,7 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ __('Supervisor - LininSoftTech') }}</title>
+    <title>{{ __('Supervisor - LinenSoftTech') }}</title>
 
     <!-- Scripts -->
     <script src="{{ asset('js/app.js') }}"></script>
