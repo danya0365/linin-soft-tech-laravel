@@ -7,7 +7,7 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ __('LininSoftTech') }}</title>
+    <title>{{ __('LinenSoftTech') }}</title>
 
     <!-- Scripts -->
     <script src="{{ asset('js/app.js') }}" defer></script>
@@ -87,6 +87,14 @@
         <main class="py-4">
             @yield('content')
         </main>
+        <footer>
+            <div class="container d-flex justify-content-between py-4 my-4 border-top">
+                <p>&copy; 2021 {{ config('app.name'); }}, Inc. All rights reserved.</p>
+                <div class="d-flex">
+                    v{{ config('app.version'); }}
+                </div>
+            </div>
+        </footer>
     </div>
 </body>
 </html>
