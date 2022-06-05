@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Truck;
+use App\Models\Note;
 use Illuminate\Http\Request;
 
 /**
- * Class TruckController
+ * Class NoteController
  * @package App\Http\Controllers
  */
-class TruckController extends Controller
+class NoteController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -18,10 +18,10 @@ class TruckController extends Controller
      */
     public function index()
     {
-        $trucks = Truck::paginate();
+        $notes = Note::paginate();
 
-        return view('truck.index', compact('trucks'))
-            ->with('i', (request()->input('page', 1) - 1) * $trucks->perPage());
+        return view('note.index', compact('notes'))
+            ->with('i', (request()->input('page', 1) - 1) * $notes->perPage());
     }
 
     /**
@@ -31,8 +31,8 @@ class TruckController extends Controller
      */
     public function create()
     {
-        $truck = new Truck();
-        return view('truck.create', compact('truck'));
+        $note = new Note();
+        return view('note.create', compact('note'));
     }
 
     /**
@@ -43,12 +43,12 @@ class TruckController extends Controller
      */
     public function store(Request $request)
     {
-        request()->validate(Truck::$rules);
+        request()->validate(Note::$rules);
 
-        $truck = Truck::create($request->all());
+        $note = Note::create($request->all());
 
-        return redirect()->route('trucks.index')
-            ->with('success', 'Truck created successfully.');
+        return redirect()->route('notes.index')
+            ->with('success', 'Note created successfully.');
     }
 
     /**
@@ -59,9 +59,9 @@ class TruckController extends Controller
      */
     public function show($id)
     {
-        $truck = Truck::find($id);
+        $note = Note::find($id);
 
-        return view('truck.show', compact('truck'));
+        return view('note.show', compact('note'));
     }
 
     /**
@@ -72,26 +72,26 @@ class TruckController extends Controller
      */
     public function edit($id)
     {
-        $truck = Truck::find($id);
+        $note = Note::find($id);
 
-        return view('truck.edit', compact('truck'));
+        return view('note.edit', compact('note'));
     }
 
     /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request $request
-     * @param  Truck $truck
+     * @param  Note $note
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Truck $truck)
+    public function update(Request $request, Note $note)
     {
-        request()->validate(Truck::$rules);
+        request()->validate(Note::$rules);
 
-        $truck->update($request->all());
+        $note->update($request->all());
 
-        return redirect()->route('trucks.index')
-            ->with('success', 'Truck updated successfully');
+        return redirect()->route('notes.index')
+            ->with('success', 'Note updated successfully');
     }
 
     /**
@@ -101,17 +101,9 @@ class TruckController extends Controller
      */
     public function destroy($id)
     {
-        $truck = Truck::find($id)->delete();
+        $note = Note::find($id)->delete();
 
-        return redirect()->route('trucks.index')
-            ->with('success', 'Truck deleted successfully');
-    }
-
-
-    public function createNote($id)
-    {
-        $truck = Truck::find($id);
-
-        return view('truck.create-note', compact('truck'));
+        return redirect()->route('notes.index')
+            ->with('success', 'Note deleted successfully');
     }
 }
