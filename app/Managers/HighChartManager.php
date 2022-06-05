@@ -12,7 +12,8 @@ class HighChartManager extends Manager
     public static function getEnergyWeekSummary()
     {
         $currentDate = \Carbon\Carbon::now();
-        $agoDate = $currentDate->subDays(7);
+        $totalDays = 7;
+        $agoDate = $currentDate->subDays($totalDays);
 
         $energyResourceData = (function ($energyResourceId) use ($agoDate) {
             $query = EnergyResourceLog::query();
@@ -28,7 +29,7 @@ class HighChartManager extends Manager
 
             $weekDayReports = [];
             foreach ($rows as $key => $row) {
-                $date = \Carbon\Carbon::parse($row->created_at)->format('Y-m-d');
+                $date = \Carbon\Carbon::parse($row->date)->format('Y-m-d');
                 if (!isset($weekDayReports[$date])) {
                     $weekDayReports[$date] = [];
                 }
@@ -41,7 +42,7 @@ class HighChartManager extends Manager
 
         $titles = [];
         $_date = \Carbon\Carbon::now();
-        for ($i = 0; $i < 7; $i++) {
+        for ($i = 0; $i < $totalDays; $i++) {
             $date = $i > 0 ? $_date->subDays(1) : $_date;
             $titles[] = $date->format('Y-m-d');
         }
@@ -53,7 +54,7 @@ class HighChartManager extends Manager
             $data = $energyResourceData($energyResource->id);
             $_date = \Carbon\Carbon::now();
             $_data = [];
-            for ($i = 0; $i < 7; $i++) {
+            for ($i = 0; $i < $totalDays; $i++) {
                 $date = $i > 0 ? $_date->subDays(1) : $_date;
                 $dateString = $date->format('Y-m-d');
                 $_data[] = isset($data[$dateString]) ? $data[$dateString] : 0;
