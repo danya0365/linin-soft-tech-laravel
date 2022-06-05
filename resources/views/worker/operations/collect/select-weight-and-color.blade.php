@@ -94,7 +94,7 @@
                                             @foreach (['red', 'blue', 'yellow', 'green', 'orange', 'purple', 'magenta', 'cyan', 'white', 'black', 'gray', 'brown'] as $color)
                                             <div class="col-4">
                                                 <div class="border color-number" style="width: 100%; background-color: {{ $color }}">
-                                                    <div class="rounded-3 d-flex align-items-center justify-content-center" style="font-size: 48px; opacity: 0">
+                                                    <div class="rounded-3 d-flex align-items-center justify-content-center" style="font-size: 48px; opacity: 0" data-color="{{ $color }}">
                                                         &nbsp;
                                                     </div>
                                                 </div>
@@ -196,7 +196,7 @@ $(function(){
     };
     setColorResult(selectColor);
     $('.color-number').click(function(){
-        var color = $.trim($(this).find('div').text())
+        var color = $.trim($(this).find('div').data('color'))
         setColorResult(color);
     })
 })

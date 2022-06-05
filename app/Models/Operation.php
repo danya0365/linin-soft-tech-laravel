@@ -168,7 +168,7 @@ class Operation extends Model
     $summaryReports = [];
     $operationLinenProducts = DB::table('operations_linen_products')
       ->selectRaw(
-        'SUM(wet_weight) as total_wet_weight, linen_product_id, linen_products.name as linen_product_name'
+        'SUM(wet_weight) as total_wet_weight, linen_product_id, (select name from linen_products where id = operations_linen_products.linen_product_id) as linen_product_name'
       )
       ->join('linen_products', function ($join) {
         $join->on('linen_products.id', '=', 'operations_linen_products.linen_product_id');
@@ -195,7 +195,7 @@ class Operation extends Model
     $summaryReports = [];
     $operationLinenProducts = DB::table('operations_linen_products')
       ->selectRaw(
-        'SUM(dry_weight) as total_dry_weight, linen_product_id, linen_products.name as linen_product_name'
+        'SUM(dry_weight) as total_dry_weight, linen_product_id, (select name from linen_products where id = operations_linen_products.linen_product_id) as linen_product_name'
       )
       ->join('linen_products', function ($join) {
         $join->on('linen_products.id', '=', 'operations_linen_products.linen_product_id');
@@ -222,7 +222,7 @@ class Operation extends Model
     $summaryReports = [];
     $operationLinenProducts = DB::table('operations_linen_products')
       ->selectRaw(
-        'SUM(iron_piece) as total_iron_piece, linen_product_id, linen_products.name as linen_product_name'
+        'SUM(iron_piece) as total_iron_piece, linen_product_id, (select name from linen_products where id = operations_linen_products.linen_product_id) as linen_product_name'
       )
       ->join('linen_products', function ($join) {
         $join->on('linen_products.id', '=', 'operations_linen_products.linen_product_id');
@@ -249,7 +249,7 @@ class Operation extends Model
     $summaryReports = [];
     $operationLinenProducts = DB::table('operations_linen_products')
       ->selectRaw(
-        'SUM(packing_piece) as total_packing_piece, linen_product_id, linen_products.name as linen_product_name'
+        'SUM(packing_piece) as total_packing_piece, linen_product_id, (select name from linen_products where id = operations_linen_products.linen_product_id) as linen_product_name'
       )
       ->join('linen_products', function ($join) {
         $join->on('linen_products.id', '=', 'operations_linen_products.linen_product_id');
@@ -279,7 +279,7 @@ class Operation extends Model
         'SUM(collect_weight) as total_collect_weight, 
         SUM(collect_pack) as total_collect_pack, 
         linen_product_id, 
-        linen_products.name as linen_product_name'
+        (select name from linen_products where id = operations_linen_products.linen_product_id) as linen_product_name'
       )
       ->join('linen_products', function ($join) {
         $join->on('linen_products.id', '=', 'operations_linen_products.linen_product_id');
@@ -310,7 +310,7 @@ class Operation extends Model
     $summaryReports = [];
     $operationLinenProducts = DB::table('operations_linen_products')
       ->selectRaw(
-        'SUM(deliver_pack) as total_deliver_pack, linen_product_id, linen_products.name as linen_product_name'
+        'SUM(deliver_pack) as total_deliver_pack, linen_product_id, (select name from linen_products where id = operations_linen_products.linen_product_id) as linen_product_name'
       )
       ->join('linen_products', function ($join) {
         $join->on('linen_products.id', '=', 'operations_linen_products.linen_product_id');

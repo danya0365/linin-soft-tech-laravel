@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Worker;
 
+use App\Enums\OperationStatus;
 use App\Enums\OperationType;
 use App\Http\Controllers\Controller;
 use App\Models\LinenType;
@@ -44,6 +45,13 @@ class ProductController extends Controller
             $query->with('employee')->with('customer');
         }])->with('linenProduct')->where('linen_case', $linenCase['var']);
 
+        $query->whereNotNull('linen_product_id');
+        $query->where(function ($query) {
+            $query->whereHas('operation', function ($query) {
+                $query->where('status', OperationStatus::Close());
+            });
+        });
+
         if ($linenTypeSelected || $operationTypeSelected) {
             $query->where(function ($query) use ($linenTypeSelected, $operationTypeSelected) {
                 $query->whereHas('linenProduct', function ($query) use ($linenTypeSelected) {
@@ -84,7 +92,14 @@ class ProductController extends Controller
                 'linen_product_id'
             )
                 ->where('linen_case', $linenCase['var'])
+                ->whereNotNull('linen_product_id')
                 ->groupBy('linen_product_id');
+
+            $query->where(function ($query) {
+                $query->whereHas('operation', function ($query) {
+                    $query->where('status', OperationStatus::Close());
+                });
+            });
 
             $dateStartAt = request()->get('date_start_at');
             $dateEndAt = request()->get('date_end_at');

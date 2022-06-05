@@ -7,7 +7,7 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ __('LininSoftTech') }}</title>
+    <title>{{ __('LinenSoftTech') }}</title>
 
     <!-- Scripts -->
     <script src="{{ asset('js/app.js') }}" defer></script>
@@ -53,7 +53,7 @@
                             @endif
                         @else
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ route('worker') }}">{{ __('คนงาน - Worker') }}</a>
+                                <a class="nav-link" href="{{ route('worker') }}">{{ __('พนักงาน - Worker') }}</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="{{ route('supervisor') }}">{{ __('ผู้คุม - Supervisor') }}</a>
@@ -87,6 +87,14 @@
         <main class="py-4">
             @yield('content')
         </main>
+        <footer>
+            <div class="container d-flex justify-content-between py-4 my-4 border-top">
+                <p>&copy; 2021 {{ config('app.name'); }}, Inc. All rights reserved.</p>
+                <div class="d-flex">
+                    v{{ config('app.version'); }}
+                </div>
+            </div>
+        </footer>
     </div>
 </body>
 </html>
