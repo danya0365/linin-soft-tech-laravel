@@ -14,6 +14,12 @@
         </nav>
         <div class="row">
             <div class="col-md-12">
+                @if (session('success'))
+                    <div class="alert alert-success" role="alert">
+                        {{ session('success') }}
+                    </div>
+                @endif
+
                 <div class="card">
                     <div class="card-header">
                         <div class="float-left">
@@ -46,6 +52,59 @@
 
                     </div>
                 </div>
+            </div>
+        </div>
+        <div class="row mt-2">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+
+                            <span id="card_title">
+                                {{ __('Note') }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead class="thead">
+                                    <tr>
+                                        <th>Date Created</th>
+                                        
+										<th>Message</th>
+										<th>Image Url</th>
+										<th>Cost</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($notes as $note)
+                                        <tr>
+                                            <td>{{ $note->created_at->format('Y-m-d') }}</td>
+                                            
+											<td>{{ $note->message }}</td>
+											<td>{{ $note->image_url }}</td>
+											<td>{{ $note->cost }}</td>
+
+                                            <td>
+                                                <form action="{{ route('notes.destroy',$note->id) }}" method="POST">
+                                                    <a class="btn btn-sm btn-primary " href="{{ route('notes.show',$note->id) }}"><i class="fa fa-fw fa-eye"></i> Show</a>
+                                                    <a class="btn btn-sm btn-success" href="{{ route('notes.edit',$note->id) }}"><i class="fa fa-fw fa-edit"></i> Edit</a>
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-danger btn-sm"><i class="fa fa-fw fa-trash"></i> Delete</button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                {!! $notes->links() !!}
             </div>
         </div>
     </div>

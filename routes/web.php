@@ -45,6 +45,8 @@ Route::group(['middleware' => ['admin']], function () {
 
     Route::match(array('GET', 'POST'), 'trucks/{id}/create-note', [App\Http\Controllers\TruckController::class, 'createNote'])->name('trucks.create-note');
     Route::resource('trucks', App\Http\Controllers\TruckController::class);
+
+    Route::resource('notes', App\Http\Controllers\NoteController::class);
 });
 
 Route::group(['prefix' => 'supervisor', 'middleware' => ['supervisor']], function () {

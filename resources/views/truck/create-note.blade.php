@@ -19,7 +19,8 @@
                 <div class="card-header">เพิ่มบันทึก - Create Note</div>
                 <div class="card-body">
                     <form class="row g-3 mb-3" action="{{ request()->url() }}" method="POST" role="form" enctype="multipart/form-data">
-                        
+                        {{ Form::hidden('truck_id', $truck->id) }}
+
                         @csrf
 
                         <div class="col-12">
@@ -29,19 +30,15 @@
                         </div>
 
                         <div class="col-12">
-                            <label for="note" class="form-label">บันทึกข้อความ</label>
-                            <textarea name="note" class="form-control" rows="3"></textarea>
-                            @error('note')
-                                <div class="text-danger">{{ $message }}</div>
-                            @enderror
+                            {{ Form::label('cost', 'ค่าใช้จ่าย - Cost (Thai Baht)', ['class' => "form-label"]) }}
+                            {{ Form::text('cost', $note->cost, ['class' => 'form-control' . ($errors->has('cost') ? ' is-invalid' : ''), 'placeholder' => '']) }}
+                            {!! $errors->first('cost', '<div class="invalid-feedback">:message</div>') !!}
                         </div>
 
                         <div class="col-12">
-                            <label for="cost" class="form-label">ค่าใช้จ่าย - Cost (Thai Baht)</label>
-                            <input type="text" name="cost" class="form-control" id="cost">
-                            @error('cost')
-                                <div class="text-danger">{{ $message }}</div>
-                            @enderror
+                            {{ Form::label('image_upload', 'อัพโหลดรูป - Attach Photo', ['class' => "form-label"]) }}
+                            {{ Form::file('image_upload', ['class' => 'form-control' . ($errors->has('image_upload') ? ' is-invalid' : ''), 'placeholder' => '']) }}
+                            {!! $errors->first('image_upload', '<div class="invalid-feedback">:message</div>') !!}
                         </div>
 
                         <div class="col-12">
