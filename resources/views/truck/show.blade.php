@@ -85,7 +85,13 @@
                                             <td>{{ $note->created_at->format('Y-m-d') }}</td>
                                             
 											<td>{{ $note->message }}</td>
-											<td>{{ $note->image_url }}</td>
+											<td>
+                                                @if ( $note->image_url )
+                                                <a href="{{ asset($note->image_url) }}" >
+                                                    View Photo
+                                                </a>
+                                                @endif
+                                            </td>
 											<td>{{ $note->cost }}</td>
 
                                             <td>
