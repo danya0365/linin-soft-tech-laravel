@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ExpenseType;
+use App\Managers\ExpenseManager;
 use App\Models\Note;
 use Illuminate\Http\Request;
 
@@ -101,7 +103,9 @@ class NoteController extends Controller
      */
     public function destroy($id)
     {
-        $note = Note::find($id)->delete();
+        $note = Note::find($id);
+        $note->delete();
+        ExpenseManager::delete($note);
 
         return redirect()->route('notes.index')
             ->with('success', 'Note deleted successfully');

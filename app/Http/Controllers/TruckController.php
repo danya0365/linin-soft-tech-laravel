@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ExpenseType;
+use App\Managers\ExpenseManager;
 use App\Models\Note;
 use App\Models\Truck;
 use Illuminate\Http\Request;
@@ -142,6 +144,10 @@ class TruckController extends Controller
             }
 
             $note = Note::create($post);
+
+            if ($note) {
+                ExpenseManager::create(ExpenseType::Truck(), $note, $note->cost);
+            }
 
             return redirect()->route('trucks.show', $truck)
                 ->with('success', 'Note created successfully');

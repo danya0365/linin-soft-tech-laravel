@@ -67,47 +67,26 @@
                     </div>
 
                     <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-striped table-hover">
-                                <thead class="thead">
-                                    <tr>
-                                        <th>Date Created</th>
-                                        
-										<th>Message</th>
-										<th>Image Url</th>
-										<th>Cost</th>
-                                        <th></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($notes as $note)
-                                        <tr>
-                                            <td>{{ $note->created_at->format('Y-m-d') }}</td>
-                                            
-											<td>{{ $note->message }}</td>
-											<td>
-                                                @if ( $note->image_url )
-                                                <a href="{{ asset($note->image_url) }}" >
-                                                    View Photo
-                                                </a>
-                                                @endif
-                                            </td>
-											<td>{{ $note->cost }}</td>
-
-                                            <td>
-                                                <form action="{{ route('notes.destroy',$note->id) }}" method="POST">
-                                                    <a class="btn btn-sm btn-primary " href="{{ route('notes.show',$note->id) }}"><i class="fa fa-fw fa-eye"></i> Show</a>
-                                                    <a class="btn btn-sm btn-success" href="{{ route('notes.edit',$note->id) }}"><i class="fa fa-fw fa-edit"></i> Edit</a>
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-danger btn-sm"><i class="fa fa-fw fa-trash"></i> Delete</button>
-                                                </form>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
+                    @foreach ($notes as $note)
+                        <div class="card mb-2">
+                            <div class="card-body">
+                            <h5 class="card-title">ค่าใช้จ่าย: {{ $note->cost }}</h5>
+                            <p class="card-text">{{ $note->message }}</p>
+                            <p class="card-text"><small class="text-muted">โพสท์เมื่อ: {{ $note->created_at->format('Y-m-d') }}</small></p>
+                            </div>
+                            <div class="card-body">
+                                <form action="{{ route('notes.destroy',$note->id) }}" method="POST">
+                                    <a class="btn btn-sm btn-success" href="{{ route('notes.edit',$note->id) }}"><i class="fa fa-fw fa-edit"></i> Edit</a>
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-danger btn-sm"><i class="fa fa-fw fa-trash"></i> Delete</button>
+                                </form>
+                            </div>
+                            @if ( $note->image_url != '' )
+                            <img src="{{ asset($note->image_url) }}" class="card-img-bottom" alt="{{ asset($note->image_url) }}">
+                            @endif
                         </div>
+                    @endforeach
                     </div>
                 </div>
                 {!! $notes->links() !!}
