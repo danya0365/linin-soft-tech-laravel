@@ -143,6 +143,7 @@ class DeliverController extends Controller
                 if ($operationTypeSelected) {
                     $query->where('operation_type', $operationTypeSelected);
                 }
+                $query->where('status', OperationStatus::Close());
             });
         });
 
