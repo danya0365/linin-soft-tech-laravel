@@ -7,13 +7,18 @@ use App\Models\Income;
 
 class IncomeManager extends Manager
 {
-    public static function create($typeName, $modelInstance, $amount)
+    public static function create($typeName, $modelInstance, $amount, $date = null)
     {
         $income = new Income();
         $income->type_name = $typeName;
-        $income->table_name = $modelInstance->getTable();;
+        $income->table_name = $modelInstance->getTable();
         $income->table_id = $modelInstance->id;
         $income->amount = $amount;
+        if ($date) {
+            $income->timestamps = false;
+            $income->created_at = \Carbon\Carbon::parse($date);
+            $income->updated_at = \Carbon\Carbon::now();
+        }
         $income->save();
     }
 
