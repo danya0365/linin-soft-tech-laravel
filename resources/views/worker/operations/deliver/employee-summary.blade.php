@@ -42,6 +42,10 @@
                         ชนิดผ้า: {{ $operationLinenProduct['linen_product'] ? $operationLinenProduct['linen_product']['name'] : 'ยังไม่ได้เลือก' }},
                         จำนวนแพ็ค: {{ $operationLinenProduct['deliver_pack'] ? $operationLinenProduct['deliver_pack'] : 'ยังไม่ได้เลือก' }} pack,
                         สี: <span style="color: {{ $operationLinenProduct['color'] ? $operationLinenProduct['color'] : '' }}">{{ $operationLinenProduct['color'] ? $operationLinenProduct['color'] : 'ยังไม่ได้เลือก' }}</span>
+                        <form class="delete-form" action="{{ route('worker.operation.deliver.delete-collect-operation', ['operationId' => $operation['id'], 'operationLinenProductId' => $operationLinenProduct['id']]) }}" method="POST">
+                            @csrf
+                            <button type="submit" class="btn btn-danger btn-sm"><i class="fa fa-fw fa-trash"></i> Delete</button>
+                        </form>
                     </li>
                     @endforeach
                 </ul>
@@ -127,6 +131,10 @@
         $("#close-operation").on("click", closeOperation);
         $("#reopen-operation").on("click", reopenOperation);
         $("#select-collect-operation").on("click", selectCollectOperation);
+        $(".delete-form").on("submit", function(){
+            removeOnUnload();
+            return true;
+        });
     })
 </script>
 

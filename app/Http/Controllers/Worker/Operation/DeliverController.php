@@ -147,6 +147,8 @@ class DeliverController extends Controller
             });
         });
 
+        $query->whereNull('deliver_operation_id');
+
         $dateStartAt = request()->get('date_start_at');
         $dateEndAt = request()->get('date_end_at');
         if ($dateStartAt && $dateEndAt) {
@@ -157,8 +159,22 @@ class DeliverController extends Controller
             $query->orderBy($sort, $order);
         }
 
-        $operations = $query->paginate();
+        $operations = $query->paginate(100);
 
         return view('worker.operations.deliver.select-collect-operation', ['operations' => $operations, 'operation' => $operation->toArray()]);
+    }
+
+
+    public function deleteCollectOperation($operationId)
+    {
+        $operationLinenProductId = request()->get('operationLinenProductId');
+        OperationLinenProduct::where('id', $operationLinenProductId)->update(
+            [
+                'deliver_pack' => null,
+                'deliver_operation_id' => null
+            ]
+        );
+
+        return redirect(route('worker.operation.deliver.employee-summary', ['operationId' => $operationId]));
     }
 }
