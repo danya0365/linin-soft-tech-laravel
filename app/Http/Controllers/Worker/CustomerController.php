@@ -210,17 +210,19 @@ class CustomerController extends Controller
 
     public function submitBilling($customerId)
     {
-        request()->validate(['total_billing_weight' => 'required', 'total_billing_payment' => 'required']);
+        request()->validate(['total_billing_weight' => 'required', 'total_billing_payment' => 'required', 'billing_payment_date' => 'required']);
 
         $operation = new Operation();
         $operation->operation_type = OperationType::Payment();
+        $operation->status = OperationStatus::Close();
         $operation->customer_id = $customerId;
         $operation->total_billing_weight = request()->get('total_billing_weight');
         $operation->total_billing_payment = request()->get('total_billing_payment');
+        $operation->billing_payment_date = request()->get('billing_payment_date');
         $operation->save();
 
         OperationManager::createCustomerOperationDailySummary($operation);
-        IncomeManager::create(IncomeType::CustomerBilling(), $operation, $operation->total_billing_payment);
+        IncomeManager::create(IncomeType::CustomerBilling(), $operation, $operation->total_billing_payment, $operation->billing_payment_date);
         return redirect(route('worker.customer.operation-summary'));
     }
 }
