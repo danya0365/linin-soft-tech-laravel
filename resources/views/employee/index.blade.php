@@ -45,7 +45,7 @@
 										<th>Code</th>
 										<th>Name</th>
 										<th>Photo</th>
-										<th>Department Id</th>
+										<th>Department</th>
 
                                         <th></th>
                                     </tr>
@@ -58,7 +58,7 @@
 											<td>{{ $employee->code }}</td>
 											<td>{{ $employee->name }}</td>
 											<td>{{ $employee->photo }}</td>
-											<td>{{ $employee->department_id }}</td>
+											<td>{{ $employee->department ? $employee->department->name : '-' }}</td>
 
                                             <td>
                                                 <form action="{{ route('employees.destroy',$employee->id) }}" method="POST">

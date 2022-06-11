@@ -33,8 +33,8 @@
                             {{ $employee->photo }}
                         </div>
                         <div class="form-group">
-                            <strong>Department Id:</strong>
-                            {{ $employee->department_id }}
+                            <strong>Department:</strong>
+                            {{ $employee->department ? $employee->department->name : '-' }}
                         </div>
 
                     </div>

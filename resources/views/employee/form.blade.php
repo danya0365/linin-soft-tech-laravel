@@ -18,7 +18,14 @@
         </div>
         <div class="form-group">
             {{ Form::label('department_id') }}
-            {{ Form::text('department_id', $employee->department_id, ['class' => 'form-control' . ($errors->has('department_id') ? ' is-invalid' : ''), 'placeholder' => 'Department Id']) }}
+            <select name="department_id" class="form-select">
+                <option value=""></option>
+            @foreach (App\Models\Department::get() as $department)
+                <option value="{{ $department->id }}" @selected($employee->department_id == $department->id)>
+                    {{ $department->name }}
+                </option>
+            @endforeach
+            </select>
             {!! $errors->first('department_id', '<div class="invalid-feedback">:message</div>') !!}
         </div>
 

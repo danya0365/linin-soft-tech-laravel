@@ -43,7 +43,7 @@
                                         <th>No</th>
                                         
 										<th>Name</th>
-										<th>Customer Group Id</th>
+										<th>Customer Group</th>
 										<th>Total Wet Weight</th>
 										<th>Total Dry Weight</th>
 										<th>Total Billing Weight</th>
@@ -59,7 +59,7 @@
                                             <td>{{ ++$i }}</td>
                                             
 											<td>{{ $customer->name }}</td>
-											<td>{{ $customer->customer_group_id }}</td>
+											<td>{{ $customer->customerGroup ? $customer->customerGroup->name : '-' }}</td>
 											<td>{{ $customer->total_wet_weight }}</td>
 											<td>{{ $customer->total_dry_weight }}</td>
 											<td>{{ $customer->total_billing_weight }}</td>
