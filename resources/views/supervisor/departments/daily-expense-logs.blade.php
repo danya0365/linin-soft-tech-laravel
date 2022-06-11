@@ -12,6 +12,13 @@
     </nav>
     <div class="row justify-content-center">
         <div class="col-md-12 m-2">
+
+            @if ($message = Session::get('success'))
+            <div class="alert alert-success mb-2">
+                {{ $message }}
+            </div>
+            @endif
+            
             <div class="card">
                 <div class="card-header">ประวัติค่าใช้จ่ายรายวัน</div>
                 <div class="card-body">
@@ -54,12 +61,6 @@
                             <a href="{{ route('supervisor.department.daily-expense-log') }}" role="button" class="btn btn-outline-secondary">Reset</a>
                         </div>
                     </form>
-
-                    @if ($message = Session::get('success'))
-                    <div class="alert alert-success mb-2">
-                        {{ $message }}
-                    </div>
-                    @endif
 
                     @foreach ($departmentDailyCostLogs as $departmentDailyCostLog)
                     <div class="card mb-2">
