@@ -32,7 +32,7 @@
                             <tbody>
                                 @foreach ($inventoryLogs as $inventoryLog)
                                     <tr>
-                                        <td>{{ $inventoryLog->updated_at->format('Y-m-d') }}</td>
+                                        <td>{{ $inventoryLog->created_at->format('Y-m-d') }}</td>
                                         <td class="text-center">{{ $inventoryLog->type }}</td>
                                         <td class="text-center">{{ $inventoryLog->quantity }}</td>
                                         <td class="text-center">{{ number_format($inventoryLog->cost) }}</td>

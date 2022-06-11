@@ -137,14 +137,17 @@ class EnergyResourceLogController extends Controller
 
         if (request()->isMethod('post')) {
 
-            request()->validate(['value' => 'required', 'cost' => 'required']);
+            request()->validate(['value' => 'required', 'cost' => 'required', 'created_at' => 'required']);
 
             $energyResourceLog->value = request()->get('value');
             $energyResourceLog->cost = request()->get('cost');
             $energyResourceLog->unit = "litre";
+            $energyResourceLog->timestamps = false;
+            $energyResourceLog->created_at = \Carbon\Carbon::parse(request()->get('created_at'));
+            $energyResourceLog->updated_at = \Carbon\Carbon::now();
             $energyResourceLog->save();
 
-            ExpenseManager::create(ExpenseType::Water(), $energyResourceLog, $energyResourceLog->cost);
+            ExpenseManager::create(ExpenseType::Water(), $energyResourceLog, $energyResourceLog->cost, $energyResourceLog->created_at);
 
             return redirect(route('worker.energy-resource.logs'));
         }
@@ -167,14 +170,17 @@ class EnergyResourceLogController extends Controller
 
         if (request()->isMethod('post')) {
 
-            request()->validate(['value' => 'required', 'cost' => 'required']);
+            request()->validate(['value' => 'required', 'cost' => 'required', 'created_at' => 'required']);
 
             $energyResourceLog->value = request()->get('value');
             $energyResourceLog->cost = request()->get('cost');
             $energyResourceLog->unit = "kw/hour";
+            $energyResourceLog->timestamps = false;
+            $energyResourceLog->created_at = \Carbon\Carbon::parse(request()->get('created_at'));
+            $energyResourceLog->updated_at = \Carbon\Carbon::now();
             $energyResourceLog->save();
 
-            ExpenseManager::create(ExpenseType::Electricity(), $energyResourceLog, $energyResourceLog->cost);
+            ExpenseManager::create(ExpenseType::Electricity(), $energyResourceLog, $energyResourceLog->cost, $energyResourceLog->created_at);
 
             return redirect(route('worker.energy-resource.logs'));
         }
@@ -197,14 +203,17 @@ class EnergyResourceLogController extends Controller
 
         if (request()->isMethod('post')) {
 
-            request()->validate(['value' => 'required', 'cost' => 'required']);
+            request()->validate(['value' => 'required', 'cost' => 'required', 'created_at' => 'required']);
 
             $energyResourceLog->value = request()->get('value');
             $energyResourceLog->cost = request()->get('cost');
             $energyResourceLog->unit = "kg/gas";
+            $energyResourceLog->timestamps = false;
+            $energyResourceLog->created_at = \Carbon\Carbon::parse(request()->get('created_at'));
+            $energyResourceLog->updated_at = \Carbon\Carbon::now();
             $energyResourceLog->save();
 
-            ExpenseManager::create(ExpenseType::Gas(), $energyResourceLog, $energyResourceLog->cost);
+            ExpenseManager::create(ExpenseType::Gas(), $energyResourceLog, $energyResourceLog->cost, $energyResourceLog->created_at);
 
             return redirect(route('worker.energy-resource.logs'));
         }
@@ -227,14 +236,17 @@ class EnergyResourceLogController extends Controller
 
         if (request()->isMethod('post')) {
 
-            request()->validate(['value' => 'required', 'cost' => 'required']);
+            request()->validate(['value' => 'required', 'cost' => 'required', 'created_at' => 'required']);
 
             $energyResourceLog->value = request()->get('value');
             $energyResourceLog->cost = request()->get('cost');
             $energyResourceLog->unit = "kg";
+            $energyResourceLog->timestamps = false;
+            $energyResourceLog->created_at = \Carbon\Carbon::parse(request()->get('created_at'));
+            $energyResourceLog->updated_at = \Carbon\Carbon::now();
             $energyResourceLog->save();
 
-            ExpenseManager::create(ExpenseType::Biomass(), $energyResourceLog, $energyResourceLog->cost);
+            ExpenseManager::create(ExpenseType::Biomass(), $energyResourceLog, $energyResourceLog->cost, $energyResourceLog->created_at);
 
             return redirect(route('worker.energy-resource.logs'));
         }
@@ -257,14 +269,17 @@ class EnergyResourceLogController extends Controller
 
         if (request()->isMethod('post')) {
 
-            request()->validate(['value' => 'required', 'cost' => 'required']);
+            request()->validate(['value' => 'required', 'cost' => 'required', 'created_at' => 'required']);
 
             $energyResourceLog->value = request()->get('value');
             $energyResourceLog->cost = request()->get('cost');
             $energyResourceLog->unit = "litre";
+            $energyResourceLog->timestamps = false;
+            $energyResourceLog->created_at = \Carbon\Carbon::parse(request()->get('created_at'));
+            $energyResourceLog->updated_at = \Carbon\Carbon::now();
             $energyResourceLog->save();
 
-            ExpenseManager::create(ExpenseType::FuelOil(), $energyResourceLog, $energyResourceLog->cost);
+            ExpenseManager::create(ExpenseType::FuelOil(), $energyResourceLog, $energyResourceLog->cost, $energyResourceLog->created_at);
 
             return redirect(route('worker.energy-resource.logs'));
         }
@@ -287,14 +302,17 @@ class EnergyResourceLogController extends Controller
 
         if (request()->isMethod('post')) {
 
-            request()->validate(['value' => 'required', 'cost' => 'required']);
+            request()->validate(['value' => 'required', 'cost' => 'required', 'created_at' => 'required']);
 
             $energyResourceLog->value = request()->get('value');
             $energyResourceLog->cost = request()->get('cost');
             $energyResourceLog->unit = "litre";
+            $energyResourceLog->timestamps = false;
+            $energyResourceLog->created_at = \Carbon\Carbon::parse(request()->get('created_at'));
+            $energyResourceLog->updated_at = \Carbon\Carbon::now();
             $energyResourceLog->save();
 
-            ExpenseManager::create(ExpenseType::Petrol(), $energyResourceLog, $energyResourceLog->cost);
+            ExpenseManager::create(ExpenseType::Petrol(), $energyResourceLog, $energyResourceLog->cost, $energyResourceLog->created_at);
 
             return redirect(route('worker.energy-resource.logs'));
         }

@@ -12,10 +12,10 @@
     </nav>
     <div class="row justify-content-center">
         @if ($message = Session::get('success'))
-        <div class="alert alert-success mb-2">
-            {{ $message }}
-        </div>
-    @endif
+            <div class="alert alert-success mb-2">
+                {{ $message }}
+            </div>
+        @endif
         <div class="col-md-12 m-2">
             <div class="card">
                 <div class="card-header">เพิ่มบันทึกค่าใช้จ่ายรายวัน</div>
@@ -32,21 +32,33 @@
                                     <option value="{{ $department->id }}">{{ $department->name }}</option>
                                     @endforeach
                                 </select>
+                                
                             </div>
+                            @error('department_id')
+                                <div class="text-danger">{{ $message }}</div>
+                            @enderror
                         </div>
 
                         <div class="col-12">
                             <div class="input-group">
                                 <label class="input-group-text" for="daily_date">วันที่</label>
                                 <input type="date" class="form-control" id="daily_date" name="daily_date" />
+                                
                             </div>
+                            @error('daily_date')
+                                <div class="text-danger">{{ $message }}</div>
+                            @enderror
                         </div>
 
                         <div class="col-12">
                             <div class="input-group">
                                 <label class="input-group-text" for="cost">จำนวนเงิน</label>
                                 <input type="number" class="form-control" id="cost" name="cost" />
+                                
                             </div>
+                            @error('cost')
+                                <div class="text-danger">{{ $message }}</div>
+                            @enderror
                         </div>
 
                         <div class="col-12">

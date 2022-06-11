@@ -64,6 +64,15 @@
                                 {!! $errors->first('cost', '<div class="invalid-feedback">:message</div>') !!}
                             </div>
                         </div>
+
+                        <div class="col-12">
+                            <div class="input-group">
+                                {{ Form::label('created_at', 'วันที่เบิกของ', ['class' => "input-group-text"]) }}
+                                {{ Form::date('created_at', '', ['class' => 'form-control' . ($errors->has('created_at') ? ' is-invalid' : ''), 'placeholder' => '']) }}
+                                {!! $errors->first('created_at', '<div class="invalid-feedback">:message</div>') !!}
+                            </div>
+                        </div>
+
                     </div>
                     
                 </div>
