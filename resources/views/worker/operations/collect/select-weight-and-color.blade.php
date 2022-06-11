@@ -38,29 +38,9 @@
                                         </x-number-pad>
                                     </div>
                                     <div class="col-sm-4">
-                                        <div class="row g-2">
-
-                                            <div class="col-12 text-center">
-                                                <h2>สี</h2>
-                                            </div>
-                                            <div class="col-12">
-                                                <div class="p-3 border bg-light" style="width: 100%">
-                                                    <div class="rounded-3" style="text-align: right; font-size: 48px" id="color-result">
-                                                        &nbsp;
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            @foreach (['red', 'blue', 'yellow', 'green', 'orange', 'purple', 'magenta', 'cyan', 'white', 'black', 'gray', 'brown'] as $color)
-                                            <div class="col-4">
-                                                <div class="border color-number" style="width: 100%; background-color: {{ $color }}">
-                                                    <div class="rounded-3 d-flex align-items-center justify-content-center" style="font-size: 48px; opacity: 0" data-color="{{ $color }}">
-                                                        &nbsp;
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            @endforeach
-                                        </div>
+                                        <x-color-pad :inputName="'color'" :inputValue="$operationLinenProduct['color']">
+                                            สี
+                                        </x-color-pad>
                                     </div>
                                 </div>
                             </div>
@@ -85,20 +65,5 @@
         </div>
     </div>
 </div>
-<script type="text/javascript">
-$(function(){
-    var selectColor = $('[name=color]').val();
-    var setColorResult = (color) => {
-        $("#color-result").css('background-color', color);
-        $('[name=color]').val(color);
-        selectColor = $('[name=color]').val();
-    };
-    setColorResult(selectColor);
-    $('.color-number').click(function(){
-        var color = $.trim($(this).find('div').data('color'))
-        setColorResult(color);
-    })
-})
-</script>
 
 @endsection
