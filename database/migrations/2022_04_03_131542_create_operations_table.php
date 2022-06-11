@@ -37,6 +37,7 @@ return new class extends Migration
             $table->integer('total_deliver_pack')->nullable();
             $table->float('total_billing_weight')->nullable();
             $table->float('total_billing_payment')->nullable();
+            $table->date('billing_payment_date')->nullable();
             $table->string('colors')->nullable();
             $table->string('search_tags')->nullable();
             $table->enum('status', ['in-progress', 'close']);

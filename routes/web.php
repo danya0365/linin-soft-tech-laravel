@@ -18,6 +18,14 @@ Route::get('/', function () {
     return redirect('home');
 });
 
+Route::get('/test', function () {
+
+    $inputName = 'weight';
+    $inputValue = 12.45;
+
+    return view('test', ['inputName' => $inputName, 'inputValue' => $inputValue]);
+});
+
 Route::get('/landing', function () {
     return view('landing');
 });
@@ -196,6 +204,7 @@ Route::group(['prefix' => 'worker', 'middleware' => ['auth']], function () {
             Route::get('/{operationId}/truck/{truckId}', [App\Http\Controllers\Worker\Operation\DeliverController::class, 'setSelectTruck'])->name('worker.operation.deliver.set-select-truck');
             Route::get('/{operationId}/employee-summary', [App\Http\Controllers\Worker\Operation\DeliverController::class, 'getEmployeeSummary'])->name('worker.operation.deliver.employee-summary');
             Route::match(array('GET', 'POST'), '/{operationId}/collect-operation', [App\Http\Controllers\Worker\Operation\DeliverController::class, 'selectCollectOperation'])->name('worker.operation.deliver.select-collect-operation');
+            Route::match(array('GET', 'POST'), '/{operationId}/delete-collect-operation', [App\Http\Controllers\Worker\Operation\DeliverController::class, 'deleteCollectOperation'])->name('worker.operation.deliver.delete-collect-operation');
             Route::get('/{operationId}/close', [App\Http\Controllers\Worker\Operation\DeliverController::class, 'setClose'])->name('worker.operation.deliver.set-close');
             Route::get('/{operationId}/in-progress', [App\Http\Controllers\Worker\Operation\DeliverController::class, 'setInProgress'])->name('worker.operation.deliver.set-in-progress');
         });

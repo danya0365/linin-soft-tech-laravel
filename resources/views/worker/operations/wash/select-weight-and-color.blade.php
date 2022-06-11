@@ -23,63 +23,21 @@
                 <div class="card-body">
                     <form method="POST" action="{{ route('worker.operation.wash.set-select-weight-and-color', ['operationId' => $operation['id'], 'operationLinenProductId' => $operationLinenProduct['id']]) }}"  role="form" enctype="multipart/form-data">
                         @csrf
-                        {{ Form::hidden('wet_weight', $operationLinenProduct['wet_weight']) }}
-                        {{ Form::hidden('color', $operationLinenProduct['color']) }}
                         <div class="box box-info padding-1">
                             <div class="box-body">
                                 
                                 <div class="row g-2">
                                     <div class="col-sm-6">
-                                        <div class="row g-2">
-                                            <div class="col-12 text-center">
-                                                <h2>น้ำหนักกิโลกรัม</h2>
-                                            </div>
-                                            <div class="col-12">
-                                                <div class="p-3 border bg-light" style="width: 100%">
-                                                    <div class="rounded-3" style="text-align: right; font-size: 48px" id="pad-result">
-                                                        0
-                                                    </div>
-                                                </div>
-                                            </div>
-        
-                                            @foreach ([7, 8, 9, 4, 5, 6, 1, 2, 3, '', 0, 'ลบ'] as $pad)
-                                            <div class="col-4">
-                                                <div class="border bg-light" style="width: 100%">
-                                                    <div class="rounded-3 d-flex align-items-center justify-content-center pad-number" style="font-size: 48px">
-                                                        {{ $pad }}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            @endforeach
-                                        </div>
+                                        <x-number-pad :inputName="'wet_weight'" :inputValue="$operationLinenProduct['wet_weight']">
+                                            น้ำหนักกิโลกรัม
+                                        </x-number-pad>
                                     </div>
                                     <div class="col-sm-6">
-                                        <div class="row g-2">
-
-                                            <div class="col-12 text-center">
-                                                <h2>สี</h2>
-                                            </div>
-                                            <div class="col-12">
-                                                <div class="p-3 border bg-light" style="width: 100%">
-                                                    <div class="rounded-3" style="text-align: right; font-size: 48px" id="color-result">
-                                                        &nbsp;
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            @foreach (['red', 'blue', 'yellow', 'green', 'orange', 'purple', 'magenta', 'cyan', 'white', 'black', 'gray', 'brown'] as $color)
-                                            <div class="col-4">
-                                                <div class="border color-number" style="width: 100%; background-color: {{ $color }}">
-                                                    <div class="rounded-3 d-flex align-items-center justify-content-center" style="font-size: 48px; opacity: 0">
-                                                        {{ $color }}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            @endforeach
-                                        </div>
+                                        <x-color-pad :inputName="'color'" :inputValue="$operationLinenProduct['color']">
+                                            สี
+                                        </x-color-pad>
                                     </div>
                                 </div>
-
 
                             </div>
                             <div class="box-footer">
@@ -103,51 +61,5 @@
         </div>
     </div>
 </div>
-<script type="text/javascript">
-$(function(){
-    var number = $('[name=wet_weight]').val();
-    var selectColor = $('[name=color]').val();
-    var setPadResult = function(number){
-        var numbers = number.split('.');
-        if (numbers.length == 2) {
-            number = numbers[0] + '.' + numbers[1];
-            number = parseFloat(number);
-            //numbers = `${number}`.split('.');
-            //number = numbers[0].toLocaleString() + (numbers[1] ? '.' + numbers[1] : '');
-        } else {
-            number = parseInt(number);
-        }
-        if (isNaN(number)) {
-            number = 0;
-        }
-        $("#pad-result").html(number.toLocaleString());
-        $('[name=wet_weight]').val(number);
-    }
-    setPadResult(number);
-    $('.pad-number').click(function(){
-        var padNumber =  $.trim($(this).text())
-        padNumber = padNumber.replace(',', '');
-        if ( padNumber == '') {
-            return
-        }
-        number = number != '0' ? number + '' + padNumber : padNumber;
-        if ( padNumber == 'ลบ') {
-            number = '0';
-        }
-        setPadResult(number);
-    })
-
-    var setColorResult = (color) => {
-        $("#color-result").css('background-color', color);
-        $('[name=color]').val(color);
-        selectColor = $('[name=color]').val();
-    };
-    setColorResult(selectColor);
-    $('.color-number').click(function(){
-        var color = $.trim($(this).find('div').text())
-        setColorResult(color);
-    })
-})
-</script>
 
 @endsection
