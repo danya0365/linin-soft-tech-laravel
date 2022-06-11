@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ExpenseType;
+use App\Managers\ExpenseManager;
+use App\Models\Note;
 use App\Models\Truck;
 use Illuminate\Http\Request;
 
@@ -61,7 +64,9 @@ class TruckController extends Controller
     {
         $truck = Truck::find($id);
 
-        return view('truck.show', compact('truck'));
+        $notes = Note::where('truck_id', $id)->paginate();
+
+        return view('truck.show', compact('truck', 'notes'));
     }
 
     /**
@@ -105,5 +110,49 @@ class TruckController extends Controller
 
         return redirect()->route('trucks.index')
             ->with('success', 'Truck deleted successfully');
+    }
+
+
+    public function createNote($id)
+    {
+        $truck = Truck::find($id);
+        $note = new Note();
+
+        if (request()->isMethod('post')) {
+
+            request()->validate(
+                [
+                    'message' => 'required', 'cost' => 'required', 'truck_id' => 'required',
+                    'image_upload' => 'mimes:jpeg,jpg,png,gif|max:10000'
+                ]
+            );
+
+            $post = request()->all();
+            $request = request();
+            if (request()->hasFile('image_upload')) {
+                if (request()->file('image_upload')->isValid()) {
+                    $request->photo = request()->file('image_upload');
+                    $path = $request->photo->path();
+                    $fileName = $request->photo->getClientOriginalName();
+                    $fileName = str_replace(' ', '_', $fileName);
+                    $extension = $request->photo->extension();
+                    $date = \Carbon\Carbon::now()->format('Y-m-d');
+                    $storeDir = "$date/$fileName";
+                    $storePath = $request->photo->storeAs('images', $storeDir);
+                    $post['image_url'] = $storePath;
+                }
+            }
+
+            $note = Note::create($post);
+
+            if ($note) {
+                ExpenseManager::create(ExpenseType::Truck(), $note, $note->cost);
+            }
+
+            return redirect()->route('trucks.show', $truck)
+                ->with('success', 'Note created successfully');
+        }
+
+        return view('truck.create-note', compact('truck', 'note'));
     }
 }

@@ -76,7 +76,7 @@
                     @foreach ($summaryReports as $summaryReport)
                     <li class="list-group-item">{{ $summaryReport['title'] }}: {{ number_format($summaryReport['value']) }} kg.</li>
                     @endforeach
-                  </ul>
+                </ul>
                 <div class="card-footer text-muted text-center">
                     เวลาการทำงานทั้งหมด: {{ $workingDuration }}
                 </div>

@@ -1,25 +1,26 @@
 @extends('layouts.app')
 
 @section('template_title')
-    Create Employee Working Time
+    Update Note
 @endsection
 
 @section('content')
-    <section class="content container">
-        <div class="row">
+    <section class="content container-fluid">
+        <div class="">
             <div class="col-md-12">
 
                 @includeif('partials.errors')
 
                 <div class="card card-default">
                     <div class="card-header">
-                        <span class="card-title">Create Employee Working Time</span>
+                        <span class="card-title">Update Note</span>
                     </div>
                     <div class="card-body">
-                        <form method="POST" action="{{ route('employee-working-times.store') }}"  role="form" enctype="multipart/form-data">
+                        <form method="POST" action="{{ route('notes.update', $note->id) }}"  role="form" enctype="multipart/form-data">
+                            {{ method_field('PATCH') }}
                             @csrf
 
-                            @include('employee-working-time.form')
+                            @include('note.form')
 
                         </form>
                     </div>

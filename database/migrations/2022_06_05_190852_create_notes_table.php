@@ -13,13 +13,14 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('department_daily_cost_logs', function (Blueprint $table) {
+        Schema::create('notes', function (Blueprint $table) {
             $table->id();
-            $table->integer('department_id');
-            $table->date('daily_date');
-            $table->float('cost')->default(0.0);
             $table->mediumText('message');
             $table->string('image_url')->nullable();
+            $table->decimal('cost', 15, 2)->default(0.00);
+            $table->foreignId('washing_machine_id')->nullable()->constrained();
+            $table->foreignId('dryer_machine_id')->nullable()->constrained();
+            $table->foreignId('truck_id')->nullable()->constrained();
             $table->timestamps();
             $table->softDeletes();
         });
@@ -32,6 +33,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('department_daily_cost_logs');
+        Schema::dropIfExists('notes');
     }
 };

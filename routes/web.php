@@ -50,7 +50,11 @@ Route::group(['middleware' => ['admin']], function () {
     Route::resource('washing-machines', App\Http\Controllers\WashingMachineController::class);
     Route::resource('dryer-machines', App\Http\Controllers\DryerMachineController::class);
     Route::resource('inventories', App\Http\Controllers\InventoryController::class);
+
+    Route::match(array('GET', 'POST'), 'trucks/{id}/create-note', [App\Http\Controllers\TruckController::class, 'createNote'])->name('trucks.create-note');
     Route::resource('trucks', App\Http\Controllers\TruckController::class);
+
+    Route::resource('notes', App\Http\Controllers\NoteController::class);
 });
 
 Route::group(['prefix' => 'supervisor', 'middleware' => ['supervisor']], function () {

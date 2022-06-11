@@ -1,44 +1,48 @@
 @extends('layouts.app')
 
 @section('template_title')
-    {{ $inventoryStockLog->name ?? 'Show Inventory Stock Log' }}
+    {{ $note->name ?? 'Show Note' }}
 @endsection
 
 @section('content')
-    <section class="content container">
+    <section class="content container-fluid">
         <div class="row">
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-header">
                         <div class="float-left">
-                            <span class="card-title">Show Inventory Stock Log</span>
+                            <span class="card-title">Show Note</span>
                         </div>
                         <div class="float-right">
-                            <a class="btn btn-primary" href="{{ route('inventory-stock-logs.index') }}"> Back</a>
+                            <a class="btn btn-primary" href="{{ route('notes.index') }}"> Back</a>
                         </div>
                     </div>
 
                     <div class="card-body">
                         
                         <div class="form-group">
-                            <strong>Employee Id:</strong>
-                            {{ $inventoryStockLog->employee_id }}
+                            <strong>Message:</strong>
+                            {{ $note->message }}
                         </div>
                         <div class="form-group">
-                            <strong>Inventory Id:</strong>
-                            {{ $inventoryStockLog->inventory_id }}
-                        </div>
-                        <div class="form-group">
-                            <strong>Type:</strong>
-                            {{ $inventoryStockLog->type }}
-                        </div>
-                        <div class="form-group">
-                            <strong>Quantity:</strong>
-                            {{ $inventoryStockLog->quantity }}
+                            <strong>Image Url:</strong>
+                            {{ $note->image_url }}
                         </div>
                         <div class="form-group">
                             <strong>Cost:</strong>
-                            {{ $inventoryStockLog->cost }}
+                            {{ $note->cost }}
+                        </div>
+                        <div class="form-group">
+                            <strong>Washing Machine Id:</strong>
+                            {{ $note->washing_machine_id }}
+                        </div>
+                        <div class="form-group">
+                            <strong>Dryer Machine Id:</strong>
+                            {{ $note->dryer_machine_id }}
+                        </div>
+                        <div class="form-group">
+                            <strong>Truck Id:</strong>
+                            {{ $note->truck_id }}
                         </div>
 
                     </div>
