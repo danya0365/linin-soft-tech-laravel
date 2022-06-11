@@ -56,40 +56,41 @@
                     </form>
 
                     @if ($message = Session::get('success'))
-                        <div class="alert alert-success mb-2">
-                            {{ $message }}
-                        </div>
+                    <div class="alert alert-success mb-2">
+                        {{ $message }}
+                    </div>
                     @endif
 
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-hover">
-                            <thead class="thead">
-                                <tr>
-                                    <th>บันทึกเมื่อ</th>
-                                    <th>แผนก</th>
-                                    <th>จำนวน</th>
-                                    <th>วันที่</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($departmentDailyCostLogs as $departmentDailyCostLog)
-                                    <tr>
-                                        <td class="text-center">{{ $departmentDailyCostLog->created_at->format('Y-m-d H:i') }}</td>
-                                        <td class="text-center">{{ $departmentDailyCostLog->department->name }}</td>
-                                        <td class="text-end">{{ $departmentDailyCostLog->cost }}</td>
-                                        <td class="text-start">{{ $departmentDailyCostLog->daily_date }}</td>
-                                        <td>
-                                            <form class="delete-form" action="{{ route('supervisor.department.delete-daily-expense-log', ['id' => $departmentDailyCostLog->id]) }}" method="POST">
-                                                @csrf
-                                                <button type="submit" class="btn btn-danger btn-sm"><i class="fa fa-fw fa-trash"></i> Delete</button>
-                                            </form>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+                    @foreach ($departmentDailyCostLogs as $departmentDailyCostLog)
+                    <div class="card mb-2">
+                        <div class="card-body">
+                            <h5 class="card-title">แผนก: {{ $departmentDailyCostLog->department->name  }}</h5>
+                            <p class="card-text">{{ $departmentDailyCostLog->message }}</p>
+                        </div>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">
+                                วันที่: {{ $departmentDailyCostLog->daily_date }}
+                            </li>
+                            <li class="list-group-item">
+                                จำนวน: {{ number_format($departmentDailyCostLog->cost) }}
+                            </li>
+                            <li class="list-group-item">
+                                <small class="text-muted">บันทึกเมื่อ: {{ $departmentDailyCostLog->created_at->format('Y-m-d') }}</small>
+                            </li>
+                        </ul>
+                        <div class="card-body">
+                            <form class="delete-form" action="{{ route('supervisor.department.delete-daily-expense-log', ['id' => $departmentDailyCostLog->id]) }}" method="POST">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-danger btn-sm"><i class="fa fa-fw fa-trash"></i> Delete</button>
+                            </form>
+                        </div>
+                        @if ( $departmentDailyCostLog->image_url != '' )
+                        <img src="{{ asset($departmentDailyCostLog->image_url) }}" class="card-img-bottom" alt="{{ asset($departmentDailyCostLog->image_url) }}">
+                        @endif
                     </div>
+                    @endforeach
+
                 </div>
                 <div class="card-footer">
                     {!! $departmentDailyCostLogs->withQueryString()->links() !!}
