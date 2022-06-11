@@ -3,7 +3,14 @@
         
         <div class="form-group">
             {{ Form::label('linen_type_id') }}
-            {{ Form::text('linen_type_id', $linenProduct->linen_type_id, ['class' => 'form-control' . ($errors->has('linen_type_id') ? ' is-invalid' : ''), 'placeholder' => 'Linen Type Id']) }}
+            <select name="linen_type_id" class="form-select">
+                <option value=""></option>
+            @foreach (App\Models\LinenType::get() as $linenType)
+                <option value="{{ $linenType->id }}" @selected($linenProduct->linen_type_id == $linenType->id)>
+                    {{ $linenType->name }}
+                </option>
+            @endforeach
+            </select>
             {!! $errors->first('linen_type_id', '<div class="invalid-feedback">:message</div>') !!}
         </div>
         <div class="form-group">

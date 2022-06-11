@@ -21,8 +21,8 @@
                     <div class="card-body">
                         
                         <div class="form-group">
-                            <strong>Linen Type Id:</strong>
-                            {{ $linenProduct->linen_type_id }}
+                            <strong>Linen Type:</strong>
+                            {{ $linenProduct->linenType ? $linenProduct->linenType->name : '-' }}
                         </div>
                         <div class="form-group">
                             <strong>Name:</strong>
