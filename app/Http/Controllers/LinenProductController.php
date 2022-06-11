@@ -18,7 +18,7 @@ class LinenProductController extends Controller
      */
     public function index()
     {
-        $linenProducts = LinenProduct::paginate();
+        $linenProducts = LinenProduct::with('linenType')->paginate();
 
         return view('linen-product.index', compact('linenProducts'))
             ->with('i', (request()->input('page', 1) - 1) * $linenProducts->perPage());
@@ -59,7 +59,7 @@ class LinenProductController extends Controller
      */
     public function show($id)
     {
-        $linenProduct = LinenProduct::find($id);
+        $linenProduct = LinenProduct::with('linenType')->find($id);
 
         return view('linen-product.show', compact('linenProduct'));
     }

@@ -42,7 +42,7 @@
                                     <tr>
                                         <th>No</th>
                                         
-										<th>Linen Type Id</th>
+										<th>Linen Type</th>
 										<th>Name</th>
 
                                         <th></th>
@@ -53,7 +53,7 @@
                                         <tr>
                                             <td>{{ ++$i }}</td>
                                             
-											<td>{{ $linenProduct->linen_type_id }}</td>
+											<td>{{ $linenProduct->linenType ? $linenProduct->linenType->name : '-' }}</td>
 											<td>{{ $linenProduct->name }}</td>
 
                                             <td>

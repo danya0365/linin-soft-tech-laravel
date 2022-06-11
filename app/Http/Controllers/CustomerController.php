@@ -18,7 +18,7 @@ class CustomerController extends Controller
      */
     public function index()
     {
-        $customers = Customer::paginate();
+        $customers = Customer::with('customerGroup')->paginate();
 
         return view('customer.index', compact('customers'))
             ->with('i', (request()->input('page', 1) - 1) * $customers->perPage());
@@ -59,7 +59,7 @@ class CustomerController extends Controller
      */
     public function show($id)
     {
-        $customer = Customer::find($id);
+        $customer = Customer::with('customerGroup')->find($id);
 
         return view('customer.show', compact('customer'));
     }

@@ -25,8 +25,8 @@
                             {{ $customer->name }}
                         </div>
                         <div class="form-group">
-                            <strong>Customer Group Id:</strong>
-                            {{ $customer->customer_group_id }}
+                            <strong>Customer Group:</strong>
+                            {{ $customer->customerGroup ? $customer->customerGroup->name : '-' }}
                         </div>
                         <div class="form-group">
                             <strong>Total Wet Weight:</strong>

@@ -8,7 +8,14 @@
         </div>
         <div class="form-group">
             {{ Form::label('customer_group_id') }}
-            {{ Form::text('customer_group_id', $customer->customer_group_id, ['class' => 'form-control' . ($errors->has('customer_group_id') ? ' is-invalid' : ''), 'placeholder' => 'Customer Group Id']) }}
+            <select name="customer_group_id" class="form-select">
+                <option value=""></option>
+            @foreach (App\Models\CustomerGroup::get() as $customerGroup)
+                <option value="{{ $customerGroup->id }}" @selected($customer->customer_group_id == $customerGroup->id)>
+                    {{ $customerGroup->name }}
+                </option>
+            @endforeach
+            </select>
             {!! $errors->first('customer_group_id', '<div class="invalid-feedback">:message</div>') !!}
         </div>
         <div class="form-group">
