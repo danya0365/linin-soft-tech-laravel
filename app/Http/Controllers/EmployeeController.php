@@ -18,7 +18,7 @@ class EmployeeController extends Controller
      */
     public function index()
     {
-        $employees = Employee::paginate();
+        $employees = Employee::with('department')->paginate();
 
         return view('employee.index', compact('employees'))
             ->with('i', (request()->input('page', 1) - 1) * $employees->perPage());
@@ -59,7 +59,7 @@ class EmployeeController extends Controller
      */
     public function show($id)
     {
-        $employee = Employee::find($id);
+        $employee = Employee::with('department')->find($id);
 
         return view('employee.show', compact('employee'));
     }
