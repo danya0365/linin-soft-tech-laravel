@@ -38,6 +38,14 @@
                         </div>
 
                         <div class="col-12">
+                            <label for="created_at" class="form-label">วันที่</label>
+                            <input type="date" name="created_at" class="form-control" id="created_at">
+                            @error('created_at')
+                                <div class="text-danger">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="col-12">
                             <button type="submit" class="btn btn-primary">Submit</button>
                             <button type="reset" class="btn btn-outline-secondary">Reset</button>
                         </div>

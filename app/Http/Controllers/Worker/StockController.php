@@ -77,7 +77,8 @@ class StockController extends Controller
 
             request()->validate(
                 [
-                    'increase_quantity' => 'required|numeric'
+                    'increase_quantity' => 'required|numeric',
+                    'created_at' => 'required'
                 ]
             );
 
@@ -89,6 +90,9 @@ class StockController extends Controller
             $inventoryStockLog->quantity = $increaseQuantity;
             $inventoryStockLog->employee_id = null; // TODO: add select employee screen
             $inventoryStockLog->cost = 0;
+            $inventoryStockLog->timestamps = false;
+            $inventoryStockLog->created_at = \Carbon\Carbon::parse(request()->get('created_at'));
+            $inventoryStockLog->updated_at = \Carbon\Carbon::now();
             $inventoryStockLog->save();
 
             $inventory->total_quantity += $increaseQuantity;
@@ -115,7 +119,8 @@ class StockController extends Controller
             request()->validate(
                 [
                     'decrease_quantity' => 'required|numeric',
-                    'cost' => 'required|numeric'
+                    'cost' => 'required|numeric',
+                    'created_at' => 'required'
                 ]
             );
 
@@ -127,12 +132,15 @@ class StockController extends Controller
             $inventoryStockLog->quantity = $decreaseQuantity;
             $inventoryStockLog->employee_id = null; // TODO: add select employee screen
             $inventoryStockLog->cost = request()->get('cost');
+            $inventoryStockLog->timestamps = false;
+            $inventoryStockLog->created_at = \Carbon\Carbon::parse(request()->get('created_at'));
+            $inventoryStockLog->updated_at = \Carbon\Carbon::now();
             $inventoryStockLog->save();
 
             $inventory->remain_quantity -= $decreaseQuantity;
             $inventory->save();
 
-            ExpenseManager::create(ExpenseType::Inventory(), $inventoryStockLog, $inventoryStockLog->cost);
+            ExpenseManager::create(ExpenseType::Inventory(), $inventoryStockLog, $inventoryStockLog->cost, $inventoryStockLog->created_at);
 
             return redirect(route('worker.stock.show-inventory-by-group', ['inventoryGroupId' => $inventory->inventoryGroup->id]));
         }

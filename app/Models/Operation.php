@@ -293,7 +293,7 @@ class Operation extends Model
 
     foreach ($operationLinenProducts as $operationLinenProduct) {
       $totalWeightValue += $operationLinenProduct->total_collect_weight;
-      $summaryReports[] = ['title' => $operationLinenProduct->linen_product_name, 'value' => $operationLinenProduct->total_collect_weight, 'unit' => 'ชิ้น'];
+      $summaryReports[] = ['title' => $operationLinenProduct->linen_product_name, 'value' => $operationLinenProduct->total_collect_weight, 'unit' => 'kg.'];
 
       $totalPackValue += $operationLinenProduct->total_collect_pack;
       $summaryReports[] = ['title' => $operationLinenProduct->linen_product_name, 'value' => $operationLinenProduct->total_collect_pack, 'unit' => 'packs'];
