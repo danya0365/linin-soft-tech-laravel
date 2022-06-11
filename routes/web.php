@@ -18,6 +18,14 @@ Route::get('/', function () {
     return redirect('home');
 });
 
+Route::get('/test', function () {
+
+    $inputName = 'weight';
+    $inputValue = 12.45;
+
+    return view('test', ['inputName' => $inputName, 'inputValue' => $inputValue]);
+});
+
 Route::get('/landing', function () {
     return view('landing');
 });
