@@ -22,7 +22,6 @@
                 <div class="card-body">
                     <form method="POST" action="{{ route('worker.operation.collect.set-select-weight-and-color', ['operationId' => $operation['id'], 'operationLinenProductId' => $operationLinenProduct['id']]) }}"  role="form" enctype="multipart/form-data">
                         @csrf
-                        {{ Form::hidden('color', $operationLinenProduct['color']) }}
                         <div class="box box-info padding-1">
                             <div class="box-body">
                                 
