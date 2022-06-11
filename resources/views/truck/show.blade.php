@@ -70,10 +70,14 @@
                     @foreach ($notes as $note)
                         <div class="card mb-2">
                             <div class="card-body">
-                            <h5 class="card-title">ค่าใช้จ่าย: {{ $note->cost }}</h5>
-                            <p class="card-text">{{ $note->message }}</p>
-                            <p class="card-text"><small class="text-muted">โพสท์เมื่อ: {{ $note->created_at->format('Y-m-d') }}</small></p>
+                                <h5 class="card-title">ค่าใช้จ่าย: {{ $note->cost }}</h5>
+                                <p class="card-text">{{ $note->message }}</p>
                             </div>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item">
+                                    <small class="text-muted">บันทึกเมื่อ: {{ $note->created_at->format('Y-m-d') }}</small>
+                                </li>
+                            </ul>
                             <div class="card-body">
                                 <form action="{{ route('notes.destroy',$note->id) }}" method="POST">
                                     <a class="btn btn-sm btn-success" href="{{ route('notes.edit',$note->id) }}"><i class="fa fa-fw fa-edit"></i> Edit</a>

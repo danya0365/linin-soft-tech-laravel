@@ -11,54 +11,60 @@
         </ol>
     </nav>
     <div class="row justify-content-center">
-        @if ($message = Session::get('success'))
+
+        <div class="col-md-12 m-2">
+
+            @if ($message = Session::get('success'))
             <div class="alert alert-success mb-2">
                 {{ $message }}
             </div>
-        @endif
-        <div class="col-md-12 m-2">
+            @endif
+
             <div class="card">
                 <div class="card-header">เพิ่มบันทึกค่าใช้จ่ายรายวัน</div>
                 <div class="card-body">
-                    <form class="row row-cols-lg-auto g-3 mb-3" action="{{ request()->url() }}" method="POST" role="form" enctype="multipart/form-data">
+                    <form class="row g-3 mb-3" action="{{ request()->url() }}" method="POST" role="form" enctype="multipart/form-data">
                         
                         @csrf
                         <div class="col-12">
-                            <div class="input-group">
-                                <label class="input-group-text" for="department_id">แผนก</label>
-                                <select class="form-select" id="department_id" name="department_id">
-                                    <option value="">ไม่เลือก</option>
-                                    @foreach ( $departments as $department )
-                                    <option value="{{ $department->id }}">{{ $department->name }}</option>
-                                    @endforeach
-                                </select>
-                                
-                            </div>
+                            <label class="form-label" for="department_id">แผนก</label>
+                            <select class="form-select" id="department_id" name="department_id">
+                                <option value="">ไม่เลือก</option>
+                                @foreach ( $departments as $department )
+                                <option value="{{ $department->id }}">{{ $department->name }}</option>
+                                @endforeach
+                            </select>
                             @error('department_id')
                                 <div class="text-danger">{{ $message }}</div>
                             @enderror
                         </div>
 
                         <div class="col-12">
-                            <div class="input-group">
-                                <label class="input-group-text" for="daily_date">วันที่</label>
-                                <input type="date" class="form-control" id="daily_date" name="daily_date" />
-                                
-                            </div>
+                            <label class="form-label" for="daily_date">วันที่</label>
+                            <input type="date" class="form-control" id="daily_date" name="daily_date" />
                             @error('daily_date')
                                 <div class="text-danger">{{ $message }}</div>
                             @enderror
                         </div>
 
                         <div class="col-12">
-                            <div class="input-group">
-                                <label class="input-group-text" for="cost">จำนวนเงิน</label>
-                                <input type="number" class="form-control" id="cost" name="cost" />
-                                
-                            </div>
+                            <label class="form-label" for="cost">จำนวนเงิน</label>
+                            <input type="number" class="form-control" id="cost" name="cost" />
                             @error('cost')
                                 <div class="text-danger">{{ $message }}</div>
                             @enderror
+                        </div>
+
+                        <div class="col-12">
+                            {{ Form::label('message', 'บันทึกข้อความ - Note', ['class' => "form-label"]) }}
+                            {{ Form::textarea('message', '', ['class' => 'form-control' . ($errors->has('message') ? ' is-invalid' : ''), 'placeholder' => '']) }}
+                            {!! $errors->first('message', '<div class="invalid-feedback">:message</div>') !!}
+                        </div>
+
+                        <div class="col-12">
+                            {{ Form::label('image_upload', 'อัพโหลดรูป - Attach Photo', ['class' => "form-label"]) }}
+                            {{ Form::file('image_upload', ['class' => 'form-control' . ($errors->has('image_upload') ? ' is-invalid' : ''), 'placeholder' => '']) }}
+                            {!! $errors->first('image_upload', '<div class="invalid-feedback">:message</div>') !!}
                         </div>
 
                         <div class="col-12">

@@ -25,6 +25,21 @@ class DepartmentController extends Controller
             $departmentDailyCostLog->department_id = request()->get('department_id');
             $departmentDailyCostLog->cost = request()->get('cost');
             $departmentDailyCostLog->daily_date = request()->get('daily_date');
+            $departmentDailyCostLog->message = request()->get('message');
+
+            $request = request();
+            if ($request->hasFile('image_upload')) {
+                if ($request->file('image_upload')->isValid()) {
+                    $photo = $request->file('image_upload');
+                    $fileName = $photo->getClientOriginalName();
+                    $fileName = str_replace(' ', '_', $fileName);
+                    $date = \Carbon\Carbon::now()->format('Y-m-d');
+                    $storeDir = "$date/$fileName";
+                    $storePath = $photo->storeAs('images', $storeDir);
+                    $departmentDailyCostLog->image_url = $storePath;
+                }
+            }
+
             $departmentDailyCostLog->save();
 
             ExpenseManager::create(ExpenseType::DepartmentSalary(), $departmentDailyCostLog, $departmentDailyCostLog->cost);

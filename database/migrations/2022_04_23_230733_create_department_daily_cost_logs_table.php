@@ -18,6 +18,8 @@ return new class extends Migration
             $table->integer('department_id');
             $table->date('daily_date');
             $table->float('cost')->default(0.0);
+            $table->mediumText('message');
+            $table->string('image_url')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });
