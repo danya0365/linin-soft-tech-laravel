@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Managers\UploadManager;
 use App\Models\Employee;
 use Illuminate\Http\Request;
 
@@ -88,7 +89,12 @@ class EmployeeController extends Controller
     {
         request()->validate(Employee::$rules);
 
-        $employee->update($request->all());
+        $post = $request->all();
+        $imageUploaded = UploadManager::uploadAvatar('image_upload');
+        if ($imageUploaded) {
+            $post['photo'] = $imageUploaded;
+        }
+        $employee->update($post);
 
         return redirect()->route('employees.index')
             ->with('success', 'Employee updated successfully');

@@ -30,7 +30,9 @@
                         </div>
                         <div class="form-group">
                             <strong>Photo:</strong>
-                            {{ $employee->photo }}
+                            <div style="max-width: 100%">
+                                <x-employee-avatar :photo="$employee->photo" />
+                            </div>
                         </div>
                         <div class="form-group">
                             <strong>Department:</strong>
