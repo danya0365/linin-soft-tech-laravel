@@ -16,6 +16,11 @@
             {{ Form::text('photo', $employee->photo, ['class' => 'form-control' . ($errors->has('photo') ? ' is-invalid' : ''), 'placeholder' => 'Photo']) }}
             {!! $errors->first('photo', '<div class="invalid-feedback">:message</div>') !!}
         </div>
+        <div class="col-12">
+            {{ Form::label('image_upload', 'Upload photo', ['class' => "form-label"]) }}
+            {{ Form::file('image_upload', ['class' => 'form-control' . ($errors->has('image_upload') ? ' is-invalid' : ''), 'placeholder' => '']) }}
+            {!! $errors->first('image_upload', '<div class="invalid-feedback">:message</div>') !!}
+        </div>
         <div class="form-group">
             {{ Form::label('department_id') }}
             <select name="department_id" class="form-select">

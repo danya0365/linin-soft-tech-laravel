@@ -34,7 +34,9 @@
 
                     <div class="row mb-3 text-center">
                         <div class="col-12">
-                            <div class="bi bi-person-circle rounded-3 d-flex align-items-center justify-content-center p-3 py-6" style="font-size: 10em"></div>
+                            <div class="rounded-3 d-flex align-items-center justify-content-center p-3 py-6">
+                                <x-employee-avatar :photo="$employee['photo']" />
+                            </div>
                         </div>
                     </div>
                     <h5 class="card-title text-center">{{ $employee['name'] }}</h5>

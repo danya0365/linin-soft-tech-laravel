@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('code');
             $table->string('password');
             $table->string('name');
-            $table->string('photo');
+            $table->string('photo')->nullable();
             $table->integer('department_id');
             $table->timestamps();
             $table->softDeletes();
