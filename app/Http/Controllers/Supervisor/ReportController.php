@@ -22,6 +22,12 @@ class ReportController extends Controller
 
     public function energySummary(): array
     {
+
+        $queryEnergy = request()->get('energy');
+
+        $queryParam['dateStartAt'] = isset($queryEnergy['date_start_at']) ? $queryEnergy['date_start_at'] : '';
+        $queryParam['dateEndAt'] = isset($queryEnergy['date_end_at']) ? $queryEnergy['date_end_at'] : '';
+
         $energySummary = [];
 
         $query = EnergyResourceLog::select(
@@ -30,6 +36,10 @@ class ReportController extends Controller
         )->with('energyResource');
 
         $query->groupBy('energy_resource_id');
+
+        if ($queryParam['dateStartAt'] && $queryParam['dateEndAt']) {
+            $query->whereBetween('created_at', [$queryParam['dateStartAt'] . ' 00:00:00', $queryParam['dateEndAt'] . ' 23:59:59']);
+        }
 
         $energyResourceLogs = $query->get();
 
@@ -40,7 +50,7 @@ class ReportController extends Controller
             ];
         }
 
-        return $energySummary;
+        return ['data' => $energySummary, 'queryParam' => $queryParam];
     }
 
     private function profitYearSummary($incomeYearSummary, $expenseYearSummary): array
