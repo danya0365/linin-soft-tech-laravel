@@ -24,6 +24,24 @@
             <div class="card">
                 <div class="card-header">พลังงาน</div>
                 <div class="card-body text-center">
+
+                    <form class="row row-cols-lg-auto g-3 align-items-center mb-2" action="{{ request()->url() }}" method="GET">
+
+                        <div class="col-12">
+                            <div class="input-group">
+                                <input type="date" name="energy[date_start_at]" value="{{ $energySummary['queryParam']['dateStartAt'] }}" class="form-control" placeholder="วันที่เริ่ม" aria-label="วันที่เริ่ม">
+                                <span class="input-group-text"> ถึง </span>
+                                <input type="date" name="energy[date_end_at]" value="{{ $energySummary['queryParam']['dateEndAt'] }}" class="form-control" placeholder="วันที่สิ้นสุด" aria-label="วันที่สิ้นสุด">
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                            <a href="{{ route('supervisor.report') }}" role="button" class="btn btn-outline-secondary">Reset</a>
+                        </div>
+                    </form>
+
+
                     <div id="energy-pie-chart" style="min-width: 400px; height: 400px; margin: 0 auto">
 
                     </div>
@@ -109,9 +127,10 @@ function salesChart(){
 
 function energyPieChart(){
 
+    var dataChart = energySummary.data;
     var data = [];
 
-    for (const [key, value] of Object.entries(energySummary)) {
+    for (const [key, value] of Object.entries(dataChart)) {
         if (data.length == 0) {
             data.push({
                 name: value.name,
