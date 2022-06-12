@@ -22,7 +22,9 @@
                             <a href="{{ route('worker.energy-resource.set-select-employee', ['energyResourceLogId' => $energyResourceLog->id,'employeeId' => $employee['id']]) }}">
                                 <div class="p-3 border bg-light" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center">
-                                        <x-employee-avatar :photo="$employee['photo']" />
+                                        <div style="max-width: 150px">
+                                            <x-employee-avatar :photo="$employee['photo']" />
+                                        </div>
                                     </div>
                                     <div class="text-center">{{ $employee['name'] }}</div>
                                 </div>

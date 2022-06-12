@@ -64,7 +64,9 @@
                     <div class="row mb-3 text-center">
                         <div class="col-12">
                             <div class="rounded-3 d-flex align-items-center justify-content-center p-3 py-6">
-                                <x-employee-avatar :photo="$operation['dry_employee']['photo']" />
+                                <div style="max-width: 150px">
+                                    <x-employee-avatar :photo="$operation['dry_employee']['photo']" />
+                                </div>
                             </div>
                         </div>
                     </div>
