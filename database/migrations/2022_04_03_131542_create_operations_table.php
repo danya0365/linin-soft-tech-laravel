@@ -39,7 +39,7 @@ return new class extends Migration
             $table->float('total_billing_payment')->nullable();
             $table->date('billing_payment_date')->nullable();
             $table->string('colors')->nullable();
-            $table->string('search_tags')->nullable();
+            $table->longText('search_tags')->nullable();
             $table->enum('status', ['in-progress', 'close']);
             $table->timestamps();
             $table->softDeletes();
