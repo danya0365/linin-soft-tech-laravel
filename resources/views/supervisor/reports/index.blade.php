@@ -22,9 +22,9 @@
         </div>
         <div class="col-md-12 m-2">
             <div class="card">
-                <div class="card-header">พลังงาน</div>
+                <div class="card-header">ภาพรวมพลังงาน</div>
                 <div class="card-body text-center">
-
+                    <h5 class="card-title">Summary</h5>
                     <form class="row row-cols-lg-auto g-3 align-items-center mb-2" action="{{ request()->url() }}" method="GET">
 
                         <div class="col-12">
@@ -43,6 +43,17 @@
 
 
                     <div id="energy-pie-chart" style="min-width: 400px; height: 400px; margin: 0 auto">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12 m-2">
+            <div class="card">
+                <div class="card-header">พลังงานแต่ละวัน</div>
+                <div class="card-body text-center">
+
+                    <div id="energy-chart" style="min-width: 400px; height: 400px; margin: 0 auto">
 
                     </div>
                 </div>
@@ -187,6 +198,8 @@ function energyPieChart(){
 $(function(){
     salesChart();
     energyPieChart();
+    var energyWeekSummary = @json(App\Managers\HighChartManager::getEnergyWeekSummary());
+    $.energyWeekChart({ 'renderTo': 'energy-chart', 'data': energyWeekSummary});
 })
 </script>
 @endsection
