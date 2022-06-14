@@ -85,31 +85,31 @@ class EmployeeController extends Controller
                     case OperationType::Wash():
                         $fieldValue = $row->total_wet_weight;
                         $totalOperationSummaries[$operationType] += $fieldValue;
-                        $operationSummaries[$operationType][] = ['title' => $row->linenProduct->name, 'value' => $fieldValue];
+                        $operationSummaries[$operationType][] = ['title' => $row->linenProduct->name ?? '-', 'value' => $fieldValue];
                         break;
                     case OperationType::Dry():
                         $fieldValue = $row->total_dry_weight;
                         $totalOperationSummaries[$operationType] += $fieldValue;
-                        $operationSummaries[$operationType][] = ['title' => $row->linenProduct->name, 'value' => $fieldValue];
+                        $operationSummaries[$operationType][] = ['title' => $row->linenProduct->name ?? '-', 'value' => $fieldValue];
                         break;
                     case OperationType::Iron():
                         $fieldValue = $row->total_iron_piece;
                         $totalOperationSummaries[$operationType] += $fieldValue;
-                        $operationSummaries[$operationType][] = ['title' => $row->linenProduct->name, 'value' => $fieldValue];
+                        $operationSummaries[$operationType][] = ['title' => $row->linenProduct->name ?? '-', 'value' => $fieldValue];
                         break;
                     case OperationType::Packing():
                         $fieldValue = $row->total_packing_piece;
                         $totalOperationSummaries[$operationType] += $fieldValue;
-                        $operationSummaries[$operationType][] = ['title' => $row->linenProduct->name, 'value' => $fieldValue];
+                        $operationSummaries[$operationType][] = ['title' => $row->linenProduct->name ?? '-', 'value' => $fieldValue];
                         break;
                     case OperationType::Collect():
                         $fieldValue = $row->total_collect_weight;
                         $totalOperationSummaries[$operationType] += $fieldValue;
-                        $operationSummaries[$operationType][] = ['title' => $row->linenProduct->name, 'value' => $fieldValue];
+                        $operationSummaries[$operationType][] = ['title' => $row->linenProduct->name ?? '-', 'value' => $fieldValue];
 
                         $fieldValue = $row->total_collect_pack;
                         $totalOperationSummaries['collect_pack'] += $fieldValue;
-                        $operationSummaries['collect_pack'][] = ['title' => $row->linenProduct->name, 'value' => $fieldValue];
+                        $operationSummaries['collect_pack'][] = ['title' => $row->linenProduct->name ?? '-', 'value' => $fieldValue];
                         break;
 
                     default:
