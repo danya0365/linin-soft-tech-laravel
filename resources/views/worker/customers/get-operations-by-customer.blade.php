@@ -105,11 +105,13 @@
                                     <th>ชนิด</th>
                                     <th>สี</th>
                                     <th>พนักงาน</th>
-                                    <th>จำนวนที่ซัก</th>
-                                    <th>จำนวนที่อบ</th>
-                                    <th>จำนวนที่รีด</th>
-                                    <th>จำนวนที่พับแพ็ค</th>
-                                    <th>จำนวนที่จัดเก็บ</th>
+                                    <th>จำนวนที่ซัก (kg.)</th>
+                                    <th>จำนวนที่อบ (kg.)</th>
+                                    <th>จำนวนที่รีด (piece)</th>
+                                    <th>จำนวนที่พับแพ็ค (piece)</th>
+                                    <th>น้ำหนักที่จัดเก็บ (kg.)</th>
+                                    <th>จำนวนที่จัดเก็บ (pack)</th>
+                                    <th>จำนวนที่ขนส่ง (pack)</th>
                                     <th>เวลา</th>
                                 </tr>
                             </thead>
@@ -122,11 +124,22 @@
                                         <td>{{ $operation->linen_case }}</td>
                                         <td style="background-color: {{ $operation->color }}">{{ $operation->color }}</td>
                                         <td>{{ $operation->operation->employee->name }}</td>
-                                        <td class="text-center">{{ $operation->wet_weight }}</td>
-                                        <td class="text-center">{{ $operation->dry_weight }}</td>
+                                        <td class="text-center">
+                                            {{ $operation->wet_weight }}
+                                            (#{{ $operation->operation->washing_machine_id }})
+                                        </td>
+                                        <td class="text-center">
+                                            {{ $operation->dry_weight }}
+                                            (#{{ $operation->operation->dryer_machine_id }})
+                                        </td>
                                         <td class="text-center">{{ $operation->iron_piece }}</td>
                                         <td class="text-center">{{ $operation->packing_piece }}</td>
                                         <td class="text-center">{{ $operation->collect_weight }}</td>
+                                        <td class="text-center">{{ $operation->collect_pack }}</td>
+                                        <td class="text-center">
+                                            {{ $operation->deliver_pack }}
+                                            (#{{ $operation->operation->truck_id }})
+                                        </td>
                                         <td class="text-center">{{ $operation->created_at->format('H:i') }}</td>
                                     </tr>
                                 @endforeach
