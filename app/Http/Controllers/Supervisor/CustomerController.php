@@ -15,6 +15,7 @@ use App\Models\CustomerGroup;
 use App\Models\Department;
 use App\Models\DepartmentDailyCostLog;
 use App\Models\Operation;
+use App\Models\OperationLinenProduct;
 
 class CustomerController extends Controller
 {
@@ -55,6 +56,45 @@ class CustomerController extends Controller
 
     public function getBillingLog()
     {
-        return view('supervisor.customers.index');
+        $sortOrders = [
+            ['var' => 'id-desc', 'name' => 'ใหม่ที่สุด - Newest'],
+            ['var' => 'id-asc', 'name' => 'เก่าที่สุด - Oldest'],
+        ];
+        $sortOrderSelected = request()->get('sort_order', 'id-desc');
+        $customerIdSelected = request()->get('customer_id');
+
+        $query = Operation::with('customer');
+
+        $query->where('operation_type', OperationType::Payment());
+        if ($customerIdSelected) {
+            $query->where('customer_id', $customerIdSelected);
+        }
+
+        $dateStartAt = request()->get('date_start_at');
+        $dateEndAt = request()->get('date_end_at');
+        if ($dateStartAt && $dateEndAt) {
+            $query->whereBetween('created_at', [$dateStartAt . ' 00:00:00', $dateEndAt . ' 23:59:59']);
+        }
+        if ($sortOrderSelected) {
+            list($sort, $order) = explode('-', $sortOrderSelected);
+            $query->orderBy($sort, $order);
+        }
+
+        $billingLogs = $query->paginate();
+        $customerGroups = CustomerGroup::with('customers')->get();
+
+        return view(
+            'supervisor.customers.billing-logs',
+            [
+                'billingLogs' => $billingLogs,
+                'customerGroups' => $customerGroups,
+                'customerIdSelected' => $customerIdSelected,
+                'dateStartAt' => $dateStartAt,
+                'dateEndAt' => $dateEndAt,
+                'sortOrders' => $sortOrders,
+                'sortOrderSelected' => $sortOrderSelected,
+            ]
+        )
+            ->with('i', (request()->input('page', 1) - 1) * $billingLogs->perPage());
     }
 }
