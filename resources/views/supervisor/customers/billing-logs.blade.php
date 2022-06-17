@@ -7,7 +7,7 @@
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{ route('supervisor') }}">Supervisor</a></li>
             <li class="breadcrumb-item"><a href="{{ route('supervisor.customer') }}">{{ __('Customer') }}</a></li>
-            <li class="breadcrumb-item active" aria-current="page">{{ __('Billing Logs') }}</li>
+            <li class="breadcrumb-item active" aria-current="page">{{ __('ประวัติบิลรายรับ - Billing Logs') }}</li>
         </ol>
     </nav>
     <div class="row justify-content-center">
@@ -20,7 +20,7 @@
             @endif
             
             <div class="card">
-                <div class="card-header">{{ __('Billing Logs') }}</div>
+                <div class="card-header">{{ __('ประวัติบิลรายรับ - Billing Logs') }}</div>
                 <div class="card-body">
  
                     <form class="row row-cols-lg-auto g-3 align-items-center mb-2" action="{{ request()->url() }}" method="GET">

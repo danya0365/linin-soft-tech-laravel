@@ -7,7 +7,7 @@
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{ route('supervisor') }}">Supervisor</a></li>
             <li class="breadcrumb-item"><a href="{{ route('supervisor.customer') }}">{{ __('Customer') }}</a></li>
-            <li class="breadcrumb-item active" aria-current="page">{{ __('New Billing') }}</li>
+            <li class="breadcrumb-item active" aria-current="page">{{ __('เพิ่มบิลรายรับ - New Income Billing') }}</li>
         </ol>
     </nav>
     <div class="row justify-content-center">
