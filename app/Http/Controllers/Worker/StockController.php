@@ -26,7 +26,7 @@ class StockController extends Controller
     public function showInventoryByGroup($inventoryGroupId)
     {
         $inventoryGroup = InventoryGroup::find($inventoryGroupId);
-        $inventories = Inventory::where("inventory_group_id", $inventoryGroup->id)->paginate();
+        $inventories = Inventory::where("inventory_group_id", $inventoryGroup->id)->paginate(100);
         return view(
             'worker.stocks.show-inventory-by-group',
             [
@@ -64,6 +64,33 @@ class StockController extends Controller
             'worker.stocks.create-inventory-by-group',
             [
                 'inventoryGroup' => $inventoryGroup,
+                'inventory' => $inventory
+            ]
+        );
+    }
+
+    public function editInventory($inventoryId)
+    {
+        $inventory = Inventory::with('inventoryGroup')->find($inventoryId);
+
+        if (request()->isMethod('post')) {
+
+            request()->validate(
+                [
+                    'name' => 'required',
+                    'unit' => 'required',
+                ]
+            );
+
+            $inventory->name = request()->get('name');
+            $inventory->unit = request()->get('unit');
+            $inventory->save();
+
+            return redirect(route('worker.stock.show-inventory-by-group', ['inventoryGroupId' => $inventory->inventory_group_id]));
+        }
+        return view(
+            'worker.stocks.edit-inventory',
+            [
                 'inventory' => $inventory
             ]
         );

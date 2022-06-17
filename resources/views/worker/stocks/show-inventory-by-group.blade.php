@@ -50,6 +50,10 @@
                                         <td class="text-center">{{ $inventory->remain_quantity }}</td>
                                         <td class="text-center">{{ $inventory->unit }}</td>
                                         <td class="text-center">
+                                            <a class="btn btn-primary" href="{{ route('worker.stock.edit-inventory', ['inventoryId' => $inventory->id]) }}" role="button">
+                                                <i class="fa-solid fa-edit"></i>
+                                            </a>
+
                                             <a class="btn btn-primary" href="{{ route('worker.stock.inventory.increase-stock', ['inventoryId' => $inventory->id]) }}" role="button">
                                                 <i class="fa-solid fa-plus"></i>
                                             </a>
