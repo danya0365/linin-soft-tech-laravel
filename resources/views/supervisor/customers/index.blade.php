@@ -21,7 +21,7 @@
                                     <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 150px">
                                         <div class="text-center">
                                             <div class="fa-solid fa-money-bill" style="font-size: 3em"></div>
-                                            <div class="text-center mt-3">{{ __('เพิ่มบิลค่าใช้จ่าย - New Billing') }}</div>
+                                            <div class="text-center mt-3">{{ __('เพิ่มบิลรายรับ - New Income Billing') }}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -33,7 +33,7 @@
                                     <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 150px">
                                         <div class="text-center">
                                             <div class="fa-solid fa-history" style="font-size: 3em"></div>
-                                            <div class="text-center mt-3">{{ __('ประวัติบิลค่าใช้จ่าย - Billing Logs') }}</div>
+                                            <div class="text-center mt-3">{{ __('ประวัติบิลรายรับ - Income Billing Logs') }}</div>
                                         </div>
                                     </div>
                                 </div>
