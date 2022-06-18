@@ -116,4 +116,21 @@ class CustomerController extends Controller
         )
             ->with('i', (request()->input('page', 1) - 1) * $billingLogs->perPage());
     }
+
+    /**
+     * @param int $id
+     * @return \Illuminate\Http\RedirectResponse
+     * @throws \Exception
+     */
+    public function deleteBillingLog($id)
+    {
+        $billingLog = Operation::find($id);
+
+        $billingLog->delete();
+
+        IncomeManager::delete($billingLog);
+
+        return redirect()->route('supervisor.customer.billing-logs')
+            ->with('success', 'BillingLog deleted successfully');
+    }
 }

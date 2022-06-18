@@ -75,6 +75,7 @@
                                     <th>น้ำหนักที่ลูกค้า (kg.)</th>
                                     <th>จำนวนเงิน (Thai Baht)</th>
                                     <th>วันที่เก็บเงิน</th>
+                                    <th></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -89,6 +90,12 @@
                                             {{ number_format($billingLog->total_billing_payment) }}
                                         </td>
                                         <td class="text-end">{{ $billingLog->billing_payment_date }}</td>
+                                        <td>
+                                            <form class="delete-form" action="{{ route('supervisor.customer.billing-logs.delete', $billingLog->id) }}" method="POST">
+                                                @csrf
+                                                <button type="submit" class="btn btn-danger btn-sm"><i class="fa fa-fw fa-trash"></i> Delete</button>
+                                            </form>
+                                        </td>
                                     </tr>
                                 @endforeach
                             </tbody>
