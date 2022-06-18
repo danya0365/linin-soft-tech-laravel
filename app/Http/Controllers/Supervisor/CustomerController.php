@@ -74,7 +74,7 @@ class CustomerController extends Controller
         $dateStartAt = request()->get('date_start_at');
         $dateEndAt = request()->get('date_end_at');
         if ($dateStartAt && $dateEndAt) {
-            $query->whereBetween('created_at', [$dateStartAt . ' 00:00:00', $dateEndAt . ' 23:59:59']);
+            $query->whereBetween('billing_payment_date', [$dateStartAt, $dateEndAt]);
         }
         if ($sortOrderSelected) {
             list($sort, $order) = explode('-', $sortOrderSelected);
@@ -96,7 +96,7 @@ class CustomerController extends Controller
             $dateStartAt = request()->get('date_start_at');
             $dateEndAt = request()->get('date_end_at');
             if ($dateStartAt && $dateEndAt) {
-                $query->whereBetween('created_at', [$dateStartAt . ' 00:00:00', $dateEndAt . ' 23:59:59']);
+                $query->whereBetween('billing_payment_date', [$dateStartAt, $dateEndAt]);
             }
             return $query->get();
         })();
