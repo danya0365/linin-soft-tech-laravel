@@ -334,8 +334,6 @@
 
 (function ($) {
     function salesLatestDaysChart(targetId, categories, seriesData) {
-        console.log("seriesData", seriesData);
-
         var series = seriesData.map(function (item, index) {
             var name = item.name;
             var data = item.data.map(function (item, index) {
