@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ExpenseType;
+use App\Managers\ExpenseManager;
+use App\Models\Note;
 use App\Models\WashingMachine;
 use Illuminate\Http\Request;
 
@@ -61,7 +64,9 @@ class WashingMachineController extends Controller
     {
         $washingMachine = WashingMachine::find($id);
 
-        return view('washing-machine.show', compact('washingMachine'));
+        $notes = Note::where('washing_machine_id', $id)->paginate();
+
+        return view('washing-machine.show', compact('washingMachine', 'notes'));
     }
 
     /**
@@ -105,5 +110,61 @@ class WashingMachineController extends Controller
 
         return redirect()->route('washing-machines.index')
             ->with('success', 'WashingMachine deleted successfully');
+    }
+
+
+    public function createNote($id)
+    {
+        $washingMachine = WashingMachine::find($id);
+        $note = new Note();
+
+        if (request()->isMethod('post')) {
+
+            request()->validate(
+                [
+                    'message' => 'required',
+                    'cost' => 'required',
+                    'washing_machine_id' => 'required',
+                    'image_upload' => 'mimes:jpeg,jpg,png,gif|max:10000'
+                ]
+            );
+
+            $post = request()->all();
+            $request = request();
+            if (request()->hasFile('image_upload')) {
+                if (request()->file('image_upload')->isValid()) {
+                    $request->photo = request()->file('image_upload');
+                    $path = $request->photo->path();
+                    $fileName = $request->photo->getClientOriginalName();
+                    $fileName = str_replace(' ', '_', $fileName);
+                    $extension = $request->photo->extension();
+                    $date = \Carbon\Carbon::now()->format('Y-m-d');
+                    $storeDir = "$date/$fileName";
+                    $storePath = $request->photo->storeAs('images', $storeDir);
+                    $post['image_url'] = $storePath;
+                }
+            }
+
+            $note = new Note();
+            $note->message = $post['message'];
+            $note->image_url = $post['image_url'] ?? '';
+            $note->cost = $post['cost'];
+            $note->washing_machine_id = $post['washing_machine_id'];
+            if ($post['note_date']) {
+                $note->timestamps = false;
+                $note->created_at = \Carbon\Carbon::parse($post['note_date']);
+                $note->updated_at = \Carbon\Carbon::now();
+            }
+            $note->save();
+
+            if ($note) {
+                ExpenseManager::create(ExpenseType::WashingMachine(), $note, $note->cost, $note->created_at);
+            }
+
+            return redirect()->route('washing-machines.show', $washingMachine)
+                ->with('success', 'Note created successfully');
+        }
+
+        return view('washing-machine.create-note', compact('washingMachine', 'note'));
     }
 }
