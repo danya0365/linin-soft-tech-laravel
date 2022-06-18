@@ -59,6 +59,17 @@
                 </div>
             </div>
         </div>
+        <div class="col-md-12 m-2">
+            <div class="card">
+                <div class="card-header">ต้นทุนแต่ละวัน</div>
+                <div class="card-body text-center">
+
+                    <div id="energy-chart" style="min-width: 400px; height: 400px; margin: 0 auto">
+
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 <script>
