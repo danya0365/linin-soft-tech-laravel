@@ -124,10 +124,9 @@ $(function(){
 </script>
 <script>
 
-var energyWeekSummary = @json(App\Managers\HighChartManager::getEnergyWeekSummary());
-
 $(function(){
-    $.energyWeekChart({ 'renderTo': 'energy-chart', 'data': energyWeekSummary});
+    var energyDaysSummary = @json(App\Managers\HighChartManager::getEnergyDaysSummary());
+    $.energyDaysChart({ 'renderTo': 'energy-chart', 'data': energyDaysSummary});
 })
 </script>
 @endsection

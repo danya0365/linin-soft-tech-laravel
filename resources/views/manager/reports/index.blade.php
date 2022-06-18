@@ -64,7 +64,7 @@
                 <div class="card-header">ต้นทุนแต่ละวัน</div>
                 <div class="card-body text-center">
 
-                    <div id="energy-chart" style="min-width: 400px; height: 400px; margin: 0 auto">
+                    <div id="expense-day-chart" style="min-width: 400px; height: 400px; margin: 0 auto">
 
                     </div>
                 </div>
@@ -121,12 +121,22 @@ function salesChart(){
         },
         xAxis: {
             categories: categories,
-            crosshair: true
+            crosshair: true,
+            labels: {
+                formatter: function () {
+                    return this.value;
+                }
+            }
         },
         yAxis: {
             min: 0,
             title: {
                 text: 'จำนวนเงิน (บาท)'
+            },
+            labels: {
+                formatter: function () {
+                    return this.value;
+                }
             }
         },
         tooltip: {
@@ -209,8 +219,10 @@ function energyPieChart(){
 $(function(){
     salesChart();
     energyPieChart();
-    var energyWeekSummary = @json(App\Managers\HighChartManager::getEnergyWeekSummary());
-    $.energyWeekChart({ 'renderTo': 'energy-chart', 'data': energyWeekSummary});
+    var energyDaysSummary = @json(App\Managers\HighChartManager::getEnergyDaysSummary());
+    $.energyDaysChart({ 'renderTo': 'energy-chart', 'data': energyDaysSummary});
+    var expenseDaysSummary = @json(App\Managers\HighChartManager::getExpenseDaysSummary());
+    $.expenseDaysChart({ 'renderTo': 'expense-day-chart', 'data': expenseDaysSummary});
 })
 </script>
 @endsection
