@@ -20,4 +20,6 @@ final class ExpenseType extends Enum
     const DepartmentSalary = 'department-salary';
     const Inventory = 'inventory';
     const Truck = 'truck';
+    const WashingMachine = 'washing_machine';
+    const DryerMachine = 'dryer_machine';
 }

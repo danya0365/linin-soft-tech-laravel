@@ -75,12 +75,11 @@
                             </div>
                             <ul class="list-group list-group-flush">
                                 <li class="list-group-item">
-                                    <small class="text-muted">บันทึกเมื่อ: {{ $note->created_at->format('Y-m-d') }}</small>
+                                    <small class="text-muted">วันที่: {{ $note->created_at->format('Y-m-d') }}</small>
                                 </li>
                             </ul>
                             <div class="card-body">
                                 <form action="{{ route('notes.destroy',$note->id) }}" method="POST">
-                                    <a class="btn btn-sm btn-success" href="{{ route('notes.edit',$note->id) }}"><i class="fa fa-fw fa-edit"></i> Edit</a>
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-danger btn-sm"><i class="fa fa-fw fa-trash"></i> Delete</button>

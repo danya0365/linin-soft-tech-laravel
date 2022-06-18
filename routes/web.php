@@ -47,6 +47,8 @@ Route::group(['middleware' => ['admin']], function () {
     Route::resource('employees', App\Http\Controllers\EmployeeController::class);
     Route::resource('linen-types', App\Http\Controllers\LinenTypeController::class);
     Route::resource('linen-products', App\Http\Controllers\LinenProductController::class);
+
+    Route::match(array('GET', 'POST'), 'washing-machines/{id}/create-note', [App\Http\Controllers\WashingMachineController::class, 'createNote'])->name('washing-machines.create-note');
     Route::resource('washing-machines', App\Http\Controllers\WashingMachineController::class);
     Route::resource('dryer-machines', App\Http\Controllers\DryerMachineController::class);
     Route::resource('inventories', App\Http\Controllers\InventoryController::class);
@@ -86,6 +88,7 @@ Route::group(['prefix' => 'supervisor', 'middleware' => ['supervisor']], functio
         Route::get('/', [App\Http\Controllers\Supervisor\CustomerController::class, 'index'])->name('supervisor.customer');
         Route::match(array('GET', 'POST'), '/new-billing', [App\Http\Controllers\Supervisor\CustomerController::class, 'getNewBilling'])->name('supervisor.customer.new-billing');
         Route::get('/billing-logs', [App\Http\Controllers\Supervisor\CustomerController::class, 'getBillingLog'])->name('supervisor.customer.billing-logs');
+        Route::match(array('GET', 'POST'), '/billing-logs/{id}/delete', [App\Http\Controllers\Supervisor\CustomerController::class, 'deleteBillingLog'])->name('supervisor.customer.billing-logs.delete');
     });
 });
 
