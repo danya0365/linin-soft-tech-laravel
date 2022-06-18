@@ -1,4 +1,183 @@
 (function ($) {
+    function energyPieChart(targetId, dataChart) {
+        var data = [];
+
+        for (const [key, value] of Object.entries(dataChart)) {
+            if (data.length == 0) {
+                data.push({
+                    name: value.name,
+                    y: parseFloat(value.value),
+                    sliced: true,
+                    selected: true,
+                });
+            } else {
+                data.push({
+                    name: value.name,
+                    y: parseFloat(value.value),
+                });
+            }
+        }
+
+        var series = [
+            {
+                name: "พลังงาน",
+                colorByPoint: true,
+                data: data,
+            },
+        ];
+
+        Highcharts.chart(targetId, {
+            chart: {
+                plotBackgroundColor: null,
+                plotBorderWidth: null,
+                plotShadow: false,
+                type: "pie",
+            },
+            title: {
+                text: "พลังงานที่ใช้ (บาท)",
+            },
+            tooltip: {
+                pointFormat: "{series.name}: <b>{point.y} บาท</b>",
+            },
+            accessibility: {
+                point: {
+                    valueSuffix: "%",
+                },
+            },
+            plotOptions: {
+                pie: {
+                    allowPointSelect: true,
+                    cursor: "pointer",
+                    dataLabels: {
+                        enabled: true,
+                        format: "<b>{point.name}</b>: {point.percentage:.1f} %",
+                    },
+                },
+            },
+            series: series,
+        });
+    }
+
+    $.energyPieChart = function (options) {
+        var settings = $.extend(
+            {
+                data: null,
+                renderTo: null,
+            },
+            options
+        );
+
+        energyPieChart(settings.renderTo, settings.data);
+    };
+})(jQuery);
+
+(function ($) {
+    function salesChart(
+        targetId,
+        categories,
+        expenseYearSummary,
+        incomeYearSummary,
+        profitYearSummary
+    ) {
+        var expenseData = [];
+        for (const [key, value] of Object.entries(expenseYearSummary)) {
+            expenseData.push(parseFloat(value.total_amount));
+        }
+        var expenses = {
+            name: "ต้นทุน",
+            data: expenseData,
+        };
+
+        var incomeData = [];
+        for (const [key, value] of Object.entries(incomeYearSummary)) {
+            incomeData.push(parseFloat(value.total_amount));
+        }
+        var incomes = {
+            name: "ยอดขาย",
+            data: incomeData,
+        };
+
+        var profitData = [];
+        for (const [key, value] of Object.entries(profitYearSummary)) {
+            profitData.push(parseFloat(value.total_amount));
+        }
+        var profits = {
+            name: "กำไร",
+            data: profitData,
+        };
+
+        var series = [incomes, expenses, profits];
+
+        Highcharts.chart(targetId, {
+            chart: {
+                type: "column",
+            },
+            title: {
+                text: "ต้นทุน, ยอดขาย, กำไร",
+            },
+            subtitle: {
+                text: "",
+            },
+            xAxis: {
+                categories: categories,
+                crosshair: true,
+                labels: {
+                    formatter: function () {
+                        return this.value;
+                    },
+                },
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: "จำนวนเงิน (บาท)",
+                },
+                labels: {
+                    formatter: function () {
+                        return this.value;
+                    },
+                },
+            },
+            tooltip: {
+                headerFormat:
+                    '<span style="font-size:10px">{point.key}</span><table>',
+                pointFormat:
+                    '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                    '<td style="padding:0"><b>{point.y:.1f} บาท</b></td></tr>',
+                footerFormat: "</table>",
+                shared: true,
+                useHTML: true,
+            },
+            plotOptions: {
+                column: {
+                    pointPadding: 0.2,
+                    borderWidth: 0,
+                },
+            },
+            series: series,
+        });
+    }
+
+    $.salesChart = function (options) {
+        var settings = $.extend(
+            {
+                data: null,
+                renderTo: null,
+            },
+            options
+        );
+
+        salesChart(
+            settings.renderTo,
+            settings.data.monthYearTitles,
+            settings.data.expenseYearSummary,
+            settings.data.incomeYearSummary,
+            settings.data.profitYearSummary
+        );
+    };
+})(jQuery);
+
+(function ($) {
     function energyDaysChart(targetId, categories, seriesData) {
         var series = seriesData.map(function (item, index) {
             var name = item.name;
@@ -61,8 +240,6 @@
             {
                 data: null,
                 renderTo: null,
-                tickInterval: 1 * 3600 * 1000, // 1 hours
-                pointInterval: 3600 * 1000, // one day (in milisec.)
             },
             options
         );
@@ -148,6 +325,88 @@
         );
 
         expenseDaysChart(
+            settings.renderTo,
+            settings.data.titles,
+            settings.data.data
+        );
+    };
+})(jQuery);
+
+(function ($) {
+    function salesLatestDaysChart(targetId, categories, seriesData) {
+        console.log("seriesData", seriesData);
+
+        var series = seriesData.map(function (item, index) {
+            var name = item.name;
+            var data = item.data.map(function (item, index) {
+                return parseFloat(item);
+            });
+            return {
+                name: name,
+                data: data,
+            };
+        });
+
+        Highcharts.chart(targetId, {
+            chart: {
+                type: "column",
+            },
+            title: {
+                text: "ต้นทุน, ยอดขาย, กำไร 7 วันล่าสุด",
+            },
+            subtitle: {
+                text: "",
+            },
+            xAxis: {
+                categories: categories,
+                crosshair: true,
+                labels: {
+                    formatter: function () {
+                        return this.value;
+                    },
+                },
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: "จำนวนเงิน (บาท)",
+                },
+                labels: {
+                    formatter: function () {
+                        return this.value;
+                    },
+                },
+            },
+            tooltip: {
+                headerFormat:
+                    '<span style="font-size:10px">{point.key}</span><table>',
+                pointFormat:
+                    '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                    '<td style="padding:0"><b>{point.y:.1f} บาท</b></td></tr>',
+                footerFormat: "</table>",
+                shared: true,
+                useHTML: true,
+            },
+            plotOptions: {
+                column: {
+                    pointPadding: 0.2,
+                    borderWidth: 0,
+                },
+            },
+            series: series,
+        });
+    }
+
+    $.salesLatestDaysChart = function (options) {
+        var settings = $.extend(
+            {
+                data: null,
+                renderTo: null,
+            },
+            options
+        );
+
+        salesLatestDaysChart(
             settings.renderTo,
             settings.data.titles,
             settings.data.data
