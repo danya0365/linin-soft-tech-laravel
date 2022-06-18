@@ -16,6 +16,7 @@ use App\Models\Department;
 use App\Models\DepartmentDailyCostLog;
 use App\Models\Operation;
 use App\Models\OperationLinenProduct;
+use Illuminate\Support\Facades\DB;
 
 class CustomerController extends Controller
 {
@@ -83,10 +84,28 @@ class CustomerController extends Controller
         $billingLogs = $query->paginate();
         $customerGroups = CustomerGroup::with('customers')->get();
 
+        $billingSums = (function () {
+            $query = Operation::with('customer')->select(
+                DB::raw('sum(total_billing_weight) as total_billing_weight'),
+                DB::raw('sum(total_billing_payment) as total_billing_payment'),
+                'customer_id'
+            )
+                ->whereNotNull('customer_id')
+                ->groupBy('customer_id');
+
+            $dateStartAt = request()->get('date_start_at');
+            $dateEndAt = request()->get('date_end_at');
+            if ($dateStartAt && $dateEndAt) {
+                $query->whereBetween('created_at', [$dateStartAt . ' 00:00:00', $dateEndAt . ' 23:59:59']);
+            }
+            return $query->get();
+        })();
+
         return view(
             'supervisor.customers.billing-logs',
             [
                 'billingLogs' => $billingLogs,
+                'billingSums' => $billingSums,
                 'customerGroups' => $customerGroups,
                 'customerIdSelected' => $customerIdSelected,
                 'dateStartAt' => $dateStartAt,

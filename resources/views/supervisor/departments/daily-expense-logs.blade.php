@@ -92,6 +92,28 @@
                     </div>
                     @endforeach
 
+
+                    <div class="table-responsive mb-2">
+                        <table class="table table-bordered table-hover">
+                            <thead class="thead">
+                                <tr>
+                                    <th>แผนก</th>
+                                    <th>จำนวนเงิน (Thai Baht)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($departmentDailyCostSums as $departmentDailyCostSum)
+                                    <tr>
+                                        <td>{{ $departmentDailyCostSum->department->name ?? '-' }}</td>
+                                        <td class="text-center">
+                                            {{ number_format($departmentDailyCostSum->total_cost) }}
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+
                 </div>
                 <div class="card-footer">
                     {!! $departmentDailyCostLogs->withQueryString()->links() !!}
