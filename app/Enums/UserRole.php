@@ -15,5 +15,6 @@ final class UserRole extends Enum
     const Admin = 'admin';
     const Manager = 'manager';
     const Supervisor = 'supervisor';
+    const Customer = 'customer';
     const Employee = 'employee';
 }
