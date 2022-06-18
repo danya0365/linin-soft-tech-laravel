@@ -13,9 +13,16 @@
         </div>
         <div class="form-group">
             {{ Form::label('role') }}
-            {{ Form::text('role', $user->role, ['class' => 'form-control' . ($errors->has('role') ? ' is-invalid' : ''), 'placeholder' => 'Role']) }}
+            <select class="form-select" id="role" name="role">
+                <option value="">เลือก</option>
+                @foreach ( $userRoles as $key => $userRole )
+                <option value="{{ $key }}" {{ $user->role == $key ? 'selected' : '' }}>{{ $userRole }}</option>
+                @endforeach
+            </select>
             {!! $errors->first('role', '<div class="invalid-feedback">:message</div>') !!}
         </div>
+
+        
 
     </div>
     <div class="box-footer mt-4">

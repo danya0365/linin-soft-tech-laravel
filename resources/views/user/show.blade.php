@@ -30,7 +30,7 @@
                         </div>
                         <div class="form-group">
                             <strong>Role:</strong>
-                            {{ $user->role }}
+                            {{ App\Enums\UserRole::getDescription($user->role) }}
                         </div>
 
                     </div>
