@@ -82,13 +82,13 @@
                                     <tr>
                                         <td>{{ $billingLog->created_at->format('Y-m-d') }}</td>
                                         <td>{{ $billingLog->customer->name ?? '-' }}</td>
-                                        <td class="text-center">
+                                        <td class="text-end">
                                             {{ number_format($billingLog->total_billing_weight) }}
                                         </td>
-                                        <td class="text-center">
+                                        <td class="text-end">
                                             {{ number_format($billingLog->total_billing_payment) }}
                                         </td>
-                                        <td class="text-center">{{ $billingLog->billing_payment_date }}</td>
+                                        <td class="text-end">{{ $billingLog->billing_payment_date }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -106,18 +106,32 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                @php
+                                    $sum_total_billing_weight = $sum_total_billing_payment = 0;
+                                @endphp
                                 @foreach ($billingSums as $billingSum)
                                     <tr>
                                         <td>{{ $billingSum->customer->name ?? '-' }}</td>
-                                        <td class="text-center">
+                                        <td class="text-end">
                                             {{ number_format($billingSum->total_billing_weight) }}
                                         </td>
-                                        <td class="text-center">
+                                        <td class="text-end">
                                             {{ number_format($billingSum->total_billing_payment) }}
                                         </td>
                                     </tr>
+                                    @php
+                                    $sum_total_billing_weight += $billingSum->total_billing_weight;
+                                    $sum_total_billing_payment += $billingSum->total_billing_payment;
+                                @endphp
                                 @endforeach
                             </tbody>
+                            <tfoot class="tfoot">
+                                <tr>
+                                    <th>ยอดรวม: </th>
+                                    <th class="text-end">{{ number_format($sum_total_billing_weight) }}</th>
+                                    <th class="text-end">{{ number_format($sum_total_billing_payment) }}</th>
+                                </tr>
+                            </tfoot>
                         </table>
                     </div>
 

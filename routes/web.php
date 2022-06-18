@@ -57,6 +57,20 @@ Route::group(['middleware' => ['admin']], function () {
     Route::resource('notes', App\Http\Controllers\NoteController::class);
 });
 
+Route::group(['prefix' => 'manager', 'middleware' => ['manager']], function () {
+
+    Route::get('/', [App\Http\Controllers\ManagerController::class, 'index'])->name('manager');
+
+    Route::group(['prefix' => 'report'], function () {
+        Route::get('/', [App\Http\Controllers\Manager\ReportController::class, 'index'])->name('manager.report');
+    });
+});
+
+Route::group(['prefix' => 'customer', 'middleware' => ['customer']], function () {
+
+    Route::match(array('GET', 'POST'), '/create-feedback', [App\Http\Controllers\CustomerController::class, 'createFeedback'])->name('customers.create-feedback');
+});
+
 Route::group(['prefix' => 'supervisor', 'middleware' => ['supervisor']], function () {
 
     Route::get('/', [App\Http\Controllers\SupervisorController::class, 'index'])->name('supervisor');
@@ -72,11 +86,6 @@ Route::group(['prefix' => 'supervisor', 'middleware' => ['supervisor']], functio
         Route::get('/', [App\Http\Controllers\Supervisor\CustomerController::class, 'index'])->name('supervisor.customer');
         Route::match(array('GET', 'POST'), '/new-billing', [App\Http\Controllers\Supervisor\CustomerController::class, 'getNewBilling'])->name('supervisor.customer.new-billing');
         Route::get('/billing-logs', [App\Http\Controllers\Supervisor\CustomerController::class, 'getBillingLog'])->name('supervisor.customer.billing-logs');
-    });
-
-
-    Route::group(['prefix' => 'report'], function () {
-        Route::get('/', [App\Http\Controllers\Supervisor\ReportController::class, 'index'])->name('supervisor.report');
     });
 });
 

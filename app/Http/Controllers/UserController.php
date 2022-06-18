@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\UserRole;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -32,7 +33,10 @@ class UserController extends Controller
     public function create()
     {
         $user = new User();
-        return view('user.create', compact('user'));
+
+        $userRoles = UserRole::asSelectArray();
+
+        return view('user.create', compact('user', 'userRoles'));
     }
 
     /**
@@ -74,7 +78,9 @@ class UserController extends Controller
     {
         $user = User::find($id);
 
-        return view('user.edit', compact('user'));
+        $userRoles = UserRole::asSelectArray();
+
+        return view('user.edit', compact('user', 'userRoles'));
     }
 
     /**

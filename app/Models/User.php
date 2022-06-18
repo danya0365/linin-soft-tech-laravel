@@ -39,6 +39,10 @@ class User extends Authenticatable
     'email',
     'password',
     'role',
+    'is_can_access_admin',
+    'is_can_access_manager',
+    'is_can_access_supervisor',
+    'is_can_access_customer',
   ];
 
   static $rules = [

@@ -73,7 +73,7 @@ class DepartmentController extends Controller
         $dateStartAt = request()->get('date_start_at');
         $dateEndAt = request()->get('date_end_at');
         if ($dateStartAt && $dateEndAt) {
-            $query->whereBetween('created_at', [$dateStartAt . ' 00:00:00', $dateEndAt . ' 23:59:59']);
+            $query->whereBetween('daily_date', [$dateStartAt, $dateEndAt]);
         }
         if ($sortOrderSelected) {
             list($sort, $order) = explode('-', $sortOrderSelected);
@@ -93,7 +93,7 @@ class DepartmentController extends Controller
             $dateStartAt = request()->get('date_start_at');
             $dateEndAt = request()->get('date_end_at');
             if ($dateStartAt && $dateEndAt) {
-                $query->whereBetween('created_at', [$dateStartAt . ' 00:00:00', $dateEndAt . ' 23:59:59']);
+                $query->whereBetween('daily_date', [$dateStartAt, $dateEndAt]);
             }
             return $query->get();
         })();

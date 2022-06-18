@@ -15,7 +15,8 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->boolean('is_can_access_admin')->default(0)->after('role');
-            $table->boolean('is_can_access_supervisor')->default(0)->after('is_can_access_admin');
+            $table->boolean('is_can_access_manager')->default(0)->after('is_can_access_admin');
+            $table->boolean('is_can_access_supervisor')->default(0)->after('is_can_access_manager');
             $table->boolean('is_can_access_customer')->default(0)->after('is_can_access_supervisor');
         });
     }
