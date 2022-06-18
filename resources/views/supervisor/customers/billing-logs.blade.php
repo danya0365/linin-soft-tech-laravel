@@ -66,7 +66,7 @@
                         </div>
                     </form>
 
-                    <div class="table-responsive">
+                    <div class="table-responsive mb-2">
                         <table class="table table-bordered table-hover">
                             <thead class="thead">
                                 <tr>
@@ -89,6 +89,32 @@
                                             {{ number_format($billingLog->total_billing_payment) }}
                                         </td>
                                         <td class="text-center">{{ $billingLog->billing_payment_date }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+
+
+                    <div class="table-responsive mb-2">
+                        <table class="table table-bordered table-hover">
+                            <thead class="thead">
+                                <tr>
+                                    <th>ลูกค้า</th>
+                                    <th>น้ำหนักที่ลูกค้า (kg.)</th>
+                                    <th>จำนวนเงิน (Thai Baht)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($billingSums as $billingSum)
+                                    <tr>
+                                        <td>{{ $billingSum->customer->name ?? '-' }}</td>
+                                        <td class="text-center">
+                                            {{ number_format($billingSum->total_billing_weight) }}
+                                        </td>
+                                        <td class="text-center">
+                                            {{ number_format($billingSum->total_billing_payment) }}
+                                        </td>
                                     </tr>
                                 @endforeach
                             </tbody>
