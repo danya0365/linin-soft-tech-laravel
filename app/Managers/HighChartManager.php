@@ -167,23 +167,27 @@ class SalesLatestDaysSummary
 
         foreach ($incomeRows as $key => $incomeRow) {
             $ymd = $incomeRow->ymd;
-            $data[$ymd] = $incomeRow->total_cost;
+            if (isset($data[$ymd])) {
+                $data[$ymd] = $incomeRow->total_cost;
+            }
         }
         return $data;
     }
 
     private function expenseLatestDaysSummary($totalDays, $agoDate): array
     {
-        $incomeRows = DB::table('expenses')
+        $expenseRows = DB::table('expenses')
             ->select(DB::raw("DATE_FORMAT(created_at, '%Y-%m-%d') as ymd"), DB::raw('SUM(amount) as total_cost'))
             ->where('created_at', '>=', $agoDate)
             ->groupBy('ymd')->get();
         $result = $this->generateLatestDaysSummaryStructure($totalDays);
         $data = $result['data'];
 
-        foreach ($incomeRows as $key => $incomeRow) {
-            $ymd = $incomeRow->ymd;
-            $data[$ymd] = $incomeRow->total_cost;
+        foreach ($expenseRows as $key => $expenseRow) {
+            $ymd = $expenseRow->ymd;
+            if (isset($data[$ymd])) {
+                $data[$ymd] = $expenseRow->total_cost;
+            }
         }
 
         return $data;
