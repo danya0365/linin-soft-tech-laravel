@@ -66,6 +66,11 @@ Route::group(['prefix' => 'manager', 'middleware' => ['manager']], function () {
     });
 });
 
+Route::group(['prefix' => 'customer', 'middleware' => ['customer']], function () {
+
+    Route::match(array('GET', 'POST'), '/create-feedback', [App\Http\Controllers\CustomerController::class, 'createFeedback'])->name('customers.create-feedback');
+});
+
 Route::group(['prefix' => 'supervisor', 'middleware' => ['supervisor']], function () {
 
     Route::get('/', [App\Http\Controllers\SupervisorController::class, 'index'])->name('supervisor');

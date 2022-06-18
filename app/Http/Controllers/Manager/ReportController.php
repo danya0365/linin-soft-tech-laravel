@@ -11,7 +11,7 @@ class ReportController extends Controller
     public function index()
     {
         return view(
-            'supervisor.reports.index',
+            'manager.reports.index',
             [
                 'salesYearSummary' => $this->salesYearSummary(),
                 'energySummary' => $this->energySummary()

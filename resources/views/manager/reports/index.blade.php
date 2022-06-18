@@ -37,7 +37,7 @@
 
                         <div class="col-12">
                             <button type="submit" class="btn btn-primary">Submit</button>
-                            <a href="{{ route('supervisor.report') }}" role="button" class="btn btn-outline-secondary">Reset</a>
+                            <a href="{{ route('manager.report') }}" role="button" class="btn btn-outline-secondary">Reset</a>
                         </div>
                     </form>
 
