@@ -59,7 +59,7 @@
 											<td>{{ $user->role }}</td>
 
                                             <td>
-                                                <form action="{{ route('users.destroy',$user->id) }}" method="POST">
+                                                <form class="delete-form" action="{{ route('users.destroy',$user->id) }}" method="POST">
                                                     <a class="btn btn-sm btn-primary " href="{{ route('users.show',$user->id) }}"><i class="fa fa-fw fa-eye"></i> Show</a>
                                                     <a class="btn btn-sm btn-success" href="{{ route('users.edit',$user->id) }}"><i class="fa fa-fw fa-edit"></i> Edit</a>
                                                     @csrf
@@ -78,4 +78,14 @@
             </div>
         </div>
     </div>
+<script>
+    $(function(){
+        $('.delete-form').on('submit', function(e){
+            if (!confirm("Are you sure?")) {
+                return false;
+            }
+            return true
+        })
+    });
+</script>
 @endsection
