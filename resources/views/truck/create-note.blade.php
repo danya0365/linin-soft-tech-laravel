@@ -42,6 +42,14 @@
                         </div>
 
                         <div class="col-12">
+                            <label for="note_date" class="form-label">วันที่บันทึก</label>
+                            <input type="date" name="note_date" class="form-control" id="note_date">
+                            @error('note_date')
+                                <div class="text-danger">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="col-12">
                             <button type="submit" class="btn btn-primary">Submit</button>
                             <button type="reset" class="btn btn-outline-secondary">Reset</button>
                         </div>
