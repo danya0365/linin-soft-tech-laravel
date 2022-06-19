@@ -12,6 +12,63 @@
     <div class="row justify-content-center">
         <div class="col-md-12 m-2">
             <div class="card">
+                <div class="card-header">ภาพรวม</div>
+                <div class="card-body text-center">
+                    <form class="row row-cols-lg-auto g-3 align-items-center mb-2" action="{{ request()->url() }}" method="GET">
+
+                        <div class="col-12">
+                            <div class="input-group">
+                                <input type="date" name="overall[date_start_at]" value="{{ $overallSummary['queryParam']['dateStartAt'] }}" class="form-control" placeholder="วันที่เริ่ม" aria-label="วันที่เริ่ม">
+                                <span class="input-group-text"> ถึง </span>
+                                <input type="date" name="overall[date_end_at]" value="{{ $overallSummary['queryParam']['dateEndAt'] }}" class="form-control" placeholder="วันที่สิ้นสุด" aria-label="วันที่สิ้นสุด">
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                            <a href="{{ route('manager.report') }}" role="button" class="btn btn-outline-secondary">Reset</a>
+                        </div>
+                    </form>
+
+
+                    <div class="row g-2">
+                        <div class="col-4">
+                            <div class="card text-center">
+                                <div class="card-header">
+                                    <p class="fs-3 m-0">ต้นทุน</p>
+                                </div>
+                                <div class="card-body">
+                                    <p class="fs-1 m-0">{{ number_format($overallSummary['data']['expense']) }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="card text-center">
+                                <div class="card-header">
+                                    <p class="fs-3 m-0">ยอดขาย</p>
+                                </div>
+                                <div class="card-body">
+                                    <p class="fs-1 m-0">{{ number_format($overallSummary['data']['income']) }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="card text-center">
+                                <div class="card-header">
+                                    <p class="fs-3 m-0">กำไร</p>
+                                </div>
+                                <div class="card-body">
+                                    <p class="fs-1 m-0">{{ number_format($overallSummary['data']['profit']) }}</p>
+                                </div>
+                            </div>
+                        </div>
+                      </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-12 m-2">
+            <div class="card">
                 <div class="card-header">ต้นทุน, ยอดขาย, กำไร ต่อเดือน</div>
                 <div class="card-body text-center">
                     <div id="sales-bar-chart" style="min-width: 400px; height: 400px; margin: 0 auto">

@@ -13,10 +13,54 @@ class ReportController extends Controller
         return view(
             'manager.reports.index',
             [
+                'overallSummary' => $this->overallSummary(),
                 'salesYearSummary' => $this->salesYearSummary(),
                 'energySummary' => $this->energySummary()
             ]
         );
+    }
+
+    public function overallSummary(): array
+    {
+        $queryOverall = request()->get('overall');
+
+        $queryParam['dateStartAt'] = isset($queryOverall['date_start_at']) ? $queryOverall['date_start_at'] : '';
+        $queryParam['dateEndAt'] = isset($queryOverall['date_end_at']) ? $queryOverall['date_end_at'] : '';
+
+        $overallSummary = [];
+
+        $expense = (function () use ($queryParam) {
+
+            $query = DB::table('expenses')
+                ->select(DB::raw('SUM(amount) as total_amount'));
+
+            if ($queryParam['dateStartAt'] && $queryParam['dateEndAt']) {
+                $query->whereBetween('created_at', [$queryParam['dateStartAt'] . ' 00:00:00', $queryParam['dateEndAt'] . ' 23:59:59']);
+            }
+
+            $totalAmount = $query->value('total_amount');
+            return $totalAmount;
+        })();
+
+
+        $income = (function () use ($queryParam) {
+
+            $query = DB::table('incomes')
+                ->select(DB::raw('SUM(amount) as total_amount'));
+
+            if ($queryParam['dateStartAt'] && $queryParam['dateEndAt']) {
+                $query->whereBetween('created_at', [$queryParam['dateStartAt'] . ' 00:00:00', $queryParam['dateEndAt'] . ' 23:59:59']);
+            }
+
+            $totalAmount = $query->value('total_amount');
+            return $totalAmount;
+        })();
+
+        $overallSummary['expense'] = $expense;
+        $overallSummary['income'] = $income;
+        $overallSummary['profit'] = $income - $expense;
+
+        return ['data' => $overallSummary, 'queryParam' => $queryParam];
     }
 
     public function energySummary(): array
