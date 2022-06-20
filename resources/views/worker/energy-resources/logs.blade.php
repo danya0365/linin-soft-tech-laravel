@@ -65,7 +65,7 @@
                         <table class="table table-bordered table-hover">
                             <thead class="thead">
                                 <tr>
-                                    <th>บันทึกเมื่อ</th>
+                                    <th>วันที่</th>
                                     <th>พลังงาน</th>
                                     <th>จำนวน</th>
                                     <th>หน่วย</th>
