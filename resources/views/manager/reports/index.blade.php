@@ -137,6 +137,17 @@
                 </div>
             </div>
         </div>
+        <div class="col-md-12 m-2">
+            <div class="card">
+                <div class="card-header">ยอดขายแต่ละวัน</div>
+                <div class="card-body text-center">
+
+                    <div id="income-day-chart" style="min-width: 400px; height: 400px; margin: 0 auto">
+
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 <script>
@@ -155,6 +166,9 @@ $(function(){
 
     var salesLatestDaysSummary = @json(App\Managers\HighChartManager::getSalesLatestDaysSummary());
     $.salesLatestDaysChart({ 'renderTo': 'sales-latest-days-chart', 'data': salesLatestDaysSummary});
+
+    var incomeDaysSummary = @json(App\Managers\HighChartManager::getIncomeDaysSummary());
+    $.incomeDaysChart({ 'renderTo': 'income-day-chart', 'data': incomeDaysSummary});
 })
 </script>
 @endsection
