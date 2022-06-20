@@ -96,6 +96,7 @@ class EnergyResourceLogController extends Controller
                 DepartmentNameId::Packing(),
                 DepartmentNameId::Collect(),
                 DepartmentNameId::Deliver(),
+                DepartmentNameId::Maintenance(),
             ]
         )->get();
         return view('worker.energy-resources.select-employee', ['departments' => $departments, 'energyResourceLog' => $energyResourceLog]);
