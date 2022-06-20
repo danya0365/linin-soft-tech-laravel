@@ -121,11 +121,6 @@
             xAxis: {
                 categories: categories,
                 crosshair: true,
-                labels: {
-                    formatter: function () {
-                        return this.value;
-                    },
-                },
             },
             yAxis: {
                 min: 0,
@@ -134,7 +129,9 @@
                 },
                 labels: {
                     formatter: function () {
-                        return this.value;
+                        return (
+                            Math.round(this.value * 100) / 100
+                        ).toLocaleString();
                     },
                 },
             },
@@ -211,7 +208,9 @@
                 },
                 labels: {
                     formatter: function () {
-                        return this.value;
+                        return (
+                            Math.round(this.value * 100) / 100
+                        ).toLocaleString();
                     },
                 },
             },
@@ -278,11 +277,6 @@
             xAxis: {
                 categories: categories,
                 crosshair: true,
-                labels: {
-                    formatter: function () {
-                        return this.value;
-                    },
-                },
             },
             yAxis: {
                 min: 0,
@@ -291,7 +285,9 @@
                 },
                 labels: {
                     formatter: function () {
-                        return this.value;
+                        return (
+                            Math.round(this.value * 100) / 100
+                        ).toLocaleString();
                     },
                 },
             },
@@ -358,11 +354,6 @@
             xAxis: {
                 categories: categories,
                 crosshair: true,
-                labels: {
-                    formatter: function () {
-                        return this.value;
-                    },
-                },
             },
             yAxis: {
                 min: 0,
@@ -371,7 +362,9 @@
                 },
                 labels: {
                     formatter: function () {
-                        return this.value;
+                        return (
+                            Math.round(this.value * 100) / 100
+                        ).toLocaleString();
                     },
                 },
             },
@@ -438,11 +431,6 @@
             xAxis: {
                 categories: categories,
                 crosshair: true,
-                labels: {
-                    formatter: function () {
-                        return this.value;
-                    },
-                },
             },
             yAxis: {
                 min: 0,
@@ -451,7 +439,9 @@
                 },
                 labels: {
                     formatter: function () {
-                        return this.value;
+                        return (
+                            Math.round(this.value * 100) / 100
+                        ).toLocaleString();
                     },
                 },
             },
