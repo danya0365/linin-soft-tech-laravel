@@ -3,6 +3,7 @@
 namespace App\Managers;
 
 use App\Enums\ExpenseType;
+use App\Enums\IncomeType;
 use App\Managers\Manager;
 use App\Models\EnergyResource;
 use App\Models\EnergyResourceLog;
@@ -119,6 +120,63 @@ class HighChartManager extends Manager
                 $_data[] = isset($data[$dateString]) ? $data[$dateString] : 0;
             }
             $returnData[] = ['name' => $expenseType, 'data' => $_data];
+        }
+
+        return ['titles' => $titles, 'data' => $returnData];
+    }
+
+
+    public static function getIncomeDaysSummary()
+    {
+        $currentDate = \Carbon\Carbon::now();
+        $totalDays = 7;
+        $agoDate = $currentDate->subDays($totalDays);
+
+        $incomeData = (function ($typeName) use ($agoDate) {
+            $query = Income::query();
+            $query->select(
+                DB::raw('SUM(amount) as total_cost'),
+                DB::raw("DATE_FORMAT(created_at, '%Y-%m-%d') as date")
+            );
+
+            $query->where('type_name', $typeName)->where('created_at', '>=', $agoDate);
+            $query->groupBy('date');
+
+            $rows = $query->get();
+
+            $returnData = [];
+            foreach ($rows as $key => $row) {
+                $date = \Carbon\Carbon::parse($row->date)->format('Y-m-d');
+                if (!isset($returnData[$date])) {
+                    $returnData[$date] = [];
+                }
+                $row = $row->toArray();
+                $returnData[$date] =  $row['total_cost'];
+            }
+
+            return $returnData;
+        });
+
+        $titles = [];
+        $_date = \Carbon\Carbon::now();
+        for ($i = 0; $i < $totalDays; $i++) {
+            $date = $i > 0 ? $_date->subDays(1) : $_date;
+            $titles[] = $date->format('Y-m-d');
+        }
+
+        $returnData = [];
+        $incomeTypes = IncomeType::asSelectArray();
+        foreach ($incomeTypes as $key => $incomeType) {
+
+            $data = $incomeData($key);
+            $_date = \Carbon\Carbon::now();
+            $_data = [];
+            for ($i = 0; $i < $totalDays; $i++) {
+                $date = $i > 0 ? $_date->subDays(1) : $_date;
+                $dateString = $date->format('Y-m-d');
+                $_data[] = isset($data[$dateString]) ? $data[$dateString] : 0;
+            }
+            $returnData[] = ['name' => $incomeType, 'data' => $_data];
         }
 
         return ['titles' => $titles, 'data' => $returnData];
