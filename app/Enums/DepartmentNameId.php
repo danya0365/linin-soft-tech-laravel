@@ -21,4 +21,5 @@ final class DepartmentNameId extends Enum
     const Packing = 5;
     const Collect = 6;
     const Deliver = 7;
+    const Maintenance = 8;
 }

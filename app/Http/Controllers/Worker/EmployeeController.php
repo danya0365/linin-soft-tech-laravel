@@ -31,6 +31,8 @@ class EmployeeController extends Controller
                 DepartmentNameId::Iron(),
                 DepartmentNameId::Packing(),
                 DepartmentNameId::Collect(),
+                DepartmentNameId::Deliver(),
+                DepartmentNameId::Maintenance(),
             ]
         )->get();
         return view('worker.employees.select-employee', ['departments' => $departments]);

@@ -81,14 +81,14 @@ Route::group(['prefix' => 'supervisor', 'middleware' => ['supervisor']], functio
         Route::get('/', [App\Http\Controllers\Supervisor\DepartmentController::class, 'index'])->name('supervisor.department');
         Route::match(array('GET', 'POST'), '/submit-daily-expense', [App\Http\Controllers\Supervisor\DepartmentController::class, 'submitDailyExpense'])->name('supervisor.department.submit-daily-expense');
         Route::match(array('GET', 'POST'), '/daily-expense-logs', [App\Http\Controllers\Supervisor\DepartmentController::class, 'dailyExpenseLogs'])->name('supervisor.department.daily-expense-log');
-        Route::match(array('GET', 'POST'), '/daily-expense-log/{id}/delete', [App\Http\Controllers\Supervisor\DepartmentController::class, 'deleteDailyExpenseLog'])->name('supervisor.department.delete-daily-expense-log');
+        Route::match(array('GET', 'POST', 'DELETE'), '/daily-expense-log/{id}/delete', [App\Http\Controllers\Supervisor\DepartmentController::class, 'deleteDailyExpenseLog'])->name('supervisor.department.delete-daily-expense-log');
     });
 
     Route::group(['prefix' => 'customer'], function () {
         Route::get('/', [App\Http\Controllers\Supervisor\CustomerController::class, 'index'])->name('supervisor.customer');
         Route::match(array('GET', 'POST'), '/new-billing', [App\Http\Controllers\Supervisor\CustomerController::class, 'getNewBilling'])->name('supervisor.customer.new-billing');
         Route::get('/billing-logs', [App\Http\Controllers\Supervisor\CustomerController::class, 'getBillingLog'])->name('supervisor.customer.billing-logs');
-        Route::match(array('GET', 'POST'), '/billing-logs/{id}/delete', [App\Http\Controllers\Supervisor\CustomerController::class, 'deleteBillingLog'])->name('supervisor.customer.billing-logs.delete');
+        Route::match(array('GET', 'POST', 'DELETE'), '/billing-logs/{id}/delete', [App\Http\Controllers\Supervisor\CustomerController::class, 'deleteBillingLog'])->name('supervisor.customer.billing-logs.delete');
     });
 });
 
