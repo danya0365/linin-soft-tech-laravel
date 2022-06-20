@@ -77,7 +77,7 @@
                             <tbody>
                                 @foreach ($energyResourceLogs as $energyResourceLog)
                                     <tr>
-                                        <td class="text-center">{{ $energyResourceLog->created_at->format('Y-m-d H:i') }}</td>
+                                        <td class="text-center">{{ $energyResourceLog->created_at->format('Y-m-d') }}</td>
                                         <td class="text-center">{{ $energyResourceLog->energyResource->name }}</td>
                                         <td class="text-end">{{ $energyResourceLog->value }}</td>
                                         <td class="text-start">{{ $energyResourceLog->unit }}</td>
