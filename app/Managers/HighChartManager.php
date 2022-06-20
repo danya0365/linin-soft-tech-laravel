@@ -158,7 +158,7 @@ class SalesLatestDaysSummary
 
     private function incomeLatestDaysSummary($totalDays, $agoDate): array
     {
-        $incomeRows = DB::table('incomes')
+        $incomeRows = Income::query()
             ->select(DB::raw("DATE_FORMAT(created_at, '%Y-%m-%d') as ymd"), DB::raw('SUM(amount) as total_cost'))
             ->where('created_at', '>=', $agoDate)
             ->groupBy('ymd')->get();
@@ -176,7 +176,7 @@ class SalesLatestDaysSummary
 
     private function expenseLatestDaysSummary($totalDays, $agoDate): array
     {
-        $expenseRows = DB::table('expenses')
+        $expenseRows = Expense::query()
             ->select(DB::raw("DATE_FORMAT(created_at, '%Y-%m-%d') as ymd"), DB::raw('SUM(amount) as total_cost'))
             ->where('created_at', '>=', $agoDate)
             ->groupBy('ymd')->get();

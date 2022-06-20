@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Manager;
 
 use App\Http\Controllers\Controller;
 use App\Models\EnergyResourceLog;
+use App\Models\Expense;
+use App\Models\Income;
 use Illuminate\Support\Facades\DB;
 
 class ReportController extends Controller
@@ -31,7 +33,7 @@ class ReportController extends Controller
 
         $expense = (function () use ($queryParam) {
 
-            $query = DB::table('expenses')
+            $query = Expense::query()
                 ->select(DB::raw('SUM(amount) as total_amount'));
 
             if ($queryParam['dateStartAt'] && $queryParam['dateEndAt']) {
@@ -45,7 +47,7 @@ class ReportController extends Controller
 
         $income = (function () use ($queryParam) {
 
-            $query = DB::table('incomes')
+            $query = Income::query()
                 ->select(DB::raw('SUM(amount) as total_amount'));
 
             if ($queryParam['dateStartAt'] && $queryParam['dateEndAt']) {
@@ -135,7 +137,12 @@ class ReportController extends Controller
 
     private function incomeYearSummary(): array
     {
-        $incomeRows = DB::table('incomes')->select(DB::raw("DATE_FORMAT(created_at, '%Y-%m') as month_year"), DB::raw('SUM(amount) as total_amount'))->whereYear('created_at', date('Y'))->groupBy('month_year')->get();
+        $incomeRows = Income::query()
+            ->select(DB::raw("DATE_FORMAT(created_at, '%Y-%m') as month_year"), DB::raw('SUM(amount) as total_amount'))
+            ->whereYear('created_at', date('Y'))
+            ->groupBy('month_year')
+            ->get();
+
         $result = $this->generateYearSummaryStructure();
 
         foreach ($incomeRows as $key => $incomeRow) {
@@ -149,7 +156,11 @@ class ReportController extends Controller
 
     private function expenseYearSummary(): array
     {
-        $incomeRows = DB::table('expenses')->select(DB::raw("DATE_FORMAT(created_at, '%Y-%m') as month_year"), DB::raw('SUM(amount) as total_amount'))->whereYear('created_at', date('Y'))->groupBy('month_year')->get();
+        $incomeRows = Expense::query()
+            ->select(DB::raw("DATE_FORMAT(created_at, '%Y-%m') as month_year"), DB::raw('SUM(amount) as total_amount'))
+            ->whereYear('created_at', date('Y'))
+            ->groupBy('month_year')
+            ->get();
         $result = $this->generateYearSummaryStructure();
 
         foreach ($incomeRows as $key => $incomeRow) {
