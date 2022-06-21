@@ -112,6 +112,9 @@
             chart: {
                 type: "column",
             },
+            credits: {
+                enabled: false,
+            },
             title: {
                 text: "ต้นทุน, ยอดขาย, กำไร",
             },
@@ -123,7 +126,6 @@
                 crosshair: true,
             },
             yAxis: {
-                min: 0,
                 title: {
                     text: "จำนวนเงิน (บาท)",
                 },
@@ -202,7 +204,6 @@
                 crosshair: true,
             },
             yAxis: {
-                min: 0,
                 title: {
                     text: "จำนวนเงิน (บาท)",
                 },
@@ -279,7 +280,6 @@
                 crosshair: true,
             },
             yAxis: {
-                min: 0,
                 title: {
                     text: "จำนวนเงิน (บาท)",
                 },
@@ -356,7 +356,6 @@
                 crosshair: true,
             },
             yAxis: {
-                min: 0,
                 title: {
                     text: "จำนวนเงิน (บาท)",
                 },
@@ -422,6 +421,9 @@
             chart: {
                 type: "column",
             },
+            credits: {
+                enabled: false,
+            },
             title: {
                 text: "ต้นทุน, ยอดขาย, กำไร 7 วันล่าสุด",
             },
@@ -433,7 +435,6 @@
                 crosshair: true,
             },
             yAxis: {
-                min: 0,
                 title: {
                     text: "จำนวนเงิน (บาท)",
                 },
