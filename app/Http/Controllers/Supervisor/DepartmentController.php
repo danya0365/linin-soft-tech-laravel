@@ -43,7 +43,7 @@ class DepartmentController extends Controller
 
             $departmentDailyCostLog->save();
 
-            ExpenseManager::create(ExpenseType::DepartmentSalary(), $departmentDailyCostLog, $departmentDailyCostLog->cost);
+            ExpenseManager::create(ExpenseType::DepartmentSalary(), $departmentDailyCostLog, $departmentDailyCostLog->cost, $departmentDailyCostLog->daily_date);
 
             return redirect()->back()->with('success', 'DepartmentDailyCostLog submit successfully');
         }
