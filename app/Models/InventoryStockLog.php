@@ -25,8 +25,7 @@ class InventoryStockLog extends Model
 {
     use SoftDeletes;
 
-    static $rules = [
-    ];
+    static $rules = [];
 
     protected $perPage = 20;
 
@@ -35,8 +34,10 @@ class InventoryStockLog extends Model
      *
      * @var array
      */
-    protected $fillable = ['employee_id','inventory_id','type','quantity','cost'];
+    protected $fillable = ['employee_id', 'inventory_id', 'type', 'quantity', 'cost'];
 
-
-
+    public function inventory()
+    {
+        return $this->belongsTo(Inventory::class);
+    }
 }
