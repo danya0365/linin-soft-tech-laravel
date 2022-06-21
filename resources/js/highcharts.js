@@ -112,6 +112,9 @@
             chart: {
                 type: "column",
             },
+            credits: {
+                enabled: false,
+            },
             title: {
                 text: "ต้นทุน, ยอดขาย, กำไร",
             },
@@ -121,20 +124,16 @@
             xAxis: {
                 categories: categories,
                 crosshair: true,
-                labels: {
-                    formatter: function () {
-                        return this.value;
-                    },
-                },
             },
             yAxis: {
-                min: 0,
                 title: {
                     text: "จำนวนเงิน (บาท)",
                 },
                 labels: {
                     formatter: function () {
-                        return this.value;
+                        return (
+                            Math.round(this.value * 100) / 100
+                        ).toLocaleString();
                     },
                 },
             },
@@ -205,13 +204,14 @@
                 crosshair: true,
             },
             yAxis: {
-                min: 0,
                 title: {
                     text: "จำนวนเงิน (บาท)",
                 },
                 labels: {
                     formatter: function () {
-                        return this.value;
+                        return (
+                            Math.round(this.value * 100) / 100
+                        ).toLocaleString();
                     },
                 },
             },
@@ -278,20 +278,16 @@
             xAxis: {
                 categories: categories,
                 crosshair: true,
-                labels: {
-                    formatter: function () {
-                        return this.value;
-                    },
-                },
             },
             yAxis: {
-                min: 0,
                 title: {
                     text: "จำนวนเงิน (บาท)",
                 },
                 labels: {
                     formatter: function () {
-                        return this.value;
+                        return (
+                            Math.round(this.value * 100) / 100
+                        ).toLocaleString();
                     },
                 },
             },
@@ -358,20 +354,16 @@
             xAxis: {
                 categories: categories,
                 crosshair: true,
-                labels: {
-                    formatter: function () {
-                        return this.value;
-                    },
-                },
             },
             yAxis: {
-                min: 0,
                 title: {
                     text: "จำนวนเงิน (บาท)",
                 },
                 labels: {
                     formatter: function () {
-                        return this.value;
+                        return (
+                            Math.round(this.value * 100) / 100
+                        ).toLocaleString();
                     },
                 },
             },
@@ -429,6 +421,9 @@
             chart: {
                 type: "column",
             },
+            credits: {
+                enabled: false,
+            },
             title: {
                 text: "ต้นทุน, ยอดขาย, กำไร 7 วันล่าสุด",
             },
@@ -438,20 +433,16 @@
             xAxis: {
                 categories: categories,
                 crosshair: true,
-                labels: {
-                    formatter: function () {
-                        return this.value;
-                    },
-                },
             },
             yAxis: {
-                min: 0,
                 title: {
                     text: "จำนวนเงิน (บาท)",
                 },
                 labels: {
                     formatter: function () {
-                        return this.value;
+                        return (
+                            Math.round(this.value * 100) / 100
+                        ).toLocaleString();
                     },
                 },
             },
