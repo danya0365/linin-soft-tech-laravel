@@ -27,6 +27,7 @@
                                     <th>Import/Export</th>
                                     <th>จำนวน - Count</th>
                                     <th>ค่าใช้จ่าย - Cost (Thai Baht)</th>
+                                    <th></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -44,6 +45,12 @@
                                         <td class="text-center">{{ $inventoryLog->type }}</td>
                                         <td class="text-center">{{ $inventoryLog->quantity }}</td>
                                         <td class="text-center">{{ number_format($inventoryLog->cost) }}</td>
+                                        <td>
+                                            <form class="delete-form" action="{{ route('worker.stock.inventory.delete', $inventoryLog->id) }}" method="POST">
+                                                @csrf
+                                                <button type="submit" class="btn btn-danger btn-sm"><i class="fa fa-fw fa-trash"></i> Delete</button>
+                                            </form>
+                                        </td>
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -58,4 +65,14 @@
         </div>
     </div>
 </div>
+<script>
+    $(function(){
+        $('.delete-form').on('submit', function(e){
+            if (!confirm("Are you sure?")) {
+                return false;
+            }
+            return true
+        })
+    });
+</script>
 @endsection

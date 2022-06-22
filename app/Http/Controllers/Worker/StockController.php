@@ -96,6 +96,38 @@ class StockController extends Controller
         );
     }
 
+    public function deleteInventory($inventoryId)
+    {
+        $inventoryStockLog = InventoryStockLog::find($inventoryId);
+
+        $inventory = Inventory::find($inventoryStockLog->inventory_id);
+
+        if ($inventoryStockLog->type == 'import') {
+            $inventory->total_quantity -= $inventoryStockLog->quantity;
+            if ($inventory->total_quantity < 0) {
+                return redirect()->back()->with('error', 'ไม่สามารถลบได้');
+            }
+            $inventory->remain_quantity -= $inventoryStockLog->quantity;
+            if ($inventory->remain_quantity < 0) {
+                return redirect()->back()->with('error', 'ไม่สามารถลบได้');
+            }
+            $inventory->save();
+        }
+
+        if ($inventoryStockLog->type == 'export') {
+            $inventory->remain_quantity += $inventoryStockLog->quantity;
+            if ($inventory->remain_quantity > $inventory->total_quantity) {
+                return redirect()->back()->with('error', 'ไม่สามารถลบได้');
+            }
+            $inventory->save();
+            ExpenseManager::delete($inventoryStockLog);
+        }
+
+        $inventoryStockLog->delete();
+
+        return redirect()->back();
+    }
+
     public function getInventoryIncreaseStock($inventoryId)
     {
         $inventory = Inventory::with('inventoryGroup')->find($inventoryId);
