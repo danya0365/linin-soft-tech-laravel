@@ -15,7 +15,7 @@
                 <div class="card-header">{{ __('Supervisor Menu') }}</div>
                 <div class="card-body">
                     <div class="row g-2">
-                        <div class="col-sm-6">
+                        <div class="col-sm-4">
                             <a href="{{ route('supervisor.customer') }}">
                                 <div class="p-3 border bg-light" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 110px">
@@ -27,13 +27,25 @@
                                 </div>
                             </a>
                         </div>
-                        <div class="col-sm-6">
+                        <div class="col-sm-4">
                             <a href="{{ route('supervisor.department') }}">
                                 <div class="p-3 border bg-light" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center">
                                         <div class="bi bi-people-fill" style="font-size: 3em"></div>
                                     </div>
                                     <div class="text-center">{{ __('แผนก - Department') }}</div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-sm-4">
+                            <a href="{{ route('supervisor.report') }}">
+                                <div class="p-3 border bg-light" style="min-height: 150px">
+                                    <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 110px">
+                                        <div class="text-center">
+                                            <div class="fa-solid fa-chart-pie" style="font-size: 3em"></div>
+                                            <div class="text-center mt-3">{{ __('รายงานสถิติ - Report') }}</div>
+                                        </div>
+                                    </div>
                                 </div>
                             </a>
                         </div>

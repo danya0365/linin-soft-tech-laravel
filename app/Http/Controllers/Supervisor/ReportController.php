@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Manager;
+namespace App\Http\Controllers\Supervisor;
 
 use App\Http\Controllers\Controller;
 use App\Managers\HighChartManager;
@@ -13,7 +13,7 @@ class ReportController extends Controller
         $energySummary = HighChartManager::getEnergySummary(request()->get('energy'));
 
         return view(
-            'manager.reports.index',
+            'supervisor.reports.index',
             [
                 'overallSummary' => $overallSummary,
                 'energySummary' => $energySummary
