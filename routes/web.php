@@ -90,6 +90,10 @@ Route::group(['prefix' => 'supervisor', 'middleware' => ['supervisor']], functio
         Route::get('/billing-logs', [App\Http\Controllers\Supervisor\CustomerController::class, 'getBillingLog'])->name('supervisor.customer.billing-logs');
         Route::match(array('GET', 'POST', 'DELETE'), '/billing-logs/{id}/delete', [App\Http\Controllers\Supervisor\CustomerController::class, 'deleteBillingLog'])->name('supervisor.customer.billing-logs.delete');
     });
+
+    Route::group(['prefix' => 'report'], function () {
+        Route::get('/', [App\Http\Controllers\Supervisor\ReportController::class, 'index'])->name('supervisor.report');
+    });
 });
 
 Route::group(['prefix' => 'worker', 'middleware' => ['auth']], function () {
