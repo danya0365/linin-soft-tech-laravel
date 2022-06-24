@@ -215,25 +215,89 @@ class StockController extends Controller
     public function showInventoryLogsById($inventoryId)
     {
         $inventory = Inventory::with('inventoryGroup')->find($inventoryId);
-        $inventoryLogs = InventoryStockLog::where("inventory_id", $inventory->id)->orderBy('id', 'desc')->paginate();
+        $sortOrders = [
+            ['var' => 'id-desc', 'name' => 'ใหม่ที่สุด - Newest'],
+            ['var' => 'id-asc', 'name' => 'เก่าที่สุด - Oldest'],
+        ];
+
+        $sortOrderSelected = request()->get('sort_order', 'id-desc');
+
+        $query = InventoryStockLog::with(['inventory' => function ($query) {
+            $query->with('inventoryGroup');
+        }])->where("inventory_id", $inventory->id);
+
+        $dateStartAt = request()->get('date_start_at');
+        $dateEndAt = request()->get('date_end_at');
+        if ($dateStartAt && $dateEndAt) {
+            $query->whereBetween('created_at', [$dateStartAt . ' 00:00:00', $dateEndAt . ' 23:59:59']);
+        }
+
+        if ($sortOrderSelected) {
+            list($sort, $order) = explode('-', $sortOrderSelected);
+            $query->orderBy($sort, $order);
+        }
+
+        $inventoryLogs = $query->paginate();
+
         return view(
             'worker.stocks.inventory-logs-by-id',
             [
                 'inventory' => $inventory,
-                'inventoryLogs' => $inventoryLogs
+                'inventoryLogs' => $inventoryLogs,
+                'sortOrders' => $sortOrders,
+                'sortOrderSelected' => $sortOrderSelected,
+                'dateStartAt' => $dateStartAt,
+                'dateEndAt' => $dateEndAt
             ]
         );
     }
 
     public function showInventoriesLogs()
     {
-        $inventoryLogs = InventoryStockLog::with(['inventory' => function ($query) {
+        $sortOrders = [
+            ['var' => 'id-desc', 'name' => 'ใหม่ที่สุด - Newest'],
+            ['var' => 'id-asc', 'name' => 'เก่าที่สุด - Oldest'],
+        ];
+
+        $sortOrderSelected = request()->get('sort_order', 'id-desc');
+        $inventoryGroupSelected = request()->get('inventory_group_id');
+
+        $query = InventoryStockLog::with(['inventory' => function ($query) {
             $query->with('inventoryGroup');
-        }])->orderBy('id', 'desc')->paginate();
+        }]);
+
+        if ($inventoryGroupSelected) {
+            $query->where(function ($query) use ($inventoryGroupSelected) {
+                $query->whereHas('inventory', function ($query) use ($inventoryGroupSelected) {
+                    $query->where('inventory_group_id', $inventoryGroupSelected);
+                });
+            });
+        }
+
+        $dateStartAt = request()->get('date_start_at');
+        $dateEndAt = request()->get('date_end_at');
+        if ($dateStartAt && $dateEndAt) {
+            $query->whereBetween('created_at', [$dateStartAt . ' 00:00:00', $dateEndAt . ' 23:59:59']);
+        }
+
+        if ($sortOrderSelected) {
+            list($sort, $order) = explode('-', $sortOrderSelected);
+            $query->orderBy($sort, $order);
+        }
+
+        $inventoryLogs = $query->paginate();
+        $inventoryGroups = InventoryGroup::get();
+
         return view(
             'worker.stocks.inventories-logs',
             [
-                'inventoryLogs' => $inventoryLogs
+                'inventoryLogs' => $inventoryLogs,
+                'inventoryGroups' => $inventoryGroups,
+                'sortOrders' => $sortOrders,
+                'sortOrderSelected' => $sortOrderSelected,
+                'inventoryGroupSelected' => $inventoryGroupSelected,
+                'dateStartAt' => $dateStartAt,
+                'dateEndAt' => $dateEndAt
             ]
         );
     }
