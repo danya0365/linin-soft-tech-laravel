@@ -57,6 +57,22 @@ class CustomerController extends Controller
         }
 
         $operations = $query->paginate();
+
+        $summary = (function () {
+            $query = CustomerOperationDailySummary::select(
+                DB::raw('sum(total_wet_weight) as total_wet_weight'),
+                DB::raw('sum(total_edit_collect_weight) as total_edit_collect_weight'),
+                DB::raw('sum(total_collect_weight) as total_collect_weight'),
+                DB::raw('sum(total_billing_weight) as total_billing_weight')
+            );
+            $dateStartAt = request()->get('date_start_at');
+            $dateEndAt = request()->get('date_end_at');
+            if ($dateStartAt && $dateEndAt) {
+                $query->whereBetween('operation_date', [$dateStartAt, $dateEndAt]);
+            }
+            return $query->first();
+        })();
+
         return view(
             'worker.customers.operation-summary',
             [
@@ -64,7 +80,8 @@ class CustomerController extends Controller
                 'dateStartAt' => $dateStartAt,
                 'dateEndAt' => $dateEndAt,
                 'sortOrders' => $sortOrders,
-                'sortOrderSelected' => $sortOrderSelected
+                'sortOrderSelected' => $sortOrderSelected,
+                'summary' => $summary
             ]
         )
             ->with('i', (request()->input('page', 1) - 1) * $operations->perPage());
