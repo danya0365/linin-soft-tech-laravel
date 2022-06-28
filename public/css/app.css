@@ -29222,7 +29222,8 @@ a:active {
 .bg-navy {
   background-color: #4b91d0;
 }
-.bg-navy a {
+.bg-navy a,
+.bg-navy div {
   color: #ffffff;
 }
 .bg-navy a:link {
@@ -29243,6 +29244,14 @@ a:active {
 }
 .bg-navy .dropdown-menu {
   background-color: #4b91d0;
+}
+
+.bg-brown {
+  background-color: #4c3a00;
+}
+.bg-brown a,
+.bg-brown div {
+  color: #ffffff;
 }
 .hover\:bg-gray-700:hover{
   --tw-bg-opacity: 1;
