@@ -16,7 +16,8 @@ a:active {
 .bg-navy {
     background-color: rgba(75, 145, 208, 1);
 
-    a {
+    a,
+    div {
         color: #ffffff;
     }
     a:link {
@@ -39,5 +40,14 @@ a:active {
 
     .dropdown-menu {
         background-color: rgba(75, 145, 208, 1);
+    }
+}
+
+.bg-brown {
+    background-color: rgba(76, 58, 0, 1);
+
+    a,
+    div {
+        color: #ffffff;
     }
 }
