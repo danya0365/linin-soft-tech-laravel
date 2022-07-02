@@ -17,11 +17,11 @@
                     <div class="row g-2">
                         <div class="col-sm-4">
                             <a href="{{ route('supervisor.customer') }}">
-                                <div class="p-3 border bg-light" style="min-height: 150px">
+                                <div class="p-3 border bg-success" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 110px">
                                         <div class="text-center">
-                                            <div class="fa-solid fa-hospital" style="font-size: 3em"></div>
-                                            <div class="text-center mt-3">{{ __('ลูกค้า - Customer') }}</div>
+                                            <div class="fa-solid fa-hospital text-light" style="font-size: 3em"></div>
+                                            <div class="text-center mt-3 text-light">{{ __('ลูกค้า - Customer') }}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -29,21 +29,21 @@
                         </div>
                         <div class="col-sm-4">
                             <a href="{{ route('supervisor.department') }}">
-                                <div class="p-3 border bg-light" style="min-height: 150px">
+                                <div class="p-3 border bg-info" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center">
-                                        <div class="bi bi-people-fill" style="font-size: 3em"></div>
+                                        <div class="bi bi-people-fill text-light" style="font-size: 3em"></div>
                                     </div>
-                                    <div class="text-center">{{ __('แผนก - Department') }}</div>
+                                    <div class="text-center text-light">{{ __('แผนก - Department') }}</div>
                                 </div>
                             </a>
                         </div>
                         <div class="col-sm-4">
                             <a href="{{ route('supervisor.report') }}">
-                                <div class="p-3 border bg-light" style="min-height: 150px">
+                                <div class="p-3 border bg-warning" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 110px">
                                         <div class="text-center">
-                                            <div class="fa-solid fa-chart-pie" style="font-size: 3em"></div>
-                                            <div class="text-center mt-3">{{ __('รายงานสถิติ - Report') }}</div>
+                                            <div class="fa-solid fa-chart-pie text-light" style="font-size: 3em"></div>
+                                            <div class="text-center mt-3 text-light">{{ __('รายงานสถิติ - Report') }}</div>
                                         </div>
                                     </div>
                                 </div>

@@ -4,7 +4,7 @@
             {{ config('app.name', 'Laravel') }}
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
-            <span class="navbar-toggler-icon"></span>
+            <span class="fa-solid fa-bars text-light"></span>
         </button>
 
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
@@ -30,13 +30,16 @@
                     @endif
                 @else
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('worker') }}">{{ __('พนักงาน - Worker') }}</a>
+                        <a class="nav-link" href="{{ route('worker') }}">{{ __('Worker') }}</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('supervisor') }}">{{ __('ผู้คุม - Supervisor') }}</a>
+                        <a class="nav-link" href="{{ route('supervisor') }}">{{ __('Supervisor') }}</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('setting') }}">{{ __('ตั้งค่า - Setting') }}</a>
+                        <a class="nav-link" href="{{ route('manager') }}">{{ __('Manager') }}</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('setting') }}">{{ __('Setting') }}</a>
                     </li>
                     <li class="nav-item dropdown">
                         <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>

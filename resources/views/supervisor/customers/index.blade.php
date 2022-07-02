@@ -15,25 +15,25 @@
                 <div class="card-header">Customer</div>
                 <div class="card-body">
                     <div class="row g-2">
-                        <div class="col-sm-12">
+                        <div class="col-sm-6">
                             <a href="{{ route('supervisor.customer.new-billing') }}">
-                                <div class="p-3 border bg-light" style="min-height: 150px">
+                                <div class="p-3 border bg-navy" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 150px">
                                         <div class="text-center">
-                                            <div class="fa-solid fa-money-bill" style="font-size: 3em"></div>
-                                            <div class="text-center mt-3">{{ __('เพิ่มบิลรายรับ - New Income Billing') }}</div>
+                                            <div class="fa-solid fa-money-bill text-light" style="font-size: 3em"></div>
+                                            <div class="text-center mt-3 text-light">{{ __('เพิ่มบิลรายรับ - New Income Billing') }}</div>
                                         </div>
                                     </div>
                                 </div>
                             </a>
                         </div>
-                        <div class="col-sm-12">
+                        <div class="col-sm-6">
                             <a href="{{ route('supervisor.customer.billing-logs') }}">
-                                <div class="p-3 border bg-light" style="min-height: 150px">
+                                <div class="p-3 border bg-navy" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 150px">
                                         <div class="text-center">
-                                            <div class="fa-solid fa-history" style="font-size: 3em"></div>
-                                            <div class="text-center mt-3">{{ __('ประวัติบิลรายรับ - Income Billing Logs') }}</div>
+                                            <div class="fa-solid fa-history text-light" style="font-size: 3em"></div>
+                                            <div class="text-center mt-3 text-light">{{ __('ประวัติบิลรายรับ - Income Billing Logs') }}</div>
                                         </div>
                                     </div>
                                 </div>

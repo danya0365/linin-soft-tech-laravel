@@ -17,11 +17,11 @@
                     <div class="row g-2">
                         <div class="col-sm-4">
                             <a href="{{ route('users.index') }}">
-                                <div class="p-3 border bg-light" style="min-height: 150px">
+                                <div class="p-3 border bg-navy" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 110px">
                                         <div class="text-center">
-                                            <div class="fa-solid fa-people-group" style="font-size: 3em"></div>
-                                            <div class="text-center mt-3">{{ __('ไอดีล็อกอิน') }}</div>
+                                            <div class="fa-solid fa-people-group text-light" style="font-size: 3em"></div>
+                                            <div class="text-center mt-3 text-light">{{ __('ไอดีล็อกอิน') }}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -29,11 +29,11 @@
                         </div>
                         <div class="col-sm-4">
                             <a href="{{ route('customer-groups.index') }}">
-                                <div class="p-3 border bg-light" style="min-height: 150px">
+                                <div class="p-3 border bg-navy" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 110px">
                                         <div class="text-center">
-                                            <div class="fa-solid fa-building-user" style="font-size: 3em"></div>
-                                            <div class="text-center mt-3">{{ __('กลุ่มลูกค้า') }}</div>
+                                            <div class="fa-solid fa-building-user text-light" style="font-size: 3em"></div>
+                                            <div class="text-center mt-3 text-light">{{ __('กลุ่มลูกค้า') }}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -41,11 +41,11 @@
                         </div>
                         <div class="col-sm-4">
                             <a href="{{ route('customers.index') }}">
-                                <div class="p-3 border bg-light" style="min-height: 150px">
+                                <div class="p-3 border bg-navy" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 110px">
                                         <div class="text-center">
-                                            <div class="fa-solid fa-building-user" style="font-size: 3em"></div>
-                                            <div class="text-center mt-3">{{ __('ลูกค้า') }}</div>
+                                            <div class="fa-solid fa-building-user text-light" style="font-size: 3em"></div>
+                                            <div class="text-center mt-3 text-light">{{ __('ลูกค้า') }}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -53,11 +53,11 @@
                         </div>
                         <div class="col-sm-4">
                             <a href="{{ route('departments.index') }}">
-                                <div class="p-3 border bg-light" style="min-height: 150px">
+                                <div class="p-3 border bg-navy" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 110px">
                                         <div class="text-center">
-                                            <div class="fa-solid fa-people-roof" style="font-size: 3em"></div>
-                                            <div class="text-center mt-3">{{ __('แผนกพนักงาน') }}</div>
+                                            <div class="fa-solid fa-people-roof text-light" style="font-size: 3em"></div>
+                                            <div class="text-center mt-3 text-light">{{ __('แผนกพนักงาน') }}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -65,11 +65,11 @@
                         </div>
                         <div class="col-sm-4">
                             <a href="{{ route('employees.index') }}">
-                                <div class="p-3 border bg-light" style="min-height: 150px">
+                                <div class="p-3 border bg-navy" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 110px">
                                         <div class="text-center">
-                                            <div class="fa-solid fa-person-digging" style="font-size: 3em"></div>
-                                            <div class="text-center mt-3">{{ __('พนักงาน') }}</div>
+                                            <div class="fa-solid fa-person-digging text-light" style="font-size: 3em"></div>
+                                            <div class="text-center mt-3 text-light">{{ __('พนักงาน') }}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -77,11 +77,11 @@
                         </div>
                         <div class="col-sm-4">
                             <a href="{{ route('linen-types.index') }}">
-                                <div class="p-3 border bg-light" style="min-height: 150px">
+                                <div class="p-3 border bg-navy" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 110px">
                                         <div class="text-center">
-                                            <div class="fa-solid fa-shirt" style="font-size: 3em"></div>
-                                            <div class="text-center mt-3">{{ __('ชนิดผ้า') }}</div>
+                                            <div class="fa-solid fa-shirt text-light" style="font-size: 3em"></div>
+                                            <div class="text-center mt-3 text-light">{{ __('ชนิดผ้า') }}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -89,11 +89,11 @@
                         </div>
                         <div class="col-sm-4">
                             <a href="{{ route('linen-products.index') }}">
-                                <div class="p-3 border bg-light" style="min-height: 150px">
+                                <div class="p-3 border bg-navy" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 110px">
                                         <div class="text-center">
-                                            <div class="fa-solid fa-shirt" style="font-size: 3em"></div>
-                                            <div class="text-center mt-3">{{ __('ผ้า') }}</div>
+                                            <div class="fa-solid fa-shirt text-light" style="font-size: 3em"></div>
+                                            <div class="text-center mt-3 text-light">{{ __('ผ้า') }}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -101,11 +101,11 @@
                         </div>
                         <div class="col-sm-4">
                             <a href="{{ route('washing-machines.index') }}">
-                                <div class="p-3 border bg-light" style="min-height: 150px">
+                                <div class="p-3 border bg-navy" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 110px">
                                         <div class="text-center">
-                                            <div class="fa-solid fa-shirt" style="font-size: 3em"></div>
-                                            <div class="text-center mt-3">{{ __('เครื่องซักผ้า') }}</div>
+                                            <div class="fa-solid fa-shirt text-light" style="font-size: 3em"></div>
+                                            <div class="text-center mt-3 text-light">{{ __('เครื่องซักผ้า') }}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -113,11 +113,11 @@
                         </div>
                         <div class="col-sm-4">
                             <a href="{{ route('dryer-machines.index') }}">
-                                <div class="p-3 border bg-light" style="min-height: 150px">
+                                <div class="p-3 border bg-navy" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 110px">
                                         <div class="text-center">
-                                            <div class="fa-solid fa-fire" style="font-size: 3em"></div>
-                                            <div class="text-center mt-3">{{ __('เครื่องอบผ้า') }}</div>
+                                            <div class="fa-solid fa-fire text-light" style="font-size: 3em"></div>
+                                            <div class="text-center mt-3 text-light">{{ __('เครื่องอบผ้า') }}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -125,11 +125,11 @@
                         </div>
                         <div class="col-sm-4">
                             <a href="{{ route('trucks.index') }}">
-                                <div class="p-3 border bg-light" style="min-height: 150px">
+                                <div class="p-3 border bg-navy" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 110px">
                                         <div class="text-center">
-                                            <div class="fa-solid fa-truck" style="font-size: 3em"></div>
-                                            <div class="text-center mt-3">{{ __('รถบรรทุก') }}</div>
+                                            <div class="fa-solid fa-truck text-light" style="font-size: 3em"></div>
+                                            <div class="text-center mt-3 text-light">{{ __('รถบรรทุก') }}</div>
                                         </div>
                                     </div>
                                 </div>
