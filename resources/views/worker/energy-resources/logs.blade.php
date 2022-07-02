@@ -61,7 +61,7 @@
                         </div>
                     @endif
 
-                    <div class="table-responsive">
+                    <div class="table-responsive mb-2">
                         <table class="table table-bordered table-hover">
                             <thead class="thead">
                                 <tr>
@@ -94,6 +94,32 @@
                             </tbody>
                         </table>
                     </div>
+
+                    <div class="table-responsive mb-2">
+                        <table class="table table-bordered table-hover">
+                            <thead class="thead">
+                                <tr>
+                                    <th>พลังงาน</th>
+                                    <th>จำนวนรวม</th>
+                                    <th>ค่าใช้จ่ายรวม</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($energyResourceSums as $energyResourceSum)
+                                    <tr>
+                                        <td>{{ $energyResourceSum->energyResource->name ?? '-' }}</td>
+                                        <td class="text-center">
+                                            {{ number_format($energyResourceSum->total_value) }}
+                                        </td>
+                                        <td class="text-center">
+                                            {{ number_format($energyResourceSum->total_cost) }}
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+
                 </div>
                 <div class="card-footer">
                     {!! $energyResourceLogs->withQueryString()->links() !!}

@@ -60,11 +60,38 @@ class EnergyResourceLogController extends Controller
 
         $energyResources = EnergyResource::get();
 
+        $energyResourceSums = (function () use ($energyResourceSelected) {
+            $query = EnergyResourceLog::with('energyResource')->select(
+                DB::raw('sum(value) as total_value'),
+                DB::raw('sum(cost) as total_cost'),
+                'energy_resource_id'
+            )
+                ->groupBy('energy_resource_id');
+
+            $query->whereNotNull("energy_resource_id")->whereNotNull("value")->whereNotNull("unit");
+
+            if ($energyResourceSelected) {
+                $query->where(function ($query) use ($energyResourceSelected) {
+                    $query->where('energy_resource_id', $energyResourceSelected);
+                });
+            }
+
+            $dateStartAt = request()->get('date_start_at');
+            $dateEndAt = request()->get('date_end_at');
+            if ($dateStartAt && $dateEndAt) {
+                $query->whereBetween('created_at', [$dateStartAt . ' 00:00:00', $dateEndAt . ' 23:59:59']);
+            }
+            return $query->get();
+        })();
+
+
+
         return view(
             'worker.energy-resources.logs',
             [
                 'energyResources' => $energyResources,
                 'energyResourceLogs' => $energyResourceLogs,
+                'energyResourceSums' => $energyResourceSums,
                 'sortOrders' => $sortOrders,
                 'sortOrderSelected' => $sortOrderSelected,
                 'energyResourceSelected' => $energyResourceSelected,
