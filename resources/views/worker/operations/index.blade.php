@@ -17,11 +17,11 @@
                     <div class="row g-2">
                         <div class="col-sm-4">
                             <a href="{{ route('worker.operation.wash') }}">
-                                <div class="p-3 border bg-light" style="min-height: 150px">
+                                <div class="p-3 border bg-navy" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 150px">
                                         <div class="text-center">
-                                            <div class="fa-solid fa-droplet" style="font-size: 3em"></div>
-                                            <div class="text-center mt-3">{{ __('ซัก - Wash') }}</div>
+                                            <div class="fa-solid fa-droplet text-light" style="font-size: 3em"></div>
+                                            <div class="text-center mt-3 text-light">{{ __('ซัก - Wash') }}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -29,11 +29,11 @@
                         </div>
                         <div class="col-sm-4">
                             <a href="{{ route('worker.operation.dry') }}">
-                                <div class="p-3 border bg-light" style="min-height: 150px">
+                                <div class="p-3 border bg-navy" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 150px">
                                         <div class="text-center">
-                                            <div class="fa-solid fa-fire" style="font-size: 3em"></div>
-                                            <div class="text-center mt-3">{{ __('อบ - Dry') }}</div>
+                                            <div class="fa-solid fa-fire text-light" style="font-size: 3em"></div>
+                                            <div class="text-center mt-3 text-light">{{ __('อบ - Dry') }}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -41,11 +41,11 @@
                         </div>
                         <div class="col-sm-4">
                             <a href="{{ route('worker.operation.iron') }}">
-                                <div class="p-3 border bg-light" style="min-height: 150px">
+                                <div class="p-3 border bg-navy" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 150px">
                                         <div class="text-center">
-                                            <div class="fa-solid fa-print" style="font-size: 3em"></div>
-                                            <div class="text-center mt-3">{{ __('รีด - Iron') }}</div>
+                                            <div class="fa-solid fa-print text-light" style="font-size: 3em"></div>
+                                            <div class="text-center mt-3 text-light">{{ __('รีด - Iron') }}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -53,11 +53,11 @@
                         </div>
                         <div class="col-sm-4">
                             <a href="{{ route('worker.operation.packing') }}">
-                                <div class="p-3 border bg-light" style="min-height: 150px">
+                                <div class="p-3 border bg-navy" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 150px">
                                         <div class="text-center">
-                                            <div class="fa-solid fa-people-carry-box" style="font-size: 3em"></div>
-                                            <div class="text-center mt-3">{{ __('พับแพ็ค - Packing') }}</div>
+                                            <div class="fa-solid fa-people-carry-box text-light" style="font-size: 3em"></div>
+                                            <div class="text-center mt-3 text-light">{{ __('พับแพ็ค - Packing') }}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -65,11 +65,11 @@
                         </div>
                         <div class="col-sm-4">
                             <a href="{{ route('worker.operation.collect') }}">
-                                <div class="p-3 border bg-light" style="min-height: 150px">
+                                <div class="p-3 border bg-navy" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 150px">
                                         <div class="text-center">
-                                            <div class="fa-solid fa-check-to-slot" style="font-size: 3em"></div>
-                                            <div class="text-center mt-3">{{ __('จัดเก็บ - Collect') }}</div>
+                                            <div class="fa-solid fa-check-to-slot text-light" style="font-size: 3em"></div>
+                                            <div class="text-center mt-3 text-light">{{ __('จัดเก็บ - Collect') }}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -77,11 +77,11 @@
                         </div>
                         <div class="col-sm-4">
                             <a href="{{ route('worker.operation.deliver') }}">
-                                <div class="p-3 border bg-light" style="min-height: 150px">
+                                <div class="p-3 border bg-navy" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 150px">
                                         <div class="text-center">
-                                            <div class="fa-solid fa-truck" style="font-size: 3em"></div>
-                                            <div class="text-center mt-3">{{ __('จัดส่ง - Deliver') }}</div>
+                                            <div class="fa-solid fa-truck text-light" style="font-size: 3em"></div>
+                                            <div class="text-center mt-3 text-light">{{ __('จัดส่ง - Deliver') }}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -89,11 +89,11 @@
                         </div>
                         <div class="col-sm-12">
                             <a href="{{ route('worker.operation.in-progress') }}">
-                                <div class="p-3 border bg-light" style="min-height: 150px">
+                                <div class="p-3 border bg-navy" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 150px">
                                         <div class="text-center">
-                                            <div class="fa-solid fa-hourglass" style="font-size: 3em"></div>
-                                            <div class="text-center mt-3">{{ __('ปฎิบัติการที่ยังไม่จบงาน - In Progress Operation') }}</div>
+                                            <div class="fa-solid fa-hourglass text-light" style="font-size: 3em"></div>
+                                            <div class="text-center mt-3 text-light">{{ __('ปฎิบัติการที่ยังไม่จบงาน - In Progress Operation') }}</div>
                                         </div>
                                     </div>
                                 </div>
