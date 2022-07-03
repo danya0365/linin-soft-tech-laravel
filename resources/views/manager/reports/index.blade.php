@@ -89,6 +89,31 @@
         </div>
         <div class="col-md-12 m-2">
             <div class="card">
+                <div class="card-header">ต้นทุน, ยอดขาย, ตามวันที่เลือก</div>
+                <div class="card-body text-center">
+                    <form id="sales-range-days-form" class="row row-cols-lg-auto g-3 align-items-center mb-2" action="{{ request()->url() }}" method="GET">
+
+                        <div class="col-12">
+                            <div class="input-group">
+                                <input type="date" name="sales-range-days-start-at" value="" class="form-control" placeholder="วันที่เริ่ม" aria-label="วันที่เริ่ม">
+                                <span class="input-group-text"> ถึง </span>
+                                <input type="date" name="sales-range-days-end-at" value="" class="form-control" placeholder="วันที่สิ้นสุด" aria-label="วันที่สิ้นสุด">
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                            <button type="reset" class="btn btn-outline-secondary">Reset</button>
+                        </div>
+                    </form>
+                    <div id="sales-range-days-chart" style="min-width: 400px; height: 400px; margin: 0 auto">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12 m-2">
+            <div class="card">
                 <div class="card-header">ภาพรวมพลังงาน</div>
                 <div class="card-body text-center">
                     <h5 class="card-title">Summary</h5>
@@ -152,6 +177,7 @@
 </div>
 <script>
 $(function(){
+
     var salesYearSummary = @json(App\Managers\HighChartManager::getSalesYearSummary());
     $.salesChart({ 'renderTo': "sales-bar-chart", 'data': salesYearSummary});
 
@@ -165,10 +191,30 @@ $(function(){
     $.expenseDaysChart({ 'renderTo': 'expense-day-chart', 'data': expenseDaysSummary});
 
     var salesLatestDaysSummary = @json(App\Managers\HighChartManager::getSalesLatestDaysSummary());
-    $.salesLatestDaysChart({ 'renderTo': 'sales-latest-days-chart', 'data': salesLatestDaysSummary});
+    $.salesLatestDaysChart({ 'renderTo': 'sales-latest-days-chart', 'data': salesLatestDaysSummary, 'title': "ต้นทุน, ยอดขาย, กำไร 7 วันล่าสุด"});
 
     var incomeDaysSummary = @json(App\Managers\HighChartManager::getIncomeDaysSummary());
     $.incomeDaysChart({ 'renderTo': 'income-day-chart', 'data': incomeDaysSummary});
+
+    var salesRangeDaysSummary = () => {
+        var startAt = $('[name=sales-range-days-start-at]').val();
+        var endAt = $('[name=sales-range-days-end-at]').val();
+
+        var url = '{!! route('api.sales-range-days-chart', ['startAt' => 'startAtParam', 'endAt' => 'endAtParam']) !!}';
+        
+        url = url.replace('startAtParam', startAt)
+        url = url.replace('endAtParam', endAt)
+
+        $.get(url, function(response){
+            console.log('response', response);
+            $.salesLatestDaysChart({ 'renderTo': 'sales-range-days-chart', 'data': response, 'title': `ต้นทุน, ยอดขาย, กำไร วันที่ ${startAt} ถึง ${endAt}`});
+        });
+    }
+
+    $('#sales-range-days-form').on('submit', (e) => {
+        e.preventDefault();
+        salesRangeDaysSummary();
+    })
 })
 </script>
 @endsection

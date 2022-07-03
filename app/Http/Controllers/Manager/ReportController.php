@@ -20,4 +20,13 @@ class ReportController extends Controller
             ]
         );
     }
+
+    function getSalesRangeDaysChart()
+    {
+        $startAt = request()->get('startAt');
+        $endAt = request()->get('endAt');
+
+        $result = HighChartManager::getSalesLatestDaysSummary($startAt, $endAt);
+        return $result;
+    }
 }

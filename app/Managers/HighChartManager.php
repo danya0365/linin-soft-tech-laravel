@@ -199,9 +199,9 @@ class HighChartManager extends Manager
         return ['titles' => $titles, 'data' => $returnData];
     }
 
-    public static function getSalesLatestDaysSummary(): array
+    public static function getSalesLatestDaysSummary($startDateString = '', $endDateString = ''): array
     {
-        return SalesLatestDaysSummary::getInstance()->getSalesLatestDaysSummary();
+        return SalesLatestDaysSummary::getInstance()->getSalesLatestDaysSummary($startDateString, $endDateString);
     }
 
     public static function getOverallSummary($queryOverall): array

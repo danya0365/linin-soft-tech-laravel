@@ -405,7 +405,7 @@
 })(jQuery);
 
 (function ($) {
-    function salesLatestDaysChart(targetId, categories, seriesData) {
+    function salesLatestDaysChart(targetId, titleText, categories, seriesData) {
         var series = seriesData.map(function (item, index) {
             var name = item.name;
             var data = item.data.map(function (item, index) {
@@ -425,7 +425,7 @@
                 enabled: false,
             },
             title: {
-                text: "ต้นทุน, ยอดขาย, กำไร 7 วันล่าสุด",
+                text: titleText,
             },
             subtitle: {
                 text: "",
@@ -471,12 +471,14 @@
             {
                 data: null,
                 renderTo: null,
+                title: "",
             },
             options
         );
 
         salesLatestDaysChart(
             settings.renderTo,
+            settings.title,
             settings.data.titles,
             settings.data.data
         );
