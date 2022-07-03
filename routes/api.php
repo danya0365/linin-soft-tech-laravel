@@ -43,32 +43,21 @@ Route::get('/test', [App\Http\Controllers\Supervisor\ReportController::class, 's
 
 Route::get('/test-2', function () {
 
-    $currentDate = \Carbon\Carbon::now();
-    $agoDate = $currentDate->subDays(7);
-    $energyResourceData = (function ($energyResourceId) use ($agoDate) {
-        $query = EnergyResourceLog::query();
-        $query->select(
-            DB::raw('SUM(cost) as total_cost'),
-            DB::raw("DATE_FORMAT(created_at, '%Y-%m-%d') as date"),
-        );
+    $startDateString = ''; //'2022-06-22';
+    $endDateString = '2022-07-03';
 
-        $query->where('energy_resource_id', $energyResourceId)->where('created_at', '>=', $agoDate);
-        $query->groupBy('date');
+    $endDate = $endDateString ? \Carbon\Carbon::parse($endDateString) : \Carbon\Carbon::now();
+    $startDate = $startDateString ? \Carbon\Carbon::parse($startDateString) : \Carbon\Carbon::parse($endDate->format('Y-m-d'))->subDays(7);
 
-        $rows = $query->get();
+    $dates = [];
+    $period = new \DatePeriod(
+        new \DateTime($startDate->format('Y-m-d')),
+        new \DateInterval('P1D'),
+        new \DateTime($endDate->format('Y-m-d'))
+    );
 
-        $weekDayReports = [];
-        foreach ($rows as $key => $row) {
-            $date = \Carbon\Carbon::parse($row->date)->format('Y-m-d');
-            if (!isset($weekDayReports[$date])) {
-                $weekDayReports[$date] = [];
-            }
-            $row = $row->toArray();
-            $weekDayReports[$date] =  $row['total_cost'];
-        }
-
-        return $weekDayReports;
-    });
-
-    return $energyResourceData(1);
+    foreach ($period as $key => $value) {
+        $dates[] = $value;
+    }
+    return $dates;
 });
