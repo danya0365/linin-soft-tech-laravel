@@ -13,20 +13,40 @@ use Illuminate\Support\Facades\DB;
 
 class HighChartManager extends Manager
 {
-    public static function getEnergyDaysSummary()
+    private static function getDates($startDateString = '', $endDateString = '')
     {
-        $currentDate = \Carbon\Carbon::now();
-        $totalDays = 7;
-        $agoDate = $currentDate->subDays($totalDays);
+        $endDate = $endDateString ? \Carbon\Carbon::parse($endDateString) : \Carbon\Carbon::now();
+        $endDate->addDays(1);
+        $startDate = $startDateString ? \Carbon\Carbon::parse($startDateString) : \Carbon\Carbon::parse($endDate->format('Y-m-d'))->subDays(7);
 
-        $energyResourceData = (function ($energyResourceId) use ($agoDate) {
+        $dates = [];
+        $period = new \DatePeriod(
+            new \DateTime($startDate->format('Y-m-d')),
+            new \DateInterval('P1D'),
+            new \DateTime($endDate->format('Y-m-d'))
+        );
+
+        foreach ($period as $key => $value) {
+            $dates[] = $value;
+        }
+        return $dates;
+    }
+
+    public static function getEnergyDaysSummary($startDateString = '', $endDateString = '')
+    {
+        $totalDays = 7;
+        $endDate = $endDateString ? \Carbon\Carbon::parse($endDateString) : \Carbon\Carbon::now();
+        $startDate = $startDateString ? \Carbon\Carbon::parse($startDateString) : \Carbon\Carbon::parse($endDate->format('Y-m-d'))->subDays($totalDays);
+
+        $energyResourceData = (function ($energyResourceId) use ($startDate, $endDate) {
             $query = EnergyResourceLog::query();
             $query->select(
                 DB::raw('SUM(cost) as total_cost'),
                 DB::raw("DATE_FORMAT(created_at, '%Y-%m-%d') as date")
             );
 
-            $query->where('energy_resource_id', $energyResourceId)->where('created_at', '>=', $agoDate);
+            $query->where('energy_resource_id', $energyResourceId)
+                ->whereBetween('created_at', [$startDate->startOfDay(), $endDate->endOfDay()]);
             $query->groupBy('date');
 
             $rows = $query->get();
@@ -44,11 +64,11 @@ class HighChartManager extends Manager
             return $weekDayReports;
         });
 
+        $dates = self::getDates($startDateString, $endDateString);
+
         $titles = [];
-        $_date = \Carbon\Carbon::now();
-        for ($i = 0; $i < $totalDays; $i++) {
-            $date = $i > 0 ? $_date->subDays(1) : $_date;
-            $titles[] = $date->format('Y-m-d');
+        foreach ($dates as $key => $date) {
+            $titles[] = $date->format('F j, Y');
         }
 
         $energyWeekSummary = [];
@@ -56,10 +76,8 @@ class HighChartManager extends Manager
         foreach ($energyResources as $key => $energyResource) {
 
             $data = $energyResourceData($energyResource->id);
-            $_date = \Carbon\Carbon::now();
             $_data = [];
-            for ($i = 0; $i < $totalDays; $i++) {
-                $date = $i > 0 ? $_date->subDays(1) : $_date;
+            foreach ($dates as $key => $date) {
                 $dateString = $date->format('Y-m-d');
                 $_data[] = isset($data[$dateString]) ? $data[$dateString] : 0;
             }
@@ -69,20 +87,22 @@ class HighChartManager extends Manager
         return ['titles' => $titles, 'data' => $energyWeekSummary];
     }
 
-    public static function getExpenseDaysSummary()
+    public static function getExpenseDaysSummary($startDateString = '', $endDateString = '')
     {
-        $currentDate = \Carbon\Carbon::now();
         $totalDays = 7;
-        $agoDate = $currentDate->subDays($totalDays);
+        $endDate = $endDateString ? \Carbon\Carbon::parse($endDateString) : \Carbon\Carbon::now();
+        $startDate = $startDateString ? \Carbon\Carbon::parse($startDateString) : \Carbon\Carbon::parse($endDate->format('Y-m-d'))->subDays($totalDays);
 
-        $expenseData = (function ($typeName) use ($agoDate) {
+        $expenseData = (function ($typeName) use ($startDate, $endDate) {
             $query = Expense::query();
             $query->select(
                 DB::raw('SUM(amount) as total_cost'),
                 DB::raw("DATE_FORMAT(created_at, '%Y-%m-%d') as date")
             );
 
-            $query->where('type_name', $typeName)->where('created_at', '>=', $agoDate);
+            $query->where('type_name', $typeName)
+                ->whereBetween('created_at', [$startDate->startOfDay(), $endDate->endOfDay()]);
+
             $query->groupBy('date');
 
             $rows = $query->get();
@@ -100,11 +120,11 @@ class HighChartManager extends Manager
             return $returnData;
         });
 
+        $dates = self::getDates($startDateString, $endDateString);
+
         $titles = [];
-        $_date = \Carbon\Carbon::now();
-        for ($i = 0; $i < $totalDays; $i++) {
-            $date = $i > 0 ? $_date->subDays(1) : $_date;
-            $titles[] = $date->format('Y-m-d');
+        foreach ($dates as $key => $date) {
+            $titles[] = $date->format('F j, Y');
         }
 
         $returnData = [];
@@ -112,10 +132,8 @@ class HighChartManager extends Manager
         foreach ($expenseTypes as $key => $expenseType) {
 
             $data = $expenseData($key);
-            $_date = \Carbon\Carbon::now();
             $_data = [];
-            for ($i = 0; $i < $totalDays; $i++) {
-                $date = $i > 0 ? $_date->subDays(1) : $_date;
+            foreach ($dates as $key => $date) {
                 $dateString = $date->format('Y-m-d');
                 $_data[] = isset($data[$dateString]) ? $data[$dateString] : 0;
             }
@@ -126,20 +144,21 @@ class HighChartManager extends Manager
     }
 
 
-    public static function getIncomeDaysSummary()
+    public static function getIncomeDaysSummary($startDateString = '', $endDateString = '')
     {
-        $currentDate = \Carbon\Carbon::now();
         $totalDays = 7;
-        $agoDate = $currentDate->subDays($totalDays);
+        $endDate = $endDateString ? \Carbon\Carbon::parse($endDateString) : \Carbon\Carbon::now();
+        $startDate = $startDateString ? \Carbon\Carbon::parse($startDateString) : \Carbon\Carbon::parse($endDate->format('Y-m-d'))->subDays($totalDays);
 
-        $incomeData = (function ($typeName) use ($agoDate) {
+        $incomeData = (function ($typeName) use ($startDate, $endDate) {
             $query = Income::query();
             $query->select(
                 DB::raw('SUM(amount) as total_cost'),
                 DB::raw("DATE_FORMAT(created_at, '%Y-%m-%d') as date")
             );
 
-            $query->where('type_name', $typeName)->where('created_at', '>=', $agoDate);
+            $query->where('type_name', $typeName)
+                ->whereBetween('created_at', [$startDate->startOfDay(), $endDate->endOfDay()]);
             $query->groupBy('date');
 
             $rows = $query->get();
@@ -157,11 +176,11 @@ class HighChartManager extends Manager
             return $returnData;
         });
 
+        $dates = self::getDates($startDateString, $endDateString);
+
         $titles = [];
-        $_date = \Carbon\Carbon::now();
-        for ($i = 0; $i < $totalDays; $i++) {
-            $date = $i > 0 ? $_date->subDays(1) : $_date;
-            $titles[] = $date->format('Y-m-d');
+        foreach ($dates as $key => $date) {
+            $titles[] = $date->format('F j, Y');
         }
 
         $returnData = [];
@@ -169,10 +188,8 @@ class HighChartManager extends Manager
         foreach ($incomeTypes as $key => $incomeType) {
 
             $data = $incomeData($key);
-            $_date = \Carbon\Carbon::now();
             $_data = [];
-            for ($i = 0; $i < $totalDays; $i++) {
-                $date = $i > 0 ? $_date->subDays(1) : $_date;
+            foreach ($dates as $key => $date) {
                 $dateString = $date->format('Y-m-d');
                 $_data[] = isset($data[$dateString]) ? $data[$dateString] : 0;
             }
@@ -182,10 +199,9 @@ class HighChartManager extends Manager
         return ['titles' => $titles, 'data' => $returnData];
     }
 
-    public static function getSalesLatestDaysSummary(): array
+    public static function getSalesLatestDaysSummary($startDateString = '', $endDateString = ''): array
     {
-        $salesLatestDaysSummary = new SalesLatestDaysSummary;
-        return $salesLatestDaysSummary->getSalesLatestDaysSummary();
+        return SalesLatestDaysSummary::getInstance()->getSalesLatestDaysSummary($startDateString, $endDateString);
     }
 
     public static function getOverallSummary($queryOverall): array
@@ -206,18 +222,29 @@ class HighChartManager extends Manager
 
 class SalesLatestDaysSummary
 {
-    public function getSalesLatestDaysSummary(): array
+    private static $sharedInstance;
+    public static function getInstance()
     {
-        $currentDate = \Carbon\Carbon::now();
+        if (!self::$sharedInstance) {
+            self::$sharedInstance = new SalesLatestDaysSummary();
+        }
+        return self::$sharedInstance;
+    }
+
+    public function getSalesLatestDaysSummary($startDateString = '', $endDateString = ''): array
+    {
         $totalDays = 7;
-        $agoDate = $currentDate->subDays($totalDays);
+        $endDate = $endDateString ? \Carbon\Carbon::parse($endDateString) : \Carbon\Carbon::now();
+        $startDate = $startDateString ? \Carbon\Carbon::parse($startDateString) : \Carbon\Carbon::parse($endDate->format('Y-m-d'))->subDays($totalDays);
 
-        $incomeYearSummary = $this->incomeLatestDaysSummary($totalDays, $agoDate);
-        $expenseYearSummary = $this->expenseLatestDaysSummary($totalDays, $agoDate);
-        $profitYearSummary = $this->profitLatestDaysSummary($totalDays, $incomeYearSummary, $expenseYearSummary);
-
-        $result = $this->generateLatestDaysSummaryStructure($totalDays);
+        $result = $this->generateLatestDaysSummaryStructure($startDate, $endDate);
         $titles = $result['titles'];
+        $dataStructure = $result['data'];
+
+        $incomeYearSummary = $this->incomeLatestDaysSummary($dataStructure, $startDate, $endDate);
+        $expenseYearSummary = $this->expenseLatestDaysSummary($dataStructure, $startDate, $endDate);
+
+        $profitYearSummary = $this->profitLatestDaysSummary($dataStructure, $incomeYearSummary, $expenseYearSummary);
 
         return [
             'titles' => array_values($titles),
@@ -229,67 +256,69 @@ class SalesLatestDaysSummary
         ];
     }
 
-    private function incomeLatestDaysSummary($totalDays, $agoDate): array
+    private function incomeLatestDaysSummary($dataStructure, $startDate, $endDate): array
     {
         $incomeRows = Income::query()
             ->select(DB::raw("DATE_FORMAT(created_at, '%Y-%m-%d') as ymd"), DB::raw('SUM(amount) as total_cost'))
-            ->where('created_at', '>=', $agoDate)
+            ->whereBetween('created_at', [$startDate->startOfDay(), $endDate->endOfDay()])
             ->groupBy('ymd')->get();
-        $result = $this->generateLatestDaysSummaryStructure($totalDays);
-        $data = $result['data'];
 
         foreach ($incomeRows as $key => $incomeRow) {
             $ymd = $incomeRow->ymd;
-            if (isset($data[$ymd])) {
-                $data[$ymd] = $incomeRow->total_cost;
+            if (isset($dataStructure[$ymd])) {
+                $dataStructure[$ymd] = $incomeRow->total_cost;
             }
         }
-        return $data;
+        return $dataStructure;
     }
 
-    private function expenseLatestDaysSummary($totalDays, $agoDate): array
+    private function expenseLatestDaysSummary($dataStructure, $startDate, $endDate): array
     {
         $expenseRows = Expense::query()
             ->select(DB::raw("DATE_FORMAT(created_at, '%Y-%m-%d') as ymd"), DB::raw('SUM(amount) as total_cost'))
-            ->where('created_at', '>=', $agoDate)
+            ->whereBetween('created_at', [$startDate->startOfDay(), $endDate->endOfDay()])
             ->groupBy('ymd')->get();
-        $result = $this->generateLatestDaysSummaryStructure($totalDays);
-        $data = $result['data'];
 
         foreach ($expenseRows as $key => $expenseRow) {
             $ymd = $expenseRow->ymd;
-            if (isset($data[$ymd])) {
-                $data[$ymd] = $expenseRow->total_cost;
+            if (isset($dataStructure[$ymd])) {
+                $dataStructure[$ymd] = $expenseRow->total_cost;
             }
         }
 
-        return $data;
+        return $dataStructure;
     }
 
-    private function profitLatestDaysSummary($totalDays, $incomeYearSummary, $expenseYearSummary): array
+    private function profitLatestDaysSummary($dataStructure, $incomeYearSummary, $expenseYearSummary): array
     {
-        $result = $this->generateLatestDaysSummaryStructure($totalDays);
-        $data = $result['data'];
-
-        foreach ($data as $key => $profitRow) {
-            $data[$key] = $incomeYearSummary[$key] - $expenseYearSummary[$key];
+        foreach ($dataStructure as $key => $profitRow) {
+            $dataStructure[$key] = $incomeYearSummary[$key] - $expenseYearSummary[$key];
         }
 
-        return $data;
+        return $dataStructure;
     }
 
-    private function generateLatestDaysSummaryStructure($totalDays): array
+    private function generateLatestDaysSummaryStructure($startDate, $endDate): array
     {
-        $titles = $data = [];
-        $_date = \Carbon\Carbon::now();
-        for ($i = 0; $i < $totalDays; $i++) {
-            $date = $i > 0 ? $_date->subDays(1) : $_date;
-            $dateYmd = $date->format('Y-m-d');
-            $titles[$dateYmd] = $date->format('Y F j');
-            $data[$dateYmd] = 0;
+        $titles = $dataStructure = [];
+
+        $startDate->addDays(1);
+        $endDate->addDays(1);
+
+        $period = new \DatePeriod(
+            new \DateTime($startDate->format('Y-m-d')),
+            new \DateInterval('P1D'),
+            new \DateTime($endDate->format('Y-m-d'))
+        );
+
+        foreach ($period as $key => $value) {
+
+            $dateYmd = $value->format('Y-m-d');
+            $titles[$dateYmd] = $value->format('F j, Y');
+            $dataStructure[$dateYmd] = 0;
         }
 
-        return ['titles' => $titles, 'data' => $data];
+        return ['titles' => $titles, 'data' => $dataStructure];
     }
 }
 

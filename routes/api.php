@@ -20,55 +20,33 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::get('/query', function () {
-    $incomeRows = DB::table('incomes')->select(DB::raw("DATE_FORMAT(created_at, '%Y-%m') as month_year"), DB::raw('SUM(amount) as total_amount'))->groupBy('month_year')->get();
-    $result = [];
-    $currentYear = date('Y');
-    for ($m = 1; $m <= 12; $m++) {
-        $time = mktime(0, 0, 0, $m, 1, $currentYear);
-        $monthYear = date('Y-m', $time);
-        $result[$monthYear] = ['month_year' => $monthYear, 'total_amount' => 0, 'month_year_title' => date('F y', $time)];
-    }
-
-    foreach ($incomeRows as $key => $incomeRow) {
-        $monthYear = $incomeRow->month_year;
-        $row = $result[$monthYear];
-        $row['total_amount'] = $incomeRow->total_amount;
-        $result[$monthYear] = $row;
-    }
-    return $result;
+Route::group(['middleware' => ['manager']], function () {
+    Route::get('sales-range-days-chart', [App\Http\Controllers\Manager\ReportController::class, 'getSalesRangeDaysChart'])->name('api.sales-range-days-chart');
+    Route::get('energy-range-days-chart', [App\Http\Controllers\Manager\ReportController::class, 'getEnergyRangeDaysChart'])->name('api.energy-range-days-chart');
+    Route::get('income-range-days-chart', [App\Http\Controllers\Manager\ReportController::class, 'getIncomeRangeDaysChart'])->name('api.income-range-days-chart');
 });
 
-Route::get('/test', [App\Http\Controllers\Supervisor\ReportController::class, 'salesYearSummary']);
+Route::group(['middleware' => ['supervisor', 'manager']], function () {
+    Route::get('expense-range-days-chart', [App\Http\Controllers\Manager\ReportController::class, 'getExpenseRangeDaysChart'])->name('api.expense-range-days-chart');
+});
 
 Route::get('/test-2', function () {
 
-    $currentDate = \Carbon\Carbon::now();
-    $agoDate = $currentDate->subDays(7);
-    $energyResourceData = (function ($energyResourceId) use ($agoDate) {
-        $query = EnergyResourceLog::query();
-        $query->select(
-            DB::raw('SUM(cost) as total_cost'),
-            DB::raw("DATE_FORMAT(created_at, '%Y-%m-%d') as date"),
-        );
+    $startDateString = ''; //'2022-06-22';
+    $endDateString = '2022-07-03';
 
-        $query->where('energy_resource_id', $energyResourceId)->where('created_at', '>=', $agoDate);
-        $query->groupBy('date');
+    $endDate = $endDateString ? \Carbon\Carbon::parse($endDateString) : \Carbon\Carbon::now();
+    $startDate = $startDateString ? \Carbon\Carbon::parse($startDateString) : \Carbon\Carbon::parse($endDate->format('Y-m-d'))->subDays(7);
 
-        $rows = $query->get();
+    $dates = [];
+    $period = new \DatePeriod(
+        new \DateTime($startDate->format('Y-m-d')),
+        new \DateInterval('P1D'),
+        new \DateTime($endDate->format('Y-m-d'))
+    );
 
-        $weekDayReports = [];
-        foreach ($rows as $key => $row) {
-            $date = \Carbon\Carbon::parse($row->date)->format('Y-m-d');
-            if (!isset($weekDayReports[$date])) {
-                $weekDayReports[$date] = [];
-            }
-            $row = $row->toArray();
-            $weekDayReports[$date] =  $row['total_cost'];
-        }
-
-        return $weekDayReports;
-    });
-
-    return $energyResourceData(1);
+    foreach ($period as $key => $value) {
+        $dates[] = $value;
+    }
+    return $dates;
 });
