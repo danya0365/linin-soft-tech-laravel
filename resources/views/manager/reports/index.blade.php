@@ -145,7 +145,32 @@
                 <div class="card-header">พลังงานแต่ละวัน</div>
                 <div class="card-body text-center">
 
-                    <div id="energy-chart" style="min-width: 400px; height: 400px; margin: 0 auto">
+                    <div id="energy-latest-day-chart" style="min-width: 400px; height: 400px; margin: 0 auto">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12 m-2">
+            <div class="card">
+                <div class="card-header">พลังงานตามวันที่เลือก</div>
+                <div class="card-body text-center">
+                    <form id="energy-range-days-form" class="row row-cols-lg-auto g-3 align-items-center mb-2" action="{{ request()->url() }}" method="GET">
+
+                        <div class="col-12">
+                            <div class="input-group">
+                                <input type="date" name="energy-range-days-start-at" value="" class="form-control" placeholder="วันที่เริ่ม" aria-label="วันที่เริ่ม">
+                                <span class="input-group-text"> ถึง </span>
+                                <input type="date" name="energy-range-days-end-at" value="" class="form-control" placeholder="วันที่สิ้นสุด" aria-label="วันที่สิ้นสุด">
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                            <button type="reset" class="btn btn-outline-secondary">Reset</button>
+                        </div>
+                    </form>
+                    <div id="energy-range-days-chart" style="min-width: 400px; height: 400px; margin: 0 auto">
 
                     </div>
                 </div>
@@ -185,7 +210,7 @@ $(function(){
     $.energyPieChart({ 'renderTo': "energy-pie-chart", 'data': energySummary.data});
     
     var energyDaysSummary = @json(App\Managers\HighChartManager::getEnergyDaysSummary());
-    $.energyDaysChart({ 'renderTo': 'energy-chart', 'data': energyDaysSummary});
+    $.energyDaysChart({ 'renderTo': 'energy-latest-day-chart', 'data': energyDaysSummary, 'title': "ยอดการใช้พลังงาน 7 วันล่าสุด"});
 
     var expenseDaysSummary = @json(App\Managers\HighChartManager::getExpenseDaysSummary());
     $.expenseDaysChart({ 'renderTo': 'expense-day-chart', 'data': expenseDaysSummary});
@@ -206,7 +231,6 @@ $(function(){
         url = url.replace('endAtParam', endAt)
 
         $.get(url, function(response){
-            console.log('response', response);
             $.salesLatestDaysChart({ 'renderTo': 'sales-range-days-chart', 'data': response, 'title': `ต้นทุน, ยอดขาย, กำไร วันที่ ${startAt} ถึง ${endAt}`});
         });
     }
@@ -214,6 +238,25 @@ $(function(){
     $('#sales-range-days-form').on('submit', (e) => {
         e.preventDefault();
         salesRangeDaysSummary();
+    })
+
+    var energyRangeDaysSummary = () => {
+        var startAt = $('[name=energy-range-days-start-at]').val();
+        var endAt = $('[name=energy-range-days-end-at]').val();
+
+        var url = '{!! route('api.energy-range-days-chart', ['startAt' => 'startAtParam', 'endAt' => 'endAtParam']) !!}';
+        
+        url = url.replace('startAtParam', startAt)
+        url = url.replace('endAtParam', endAt)
+
+        $.get(url, function(response){
+            $.energyDaysChart({ 'renderTo': 'energy-range-days-chart', 'data': response, 'title': `ยอดการใช้พลังงาน วันที่ ${startAt} ถึง ${endAt}`});
+        });
+    }
+
+    $('#energy-range-days-form').on('submit', (e) => {
+        e.preventDefault();
+        energyRangeDaysSummary();
     })
 })
 </script>

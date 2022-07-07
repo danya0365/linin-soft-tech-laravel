@@ -29,4 +29,13 @@ class ReportController extends Controller
         $result = HighChartManager::getSalesLatestDaysSummary($startAt, $endAt);
         return $result;
     }
+
+    function getEnergyRangeDaysChart()
+    {
+        $startAt = request()->get('startAt');
+        $endAt = request()->get('endAt');
+
+        $result = HighChartManager::getEnergyDaysSummary($startAt, $endAt);
+        return $result;
+    }
 }

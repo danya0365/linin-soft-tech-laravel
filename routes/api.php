@@ -22,6 +22,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::group(['middleware' => ['manager']], function () {
     Route::get('sales-range-days-chart', [App\Http\Controllers\Manager\ReportController::class, 'getSalesRangeDaysChart'])->name('api.sales-range-days-chart');
+    Route::get('energy-range-days-chart', [App\Http\Controllers\Manager\ReportController::class, 'getEnergyRangeDaysChart'])->name('api.energy-range-days-chart');
 });
 
 Route::get('/test-2', function () {

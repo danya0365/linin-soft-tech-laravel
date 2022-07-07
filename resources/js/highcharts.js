@@ -177,7 +177,7 @@
 })(jQuery);
 
 (function ($) {
-    function energyDaysChart(targetId, categories, seriesData) {
+    function energyDaysChart(targetId, titleText, categories, seriesData) {
         var series = seriesData.map(function (item, index) {
             var name = item.name;
             var data = item.data.map(function (item, index) {
@@ -194,7 +194,7 @@
                 type: "column",
             },
             title: {
-                text: "ยอดการใช้พลังงาน 7 วันล่าสุด",
+                text: titleText,
             },
             subtitle: {
                 text: "",
@@ -240,12 +240,14 @@
             {
                 data: null,
                 renderTo: null,
+                title: "",
             },
             options
         );
 
         energyDaysChart(
             settings.renderTo,
+            settings.title,
             settings.data.titles,
             settings.data.data
         );
