@@ -46,7 +46,7 @@ class HighChartManager extends Manager
             );
 
             $query->where('energy_resource_id', $energyResourceId)
-                ->whereBetween('created_at', [$startDate, $endDate]);
+                ->whereBetween('created_at', [$startDate->startOfDay(), $endDate->endOfDay()]);
             $query->groupBy('date');
 
             $rows = $query->get();
@@ -101,7 +101,7 @@ class HighChartManager extends Manager
             );
 
             $query->where('type_name', $typeName)
-                ->whereBetween('created_at', [$startDate, $endDate]);
+                ->whereBetween('created_at', [$startDate->startOfDay(), $endDate->endOfDay()]);
 
             $query->groupBy('date');
 
@@ -158,7 +158,7 @@ class HighChartManager extends Manager
             );
 
             $query->where('type_name', $typeName)
-                ->whereBetween('created_at', [$startDate, $endDate]);
+                ->whereBetween('created_at', [$startDate->startOfDay(), $endDate->endOfDay()]);
             $query->groupBy('date');
 
             $rows = $query->get();
@@ -260,7 +260,7 @@ class SalesLatestDaysSummary
     {
         $incomeRows = Income::query()
             ->select(DB::raw("DATE_FORMAT(created_at, '%Y-%m-%d') as ymd"), DB::raw('SUM(amount) as total_cost'))
-            ->whereBetween('created_at', [$startDate, $endDate])
+            ->whereBetween('created_at', [$startDate->startOfDay(), $endDate->endOfDay()])
             ->groupBy('ymd')->get();
 
         foreach ($incomeRows as $key => $incomeRow) {
@@ -276,7 +276,7 @@ class SalesLatestDaysSummary
     {
         $expenseRows = Expense::query()
             ->select(DB::raw("DATE_FORMAT(created_at, '%Y-%m-%d') as ymd"), DB::raw('SUM(amount) as total_cost'))
-            ->whereBetween('created_at', [$startDate, $endDate])
+            ->whereBetween('created_at', [$startDate->startOfDay(), $endDate->endOfDay()])
             ->groupBy('ymd')->get();
 
         foreach ($expenseRows as $key => $expenseRow) {
