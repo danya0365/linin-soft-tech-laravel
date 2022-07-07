@@ -217,7 +217,32 @@
                 <div class="card-header">ยอดขายแต่ละวัน</div>
                 <div class="card-body text-center">
 
-                    <div id="income-day-chart" style="min-width: 400px; height: 400px; margin: 0 auto">
+                    <div id="income-latest-day-chart" style="min-width: 400px; height: 400px; margin: 0 auto">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12 m-2">
+            <div class="card">
+                <div class="card-header">ยอดขายตามวันที่เลือก</div>
+                <div class="card-body text-center">
+                    <form id="income-range-days-form" class="row row-cols-lg-auto g-3 align-items-center mb-2" action="{{ request()->url() }}" method="GET">
+
+                        <div class="col-12">
+                            <div class="input-group">
+                                <input type="date" name="income-range-days-start-at" value="" class="form-control" placeholder="วันที่เริ่ม" aria-label="วันที่เริ่ม">
+                                <span class="input-group-text"> ถึง </span>
+                                <input type="date" name="income-range-days-end-at" value="" class="form-control" placeholder="วันที่สิ้นสุด" aria-label="วันที่สิ้นสุด">
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                            <button type="reset" class="btn btn-outline-secondary">Reset</button>
+                        </div>
+                    </form>
+                    <div id="income-range-days-chart" style="min-width: 400px; height: 400px; margin: 0 auto">
 
                     </div>
                 </div>
@@ -244,7 +269,7 @@ $(function(){
     $.salesLatestDaysChart({ 'renderTo': 'sales-latest-days-chart', 'data': salesLatestDaysSummary, 'title': "ต้นทุน, ยอดขาย, กำไร 7 วันล่าสุด"});
 
     var incomeDaysSummary = @json(App\Managers\HighChartManager::getIncomeDaysSummary());
-    $.incomeDaysChart({ 'renderTo': 'income-day-chart', 'data': incomeDaysSummary});
+    $.incomeDaysChart({ 'renderTo': 'income-latest-day-chart', 'data': incomeDaysSummary, 'title': "ยอดขาย 7 วันล่าสุด"});
 
     var salesRangeDaysSummary = () => {
         var startAt = $('[name=sales-range-days-start-at]').val();
@@ -301,6 +326,25 @@ $(function(){
     $('#expense-range-days-form').on('submit', (e) => {
         e.preventDefault();
         expenseRangeDaysSummary();
+    })
+
+    var incomeRangeDaysSummary = () => {
+        var startAt = $('[name=income-range-days-start-at]').val();
+        var endAt = $('[name=income-range-days-end-at]').val();
+
+        var url = '{!! route('api.income-range-days-chart', ['startAt' => 'startAtParam', 'endAt' => 'endAtParam']) !!}';
+        
+        url = url.replace('startAtParam', startAt)
+        url = url.replace('endAtParam', endAt)
+
+        $.get(url, function(response){
+            $.incomeDaysChart({ 'renderTo': 'income-range-days-chart', 'data': response, 'title': `ยอดขาย วันที่ ${startAt} ถึง ${endAt}`});
+        });
+    }
+
+    $('#income-range-days-form').on('submit', (e) => {
+        e.preventDefault();
+        incomeRangeDaysSummary();
     })
 })
 </script>

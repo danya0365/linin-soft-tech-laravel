@@ -333,7 +333,7 @@
 })(jQuery);
 
 (function ($) {
-    function incomeDaysChart(targetId, categories, seriesData) {
+    function incomeDaysChart(targetId, titleText, categories, seriesData) {
         var series = seriesData.map(function (item, index) {
             var name = item.name;
             var data = item.data.map(function (item, index) {
@@ -350,7 +350,7 @@
                 type: "column",
             },
             title: {
-                text: "ยอดขาย 7 วันล่าสุด",
+                text: titleText,
             },
             subtitle: {
                 text: "",
@@ -396,12 +396,14 @@
             {
                 data: null,
                 renderTo: null,
+                title: "",
             },
             options
         );
 
         incomeDaysChart(
             settings.renderTo,
+            settings.title,
             settings.data.titles,
             settings.data.data
         );

@@ -24,6 +24,7 @@ Route::group(['middleware' => ['manager']], function () {
     Route::get('sales-range-days-chart', [App\Http\Controllers\Manager\ReportController::class, 'getSalesRangeDaysChart'])->name('api.sales-range-days-chart');
     Route::get('energy-range-days-chart', [App\Http\Controllers\Manager\ReportController::class, 'getEnergyRangeDaysChart'])->name('api.energy-range-days-chart');
     Route::get('expense-range-days-chart', [App\Http\Controllers\Manager\ReportController::class, 'getExpenseRangeDaysChart'])->name('api.expense-range-days-chart');
+    Route::get('income-range-days-chart', [App\Http\Controllers\Manager\ReportController::class, 'getIncomeRangeDaysChart'])->name('api.income-range-days-chart');
 });
 
 Route::get('/test-2', function () {

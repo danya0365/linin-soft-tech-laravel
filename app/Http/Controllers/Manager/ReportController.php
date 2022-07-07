@@ -47,4 +47,13 @@ class ReportController extends Controller
         $result = HighChartManager::getExpenseDaysSummary($startAt, $endAt);
         return $result;
     }
+
+    function getIncomeRangeDaysChart()
+    {
+        $startAt = request()->get('startAt');
+        $endAt = request()->get('endAt');
+
+        $result = HighChartManager::getIncomeDaysSummary($startAt, $endAt);
+        return $result;
+    }
 }
