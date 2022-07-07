@@ -30,7 +30,7 @@ Route::get('/landing', function () {
     return view('landing');
 });
 
-Auth::routes();
+Auth::routes(['register' => false]);
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
@@ -47,6 +47,8 @@ Route::group(['middleware' => ['admin']], function () {
     Route::resource('employees', App\Http\Controllers\EmployeeController::class);
     Route::resource('linen-types', App\Http\Controllers\LinenTypeController::class);
     Route::resource('linen-products', App\Http\Controllers\LinenProductController::class);
+
+    Route::match(array('GET', 'POST'), 'washing-machines/{id}/create-note', [App\Http\Controllers\WashingMachineController::class, 'createNote'])->name('washing-machines.create-note');
     Route::resource('washing-machines', App\Http\Controllers\WashingMachineController::class);
     Route::resource('dryer-machines', App\Http\Controllers\DryerMachineController::class);
     Route::resource('inventories', App\Http\Controllers\InventoryController::class);
@@ -57,6 +59,20 @@ Route::group(['middleware' => ['admin']], function () {
     Route::resource('notes', App\Http\Controllers\NoteController::class);
 });
 
+Route::group(['prefix' => 'manager', 'middleware' => ['manager']], function () {
+
+    Route::get('/', [App\Http\Controllers\ManagerController::class, 'index'])->name('manager');
+
+    Route::group(['prefix' => 'report'], function () {
+        Route::get('/', [App\Http\Controllers\Manager\ReportController::class, 'index'])->name('manager.report');
+    });
+});
+
+Route::group(['prefix' => 'customer', 'middleware' => ['customer']], function () {
+
+    Route::match(array('GET', 'POST'), '/create-feedback', [App\Http\Controllers\CustomerController::class, 'createFeedback'])->name('customers.create-feedback');
+});
+
 Route::group(['prefix' => 'supervisor', 'middleware' => ['supervisor']], function () {
 
     Route::get('/', [App\Http\Controllers\SupervisorController::class, 'index'])->name('supervisor');
@@ -65,7 +81,14 @@ Route::group(['prefix' => 'supervisor', 'middleware' => ['supervisor']], functio
         Route::get('/', [App\Http\Controllers\Supervisor\DepartmentController::class, 'index'])->name('supervisor.department');
         Route::match(array('GET', 'POST'), '/submit-daily-expense', [App\Http\Controllers\Supervisor\DepartmentController::class, 'submitDailyExpense'])->name('supervisor.department.submit-daily-expense');
         Route::match(array('GET', 'POST'), '/daily-expense-logs', [App\Http\Controllers\Supervisor\DepartmentController::class, 'dailyExpenseLogs'])->name('supervisor.department.daily-expense-log');
-        Route::match(array('GET', 'POST'), '/daily-expense-log/{id}/delete', [App\Http\Controllers\Supervisor\DepartmentController::class, 'deleteDailyExpenseLog'])->name('supervisor.department.delete-daily-expense-log');
+        Route::match(array('GET', 'POST', 'DELETE'), '/daily-expense-log/{id}/delete', [App\Http\Controllers\Supervisor\DepartmentController::class, 'deleteDailyExpenseLog'])->name('supervisor.department.delete-daily-expense-log');
+    });
+
+    Route::group(['prefix' => 'customer'], function () {
+        Route::get('/', [App\Http\Controllers\Supervisor\CustomerController::class, 'index'])->name('supervisor.customer');
+        Route::match(array('GET', 'POST'), '/new-billing', [App\Http\Controllers\Supervisor\CustomerController::class, 'getNewBilling'])->name('supervisor.customer.new-billing');
+        Route::get('/billing-logs', [App\Http\Controllers\Supervisor\CustomerController::class, 'getBillingLog'])->name('supervisor.customer.billing-logs');
+        Route::match(array('GET', 'POST', 'DELETE'), '/billing-logs/{id}/delete', [App\Http\Controllers\Supervisor\CustomerController::class, 'deleteBillingLog'])->name('supervisor.customer.billing-logs.delete');
     });
 
     Route::group(['prefix' => 'report'], function () {
@@ -221,6 +244,7 @@ Route::group(['prefix' => 'worker', 'middleware' => ['auth']], function () {
         Route::match(array('GET', 'POST'), '/log/{energyResourceLogId}/biomass', [App\Http\Controllers\Worker\EnergyResourceLogController::class, 'submitBiomassLog'])->name('worker.energy-resource.log.submit-biomass');
         Route::match(array('GET', 'POST'), '/log/{energyResourceLogId}/fuel-oil', [App\Http\Controllers\Worker\EnergyResourceLogController::class, 'submitFuelOilLog'])->name('worker.energy-resource.log.submit-fuel-oil');
         Route::match(array('GET', 'POST'), '/log/{energyResourceLogId}/petrol', [App\Http\Controllers\Worker\EnergyResourceLogController::class, 'submitPetrolLog'])->name('worker.energy-resource.log.submit-petrol');
+        Route::match(array('GET', 'POST'), '/log/{energyResourceLogId}/chemical', [App\Http\Controllers\Worker\EnergyResourceLogController::class, 'submitChemicalLog'])->name('worker.energy-resource.log.submit-chemical');
         Route::get('/logs', [App\Http\Controllers\Worker\EnergyResourceLogController::class, 'getLogs'])->name('worker.energy-resource.logs');
         Route::post('/logs/{energyResourceLogId}/delete', [App\Http\Controllers\Worker\EnergyResourceLogController::class, 'deleteLog'])->name('worker.energy-resource.logs.delete');
         Route::get('/summary/{energyResourceVarName}', [App\Http\Controllers\Worker\EnergyResourceController::class, 'getSummary'])->name('worker.energy-resource.summary');
@@ -235,10 +259,13 @@ Route::group(['prefix' => 'worker', 'middleware' => ['auth']], function () {
     Route::group(['prefix' => 'stock'], function () {
         Route::get('/', [App\Http\Controllers\Worker\StockController::class, 'index'])->name('worker.stock');
         Route::get('/inventory-group', [App\Http\Controllers\Worker\StockController::class, 'selectInventoryGroup'])->name('worker.stock.select-inventory-group');
+        Route::get('/inventory-logs', [App\Http\Controllers\Worker\StockController::class, 'showInventoriesLogs'])->name('worker.stock.inventories-log');
         Route::get('/inventory-group/{inventoryGroupId}', [App\Http\Controllers\Worker\StockController::class, 'showInventoryByGroup'])->name('worker.stock.show-inventory-by-group');
         Route::match(array('GET', 'POST'), '/inventory-group/{inventoryGroupId}/create', [App\Http\Controllers\Worker\StockController::class, 'createInventoryByGroup'])->name('worker.stock.create-inventory-by-group');
+        Route::match(array('GET', 'POST'), '/inventory/{inventoryId}/edit', [App\Http\Controllers\Worker\StockController::class, 'editInventory'])->name('worker.stock.edit-inventory');
         Route::match(array('GET', 'POST'), '/inventory/{inventoryId}/increase-stock', [App\Http\Controllers\Worker\StockController::class, 'getInventoryIncreaseStock'])->name('worker.stock.inventory.increase-stock');
         Route::match(array('GET', 'POST'), '/inventory/{inventoryId}/decrease-stock', [App\Http\Controllers\Worker\StockController::class, 'getInventoryDecreaseStock'])->name('worker.stock.inventory.decrease-stock');
-        Route::get('/inventory/{inventoryId}/logs', [App\Http\Controllers\Worker\StockController::class, 'showInventoryLogs'])->name('worker.stock.inventory.logs');
+        Route::get('/inventory/{inventoryId}/logs', [App\Http\Controllers\Worker\StockController::class, 'showInventoryLogsById'])->name('worker.stock.inventory.logs');
+        Route::match(array('GET', 'POST'), '/inventory/{inventoryId}/delete', [App\Http\Controllers\Worker\StockController::class, 'deleteInventory'])->name('worker.stock.inventory.delete');
     });
 });

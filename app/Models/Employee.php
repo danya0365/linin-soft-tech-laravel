@@ -31,7 +31,6 @@ class Employee extends Model
   static $rules = [
     'code' => 'required',
     'name' => 'required',
-    'photo' => 'required',
     'department_id' => 'required',
   ];
 

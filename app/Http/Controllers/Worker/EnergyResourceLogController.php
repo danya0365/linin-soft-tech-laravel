@@ -60,11 +60,38 @@ class EnergyResourceLogController extends Controller
 
         $energyResources = EnergyResource::get();
 
+        $energyResourceSums = (function () use ($energyResourceSelected) {
+            $query = EnergyResourceLog::with('energyResource')->select(
+                DB::raw('sum(value) as total_value'),
+                DB::raw('sum(cost) as total_cost'),
+                'energy_resource_id'
+            )
+                ->groupBy('energy_resource_id');
+
+            $query->whereNotNull("energy_resource_id")->whereNotNull("value")->whereNotNull("unit");
+
+            if ($energyResourceSelected) {
+                $query->where(function ($query) use ($energyResourceSelected) {
+                    $query->where('energy_resource_id', $energyResourceSelected);
+                });
+            }
+
+            $dateStartAt = request()->get('date_start_at');
+            $dateEndAt = request()->get('date_end_at');
+            if ($dateStartAt && $dateEndAt) {
+                $query->whereBetween('created_at', [$dateStartAt . ' 00:00:00', $dateEndAt . ' 23:59:59']);
+            }
+            return $query->get();
+        })();
+
+
+
         return view(
             'worker.energy-resources.logs',
             [
                 'energyResources' => $energyResources,
                 'energyResourceLogs' => $energyResourceLogs,
+                'energyResourceSums' => $energyResourceSums,
                 'sortOrders' => $sortOrders,
                 'sortOrderSelected' => $sortOrderSelected,
                 'energyResourceSelected' => $energyResourceSelected,
@@ -96,6 +123,7 @@ class EnergyResourceLogController extends Controller
                 DepartmentNameId::Packing(),
                 DepartmentNameId::Collect(),
                 DepartmentNameId::Deliver(),
+                DepartmentNameId::Maintenance(),
             ]
         )->get();
         return view('worker.energy-resources.select-employee', ['departments' => $departments, 'energyResourceLog' => $energyResourceLog]);
@@ -125,6 +153,9 @@ class EnergyResourceLogController extends Controller
 
             case EnergyResourceNameId::Petrol()->value:
                 return redirect(route('worker.energy-resource.log.submit-petrol', ['energyResourceLogId' => $energyResourceLog->id]));
+
+            case EnergyResourceNameId::Chemical()->value:
+                return redirect(route('worker.energy-resource.log.submit-chemical', ['energyResourceLogId' => $energyResourceLog->id]));
         }
         return redirect(route('worker.energy-resource'));
     }
@@ -319,6 +350,39 @@ class EnergyResourceLogController extends Controller
 
         return view(
             'worker.energy-resources.submit-petrol',
+            [
+                'energyResourceLog' => $energyResourceLog,
+                'dateStartAt' => $dateStartAt,
+                'dateEndAt' => $dateEndAt
+            ]
+        );
+    }
+
+    public function submitChemicalLog($energyResourceLogId)
+    {
+        $energyResourceLog = EnergyResourceLog::with('employee')->find($energyResourceLogId);
+        $dateStartAt = request()->get('date_start_at');
+        $dateEndAt = request()->get('date_end_at');
+
+        if (request()->isMethod('post')) {
+
+            request()->validate(['value' => 'required', 'cost' => 'required', 'created_at' => 'required']);
+
+            $energyResourceLog->value = request()->get('value');
+            $energyResourceLog->cost = request()->get('cost');
+            $energyResourceLog->unit = "litre";
+            $energyResourceLog->timestamps = false;
+            $energyResourceLog->created_at = \Carbon\Carbon::parse(request()->get('created_at'));
+            $energyResourceLog->updated_at = \Carbon\Carbon::now();
+            $energyResourceLog->save();
+
+            ExpenseManager::create(ExpenseType::Chemical(), $energyResourceLog, $energyResourceLog->cost, $energyResourceLog->created_at);
+
+            return redirect(route('worker.energy-resource.logs'));
+        }
+
+        return view(
+            'worker.energy-resources.submit-chemical',
             [
                 'energyResourceLog' => $energyResourceLog,
                 'dateStartAt' => $dateStartAt,

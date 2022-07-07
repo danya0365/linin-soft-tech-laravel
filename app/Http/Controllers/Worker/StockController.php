@@ -26,7 +26,7 @@ class StockController extends Controller
     public function showInventoryByGroup($inventoryGroupId)
     {
         $inventoryGroup = InventoryGroup::find($inventoryGroupId);
-        $inventories = Inventory::where("inventory_group_id", $inventoryGroup->id)->paginate();
+        $inventories = Inventory::where("inventory_group_id", $inventoryGroup->id)->paginate(100);
         return view(
             'worker.stocks.show-inventory-by-group',
             [
@@ -67,6 +67,65 @@ class StockController extends Controller
                 'inventory' => $inventory
             ]
         );
+    }
+
+    public function editInventory($inventoryId)
+    {
+        $inventory = Inventory::with('inventoryGroup')->find($inventoryId);
+
+        if (request()->isMethod('post')) {
+
+            request()->validate(
+                [
+                    'name' => 'required',
+                    'unit' => 'required',
+                ]
+            );
+
+            $inventory->name = request()->get('name');
+            $inventory->unit = request()->get('unit');
+            $inventory->save();
+
+            return redirect(route('worker.stock.show-inventory-by-group', ['inventoryGroupId' => $inventory->inventory_group_id]));
+        }
+        return view(
+            'worker.stocks.edit-inventory',
+            [
+                'inventory' => $inventory
+            ]
+        );
+    }
+
+    public function deleteInventory($inventoryId)
+    {
+        $inventoryStockLog = InventoryStockLog::find($inventoryId);
+
+        $inventory = Inventory::find($inventoryStockLog->inventory_id);
+
+        if ($inventoryStockLog->type == 'import') {
+            $inventory->total_quantity -= $inventoryStockLog->quantity;
+            if ($inventory->total_quantity < 0) {
+                return redirect()->back()->with('error', 'ไม่สามารถลบได้');
+            }
+            $inventory->remain_quantity -= $inventoryStockLog->quantity;
+            if ($inventory->remain_quantity < 0) {
+                return redirect()->back()->with('error', 'ไม่สามารถลบได้');
+            }
+            $inventory->save();
+        }
+
+        if ($inventoryStockLog->type == 'export') {
+            $inventory->remain_quantity += $inventoryStockLog->quantity;
+            if ($inventory->remain_quantity > $inventory->total_quantity) {
+                return redirect()->back()->with('error', 'ไม่สามารถลบได้');
+            }
+            $inventory->save();
+            ExpenseManager::delete($inventoryStockLog);
+        }
+
+        $inventoryStockLog->delete();
+
+        return redirect()->back();
     }
 
     public function getInventoryIncreaseStock($inventoryId)
@@ -153,15 +212,92 @@ class StockController extends Controller
         );
     }
 
-    public function showInventoryLogs($inventoryId)
+    public function showInventoryLogsById($inventoryId)
     {
         $inventory = Inventory::with('inventoryGroup')->find($inventoryId);
-        $inventoryLogs = InventoryStockLog::where("inventory_id", $inventory->id)->orderBy('id', 'desc')->paginate();
+        $sortOrders = [
+            ['var' => 'id-desc', 'name' => 'ใหม่ที่สุด - Newest'],
+            ['var' => 'id-asc', 'name' => 'เก่าที่สุด - Oldest'],
+        ];
+
+        $sortOrderSelected = request()->get('sort_order', 'id-desc');
+
+        $query = InventoryStockLog::with(['inventory' => function ($query) {
+            $query->with('inventoryGroup');
+        }])->where("inventory_id", $inventory->id);
+
+        $dateStartAt = request()->get('date_start_at');
+        $dateEndAt = request()->get('date_end_at');
+        if ($dateStartAt && $dateEndAt) {
+            $query->whereBetween('created_at', [$dateStartAt . ' 00:00:00', $dateEndAt . ' 23:59:59']);
+        }
+
+        if ($sortOrderSelected) {
+            list($sort, $order) = explode('-', $sortOrderSelected);
+            $query->orderBy($sort, $order);
+        }
+
+        $inventoryLogs = $query->paginate();
+
         return view(
-            'worker.stocks.inventory-logs',
+            'worker.stocks.inventory-logs-by-id',
             [
                 'inventory' => $inventory,
-                'inventoryLogs' => $inventoryLogs
+                'inventoryLogs' => $inventoryLogs,
+                'sortOrders' => $sortOrders,
+                'sortOrderSelected' => $sortOrderSelected,
+                'dateStartAt' => $dateStartAt,
+                'dateEndAt' => $dateEndAt
+            ]
+        );
+    }
+
+    public function showInventoriesLogs()
+    {
+        $sortOrders = [
+            ['var' => 'id-desc', 'name' => 'ใหม่ที่สุด - Newest'],
+            ['var' => 'id-asc', 'name' => 'เก่าที่สุด - Oldest'],
+        ];
+
+        $sortOrderSelected = request()->get('sort_order', 'id-desc');
+        $inventoryGroupSelected = request()->get('inventory_group_id');
+
+        $query = InventoryStockLog::with(['inventory' => function ($query) {
+            $query->with('inventoryGroup');
+        }]);
+
+        if ($inventoryGroupSelected) {
+            $query->where(function ($query) use ($inventoryGroupSelected) {
+                $query->whereHas('inventory', function ($query) use ($inventoryGroupSelected) {
+                    $query->where('inventory_group_id', $inventoryGroupSelected);
+                });
+            });
+        }
+
+        $dateStartAt = request()->get('date_start_at');
+        $dateEndAt = request()->get('date_end_at');
+        if ($dateStartAt && $dateEndAt) {
+            $query->whereBetween('created_at', [$dateStartAt . ' 00:00:00', $dateEndAt . ' 23:59:59']);
+        }
+
+        if ($sortOrderSelected) {
+            list($sort, $order) = explode('-', $sortOrderSelected);
+            $query->orderBy($sort, $order);
+        }
+
+        $inventoryLogs = $query->paginate();
+        $inventoryGroups = InventoryGroup::get();
+
+        return view(
+            'worker.stocks.inventories-logs',
+            [
+                'inventoryLogs' => $inventoryLogs,
+                'inventoryGroups' => $inventoryGroups,
+                'sortOrders' => $sortOrders,
+                'sortOrderSelected' => $sortOrderSelected,
+                'inventoryGroupSelected' => $inventoryGroupSelected,
+                'dateStartAt' => $dateStartAt,
+                'dateEndAt' => $dateEndAt
             ]
         );
     }

@@ -21,24 +21,24 @@
                 </div>
             @endif
             <div class="card">
-                <div class="card-header">{{ __('Home Menu') }}</div>
+                <div class="card-header bg-success text-light bg-opacity-75">{{ __('Home Menu') }}</div>
                 <div class="card-body">
                     <div class="row g-2">
-                        <div class="col-sm-4">
+                        <div class="col-sm-6">
                             <a href="{{ route('worker') }}">
-                                <div class="p-3 border bg-light" style="min-height: 150px">
+                                <div class="p-3 border bg-navy" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 110px">
                                         <div class="text-center">
-                                            <div class="fa-solid fa-person-digging" style="font-size: 3em"></div>
+                                            <div class="fa-solid fa-people-line" style="font-size: 3em"></div>
                                             <div class="text-center mt-3">{{ __('พนักงาน - Worker') }}</div>
                                         </div>
                                     </div>
                                 </div>
                             </a>
                         </div>
-                        <div class="col-sm-4">
+                        <div class="col-sm-6">
                             <a href="{{ route('supervisor') }}">
-                                <div class="p-3 border bg-light" style="min-height: 150px">
+                                <div class="p-3 border bg-navy" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 110px">
                                         <div class="text-center">
                                             <div class="fa-solid fa-people-roof" style="font-size: 3em"></div>
@@ -48,9 +48,21 @@
                                 </div>
                             </a>
                         </div>
-                        <div class="col-sm-4">
+                        <div class="col-sm-6">
+                            <a href="{{ route('manager') }}">
+                                <div class="p-3 border bg-navy" style="min-height: 150px">
+                                    <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 110px">
+                                        <div class="text-center">
+                                            <div class="fa-solid fa-user-tie" style="font-size: 3em"></div>
+                                            <div class="text-center mt-3">{{ __('ผู้จัดการ - Manager') }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-sm-6">
                             <a href="{{ route('setting') }}">
-                                <div class="p-3 border bg-light" style="min-height: 150px">
+                                <div class="p-3 border bg-navy" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 110px">
                                         <div class="text-center">
                                             <div class="fa-solid fa-gears" style="font-size: 3em"></div>

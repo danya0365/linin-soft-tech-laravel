@@ -61,11 +61,11 @@
                         </div>
                     @endif
 
-                    <div class="table-responsive">
+                    <div class="table-responsive mb-2">
                         <table class="table table-bordered table-hover">
                             <thead class="thead">
                                 <tr>
-                                    <th>บันทึกเมื่อ</th>
+                                    <th>วันที่</th>
                                     <th>พลังงาน</th>
                                     <th>จำนวน</th>
                                     <th>หน่วย</th>
@@ -77,7 +77,7 @@
                             <tbody>
                                 @foreach ($energyResourceLogs as $energyResourceLog)
                                     <tr>
-                                        <td class="text-center">{{ $energyResourceLog->created_at->format('Y-m-d H:i') }}</td>
+                                        <td class="text-center">{{ $energyResourceLog->created_at->format('Y-m-d') }}</td>
                                         <td class="text-center">{{ $energyResourceLog->energyResource->name }}</td>
                                         <td class="text-end">{{ $energyResourceLog->value }}</td>
                                         <td class="text-start">{{ $energyResourceLog->unit }}</td>
@@ -94,6 +94,32 @@
                             </tbody>
                         </table>
                     </div>
+
+                    <div class="table-responsive mb-2">
+                        <table class="table table-bordered table-hover">
+                            <thead class="thead">
+                                <tr>
+                                    <th>พลังงาน</th>
+                                    <th>จำนวนรวม</th>
+                                    <th>ค่าใช้จ่ายรวม</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($energyResourceSums as $energyResourceSum)
+                                    <tr>
+                                        <td>{{ $energyResourceSum->energyResource->name ?? '-' }}</td>
+                                        <td class="text-center">
+                                            {{ number_format($energyResourceSum->total_value) }}
+                                        </td>
+                                        <td class="text-center">
+                                            {{ number_format($energyResourceSum->total_cost) }}
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+
                 </div>
                 <div class="card-footer">
                     {!! $energyResourceLogs->withQueryString()->links() !!}
@@ -124,10 +150,9 @@ $(function(){
 </script>
 <script>
 
-var energyWeekSummary = @json(App\Managers\HighChartManager::getEnergyWeekSummary());
-
 $(function(){
-    $.energyWeekChart({ 'renderTo': 'energy-chart', 'data': energyWeekSummary});
+    var energyDaysSummary = @json(App\Managers\HighChartManager::getEnergyDaysSummary());
+    $.energyDaysChart({ 'renderTo': 'energy-chart', 'data': energyDaysSummary});
 })
 </script>
 @endsection

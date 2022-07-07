@@ -17,7 +17,7 @@
                     <div class="row g-2">
                         <div class="col-sm-4">
                             <a href="{{ route('worker.energy-resource.log.select-energy-resource', ['energyResourceVarName' => 'water']) }}">
-                                <div class="p-3 border bg-light" style="min-height: 150px">
+                                <div class="p-3 border bg-navy" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 150px">
                                         <div class="text-center">
                                             <div class="fa-solid fa-water" style="font-size: 3em"></div>
@@ -29,7 +29,7 @@
                         </div>
                         <div class="col-sm-4">
                             <a href="{{ route('worker.energy-resource.log.select-energy-resource', ['energyResourceVarName' => 'electricity']) }}">
-                                <div class="p-3 border bg-light" style="min-height: 150px">
+                                <div class="p-3 border bg-navy" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 150px">
                                         <div class="text-center">
                                             <div class="fa fa-bolt" style="font-size: 3em"></div>
@@ -41,11 +41,11 @@
                         </div>
                         <div class="col-sm-4">
                             <a href="{{ route('worker.energy-resource.log.select-energy-resource', ['energyResourceVarName' => 'gas']) }}">
-                                <div class="p-3 border bg-light" style="min-height: 150px">
+                                <div class="p-3 border bg-navy" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 150px">
                                         <div class="text-center">
-                                            <div class="fa-solid fa-fire-flame-simple" style="font-size: 3em"></div>
-                                            <div class="text-center mt-3">{{ __('แก๊ส - Gas') }}</div>
+                                            <div class="fa-solid fa-fire-flame-simple text-light" style="font-size: 3em"></div>
+                                            <div class="text-center mt-3 text-light">{{ __('แก๊ส - Gas') }}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -53,23 +53,23 @@
                         </div>
                         <div class="col-sm-4">
                             <a href="{{ route('worker.energy-resource.log.select-energy-resource', ['energyResourceVarName' => 'biomass']) }}">
-                                <div class="p-3 border bg-light" style="min-height: 150px">
+                                <div class="p-3 border bg-navy" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 150px">
                                         <div class="text-center">
-                                            <div class="fa-brands fa-pagelines" style="font-size: 3em"></div>
-                                            <div class="text-center mt-3">{{ __('ชีวมวล - Biomass') }}</div>
+                                            <div class="fa-brands fa-pagelines text-light" style="font-size: 3em"></div>
+                                            <div class="text-center mt-3 text-light">{{ __('ชีวมวล - Biomass') }}</div>
                                         </div>
                                     </div>
                                 </div>
                             </a>
                         </div>
                         <div class="col-sm-4">
-                            <a href="{{ route('worker.energy-resource.log.select-energy-resource', ['energyResourceVarName' => 'fuel_oil']) }}">
-                                <div class="p-3 border bg-light" style="min-height: 150px">
+                            <a href="{{ route('worker.energy-resource.log.select-energy-resource', ['energyResourceVarName' => 'chemical']) }}">
+                                <div class="p-3 border bg-navy" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 150px">
                                         <div class="text-center">
-                                            <div class="fa-solid fa-oil-can" style="font-size: 3em"></div>
-                                            <div class="text-center mt-3">{{ __('น้ำมันเตา - Fuel Oil') }}</div>
+                                            <div class="fa-solid fa-oil-can text-light" style="font-size: 3em"></div>
+                                            <div class="text-center mt-3 text-light">{{ __('เคมี - Chemical') }}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -77,11 +77,11 @@
                         </div>
                         <div class="col-sm-4">
                             <a href="{{ route('worker.energy-resource.log.select-energy-resource', ['energyResourceVarName' => 'petrol']) }}">
-                                <div class="p-3 border bg-light" style="min-height: 150px">
+                                <div class="p-3 border bg-navy" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 150px">
                                         <div class="text-center">
-                                            <div class="fa-solid fa-gas-pump" style="font-size: 3em"></div>
-                                            <div class="text-center mt-3">{{ __('น้ำมันรถ - Petrol') }}</div>
+                                            <div class="fa-solid fa-gas-pump text-light" style="font-size: 3em"></div>
+                                            <div class="text-center mt-3 text-light">{{ __('น้ำมันรถ - Petrol') }}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -89,11 +89,11 @@
                         </div>
                         <div class="col-sm-12">
                             <a href="{{ route('worker.energy-resource.logs') }}">
-                                <div class="p-3 border bg-light" style="min-height: 150px">
+                                <div class="p-3 border bg-navy" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 150px">
                                         <div class="text-center">
-                                            <div class="fa-solid fa-history" style="font-size: 3em"></div>
-                                            <div class="text-center mt-3">{{ __('ประวัติการบันทึก - Logs') }}</div>
+                                            <div class="fa-solid fa-history text-light" style="font-size: 3em"></div>
+                                            <div class="text-center mt-3 text-light">{{ __('ประวัติการบันทึก - Logs') }}</div>
                                         </div>
                                     </div>
                                 </div>

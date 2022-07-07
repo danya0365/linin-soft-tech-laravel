@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\UserRole;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -14,7 +15,7 @@ return new class extends Migration
     public function up()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->enum('role', ['employee', 'admin', 'customer', 'standard'])->default('standard')->after('password');
+            $table->enum('role', UserRole::getValues())->default(UserRole::Employee())->after('password');
         });
     }
 

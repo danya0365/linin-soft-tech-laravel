@@ -19,4 +19,5 @@ final class EnergyResourceNameId extends Enum
     const Biomass = 4;
     const FuelOil = 5;
     const Petrol = 6;
+    const Chemical = 7;
 }

@@ -5,10 +5,9 @@
 <div class="container">
     <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ route('worker') }}">Worker</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.customer') }}">ลูกค้า</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.customer.operation-summary') }}">{{ $customer['name'] }}</a></li>
-            <li class="breadcrumb-item active" aria-current="page">แบบฟอร์ม Submit</li>
+            <li class="breadcrumb-item"><a href="{{ route('supervisor') }}">Supervisor</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('supervisor.customer') }}">{{ __('Customer') }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ __('เพิ่มบิลรายรับ - New Income Billing') }}</li>
         </ol>
     </nav>
     <div class="row justify-content-center">
@@ -16,136 +15,58 @@
             <div class="card">
                 <div class="card-header">น้ำหนักลูกค้าและยอดเก็บเงิน</div>
                 <div class="card-body">
-                    <form method="POST" action="{{ route('worker.customer.submit-billing', ['customerId' => $customer['id']]) }}"  role="form" enctype="multipart/form-data">
+                    <form method="POST" class="row g-3 mb-3" action="{{ route('supervisor.customer.new-billing') }}"  role="form" enctype="multipart/form-data">
+                        
                         @csrf
-                        {{ Form::hidden('total_billing_weight', 0) }}
-                        {{ Form::hidden('total_billing_payment', 0) }}
-                        <div class="box box-info padding-1">
-                            <div class="box-body">
-                                
-                                <div class="row g-2">
-                                    <div class="col-sm-6">
-                                        <div class="row g-2">
-                                            <div class="col-12 text-center">
-                                                <h2>น้ำหนักลูกค้า</h2>
-                                            </div>
-                                            <div class="col-12">
-                                                <div class="p-3 border bg-light" style="width: 100%">
-                                                    <div class="rounded-3" style="text-align: right; font-size: 48px" id="total_billing_weight-result">
-                                                        0
-                                                    </div>
-                                                </div>
-                                            </div>
-        
-                                            @foreach ([7, 8, 9, 4, 5, 6, 1, 2, 3, '.', 0, 'ลบ'] as $pad)
-                                            <div class="col-4">
-                                                <div class="border bg-light" style="width: 100%" id="total_billing_weight">
-                                                    <div class="rounded-3 d-flex align-items-center justify-content-center pad-number" style="font-size: 48px">
-                                                        {{ $pad }}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            @endforeach
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-6">
-                                        <div class="row g-2">
-                                            <div class="col-12 text-center">
-                                                <h2>ยอดเก็บเงิน</h2>
-                                            </div>
-                                            <div class="col-12">
-                                                <div class="p-3 border bg-light" style="width: 100%">
-                                                    <div class="rounded-3" style="text-align: right; font-size: 48px" id="total_billing_payment-result">
-                                                        0
-                                                    </div>
-                                                </div>
-                                            </div>
-        
-                                            @foreach ([7, 8, 9, 4, 5, 6, 1, 2, 3, '.', 0, 'ลบ'] as $pad)
-                                            <div class="col-4">
-                                                <div class="border bg-light" style="width: 100%" id="total_billing_payment">
-                                                    <div class="rounded-3 d-flex align-items-center justify-content-center pad-number" style="font-size: 48px">
-                                                        {{ $pad }}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            @endforeach
-                                        </div>
-                                    </div>
-                                </div>
+                        <div class="col-12">
+                            <label for="customer_id" class="form-label">ลูกค้า</label>
+                            <select class="form-select" id="customer_id" name="customer_id">
+                                <option value="">เลือกลูกค้า</option>
+                                @foreach ( $customerGroups as $customerGroup )
+                                <optgroup label="{{ $customerGroup['name'] }}">
+                                    @foreach ( $customerGroup['customers'] as $customer )
+                                    <option value="{{ $customer['id'] }}">{{ $customer['name'] }}</option>
+                                    @endforeach
+                                </optgroup>
+                                @endforeach
+                            </select>
+                        </div>
 
 
-                            </div>
-                            <div class="box-footer">
-                                <div class="row g-2 mt-2">
-                                    <div class="col-6">
-                                        <div class="d-grid gap-2" style="min-height: 60px">
-                                            <button class="btn btn-primary" type="submit">ยืนยัน</button>
-                                        </div>
-                                    </div>
-                                    <div class="col-6">
-                                        <div class="d-grid gap-2" style="min-height: 60px">
-                                            <button class="btn btn-danger" type="button" onclick="location.reload()">คืนค่า</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                        <div class="col-12">
+                            <label for="total_billing_weight" class="form-label">น้ำหนักลูกค้า (kg.)</label>
+                            <input type="number" step=".01" name="total_billing_weight" class="form-control" id="value">
+                            @error('total_billing_weight')
+                                <div class="text-danger">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="col-12">
+                            <label for="total_billing_payment" class="form-label">ยอดเก็บเงิน (Thai Baht)</label>
+                            <input type="number" step=".01" name="total_billing_payment" class="form-control" id="cost">
+                            @error('total_billing_payment')
+                                <div class="text-danger">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="col-12">
+                            <label for="billing_payment_date" class="form-label">วันที่เก็บเงิน</label>
+                            <input type="date" name="billing_payment_date" class="form-control" id="billing_payment_date">
+                            @error('billing_payment_date')
+                                <div class="text-danger">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                            <button type="reset" class="btn btn-outline-secondary">Reset</button>
                         </div>
                     </form>
+
                 </div>
             </div>
         </div>
     </div>
 </div>
-<script type="text/javascript">
-$(function(){
-    var total_billing_weight = $('[name=total_billing_weight]').val();
-    var total_billing_payment = $('[name=total_billing_payment]').val();
-    
-    var setPadResult = function(number, targetValue, targetResult){
-        var numbers = number.split('.');
-        if (numbers.length == 2) {
-            number = numbers[0] + '.' + numbers[1];
-            number = parseFloat(number);
-        } else {
-            number = parseInt(number);
-        }
-        if (isNaN(number)) {
-            number = 0;
-        }
-        $(targetResult).html(number.toLocaleString());
-        $(targetValue).val(number);
-    }
-    
-    $('#total_billing_payment .pad-number').click(function(){
-        var padNumber =  $.trim($(this).text())
-        padNumber = padNumber.replace(',', '');
-        if ( padNumber == '') {
-            return
-        }
-        total_billing_payment = total_billing_payment != '0' ? total_billing_payment + '' + padNumber : padNumber;
-        if ( padNumber == 'ลบ') {
-            total_billing_payment = '0';
-        }
-        setPadResult(total_billing_payment, $('[name=total_billing_payment]'), $("#total_billing_payment-result"));
-    })
-
-    $('#total_billing_weight .pad-number').click(function(){
-        var padNumber =  $.trim($(this).text())
-        padNumber = padNumber.replace(',', '');
-        if ( padNumber == '') {
-            return
-        }
-        total_billing_weight = total_billing_weight != '0' ? total_billing_weight + '' + padNumber : padNumber;
-        if ( padNumber == 'ลบ') {
-            total_billing_weight = '0';
-        }
-        setPadResult(total_billing_weight, $('[name=total_billing_weight]'), $("#total_billing_weight-result"));
-    })
-
-    setPadResult(total_billing_weight, $('[name=total_billing_weight]'), $("#total_billing_weight-result"));
-    setPadResult(total_billing_payment, $('[name=total_billing_payment]'), $("#total_billing_payment-result"));
-})
-</script>
 
 @endsection

@@ -57,7 +57,9 @@
                                             
 											<td>{{ $employee->code }}</td>
 											<td>{{ $employee->name }}</td>
-											<td>{{ $employee->photo }}</td>
+											<td style="width: 150px">
+                                                <x-employee-avatar :photo="$employee->photo" />
+                                            </td>
 											<td>{{ $employee->department ? $employee->department->name : '-' }}</td>
 
                                             <td>

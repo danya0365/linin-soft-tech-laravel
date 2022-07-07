@@ -17,11 +17,11 @@
                     <div class="row g-2">
                         <div class="col-sm-4">
                             <a href="{{ route('worker.product') }}">
-                                <div class="p-3 border bg-light" style="min-height: 150px">
+                                <div class="p-3 border bg-primary" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 110px">
                                         <div class="text-center">
-                                            <div class="fa-solid fa-shirt" style="font-size: 3em"></div>
-                                            <div class="text-center mt-3">{{ __('สินค้า - Product') }}</div>
+                                            <div class="fa-solid fa-shirt text-light" style="font-size: 3em"></div>
+                                            <div class="text-center mt-3 text-light">{{ __('สินค้า - Product') }}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -29,7 +29,7 @@
                         </div>
                         <div class="col-sm-4">
                             <a href="{{ route('worker.customer') }}">
-                                <div class="p-3 border bg-light" style="min-height: 150px">
+                                <div class="p-3 border bg-warning" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 110px">
                                         <div class="text-center">
                                             <div class="fa-solid fa-hospital" style="font-size: 3em"></div>
@@ -41,11 +41,11 @@
                         </div>
                         <div class="col-sm-4">
                             <a href="{{ route('worker.operation') }}">
-                                <div class="p-3 border bg-light" style="min-height: 150px">
+                                <div class="p-3 border bg-danger" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 110px">
                                         <div class="text-center">
-                                            <div class="fa-solid fa-people-carry-box" style="font-size: 3em"></div>
-                                            <div class="text-center mt-3">{{ __('ปฏิบัติการ - Operations') }}</div>
+                                            <div class="fa-solid fa-people-carry-box text-light" style="font-size: 3em"></div>
+                                            <div class="text-center mt-3 text-light">{{ __('ปฏิบัติการ - Operations') }}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -53,27 +53,27 @@
                         </div>
                         <div class="col-sm-4">
                             <a href="{{ route('worker.energy-resource') }}">
-                                <div class="p-3 border bg-light" style="min-height: 150px">
+                                <div class="p-3 border bg-success" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center">
-                                        <div class="bi bi-battery-charging" style="font-size: 3em"></div>
+                                        <div class="bi bi-battery-charging text-light" style="font-size: 3em"></div>
                                     </div>
-                                    <div class="text-center">{{ __('พลังงาน - Energy Resource') }}</div>
+                                    <div class="text-center text-light">{{ __('พลังงาน - Energy Resource') }}</div>
                                 </div>
                             </a>
                         </div>
                         <div class="col-sm-4">
                             <a href="{{ route('worker.employee') }}">
-                                <div class="p-3 border bg-light" style="min-height: 150px">
+                                <div class="p-3 border bg-info" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center">
-                                        <div class="bi bi-people-fill" style="font-size: 3em"></div>
+                                        <div class="bi bi-people-fill text-light" style="font-size: 3em"></div>
                                     </div>
-                                    <div class="text-center">{{ __('พนักงาน - Employee') }}</div>
+                                    <div class="text-center text-light">{{ __('พนักงาน - Employee') }}</div>
                                 </div>
                             </a>
                         </div>
                         <div class="col-sm-4">
                             <a href="{{ route('worker.stock') }}">
-                                <div class="p-3 border bg-light" style="min-height: 150px">
+                                <div class="p-3 border bg-brown" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 110px">
                                         <div class="text-center">
                                             <div class="fa-solid fa-warehouse" style="font-size: 3em"></div>

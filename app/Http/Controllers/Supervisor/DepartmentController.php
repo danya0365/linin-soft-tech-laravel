@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Managers\ExpenseManager;
 use App\Models\Department;
 use App\Models\DepartmentDailyCostLog;
+use Illuminate\Support\Facades\DB;
 
 class DepartmentController extends Controller
 {
@@ -42,7 +43,7 @@ class DepartmentController extends Controller
 
             $departmentDailyCostLog->save();
 
-            ExpenseManager::create(ExpenseType::DepartmentSalary(), $departmentDailyCostLog, $departmentDailyCostLog->cost);
+            ExpenseManager::create(ExpenseType::DepartmentSalary(), $departmentDailyCostLog, $departmentDailyCostLog->cost, $departmentDailyCostLog->daily_date);
 
             return redirect()->back()->with('success', 'DepartmentDailyCostLog submit successfully');
         }
@@ -72,7 +73,7 @@ class DepartmentController extends Controller
         $dateStartAt = request()->get('date_start_at');
         $dateEndAt = request()->get('date_end_at');
         if ($dateStartAt && $dateEndAt) {
-            $query->whereBetween('created_at', [$dateStartAt . ' 00:00:00', $dateEndAt . ' 23:59:59']);
+            $query->whereBetween('daily_date', [$dateStartAt, $dateEndAt]);
         }
         if ($sortOrderSelected) {
             list($sort, $order) = explode('-', $sortOrderSelected);
@@ -81,12 +82,29 @@ class DepartmentController extends Controller
 
         $departmentDailyCostLogs = $query->paginate();
 
+        $departmentDailyCostSums = (function () {
+            $query = DepartmentDailyCostLog::with('department')->select(
+                DB::raw('sum(cost) as total_cost'),
+                'department_id'
+            )
+                ->whereNotNull('department_id')
+                ->groupBy('department_id');
+
+            $dateStartAt = request()->get('date_start_at');
+            $dateEndAt = request()->get('date_end_at');
+            if ($dateStartAt && $dateEndAt) {
+                $query->whereBetween('daily_date', [$dateStartAt, $dateEndAt]);
+            }
+            return $query->get();
+        })();
+
         $departments = Department::get();
         return view(
             'supervisor.departments.daily-expense-logs',
             [
                 'departments' => $departments,
                 'departmentDailyCostLogs' => $departmentDailyCostLogs,
+                'departmentDailyCostSums' => $departmentDailyCostSums,
                 'departmentSelected' => $departmentSelected,
                 'sortOrders' => $sortOrders,
                 'sortOrderSelected' => $sortOrderSelected,

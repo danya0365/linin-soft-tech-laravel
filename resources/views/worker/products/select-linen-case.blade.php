@@ -19,11 +19,11 @@
                         @foreach ($operationLinenCases as $operationLinenCase )
                         <div class="col-sm-6">
                             <a href="{{ route('worker.product.get-operations-by-linen-case', ['linenCase' => $operationLinenCase['var']]) }}">
-                                <div class="p-3 border bg-light" style="min-height: 150px">
+                                <div class="p-3 border {{ $operationLinenCase['bg_css_class'] }}" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center">
-                                        <div class="bi {{ $operationLinenCase['icon'] }}" style="font-size: 3em"></div>
+                                        <div class="bi {{ $operationLinenCase['icon'] }} {{ $operationLinenCase['text_css_class'] }}" style="font-size: 3em"></div>
                                     </div>
-                                    <div class="text-center">{{ $operationLinenCase['name'] }}</div>
+                                    <div class="text-center {{ $operationLinenCase['text_css_class'] }}">{{ $operationLinenCase['name'] }}</div>
                                 </div>
                             </a>
                         </div>

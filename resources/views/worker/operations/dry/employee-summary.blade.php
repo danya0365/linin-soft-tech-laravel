@@ -63,7 +63,11 @@
                 <div class="card-body">
                     <div class="row mb-3 text-center">
                         <div class="col-12">
-                            <div class="bi bi-person-circle rounded-3 d-flex align-items-center justify-content-center p-3 py-6" style="font-size: 10em"></div>
+                            <div class="rounded-3 d-flex align-items-center justify-content-center p-3 py-6">
+                                <div style="max-width: 150px">
+                                    <x-employee-avatar :photo="$operation['dry_employee']['photo']" />
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <h5 class="card-title text-center">{{ $operation['dry_employee']['name'] }}</h5>

@@ -73,6 +73,19 @@
                                     </tr>
                                 @endforeach
                             </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td>
+                                        ยอดรวม
+                                    </td>
+                                    <td class="text-center">{{ number_format($summary->total_wet_weight) }}</td>
+                                    <td class="text-center">{{ number_format($summary->total_collect_weight) }}</td>
+                                    <td class="text-center">{{ number_format($summary->total_edit_collect_weight) }}</td>
+                                    <td class="text-center">{{ number_format($summary->total_collect_weight > 0 ? $summary->total_edit_collect_weight*100/$summary->total_collect_weight : 100) }}%</td>
+                                    <td class="text-center">{{ number_format($summary->total_billing_weight) }}</td>
+                                    <td class="text-center">{{ number_format($summary->total_billing_weight-$summary->total_collect_weight) }}</td>
+                                </tr>
+                            </tfoot>
                         </table>
                     </div>
                 </div>

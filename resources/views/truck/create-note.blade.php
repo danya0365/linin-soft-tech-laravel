@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('template_title')
-    Create Truck
+    Create Note
 @endsection
 
 @section('content')
@@ -39,6 +39,14 @@
                             {{ Form::label('image_upload', 'อัพโหลดรูป - Attach Photo', ['class' => "form-label"]) }}
                             {{ Form::file('image_upload', ['class' => 'form-control' . ($errors->has('image_upload') ? ' is-invalid' : ''), 'placeholder' => '']) }}
                             {!! $errors->first('image_upload', '<div class="invalid-feedback">:message</div>') !!}
+                        </div>
+
+                        <div class="col-12">
+                            <label for="note_date" class="form-label">วันที่บันทึก</label>
+                            <input type="date" name="note_date" class="form-control" id="note_date">
+                            @error('note_date')
+                                <div class="text-danger">{{ $message }}</div>
+                            @enderror
                         </div>
 
                         <div class="col-12">

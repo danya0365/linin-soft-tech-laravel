@@ -16,7 +16,6 @@
             <div class="card">
                 <div class="card-header">เพิ่มบันทึกการใช้แก็ส</div>
                 <div class="card-body">
-                    <h5 class="card-title">ปริมาณการใช้แก๊สล่าสุด -</h5>
                     <form class="row g-3 mb-3" action="{{ request()->url() }}" method="POST" role="form" enctype="multipart/form-data">
                         
                         @csrf

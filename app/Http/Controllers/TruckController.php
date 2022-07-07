@@ -122,7 +122,9 @@ class TruckController extends Controller
 
             request()->validate(
                 [
-                    'message' => 'required', 'cost' => 'required', 'truck_id' => 'required',
+                    'message' => 'required',
+                    'cost' => 'required',
+                    'truck_id' => 'required',
                     'image_upload' => 'mimes:jpeg,jpg,png,gif|max:10000'
                 ]
             );
@@ -143,10 +145,20 @@ class TruckController extends Controller
                 }
             }
 
-            $note = Note::create($post);
+            $note = new Note();
+            $note->message = $post['message'];
+            $note->image_url = $post['image_url'] ?? '';
+            $note->cost = $post['cost'];
+            $note->truck_id = $post['truck_id'];
+            if ($post['note_date']) {
+                $note->timestamps = false;
+                $note->created_at = \Carbon\Carbon::parse($post['note_date']);
+                $note->updated_at = \Carbon\Carbon::now();
+            }
+            $note->save();
 
             if ($note) {
-                ExpenseManager::create(ExpenseType::Truck(), $note, $note->cost);
+                ExpenseManager::create(ExpenseType::Truck(), $note, $note->cost, $note->created_at);
             }
 
             return redirect()->route('trucks.show', $truck)

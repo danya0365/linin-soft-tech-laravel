@@ -12,9 +12,10 @@
     <div class="row justify-content-center">
         <div class="col-md-12 m-2">
             <div class="card">
-                <div class="card-header">ต้นทุน, ยอดขาย, กำไร</div>
+                <div class="card-header">ต้นทุนแต่ละวัน</div>
                 <div class="card-body text-center">
-                    <div id="sales-bar-chart" style="min-width: 400px; height: 400px; margin: 0 auto">
+
+                    <div id="expense-latest-day-chart" style="min-width: 400px; height: 400px; margin: 0 auto">
 
                     </div>
                 </div>
@@ -22,9 +23,24 @@
         </div>
         <div class="col-md-12 m-2">
             <div class="card">
-                <div class="card-header">พลังงาน</div>
+                <div class="card-header">ต้นทุนตามวันที่เลือก</div>
                 <div class="card-body text-center">
-                    <div id="energy-pie-chart" style="min-width: 400px; height: 400px; margin: 0 auto">
+                    <form id="expense-range-days-form" class="row row-cols-lg-auto g-3 align-items-center mb-2" action="{{ request()->url() }}" method="GET">
+
+                        <div class="col-12">
+                            <div class="input-group">
+                                <input type="date" name="expense-range-days-start-at" value="" class="form-control" placeholder="วันที่เริ่ม" aria-label="วันที่เริ่ม">
+                                <span class="input-group-text"> ถึง </span>
+                                <input type="date" name="expense-range-days-end-at" value="" class="form-control" placeholder="วันที่สิ้นสุด" aria-label="วันที่สิ้นสุด">
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                            <button type="reset" class="btn btn-outline-secondary">Reset</button>
+                        </div>
+                    </form>
+                    <div id="expense-range-days-chart" style="min-width: 400px; height: 400px; margin: 0 auto">
 
                     </div>
                 </div>
@@ -33,141 +49,29 @@
     </div>
 </div>
 <script>
-
-var salesYearSummary = @json($salesYearSummary);
-var energySummary = @json($energySummary);
-
-function salesChart(){
-    var categories = salesYearSummary.monthYearTitles;
-
-    var expenseData = [];
-    for (const [key, value] of Object.entries(salesYearSummary.expenseYearSummary)) {
-        expenseData.push(parseFloat(value.total_amount));
-    }
-    var expenses = {
-        name: 'ต้นทุน',
-        data: expenseData
-    };
-
-    var incomeData = [];
-    for (const [key, value] of Object.entries(salesYearSummary.incomeYearSummary)) {
-        incomeData.push(parseFloat(value.total_amount));
-    }
-    var incomes = {
-        name: 'ยอดขาย',
-        data: incomeData
-    };
-
-    var profitData = [];
-    for (const [key, value] of Object.entries(salesYearSummary.profitYearSummary)) {
-        profitData.push(parseFloat(value.total_amount));
-    }
-    var profits = {
-        name: 'กำไร',
-        data: profitData
-    };
-
-    var series = [incomes, expenses, profits];
-
-    Highcharts.chart('sales-bar-chart', {
-        chart: {
-            type: 'column'
-        },
-        title: {
-            text: 'ต้นทุน, ยอดขาย, กำไร'
-        },
-        subtitle: {
-            text: ''
-        },
-        xAxis: {
-            categories: categories,
-            crosshair: true
-        },
-        yAxis: {
-            min: 0,
-            title: {
-                text: 'จำนวนเงิน (บาท)'
-            }
-        },
-        tooltip: {
-            headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
-            pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
-                '<td style="padding:0"><b>{point.y:.1f} บาท</b></td></tr>',
-            footerFormat: '</table>',
-            shared: true,
-            useHTML: true
-        },
-        plotOptions: {
-            column: {
-                pointPadding: 0.2,
-                borderWidth: 0
-            }
-        },
-        series: series
-    });
-}
-
-function energyPieChart(){
-
-    var data = [];
-
-    for (const [key, value] of Object.entries(energySummary)) {
-        if (data.length == 0) {
-            data.push({
-                name: value.name,
-                y: parseFloat(value.value),
-                sliced: true,
-                selected: true
-            });
-        } else {
-            data.push({
-                name: value.name,
-                y: parseFloat(value.value),
-            });
-        }
-    }
-
-    var series = [{
-        name: 'พลังงาน',
-        colorByPoint: true,
-        data: data
-    }];
-
-    Highcharts.chart('energy-pie-chart', {
-        chart: {
-            plotBackgroundColor: null,
-            plotBorderWidth: null,
-            plotShadow: false,
-            type: 'pie'
-        },
-        title: {
-            text: 'พลังงานที่ใช้ (บาท)'
-        },
-        tooltip: {
-            pointFormat: '{series.name}: <b>{point.y} บาท</b>'
-        },
-        accessibility: {
-            point: {
-                valueSuffix: '%'
-            }
-        },
-        plotOptions: {
-            pie: {
-                allowPointSelect: true,
-                cursor: 'pointer',
-                dataLabels: {
-                    enabled: true,
-                    format: '<b>{point.name}</b>: {point.percentage:.1f} %'
-                }
-            }
-        },
-        series: series
-    });
-}
-
 $(function(){
-    salesChart();
-    energyPieChart();
+
+    var expenseDaysSummary = @json(App\Managers\HighChartManager::getExpenseDaysSummary());
+    $.expenseDaysChart({ 'renderTo': 'expense-latest-day-chart', 'data': expenseDaysSummary});
+
+    var expenseRangeDaysSummary = () => {
+        var startAt = $('[name=expense-range-days-start-at]').val();
+        var endAt = $('[name=expense-range-days-end-at]').val();
+
+        var url = '{!! route('api.expense-range-days-chart', ['startAt' => 'startAtParam', 'endAt' => 'endAtParam']) !!}';
+        
+        url = url.replace('startAtParam', startAt)
+        url = url.replace('endAtParam', endAt)
+
+        $.get(url, function(response){
+            $.expenseDaysChart({ 'renderTo': 'expense-range-days-chart', 'data': response, 'title': `ยอดต้นทุน วันที่ ${startAt} ถึง ${endAt}`});
+        });
+    }
+
+    $('#expense-range-days-form').on('submit', (e) => {
+        e.preventDefault();
+        expenseRangeDaysSummary();
+    })
 })
 </script>
 @endsection

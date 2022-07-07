@@ -2,6 +2,7 @@
 
 namespace App\Managers;
 
+use App\Enums\OperationStatus;
 use App\Managers\Manager;
 use App\Models\CustomerOperationDailySummary;
 use App\Models\Operation;
@@ -45,7 +46,7 @@ class OperationManager extends Manager
 
     public static function createCustomerOperationDailySummary(Operation $operation)
     {
-        if (!$operation->customer) {
+        if (!$operation->customer_id) {
             return;
         }
 
@@ -59,7 +60,8 @@ class OperationManager extends Manager
             DB::raw('sum(collect_weight) as total_collect_weight')
         )
             ->join('operations', 'operations.id', '=', 'operation_id');
-        $query->where('operations.customer_id', $operation->customer->id);
+        $query->where('operations.customer_id', $operation->customer_id);
+        $query->where('operations.status', OperationStatus::Close());
         $query->whereBetween('operations_linen_products.created_at', [$operationDate . ' 00:00:00', $operationDate . ' 23:59:59']);
         $queryEdit = clone $query;
         $operationLinenProductSummary = $query->first();
@@ -71,14 +73,15 @@ class OperationManager extends Manager
             DB::raw('sum(total_billing_weight) as total_billing_weight'),
             DB::raw('sum(total_billing_payment) as total_billing_payment'),
         );
-        $query->where('customer_id', $operation->customer->id);
+        $query->where('customer_id', $operation->customer_id);
         $query->whereBetween('created_at', [$operationDate . ' 00:00:00', $operationDate . ' 23:59:59']);
+        $query->where('status', OperationStatus::Close());
         $operationSummary = $query->first();
 
-        $operationLog = CustomerOperationDailySummary::where(['customer_id' => $operation->customer->id, 'operation_date' => $operationDate])->first();
+        $operationLog = CustomerOperationDailySummary::where(['customer_id' => $operation->customer_id, 'operation_date' => $operationDate])->first();
         if (!$operationLog) {
             $operationLog = new CustomerOperationDailySummary;
-            $operationLog->customer_id = $operation->customer->id;
+            $operationLog->customer_id = $operation->customer_id;
             $operationLog->operation_date = $operationDate;
         }
         $operationLog->total_wet_weight = $operationLinenProductSummary->total_wet_weight ?? 0;

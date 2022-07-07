@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\UserRole;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 /**
  * Class UserController
@@ -32,7 +34,15 @@ class UserController extends Controller
     public function create()
     {
         $user = new User();
-        return view('user.create', compact('user'));
+        $user->role = UserRole::Employee();
+        $user->is_can_access_admin = 0;
+        $user->is_can_access_manager = 0;
+        $user->is_can_access_supervisor = 0;
+        $user->is_can_access_customer = 0;
+
+        $userRoles = UserRole::asSelectArray();
+
+        return view('user.create', compact('user', 'userRoles'));
     }
 
     /**
@@ -43,9 +53,11 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        request()->validate(User::$rules);
+        request()->validate(User::$onCreateRules);
 
-        $user = User::create($request->all());
+        $data = $request->all();
+        $data['password'] = Hash::make($data['password']);
+        $user = User::create($data);
 
         return redirect()->route('users.index')
             ->with('success', 'User created successfully.');
@@ -74,7 +86,9 @@ class UserController extends Controller
     {
         $user = User::find($id);
 
-        return view('user.edit', compact('user'));
+        $userRoles = UserRole::asSelectArray();
+
+        return view('user.edit', compact('user', 'userRoles'));
     }
 
     /**
@@ -86,9 +100,16 @@ class UserController extends Controller
      */
     public function update(Request $request, User $user)
     {
-        request()->validate(User::$rules);
+        request()->validate(User::$onUpdateRules);
 
-        $user->update($request->all());
+        $data = $request->all();
+        if (isset($data['password']) && trim($data['password']) != '') {
+            $data['password'] = Hash::make($data['password']);
+        } else {
+            unset($data['password']);
+        }
+
+        $user->update($data);
 
         return redirect()->route('users.index')
             ->with('success', 'User updated successfully');

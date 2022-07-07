@@ -39,14 +39,23 @@ class User extends Authenticatable
     'email',
     'password',
     'role',
+    'is_can_access_admin',
+    'is_can_access_manager',
+    'is_can_access_supervisor',
+    'is_can_access_customer',
   ];
 
-  static $rules = [
-    'name' => 'required',
-    'email' => 'required',
+  static $onCreateRules = [
+    'name' => ['required', 'string', 'max:255'],
+    'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+    'password' => ['required', 'string', 'min:8'],
     'role' => 'required',
   ];
 
+  static $onUpdateRules = [
+    'name' => ['required', 'string', 'max:255'],
+    'role' => 'required',
+  ];
 
   /**
    * The attributes that should be hidden for serialization.
