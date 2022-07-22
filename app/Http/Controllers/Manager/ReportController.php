@@ -21,6 +21,13 @@ class ReportController extends Controller
         );
     }
 
+    public function getFilter()
+    {
+        return view(
+            'manager.reports.filter'
+        );
+    }
+
     function getSalesRangeDaysChart()
     {
         $startAt = request()->get('startAt');
