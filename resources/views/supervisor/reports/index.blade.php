@@ -29,9 +29,9 @@
 
                         <div class="col-12">
                             <div class="input-group">
-                                <input type="date" name="expense-range-days-start-at" value="" class="form-control" placeholder="วันที่เริ่ม" aria-label="วันที่เริ่ม">
+                                <input type="text" name="expense-range-days-start-at" value="" class="form-control" placeholder="วันที่เริ่ม" aria-label="วันที่เริ่ม">
                                 <span class="input-group-text"> ถึง </span>
-                                <input type="date" name="expense-range-days-end-at" value="" class="form-control" placeholder="วันที่สิ้นสุด" aria-label="วันที่สิ้นสุด">
+                                <input type="text" name="expense-range-days-end-at" value="" class="form-control" placeholder="วันที่สิ้นสุด" aria-label="วันที่สิ้นสุด">
                             </div>
                         </div>
 
@@ -87,6 +87,9 @@ $(function(){
         e.preventDefault();
         expenseRangeDaysSummary();
     })
+
+    $('[name=expense-range-days-start-at]').datepicker({ format: 'yyyy-mm-dd' });
+    $('[name=expense-range-days-end-at]').datepicker({ format: 'yyyy-mm-dd' });
 })
 </script>
 @endsection
