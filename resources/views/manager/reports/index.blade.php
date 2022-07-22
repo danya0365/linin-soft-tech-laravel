@@ -18,9 +18,9 @@
 
                         <div class="col-12">
                             <div class="input-group">
-                                <input type="date" name="overall[date_start_at]" value="{{ $overallSummary['queryParam']['dateStartAt'] }}" class="form-control" placeholder="วันที่เริ่ม" aria-label="วันที่เริ่ม">
+                                <input type="text" id="overall_date_start_at" name="overall[date_start_at]" value="{{ $overallSummary['queryParam']['dateStartAt'] }}" class="form-control" placeholder="วันที่เริ่ม" aria-label="วันที่เริ่ม">
                                 <span class="input-group-text"> ถึง </span>
-                                <input type="date" name="overall[date_end_at]" value="{{ $overallSummary['queryParam']['dateEndAt'] }}" class="form-control" placeholder="วันที่สิ้นสุด" aria-label="วันที่สิ้นสุด">
+                                <input type="text" id="overall_date_end_at" name="overall[date_end_at]" value="{{ $overallSummary['queryParam']['dateEndAt'] }}" class="form-control" placeholder="วันที่สิ้นสุด" aria-label="วันที่สิ้นสุด">
                             </div>
                         </div>
 
@@ -95,9 +95,9 @@
 
                         <div class="col-12">
                             <div class="input-group">
-                                <input type="date" name="sales-range-days-start-at" value="" class="form-control" placeholder="วันที่เริ่ม" aria-label="วันที่เริ่ม">
+                                <input type="text" name="sales-range-days-start-at" value="" class="form-control" placeholder="วันที่เริ่ม" aria-label="วันที่เริ่ม">
                                 <span class="input-group-text"> ถึง </span>
-                                <input type="date" name="sales-range-days-end-at" value="" class="form-control" placeholder="วันที่สิ้นสุด" aria-label="วันที่สิ้นสุด">
+                                <input type="text" name="sales-range-days-end-at" value="" class="form-control" placeholder="วันที่สิ้นสุด" aria-label="วันที่สิ้นสุด">
                             </div>
                         </div>
 
@@ -121,9 +121,9 @@
 
                         <div class="col-12">
                             <div class="input-group">
-                                <input type="date" name="energy[date_start_at]" value="{{ $energySummary['queryParam']['dateStartAt'] }}" class="form-control" placeholder="วันที่เริ่ม" aria-label="วันที่เริ่ม">
+                                <input type="text" id="energy_date_start_at" name="energy[date_start_at]" value="{{ $energySummary['queryParam']['dateStartAt'] }}" class="form-control" placeholder="วันที่เริ่ม" aria-label="วันที่เริ่ม">
                                 <span class="input-group-text"> ถึง </span>
-                                <input type="date" name="energy[date_end_at]" value="{{ $energySummary['queryParam']['dateEndAt'] }}" class="form-control" placeholder="วันที่สิ้นสุด" aria-label="วันที่สิ้นสุด">
+                                <input type="text" id="energy_date_end_at" name="energy[date_end_at]" value="{{ $energySummary['queryParam']['dateEndAt'] }}" class="form-control" placeholder="วันที่สิ้นสุด" aria-label="วันที่สิ้นสุด">
                             </div>
                         </div>
 
@@ -159,9 +159,9 @@
 
                         <div class="col-12">
                             <div class="input-group">
-                                <input type="date" name="energy-range-days-start-at" value="" class="form-control" placeholder="วันที่เริ่ม" aria-label="วันที่เริ่ม">
+                                <input type="text" name="energy-range-days-start-at" value="" class="form-control" placeholder="วันที่เริ่ม" aria-label="วันที่เริ่ม">
                                 <span class="input-group-text"> ถึง </span>
-                                <input type="date" name="energy-range-days-end-at" value="" class="form-control" placeholder="วันที่สิ้นสุด" aria-label="วันที่สิ้นสุด">
+                                <input type="text" name="energy-range-days-end-at" value="" class="form-control" placeholder="วันที่สิ้นสุด" aria-label="วันที่สิ้นสุด">
                             </div>
                         </div>
 
@@ -195,9 +195,9 @@
 
                         <div class="col-12">
                             <div class="input-group">
-                                <input type="date" name="expense-range-days-start-at" value="" class="form-control" placeholder="วันที่เริ่ม" aria-label="วันที่เริ่ม">
+                                <input type="text" name="expense-range-days-start-at" value="" class="form-control" placeholder="วันที่เริ่ม" aria-label="วันที่เริ่ม">
                                 <span class="input-group-text"> ถึง </span>
-                                <input type="date" name="expense-range-days-end-at" value="" class="form-control" placeholder="วันที่สิ้นสุด" aria-label="วันที่สิ้นสุด">
+                                <input type="text" name="expense-range-days-end-at" value="" class="form-control" placeholder="วันที่สิ้นสุด" aria-label="วันที่สิ้นสุด">
                             </div>
                         </div>
 
@@ -231,9 +231,9 @@
 
                         <div class="col-12">
                             <div class="input-group">
-                                <input type="date" name="income-range-days-start-at" value="" class="form-control" placeholder="วันที่เริ่ม" aria-label="วันที่เริ่ม">
+                                <input type="text" name="income-range-days-start-at" value="" class="date form-control" placeholder="วันที่เริ่ม" aria-label="วันที่เริ่ม">
                                 <span class="input-group-text"> ถึง </span>
-                                <input type="date" name="income-range-days-end-at" value="" class="form-control" placeholder="วันที่สิ้นสุด" aria-label="วันที่สิ้นสุด">
+                                <input type="text" name="income-range-days-end-at" value="" class="date form-control" placeholder="วันที่สิ้นสุด" aria-label="วันที่สิ้นสุด">
                             </div>
                         </div>
 
@@ -280,8 +280,23 @@ $(function(){
         url = url.replace('startAtParam', startAt)
         url = url.replace('endAtParam', endAt)
 
+        Swal.fire({
+            title: 'Loading...',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading()
+            },
+        });
+
         $.get(url, function(response){
             $.salesLatestDaysChart({ 'renderTo': 'sales-range-days-chart', 'data': response, 'title': `ต้นทุน, ยอดขาย, กำไร วันที่ ${startAt} ถึง ${endAt}`});
+        }).fail(function() {
+            Swal.fire({
+                icon: 'error',
+                text: 'กรุณาลองใหม่อีกครั้ง'
+            })
+        }).always(function() {
+            Swal.close();
         });
     }
 
@@ -299,8 +314,23 @@ $(function(){
         url = url.replace('startAtParam', startAt)
         url = url.replace('endAtParam', endAt)
 
+        Swal.fire({
+            title: 'Loading...',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading()
+            },
+        });
+
         $.get(url, function(response){
             $.energyDaysChart({ 'renderTo': 'energy-range-days-chart', 'data': response, 'title': `ยอดการใช้พลังงาน วันที่ ${startAt} ถึง ${endAt}`});
+        }).fail(function() {
+            Swal.fire({
+                icon: 'error',
+                text: 'กรุณาลองใหม่อีกครั้ง'
+            })
+        }).always(function() {
+            Swal.close();
         });
     }
 
@@ -318,8 +348,23 @@ $(function(){
         url = url.replace('startAtParam', startAt)
         url = url.replace('endAtParam', endAt)
 
+        Swal.fire({
+            title: 'Loading...',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading()
+            },
+        });
+
         $.get(url, function(response){
             $.expenseDaysChart({ 'renderTo': 'expense-range-days-chart', 'data': response, 'title': `ยอดต้นทุน วันที่ ${startAt} ถึง ${endAt}`});
+        }).fail(function() {
+            Swal.fire({
+                icon: 'error',
+                text: 'กรุณาลองใหม่อีกครั้ง'
+            })
+        }).always(function() {
+            Swal.close();
         });
     }
 
@@ -337,8 +382,23 @@ $(function(){
         url = url.replace('startAtParam', startAt)
         url = url.replace('endAtParam', endAt)
 
+        Swal.fire({
+            title: 'Loading...',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading()
+            },
+        });
+
         $.get(url, function(response){
             $.incomeDaysChart({ 'renderTo': 'income-range-days-chart', 'data': response, 'title': `ยอดขาย วันที่ ${startAt} ถึง ${endAt}`});
+        }).fail(function() {
+            Swal.fire({
+                icon: 'error',
+                text: 'กรุณาลองใหม่อีกครั้ง'
+            })
+        }).always(function() {
+            Swal.close();
         });
     }
 
@@ -346,6 +406,30 @@ $(function(){
         e.preventDefault();
         incomeRangeDaysSummary();
     })
+
+    // $('.date').each(function(element){
+    //     new Datepicker($(element), {
+    //         // options
+    //     }); 
+    // })
+
+    $('[name=energy-range-days-start-at]').datepicker({ format: 'yyyy-mm-dd' });
+    $('[name=energy-range-days-end-at]').datepicker({ format: 'yyyy-mm-dd' });
+
+    $('[name=expense-range-days-start-at]').datepicker({ format: 'yyyy-mm-dd' });
+    $('[name=expense-range-days-end-at]').datepicker({ format: 'yyyy-mm-dd' });
+
+    $('[name=sales-range-days-start-at]').datepicker({ format: 'yyyy-mm-dd' });
+    $('[name=sales-range-days-end-at]').datepicker({ format: 'yyyy-mm-dd' });
+
+    $('[name=income-range-days-start-at]').datepicker({ format: 'yyyy-mm-dd' });
+    $('[name=income-range-days-end-at]').datepicker({ format: 'yyyy-mm-dd' });
+
+    $('#overall_date_start_at').datepicker({ format: 'yyyy-mm-dd' });
+    $('#overall_date_end_at').datepicker({ format: 'yyyy-mm-dd' });
+
+    $('#energy_date_start_at').datepicker({ format: 'yyyy-mm-dd' });
+    $('#energy_date_end_at').datepicker({ format: 'yyyy-mm-dd' });
 })
 </script>
 @endsection

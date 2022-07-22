@@ -1,4 +1,6 @@
 require("./bootstrap");
+require("gijgo");
+require("gijgo/css/gijgo.css");
 require("./worker/employee/employee-summary.js");
 require("./highcharts.js");
 
