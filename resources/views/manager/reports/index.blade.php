@@ -231,9 +231,9 @@
 
                         <div class="col-12">
                             <div class="input-group">
-                                <input type="date" name="income-range-days-start-at" value="" class="form-control" placeholder="วันที่เริ่ม" aria-label="วันที่เริ่ม">
+                                <input type="date" name="income-range-days-start-at" value="" class="date form-control" placeholder="วันที่เริ่ม" aria-label="วันที่เริ่ม">
                                 <span class="input-group-text"> ถึง </span>
-                                <input type="date" name="income-range-days-end-at" value="" class="form-control" placeholder="วันที่สิ้นสุด" aria-label="วันที่สิ้นสุด">
+                                <input type="date" name="income-range-days-end-at" value="" class="date form-control" placeholder="วันที่สิ้นสุด" aria-label="วันที่สิ้นสุด">
                             </div>
                         </div>
 
@@ -280,8 +280,23 @@ $(function(){
         url = url.replace('startAtParam', startAt)
         url = url.replace('endAtParam', endAt)
 
+        Swal.fire({
+            title: 'Loading...',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading()
+            },
+        });
+        
         $.get(url, function(response){
             $.salesLatestDaysChart({ 'renderTo': 'sales-range-days-chart', 'data': response, 'title': `ต้นทุน, ยอดขาย, กำไร วันที่ ${startAt} ถึง ${endAt}`});
+        }).fail(function() {
+            Swal.fire({
+                icon: 'error',
+                text: 'กรุณาลองใหม่อีกครั้ง'
+            })
+        }).always(function() {
+            Swal.close();
         });
     }
 
@@ -299,8 +314,23 @@ $(function(){
         url = url.replace('startAtParam', startAt)
         url = url.replace('endAtParam', endAt)
 
+        Swal.fire({
+            title: 'Loading...',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading()
+            },
+        });
+
         $.get(url, function(response){
             $.energyDaysChart({ 'renderTo': 'energy-range-days-chart', 'data': response, 'title': `ยอดการใช้พลังงาน วันที่ ${startAt} ถึง ${endAt}`});
+        }).fail(function() {
+            Swal.fire({
+                icon: 'error',
+                text: 'กรุณาลองใหม่อีกครั้ง'
+            })
+        }).always(function() {
+            Swal.close();
         });
     }
 
@@ -318,8 +348,23 @@ $(function(){
         url = url.replace('startAtParam', startAt)
         url = url.replace('endAtParam', endAt)
 
+        Swal.fire({
+            title: 'Loading...',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading()
+            },
+        });
+
         $.get(url, function(response){
             $.expenseDaysChart({ 'renderTo': 'expense-range-days-chart', 'data': response, 'title': `ยอดต้นทุน วันที่ ${startAt} ถึง ${endAt}`});
+        }).fail(function() {
+            Swal.fire({
+                icon: 'error',
+                text: 'กรุณาลองใหม่อีกครั้ง'
+            })
+        }).always(function() {
+            Swal.close();
         });
     }
 
@@ -337,8 +382,23 @@ $(function(){
         url = url.replace('startAtParam', startAt)
         url = url.replace('endAtParam', endAt)
 
+        Swal.fire({
+            title: 'Loading...',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading()
+            },
+        });
+
         $.get(url, function(response){
             $.incomeDaysChart({ 'renderTo': 'income-range-days-chart', 'data': response, 'title': `ยอดขาย วันที่ ${startAt} ถึง ${endAt}`});
+        }).fail(function() {
+            Swal.fire({
+                icon: 'error',
+                text: 'กรุณาลองใหม่อีกครั้ง'
+            })
+        }).always(function() {
+            Swal.close();
         });
     }
 

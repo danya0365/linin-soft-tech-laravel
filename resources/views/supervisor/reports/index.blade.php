@@ -63,8 +63,23 @@ $(function(){
         url = url.replace('startAtParam', startAt)
         url = url.replace('endAtParam', endAt)
 
+        Swal.fire({
+            title: 'Loading...',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading()
+            },
+        });
+
         $.get(url, function(response){
             $.expenseDaysChart({ 'renderTo': 'expense-range-days-chart', 'data': response, 'title': `ยอดต้นทุน วันที่ ${startAt} ถึง ${endAt}`});
+        }).fail(function() {
+            Swal.fire({
+                icon: 'error',
+                text: 'กรุณาลองใหม่อีกครั้ง'
+            })
+        }).always(function() {
+            Swal.close();
         });
     }
 
