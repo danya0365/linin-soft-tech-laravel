@@ -65,6 +65,7 @@ Route::group(['prefix' => 'manager', 'middleware' => ['manager']], function () {
 
     Route::group(['prefix' => 'report'], function () {
         Route::get('/', [App\Http\Controllers\Manager\ReportController::class, 'index'])->name('manager.report');
+        Route::get('/filter', [App\Http\Controllers\Manager\ReportController::class, 'getFilter'])->name('manager.report.filter');
     });
 });
 
