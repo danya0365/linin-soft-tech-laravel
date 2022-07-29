@@ -1,0 +1,37 @@
+@extends('layouts.app')
+
+@section('template_title')
+    {{ $linenProduct->name ?? 'Show Linen Product' }}
+@endsection
+
+@section('content')
+    <section class="content container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="float-left">
+                            <span class="card-title">Show Linen Product</span>
+                        </div>
+                        <div class="float-right">
+                            <a class="btn btn-primary" href="{{ route('linen-products.index') }}"> Back</a>
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+                        
+                        <div class="form-group">
+                            <strong>Linen Type:</strong>
+                            {{ $linenProduct->linenType ? $linenProduct->linenType->name : '-' }}
+                        </div>
+                        <div class="form-group">
+                            <strong>Name:</strong>
+                            {{ $linenProduct->name }}
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+@endsection
