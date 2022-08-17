@@ -108,4 +108,6 @@ return [
 
     'password_timeout' => 10800,
 
+    'super_admin_user_id' => env('SUPER_ADMIN_USER_ID', 1),
+
 ];

@@ -61,12 +61,12 @@
                             </a>
                         </div>
                         <div class="col-sm-6">
-                            <a href="{{ route('setting') }}">
+                            <a href="{{ route('admin') }}">
                                 <div class="p-3 border bg-navy" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 110px">
                                         <div class="text-center">
                                             <div class="fa-solid fa-gears" style="font-size: 3em"></div>
-                                            <div class="text-center mt-3">{{ __('ตั้งค่า - Setting') }}</div>
+                                            <div class="text-center mt-3">{{ __('ผู้ควบคุม - Admin') }}</div>
                                         </div>
                                     </div>
                                 </div>
