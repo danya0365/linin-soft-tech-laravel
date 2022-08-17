@@ -25,7 +25,7 @@
 </div>
 
 <div class="col-12">
-    {{ Form::label('is_can_access_admin', 'Access Setting', ['class' => 'form-label']) }}
+    {{ Form::label('is_can_access_admin', 'Access Admin', ['class' => 'form-label']) }}
     <div class="form-group">
         <div class="form-check form-check-inline">
             <input class="form-check-input" type="radio" id="is_can_access_admin_1" name="is_can_access_admin" value="1" {{ $user->is_can_access_admin == '1' ? 'checked' : '' }}>
@@ -69,7 +69,7 @@
     {!! $errors->first('is_can_access_supervisor', '<div class="invalid-feedback">:message</div>') !!}
 </div>
 
-<div class="col-12">
+<div class="col-12" style="display: none">
     {{ Form::label('is_can_access_customer', 'Access Customer', ['class' => 'form-label']) }}
     <div class="form-group">
         <div class="form-check form-check-inline">

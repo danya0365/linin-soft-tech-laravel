@@ -35,8 +35,9 @@ Auth::routes(['register' => false]);
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 
-Route::group(['prefix' => 'setting', 'middleware' => ['admin']], function () {
-    Route::get('/', [App\Http\Controllers\SettingController::class, 'index'])->name('setting');
+Route::group(['prefix' => 'admin', 'middleware' => ['admin']], function () {
+    Route::get('/', [App\Http\Controllers\SettingController::class, 'index'])->name('admin');
+    Route::get('/setting', [App\Http\Controllers\SettingController::class, 'index'])->name('admin.setting');
 });
 
 Route::group(['middleware' => ['admin']], function () {
