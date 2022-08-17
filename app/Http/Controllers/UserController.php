@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\UserRole;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 /**
@@ -71,6 +72,11 @@ class UserController extends Controller
      */
     public function show($id)
     {
+        if (config('auth.super_admin_user_id') == $id && Auth::user()->id != $id) {
+            return redirect()->route('users.index')
+                ->with('success', 'Can not show super admin');
+        }
+
         $user = User::find($id);
 
         return view('user.show', compact('user'));
@@ -84,6 +90,11 @@ class UserController extends Controller
      */
     public function edit($id)
     {
+        if (config('auth.super_admin_user_id') == $id && Auth::user()->id != $id) {
+            return redirect()->route('users.index')
+                ->with('success', 'Can not edit super admin');
+        }
+
         $user = User::find($id);
 
         $userRoles = UserRole::asSelectArray();
@@ -100,6 +111,11 @@ class UserController extends Controller
      */
     public function update(Request $request, User $user)
     {
+        if (config('auth.super_admin_user_id') == $user->id && Auth::user()->id != $user->id) {
+            return redirect()->route('users.index')
+                ->with('success', 'Can not edit super admin');
+        }
+
         request()->validate(User::$onUpdateRules);
 
         $data = $request->all();
@@ -122,6 +138,11 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
+        if (config('auth.super_admin_user_id') == $id && Auth::user()->id != $id) {
+            return redirect()->route('users.index')
+                ->with('success', 'Can not delete super admin');
+        }
+
         $user = User::find($id)->delete();
 
         return redirect()->route('users.index')
