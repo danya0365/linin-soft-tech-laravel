@@ -11,6 +11,17 @@
         </ol>
     </nav>
     <div class="row justify-content-center">
+        @if ($message = Session::get('success'))
+        <div class="alert alert-success mb-2">
+            {{ $message }}
+        </div>
+        @endif
+
+        @if ($message = Session::get('error'))
+        <div class="alert alert-danger mb-2">
+            {{ $message }}
+        </div>
+        @endif
         <div class="col-md-12 m-2">
             <div class="card">
                 <div class="card-header">
