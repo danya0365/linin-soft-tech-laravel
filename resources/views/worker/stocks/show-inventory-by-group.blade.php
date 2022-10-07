@@ -82,6 +82,7 @@
                                                 </a>
     
                                                 <button type="submit" class="btn btn-danger"><i class="fa-solid fa-trash"></i></button>
+                                                
                                             </form>
                                         </td>
                                     </tr>
