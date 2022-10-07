@@ -98,4 +98,14 @@
         </div>
     </div>
 </div>
+<script>
+    $(function(){
+        $('.delete-form').on('submit', function(e){
+            if (!confirm("Are you sure?")) {
+                return false;
+            }
+            return true
+        })
+    });
+</script>
 @endsection
