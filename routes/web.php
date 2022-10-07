@@ -265,9 +265,10 @@ Route::group(['prefix' => 'worker', 'middleware' => ['auth']], function () {
         Route::get('/inventory-group/{inventoryGroupId}', [App\Http\Controllers\Worker\StockController::class, 'showInventoryByGroup'])->name('worker.stock.show-inventory-by-group');
         Route::match(array('GET', 'POST'), '/inventory-group/{inventoryGroupId}/create', [App\Http\Controllers\Worker\StockController::class, 'createInventoryByGroup'])->name('worker.stock.create-inventory-by-group');
         Route::match(array('GET', 'POST'), '/inventory/{inventoryId}/edit', [App\Http\Controllers\Worker\StockController::class, 'editInventory'])->name('worker.stock.edit-inventory');
+        Route::match(array('POST'), '/inventory/{inventoryId}/delete', [App\Http\Controllers\Worker\StockController::class, 'deleteInventory'])->name('worker.stock.delete-inventory');
         Route::match(array('GET', 'POST'), '/inventory/{inventoryId}/increase-stock', [App\Http\Controllers\Worker\StockController::class, 'getInventoryIncreaseStock'])->name('worker.stock.inventory.increase-stock');
         Route::match(array('GET', 'POST'), '/inventory/{inventoryId}/decrease-stock', [App\Http\Controllers\Worker\StockController::class, 'getInventoryDecreaseStock'])->name('worker.stock.inventory.decrease-stock');
         Route::get('/inventory/{inventoryId}/logs', [App\Http\Controllers\Worker\StockController::class, 'showInventoryLogsById'])->name('worker.stock.inventory.logs');
-        Route::match(array('GET', 'POST'), '/inventory/{inventoryId}/delete', [App\Http\Controllers\Worker\StockController::class, 'deleteInventory'])->name('worker.stock.inventory.delete');
+        Route::match(array('POST'), '/inventory/{inventoryLogId}/logs/delete', [App\Http\Controllers\Worker\StockController::class, 'deleteInventoryLog'])->name('worker.stock.inventory.logs.delete');
     });
 });
