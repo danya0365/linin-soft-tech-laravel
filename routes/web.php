@@ -70,6 +70,17 @@ Route::group(['prefix' => 'manager', 'middleware' => ['manager']], function () {
     });
 });
 
+Route::group(['prefix' => 'user-customer', 'middleware' => ['user-customer']], function () {
+
+    Route::get('/', [App\Http\Controllers\UserCustomerController::class, 'index'])->name('user-customer');
+
+    Route::group(['prefix' => 'customer'], function () {
+        Route::get('/', [App\Http\Controllers\UserCustomer\CustomerController::class, 'index'])->name('user-customer.customer');
+        Route::get('/operation-summary', [App\Http\Controllers\UserCustomer\CustomerController::class, 'getOperationSummary'])->name('user-customer.customer.operation-summary');
+        Route::get('/operations-by-customer/{customerId}', [App\Http\Controllers\UserCustomer\CustomerController::class, 'getOperationsByCustomer'])->name('user-customer.customer.get-operations-by-customer');
+    });
+});
+
 Route::group(['prefix' => 'customer', 'middleware' => ['customer']], function () {
 
     Route::match(array('GET', 'POST'), '/create-feedback', [App\Http\Controllers\CustomerController::class, 'createFeedback'])->name('customers.create-feedback');
