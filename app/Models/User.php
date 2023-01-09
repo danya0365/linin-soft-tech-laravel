@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -77,4 +76,9 @@ class User extends Authenticatable
   ];
 
   protected $perPage = 20;
+
+  public function customers()
+  {
+    return $this->belongsToMany(Customer::class, 'users_customers')->using(UserCustomer::class);
+  }
 }

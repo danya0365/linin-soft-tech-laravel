@@ -56,4 +56,9 @@ class Customer extends Model
   {
     return $this->belongsTo(CustomerGroup::class);
   }
+
+  public function users()
+  {
+    return $this->belongsToMany(User::class, 'users_customers')->using(UserCustomer::class);
+  }
 }
