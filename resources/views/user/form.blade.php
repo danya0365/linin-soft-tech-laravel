@@ -25,6 +25,17 @@
 </div>
 
 <div class="col-12">
+    {{ Form::label('customer_account', 'Customer ID', ['class' => 'form-label']) }}
+    <select class="form-select" id="customer_account" name="customer_account">
+        <option value="">เลือก</option>
+        @foreach ( $customerAccounts as $key => $customerAccount )
+        <option value="{{ $customerAccount->id }}" {{ $user->customer_account == $customerAccount->id ? 'selected' : '' }}>{{ $customerAccount->name }}</option>
+        @endforeach
+    </select>
+    {!! $errors->first('customer_account', '<div class="invalid-feedback">:message</div>') !!}
+</div>
+
+<div class="col-12">
     {{ Form::label('is_can_access_admin', 'Access Admin', ['class' => 'form-label']) }}
     <div class="form-group">
         <div class="form-check form-check-inline">
@@ -69,7 +80,7 @@
     {!! $errors->first('is_can_access_supervisor', '<div class="invalid-feedback">:message</div>') !!}
 </div>
 
-<div class="col-12" style="display: none">
+<div class="col-12">
     {{ Form::label('is_can_access_customer', 'Access Customer', ['class' => 'form-label']) }}
     <div class="form-group">
         <div class="form-check form-check-inline">
