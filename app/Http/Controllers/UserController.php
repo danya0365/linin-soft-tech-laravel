@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\UserRole;
+use App\Models\Customer;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -42,8 +43,9 @@ class UserController extends Controller
         $user->is_can_access_customer = 0;
 
         $userRoles = UserRole::asSelectArray();
+        $customerAccounts = Customer::all();
 
-        return view('user.create', compact('user', 'userRoles'));
+        return view('user.create', compact('user', 'userRoles', 'customerAccounts'));
     }
 
     /**
@@ -98,8 +100,9 @@ class UserController extends Controller
         $user = User::find($id);
 
         $userRoles = UserRole::asSelectArray();
+        $customerAccounts = Customer::all();
 
-        return view('user.edit', compact('user', 'userRoles'));
+        return view('user.edit', compact('user', 'userRoles', 'customerAccounts'));
     }
 
     /**

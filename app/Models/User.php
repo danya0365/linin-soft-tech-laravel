@@ -38,6 +38,7 @@ class User extends Authenticatable
     'email',
     'password',
     'role',
+    'customer_account',
     'is_can_access_admin',
     'is_can_access_manager',
     'is_can_access_supervisor',
