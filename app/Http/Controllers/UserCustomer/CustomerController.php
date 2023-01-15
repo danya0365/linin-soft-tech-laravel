@@ -10,10 +10,17 @@ use App\Models\CustomerOperationDailySummary;
 use App\Models\LinenType;
 use App\Models\OperationLinenCase;
 use App\Models\OperationLinenProduct;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class CustomerController extends Controller
 {
+    private function getAuthCustomer()
+    {
+        $customerAccount = Auth::user()->customer_account;
+        return Customer::find($customerAccount);
+    }
+
     public function index()
     {
         return redirect(route('user-customer.customer.operation-summary'));
@@ -32,6 +39,12 @@ class CustomerController extends Controller
         ];
         $sortOrderSelected = request()->get('sort_order', $sortOrders[0]['var']);
 
+        $customer = $this->getAuthCustomer();
+        if (!$customer) {
+            abort(404);
+            exit;
+        }
+
         $query = CustomerOperationDailySummary::with('customer')->select(
             DB::raw('sum(total_wet_weight) as total_wet_weight'),
             DB::raw('sum(total_edit_collect_weight) as total_edit_collect_weight'),
@@ -40,6 +53,7 @@ class CustomerController extends Controller
             'customer_id'
         );
         $query->groupBy('customer_id');
+        $query->where('customer_id', $customer->id);
 
         $dateStartAt = request()->get('date_start_at');
         $dateEndAt = request()->get('date_end_at');
@@ -97,6 +111,11 @@ class CustomerController extends Controller
         $operationTypeSelected = request()->get('operation_type');
         $linenProductSelected = request()->get('linen_product_id');
         $linenCaseSelected = request()->get('linen_case');
+        $customer = $this->getAuthCustomer();
+        if (!$customer || $customer->id != $customerId) {
+            abort(404);
+            exit;
+        }
 
         $query = OperationLinenProduct::with(['operation' => function ($query) {
             $query->with('employee')->with('customer');
