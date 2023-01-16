@@ -82,4 +82,29 @@ class User extends Authenticatable
   {
     return $this->belongsToMany(Customer::class, 'users_customers')->using(UserCustomer::class);
   }
+
+  public function isWorker(): bool
+  {
+    return $this->is_can_access_worker;
+  }
+
+  public function isUserCustomer(): bool
+  {
+    return $this->is_can_access_customer;
+  }
+
+  public function isSupervisor(): bool
+  {
+    return $this->is_can_access_supervisor;
+  }
+
+  public function isManager(): bool
+  {
+    return $this->is_can_access_manager;
+  }
+
+  public function isAdmin(): bool
+  {
+    return $this->is_can_access_admin;
+  }
 }

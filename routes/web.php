@@ -109,7 +109,7 @@ Route::group(['prefix' => 'supervisor', 'middleware' => ['supervisor']], functio
     });
 });
 
-Route::group(['prefix' => 'worker', 'middleware' => ['auth']], function () {
+Route::group(['prefix' => 'worker', 'middleware' => ['worker']], function () {
 
     Route::get('/', [App\Http\Controllers\WorkerController::class, 'index'])->name('worker');
 
