@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Symfony\Component\Console\Output\ConsoleOutput;
 
 class SetUserPassword extends Command
 {
@@ -14,14 +15,14 @@ class SetUserPassword extends Command
      *
      * @var string
      */
-    protected $signature = 'user:set-password {args}';
+    protected $signature = 'user:set-password';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'Set user password';
 
     /**
      * Execute the console command.
@@ -30,10 +31,12 @@ class SetUserPassword extends Command
      */
     public function handle()
     {
-        list($id, $password) = explode(':', $this->argument('args'));
-        Log::info("Start " . $this->description);
-        Log::info('Set ID: ' . $id . ', password: ' . $password);
+        $id = $this->ask('Enter user id');
+        $password = $this->secret('Enter user password');
+        $output = new ConsoleOutput();
+        $output->writeln('Start ' . $this->description);
+        $output->writeln('Set ID: ' . $id . ', password: ' . $password);
         User::where('id', $id)->update(['password' => Hash::make($password)]);
-        Log::info("End " . $this->description);
+        $output->writeln('End ' . $this->description);
     }
 }
