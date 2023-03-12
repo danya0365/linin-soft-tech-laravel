@@ -96,6 +96,21 @@
 </div>
 
 <div class="col-12">
+    {{ Form::label('is_can_access_worker', 'Access Worker', ['class' => 'form-label']) }}
+    <div class="form-group">
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" id="is_can_access_worker_1" name="is_can_access_worker" value="1" {{ $user->is_can_access_worker == '1' ? 'checked' : '' }}>
+            <label class="form-check-label" for="is_can_access_worker_1">Yes</label>
+        </div>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" id="is_can_access_worker_2" name="is_can_access_worker" value="0" {{ $user->is_can_access_worker == '0' ? 'checked' : '' }}>
+            <label class="form-check-label" for="is_can_access_worker_2">No</label>
+        </div>
+    </div>
+    {!! $errors->first('is_can_access_worker', '<div class="invalid-feedback">:message</div>') !!}
+</div>
+
+<div class="col-12">
     <button type="submit" class="btn btn-primary">Submit</button>
     <button type="reset" class="btn btn-outline-secondary">Reset</button>
 </div>

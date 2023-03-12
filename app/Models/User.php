@@ -43,6 +43,7 @@ class User extends Authenticatable
     'is_can_access_manager',
     'is_can_access_supervisor',
     'is_can_access_customer',
+    'is_can_access_worker'
   ];
 
   static $onCreateRules = [
