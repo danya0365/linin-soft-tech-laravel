@@ -53,6 +53,14 @@ class OperationLinenProduct extends Pivot
             return $jobVar;
         })($array['linen_case']);
 
+        $timeNow = \Carbon\Carbon::now();
+        $array['operation_date'] = $timeNow->format('Y-m-d');
+        $array['operation_time'] = $timeNow->format('H:i');
+        if ($this->created_at) {
+            $array['operation_date'] = $this->created_at->format('Y-m-d');
+            $array['operation_time'] = $this->created_at->format('H:i');
+        }
+
         return $array;
     }
 }
