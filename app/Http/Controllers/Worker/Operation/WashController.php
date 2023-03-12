@@ -188,16 +188,21 @@ class WashController extends Controller
 
     public function setSelectWeightAndColor($operationId, $operationLinenProductId)
     {
-        request()->validate(['wet_weight' => 'required', 'color' => 'required']);
+        request()->validate(['wet_weight' => 'required', 'color' => 'required', 'operation_date' => 'required', 'operation_time' => 'required']);
 
+        $operationCreatedAt = \Carbon\Carbon::parse(request()->get('operation_date') . ' ' . request()->get('operation_time') .
+            ':00');
         $operationLinenProduct = OperationLinenProduct::find($operationLinenProductId);
         $operationLinenProductOldValue = $operationLinenProduct->getAttributes();
         $operationLinenProduct->wet_weight = request()->get('wet_weight');
         $operationLinenProduct->color = request()->get('color');
+        $operationLinenProduct->created_at = $operationCreatedAt;
         $operationLinenProductNewValue = $operationLinenProduct->getDirty();
         $operationLinenProduct->save();
 
         $operation = Operation::find($operationId);
+        $operation->created_at = $operationCreatedAt;
+        $operation->save();
         $operation->updateRelateFields();
 
         OperationManager::createOperationLog($operation->wash_employee_id, $operation, 'set_weight_and_color', $operationLinenProductOldValue, $operationLinenProductNewValue);
