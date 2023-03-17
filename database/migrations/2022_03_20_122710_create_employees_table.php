@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('employees', function (Blueprint $table) {
             $table->id();
             $table->string('code');
-            $table->string('password');
+            $table->string('password')->default('1234');
             $table->string('name');
             $table->string('photo')->nullable();
             $table->integer('department_id');
