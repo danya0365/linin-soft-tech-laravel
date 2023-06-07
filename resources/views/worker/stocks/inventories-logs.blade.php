@@ -102,7 +102,7 @@
                                         <td class="text-center">{{ $inventoryLog->quantity }}</td>
                                         <td class="text-center">{{ number_format($inventoryLog->cost) }}</td>
                                         <td>
-                                            <form class="delete-form" action="{{ route('worker.stock.inventory.delete', $inventoryLog->id) }}" method="POST">
+                                            <form class="delete-form" action="{{ route('worker.stock.inventory.logs.delete', $inventoryLog->id) }}" method="POST">
                                                 @csrf
                                                 <button type="submit" class="btn btn-danger btn-sm"><i class="fa fa-fw fa-trash"></i> Delete</button>
                                             </form>
