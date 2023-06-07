@@ -38,6 +38,22 @@
                                         </x-color-pad>
                                     </div>
                                 </div>
+                                <div class="row g-2">
+                                    <div class="col-12">
+                                        <label for="operation_date" class="form-label">วันที่บันทึก - Create Date</label>
+                                        <input value="{{ $operationLinenProduct['operation_date'] }}" type="text" placeholder="YYYY-MM-DD" pattern="(?:19|20)(?:[0-9]{2}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1[0-9]|2[0-8])|(?:(?!02)(?:0[1-9]|1[0-2])-(?:29|30))|(?:(?:0[13578]|1[02])-31))|(?:[13579][26]|[02468][048])-02-29)"  name="operation_date" class="form-control" id="operation_date">
+                                        @error('operation_date')
+                                            <div class="text-danger">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                    <div class="col-12">
+                                        <label for="operation_time" class="form-label">เวลาบันทึก - Create Time</label>
+                                        <input value="{{ $operationLinenProduct['operation_time'] }}" type="text" placeholder="HH:MM" pattern="([01]?[0-9]{1}|2[0-3]{1}):[0-5]{1}[0-9]{1}" name="operation_time" class="form-control" id="operation_time">
+                                        @error('operation_time')
+                                            <div class="text-danger">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
 
                             </div>
                             <div class="box-footer">

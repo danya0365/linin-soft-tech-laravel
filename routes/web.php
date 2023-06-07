@@ -35,8 +35,9 @@ Auth::routes(['register' => false]);
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 
-Route::group(['prefix' => 'setting', 'middleware' => ['admin']], function () {
-    Route::get('/', [App\Http\Controllers\SettingController::class, 'index'])->name('setting');
+Route::group(['prefix' => 'admin', 'middleware' => ['admin']], function () {
+    Route::get('/', [App\Http\Controllers\SettingController::class, 'index'])->name('admin');
+    Route::get('/setting', [App\Http\Controllers\SettingController::class, 'index'])->name('admin.setting');
 });
 
 Route::group(['middleware' => ['admin']], function () {
@@ -69,6 +70,17 @@ Route::group(['prefix' => 'manager', 'middleware' => ['manager']], function () {
     });
 });
 
+Route::group(['prefix' => 'user-customer', 'middleware' => ['user-customer']], function () {
+
+    Route::get('/', [App\Http\Controllers\UserCustomerController::class, 'index'])->name('user-customer');
+
+    Route::group(['prefix' => 'customer'], function () {
+        Route::get('/', [App\Http\Controllers\UserCustomer\CustomerController::class, 'index'])->name('user-customer.customer');
+        Route::get('/operation-summary', [App\Http\Controllers\UserCustomer\CustomerController::class, 'getOperationSummary'])->name('user-customer.customer.operation-summary');
+        Route::get('/operations-by-customer/{customerId}', [App\Http\Controllers\UserCustomer\CustomerController::class, 'getOperationsByCustomer'])->name('user-customer.customer.get-operations-by-customer');
+    });
+});
+
 Route::group(['prefix' => 'customer', 'middleware' => ['customer']], function () {
 
     Route::match(array('GET', 'POST'), '/create-feedback', [App\Http\Controllers\CustomerController::class, 'createFeedback'])->name('customers.create-feedback');
@@ -97,7 +109,7 @@ Route::group(['prefix' => 'supervisor', 'middleware' => ['supervisor']], functio
     });
 });
 
-Route::group(['prefix' => 'worker', 'middleware' => ['auth']], function () {
+Route::group(['prefix' => 'worker', 'middleware' => ['worker']], function () {
 
     Route::get('/', [App\Http\Controllers\WorkerController::class, 'index'])->name('worker');
 
@@ -264,9 +276,10 @@ Route::group(['prefix' => 'worker', 'middleware' => ['auth']], function () {
         Route::get('/inventory-group/{inventoryGroupId}', [App\Http\Controllers\Worker\StockController::class, 'showInventoryByGroup'])->name('worker.stock.show-inventory-by-group');
         Route::match(array('GET', 'POST'), '/inventory-group/{inventoryGroupId}/create', [App\Http\Controllers\Worker\StockController::class, 'createInventoryByGroup'])->name('worker.stock.create-inventory-by-group');
         Route::match(array('GET', 'POST'), '/inventory/{inventoryId}/edit', [App\Http\Controllers\Worker\StockController::class, 'editInventory'])->name('worker.stock.edit-inventory');
+        Route::match(array('POST'), '/inventory/{inventoryId}/delete', [App\Http\Controllers\Worker\StockController::class, 'deleteInventory'])->name('worker.stock.delete-inventory');
         Route::match(array('GET', 'POST'), '/inventory/{inventoryId}/increase-stock', [App\Http\Controllers\Worker\StockController::class, 'getInventoryIncreaseStock'])->name('worker.stock.inventory.increase-stock');
         Route::match(array('GET', 'POST'), '/inventory/{inventoryId}/decrease-stock', [App\Http\Controllers\Worker\StockController::class, 'getInventoryDecreaseStock'])->name('worker.stock.inventory.decrease-stock');
         Route::get('/inventory/{inventoryId}/logs', [App\Http\Controllers\Worker\StockController::class, 'showInventoryLogsById'])->name('worker.stock.inventory.logs');
-        Route::match(array('GET', 'POST'), '/inventory/{inventoryId}/delete', [App\Http\Controllers\Worker\StockController::class, 'deleteInventory'])->name('worker.stock.inventory.delete');
+        Route::match(array('POST'), '/inventory/{inventoryLogId}/logs/delete', [App\Http\Controllers\Worker\StockController::class, 'deleteInventoryLog'])->name('worker.stock.inventory.logs.delete');
     });
 });

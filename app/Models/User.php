@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -39,10 +38,12 @@ class User extends Authenticatable
     'email',
     'password',
     'role',
+    'customer_account',
     'is_can_access_admin',
     'is_can_access_manager',
     'is_can_access_supervisor',
     'is_can_access_customer',
+    'is_can_access_worker'
   ];
 
   static $onCreateRules = [
@@ -77,4 +78,34 @@ class User extends Authenticatable
   ];
 
   protected $perPage = 20;
+
+  public function customers()
+  {
+    return $this->belongsToMany(Customer::class, 'users_customers')->using(UserCustomer::class);
+  }
+
+  public function isWorker(): bool
+  {
+    return $this->is_can_access_worker;
+  }
+
+  public function isUserCustomer(): bool
+  {
+    return $this->is_can_access_customer;
+  }
+
+  public function isSupervisor(): bool
+  {
+    return $this->is_can_access_supervisor;
+  }
+
+  public function isManager(): bool
+  {
+    return $this->is_can_access_manager;
+  }
+
+  public function isAdmin(): bool
+  {
+    return $this->is_can_access_admin;
+  }
 }

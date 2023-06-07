@@ -33,13 +33,16 @@
                         <a class="nav-link" href="{{ route('worker') }}">{{ __('Worker') }}</a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" href="{{ route('user-customer') }}">{{ __('User Customer') }}</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="{{ route('supervisor') }}">{{ __('Supervisor') }}</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('manager') }}">{{ __('Manager') }}</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('setting') }}">{{ __('Setting') }}</a>
+                        <a class="nav-link" href="{{ route('admin') }}">{{ __('Admin') }}</a>
                     </li>
                     <li class="nav-item dropdown">
                         <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>

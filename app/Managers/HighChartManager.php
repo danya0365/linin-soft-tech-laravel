@@ -302,7 +302,6 @@ class SalesLatestDaysSummary
     {
         $titles = $dataStructure = [];
 
-        $startDate->addDays(1);
         $endDate->addDays(1);
 
         $period = new \DatePeriod(

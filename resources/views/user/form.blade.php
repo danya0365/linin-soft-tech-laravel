@@ -25,7 +25,18 @@
 </div>
 
 <div class="col-12">
-    {{ Form::label('is_can_access_admin', 'Access Setting', ['class' => 'form-label']) }}
+    {{ Form::label('customer_account', 'Customer ID', ['class' => 'form-label']) }}
+    <select class="form-select" id="customer_account" name="customer_account">
+        <option value="">เลือก</option>
+        @foreach ( $customerAccounts as $key => $customerAccount )
+        <option value="{{ $customerAccount->id }}" {{ $user->customer_account == $customerAccount->id ? 'selected' : '' }}>{{ $customerAccount->name }}</option>
+        @endforeach
+    </select>
+    {!! $errors->first('customer_account', '<div class="invalid-feedback">:message</div>') !!}
+</div>
+
+<div class="col-12">
+    {{ Form::label('is_can_access_admin', 'Access Admin', ['class' => 'form-label']) }}
     <div class="form-group">
         <div class="form-check form-check-inline">
             <input class="form-check-input" type="radio" id="is_can_access_admin_1" name="is_can_access_admin" value="1" {{ $user->is_can_access_admin == '1' ? 'checked' : '' }}>
@@ -82,6 +93,21 @@
         </div>
     </div>
     {!! $errors->first('is_can_access_customer', '<div class="invalid-feedback">:message</div>') !!}
+</div>
+
+<div class="col-12">
+    {{ Form::label('is_can_access_worker', 'Access Worker', ['class' => 'form-label']) }}
+    <div class="form-group">
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" id="is_can_access_worker_1" name="is_can_access_worker" value="1" {{ $user->is_can_access_worker == '1' ? 'checked' : '' }}>
+            <label class="form-check-label" for="is_can_access_worker_1">Yes</label>
+        </div>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" id="is_can_access_worker_2" name="is_can_access_worker" value="0" {{ $user->is_can_access_worker == '0' ? 'checked' : '' }}>
+            <label class="form-check-label" for="is_can_access_worker_2">No</label>
+        </div>
+    </div>
+    {!! $errors->first('is_can_access_worker', '<div class="invalid-feedback">:message</div>') !!}
 </div>
 
 <div class="col-12">

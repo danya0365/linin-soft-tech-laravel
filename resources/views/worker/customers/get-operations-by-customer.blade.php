@@ -123,7 +123,7 @@
                                         <td>{{ $operation->linenProduct ? $operation->linenProduct->name : '-' }}</td>
                                         <td>{{ $operation->linen_case }}</td>
                                         <td style="background-color: {{ $operation->color }}">{{ $operation->color }}</td>
-                                        <td>{{ $operation->operation->employee->name }}</td>
+                                        <td>{{ $operation->operation->employee->name ?? "" }}</td>
                                         <td class="text-center">
                                             {{ $operation->wet_weight }}
                                             (#{{ $operation->operation->washing_machine_id }})

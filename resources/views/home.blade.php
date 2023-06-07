@@ -9,7 +9,7 @@
         </ol>
     </nav>
     <div class="row justify-content-center">
-        <div class="col-md-12 m-2">
+        <div class="col-md-6 align-content-md-center m-2">
             @if (session('status'))
             <div class="alert alert-success" role="alert">
                 {{ session('status') }}
@@ -24,7 +24,8 @@
                 <div class="card-header bg-success text-light bg-opacity-75">{{ __('Home Menu') }}</div>
                 <div class="card-body">
                     <div class="row g-2">
-                        <div class="col-sm-6">
+                        @if (Auth::user()->isWorker())
+                        <div class="col-sm-12">
                             <a href="{{ route('worker') }}">
                                 <div class="p-3 border bg-navy" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 110px">
@@ -36,7 +37,23 @@
                                 </div>
                             </a>
                         </div>
-                        <div class="col-sm-6">
+                        @endif
+                        @if (Auth::user()->isUserCustomer())
+                        <div class="col-sm-12">
+                            <a href="{{ route('user-customer') }}">
+                                <div class="p-3 border bg-navy" style="min-height: 150px">
+                                    <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 110px">
+                                        <div class="text-center">
+                                            <div class="fa-solid fa-people-line" style="font-size: 3em"></div>
+                                            <div class="text-center mt-3">{{ __('ลูกค้า - Customer') }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        @endif
+                        @if (Auth::user()->isSupervisor())
+                        <div class="col-sm-12">
                             <a href="{{ route('supervisor') }}">
                                 <div class="p-3 border bg-navy" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 110px">
@@ -48,7 +65,9 @@
                                 </div>
                             </a>
                         </div>
-                        <div class="col-sm-6">
+                        @endif
+                        @if (Auth::user()->isManager())
+                        <div class="col-sm-12">
                             <a href="{{ route('manager') }}">
                                 <div class="p-3 border bg-navy" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 110px">
@@ -60,18 +79,21 @@
                                 </div>
                             </a>
                         </div>
-                        <div class="col-sm-6">
-                            <a href="{{ route('setting') }}">
+                        @endif
+                        @if (Auth::user()->isAdmin())
+                        <div class="col-sm-12">
+                            <a href="{{ route('admin') }}">
                                 <div class="p-3 border bg-navy" style="min-height: 150px">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 110px">
                                         <div class="text-center">
                                             <div class="fa-solid fa-gears" style="font-size: 3em"></div>
-                                            <div class="text-center mt-3">{{ __('ตั้งค่า - Setting') }}</div>
+                                            <div class="text-center mt-3">{{ __('ผู้ควบคุม - Admin') }}</div>
                                         </div>
                                     </div>
                                 </div>
                             </a>
                         </div>
+                        @endif
                     </div>
                 </div>
             </div>
