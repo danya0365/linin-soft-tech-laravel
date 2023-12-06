@@ -33,6 +33,9 @@
                 <p>&copy; 2021 {{ config('app.name'); }}, Inc. All rights reserved.</p>
                 <div class="d-flex">
                     v{{ config('app.version'); }}
+                    <a href="https://www.facebook.com/marosdee7" target="_blank">
+                    พัฒนาโดย: Marosdee7
+                    </a>
                 </div>
             </div>
         </footer>
