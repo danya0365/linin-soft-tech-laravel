@@ -1,176 +1,206 @@
-# Installation
+<div align="center">
 
-install docker-desktop on your mac
+# 🧺 LinenSoftTech
 
-## Alias sail in your bash_profile
+### Industrial Laundry Intelligence & Operations Platform
 
-`alias sail='[ -f sail ] && bash sail || bash vendor/bin/sail'`
+[![Laravel](https://img.shields.io/badge/Laravel-9.x-ff2d20?logo=laravel)](https://laravel.com/)
+[![PHP](https://img.shields.io/badge/PHP-8.4+-8892BF?logo=php)](https://www.php.net/)
+[![MySQL](https://img.shields.io/badge/MySQL-8.0-%2300758F?logo=mysql&logoColor=white)](https://www.mysql.com/)
+[![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.x-38B2AC?logo=tailwind-css)](https://tailwindcss.com/)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-the you can run
-`./vendor/bin/sail up`
+[![Build Status](https://img.shields.io/badge/build-passing-brightgreen)]()
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-blue.svg)]()
+[![Code Style](https://img.shields.io/badge/code_style-psr12-ff69b4.svg)]()
 
-or
-`sail up`
+**แพลตฟอร์มที่เชื่อมโยงฝั่งปฏิบัติการ ซัพพลาย พนักงาน และพลังงานของโรงซักรีดอุตสาหกรรม เพื่อให้ผู้บริหารเห็นข้อมูลแบบเรียลไทม์และตัดสินใจได้ทันที**
 
-## start sail
+[Status](#-status) • [Screenshots](#-screenshots) • [Features](#-features) • [Installation](#-installation) • [Tech Stack](#-tech-stack) • [Architecture](#-architecture) • [Roadmap](#-roadmap)
 
-### start on normally
+</div>
 
-`./vendor/bin/sail up`
+---
 
-### start in background
+## 🧭 Status
 
-`./vendor/bin/sail up -d`
+| Module              | Scope                                                         | State      |
+| ------------------- | ------------------------------------------------------------- | ---------- |
+| Operations          | Intake → Wash → Dry → Iron → Pack → Store พร้อม activity logs | ✅ MVP     |
+| Customers & Billing | ลูกค้า น้ำหนักเปียก/แห้ง Billing summary และ job history      | ✅ MVP     |
+| Inventory           | กลุ่มวัตถุดิบ สต๊อกคงเหลือ Import/Export audit trail          | ✅ MVP     |
+| Energy Tracking     | น้ำ ไฟ แก็ส ชีวมวล น้ำมันเตา พร้อม lot tracking               | ✅ MVP     |
+| Workforce           | Departments รายชื่อพนักงาน Productivity dashboards            | ✅ MVP     |
+| Analytics           | Cross-domain KPIs และ trend dashboards                        | 🚧 Planned |
 
-Once the application's Docker containers have been started, you can access the application in your web browser at: http://localhost.
+---
 
-[Full Laravel Sail](https://laravel.com/docs/9.x/sail)
+## 📸 Screenshots
 
-### stop sail
+<table>
+  <tr>
+    <td align="center"><strong>📊 Operations Dashboard</strong></td>
+    <td align="center"><strong>🧵 Linen Catalog</strong></td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/operations-dashboard.png" alt="Operations Dashboard" width="420"/></td>
+    <td><img src="docs/screenshots/linen-catalog.png" alt="Linen Catalog" width="420"/></td>
+  </tr>
+</table>
 
-`./vendor/bin/sail stop`
+<details>
+<summary>📷 More Screenshots</summary>
 
-### Execute NPM
+### Inventory & Energy Logs
 
-Install dependency
-`sail yarn`
+<img src="docs/screenshots/inventory-energy.png" alt="Inventory & Energy Logs" width="800"/>
 
-Add new package
-`sail yarn add {packageName}`
+</details>
 
-Build Js/css
-`sail yarn dev`
+---
 
-### DB Seeder
+## ✨ Features
 
-`sail php artisan migrate:fresh --seed`
+### 🧵 Product & Linen Catalogs
 
-### Database Management
+-   แยกผ้าทั่วไปและผ้าแก้ไข พร้อมตัวกรองชนิดผ้า สี น้ำหนัก และ summary real-time
 
-[PhpMyAdmin](http://localhost:8081/)
+### 👥 Customer Lifecycle
 
-### Generate CRUD
+-   ข้อมูลลูกค้าโรงพยาบาล/โรงแรม บันทึกน้ำหนักเปียก-แห้ง ยอดเงิน และดึง job history ได้ทันที
 
-[awais-vteams/laravel-crud-generator](https://github.com/awais-vteams/laravel-crud-generator)
+### ⚙️ Operations Control
 
-Add migration file to create `table` first
-`sail php artisan make:migration create_banks_table`
+-   Job Group + Job Activity logs, บังคับให้พนักงานยืนยันตัวตนและรหัสผ่านทุกครั้ง ลดการปลอมแปลงข้อมูล
 
-Then generate CRUD
-`sail php artisan make:crud banks`
+### 🔋 Energy & Sustainability
 
-Add route.php
-`Route::resource('banks', 'BankController');`
+-   บันทึกพลังงานหลายประเภท พร้อม lot number และหน่วยวัด เพื่อคุมต้นทุนและตอบโจทย์ ESG
 
-### ทุกครั้งที่มีการเพิ่ม Lib ด้วย NodeJS
+### 📦 Inventory Governance
 
-ต้องทำการติดตั้งและ Generate css และ js ไปที่ public folder ด้วยคำสั่ง
+-   Inventory groups, stock logs, import/export audit เพื่อควบคุมวัตถุดิบและสืบย้อนประวัติการใช้
 
-`yarn && yarn dev`
+### 🧑‍💼 Workforce Insights
 
-### Generate Enum
+-   รายชื่อพนักงานตามแผนก กราฟ productivity รายชั่วโมง/รายวัน และประวัติการทำงาน
 
-สร้าง enum UserType
+---
 
-`php artisan make:enum UserType`
+## 🚀 Installation
 
-### Generate Event & Listener
+```bash
+# Clone repository
+git clone https://github.com/your-org/linin-soft-tech.git
 
-`sail php artisan make:event EmployeeOperationLogCreated`
-`sail php artisan make:listener CalculateUserWorkingTimeNotification --event=EmployeeOperationLogCreated`
+# Navigate
+cd linin-soft-tech
 
-### CronJob Schedule
+# (Optional) Alias sail
+alias sail='[ -f sail ] && bash sail || bash vendor/bin/sail'
 
-add new command
-`sail php artisan make:command DaillyReportCron --command=dailyReport:cron`
+# Boot containers
+./vendor/bin/sail up -d
 
-open `app/Console/Commands/DaillyReportCron.php`
+# Install JS deps & build assets
+sail yarn && sail yarn dev
 
-search for `function handle()`
-
-add below code
-
-```
-use Illuminate\Support\Facades\Log;
-...
-
-function handle() {
-    Log::info("Cron is working fine!");
-}
-```
-
-open `app/Console/Kernel.php`
-
-add below code in `function schedule(Schedule $schedule)`
-
-`$schedule->command(DaillyReportCron::class)->daily();`
-
-test to force run schedule
-
-`sail php artisan schedule:run`
-
-\*\*\*only for local server to force cronjob running
-`sail php artisan schedule:work`
-
-### Set up your server to run crontab every second
-
-At last you can manage this command on scheduling task, you have to add a single entry to your server’s crontab file:
-`* * * * * cd /path-to-your-project && php artisan schedule:run >> /dev/null 2>&1`
-
-## Executing Commands
-
-When using Laravel Sail, your application is executing within a Docker container and is isolated from your local computer. However, Sail provides a convenient way to run various commands against your application such as arbitrary PHP commands, Artisan commands, Composer commands, and Node / NPM commands.
-
-When reading the Laravel documentation, you will often see references to Composer, Artisan, and Node / NPM commands that do not reference Sail. Those examples assume that these tools are installed on your local computer. If you are using Sail for your local Laravel development environment, you should execute those commands using Sail:
-
-### Running Artisan commands locally...
-
-`php artisan queue:work`
-
-### Running Artisan commands within Laravel Sail...
-
-`./vendor/bin/sail artisan queue:work`
-
-### Show PHP version on your sail
-
-`./vendor/bin/sail php --version`
-
-# Semantic Commit Messages
-
-See how a minor change to your commit message style can make you a better programmer.
-
-Format: `<type>(<scope>): <subject>`
-
-`<scope>` is optional
-
-## Example
-
-```
-feat: add hat wobble
-^--^  ^------------^
-|     |
-|     +-> Summary in present tense.
-|
-+-------> Type: chore, docs, feat, fix, refactor, style, or test.
+# Prepare database
+sail php artisan migrate:fresh --seed
 ```
 
-More Examples:
+เปิดใช้งานได้ที่ [http://localhost](http://localhost) และจัดการฐานข้อมูลผ่าน [http://localhost:8081](http://localhost:8081) (phpMyAdmin)
 
--   `feat`: (new feature for the user, not a new feature for build script)
--   `fix`: (bug fix for the user, not a fix to a build script)
--   `docs`: (changes to the documentation)
--   `style`: (formatting, missing semi colons, etc; no production code change)
--   `refactor`: (refactoring production code, eg. renaming a variable)
--   `test`: (adding missing tests, refactoring tests; no production code change)
--   `chore`: (updating grunt tasks etc; no production code change)
+---
 
-References:
+## 🛠️ Tech Stack
 
--   https://www.conventionalcommits.org/
--   https://seesparkbox.com/foundry/semantic_commit_messages
--   http://karma-runner.github.io/1.0/dev/git-commit-msg.html
+| Category  | Technology                                            |
+| --------- | ----------------------------------------------------- |
+| Framework | Laravel 9.x + Sail                                    |
+| Language  | PHP 8.4+                                              |
+| Database  | MySQL 8.0, Redis, Meilisearch                         |
+| Frontend  | Blade, Tailwind CSS, Laravel Mix                      |
+| DevOps    | Docker Desktop (macOS), Mailpit, Selenium, phpMyAdmin |
+| Tooling   | Artisan, Composer, Yarn, CRUD Generator               |
 
-### Install tailwind with sass
+---
 
-[Install Tailwind CSS & SASS with Laravel Mix (2022)](https://ralphjsmit.com/tailwind-sass-laravel)
-[Tailwind Documentation](https://tailwindcss.com/docs/installation)
+## 📐 Architecture
+
+```
+linin-soft-tech/
+├── app/                   # Domain logic (Customers, Operations, Inventory, Energy, HR)
+├── database/
+│   ├── migrations/        # 19 tables covering core business entities
+│   └── seeders/           # User, Department, Linen, Energy, Inventory seeds
+├── config/                # Service configuration
+├── routes/                # Web/API routes
+├── resources/
+│   └── views/             # Blade templates + Tailwind
+└── docker-compose.yml     # Sail services (mysql, redis, mailpit, etc.)
+```
+
+### Design Guidelines
+
+-   ยึด Clean Architecture + SOLID + Atomic Design สำหรับ component
+-   ตารางตระกูล `*_logs` เก็บ audit trail ทุกเหตุการณ์
+-   Scheduler + system cron สำหรับงานอัตโนมัติรายวัน
+
+---
+
+## 🗂️ Project Structure Highlights
+
+-   **Operations:** `job_groups`, `jobs`, `job_group_activity_logs`, `job_activity_logs`, `employee_operation_logs`
+-   **Inventory:** `inventory_groups`, `inventories`, `inventory_stock_logs`
+-   **Energy:** `energy_resources`, `energy_resource_logs`
+-   **HR:** `departments`, `employees`
+-   **Customers:** `customers`, `jobs`
+
+---
+
+## 🔄 Daily Workflow
+
+| Task               | Command                                                                 |
+| ------------------ | ----------------------------------------------------------------------- |
+| Start stack        | `./vendor/bin/sail up` / `./vendor/bin/sail up -d`                      |
+| Stop stack         | `./vendor/bin/sail stop`                                                |
+| Yarn install/build | `sail yarn`, `sail yarn add <pkg>`, `sail yarn dev`                     |
+| Artisan / PHP      | `./vendor/bin/sail artisan <cmd>`, `./vendor/bin/sail php --version`    |
+| CRUD scaffolding   | `sail php artisan make:migration ...`, `sail php artisan make:crud ...` |
+| Events & Enums     | `php artisan make:enum ...`, `sail php artisan make:event ...`          |
+
+---
+
+## ⏱️ Scheduling & Automation
+
+1. สร้างคำสั่ง `sail php artisan make:command DaillyReportCron --command=dailyReport:cron`
+2. เพิ่ม logic + logging ใน `handle()`
+3. ลงทะเบียนผ่าน `$schedule->command(DaillyReportCron::class)->daily();`
+4. ทดสอบด้วย `sail php artisan schedule:run` หรือ `schedule:work`
+5. ติดตั้ง cron: `* * * * * cd /path && php artisan schedule:run >> /dev/null 2>&1`
+
+---
+
+## 🎯 Roadmap
+
+-   [x] Operations pipeline & workforce tracking
+-   [x] Inventory + energy logging
+-   [x] Seeder-driven bootstrap data
+-   [ ] Advanced analytics dashboards (in progress)
+-   [ ] External integrations (IoT meters, accounting API)
+
+---
+
+## 📄 License
+
+Distributed under the MIT License. See [LICENSE](LICENSE) for more information.
+
+---
+
+<div align="center">
+
+Maintained with ❤️ by the LinenSoftTech team.  
+Star ⭐ the repo if this project helps your industrial laundry operations!
+
+</div>
