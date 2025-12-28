@@ -15,6 +15,9 @@ use App\Models\InventoryGroup;
 use App\Models\Operation;
 use App\Models\WashingMachine;
 use App\Models\DryerMachine;
+use App\Models\Expense;
+use App\Models\Income;
+use App\Managers\HighChartManager;
 use App\Services\LineMessagingService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -143,6 +146,9 @@ class LineChatbotController extends Controller
             case 'employee_detail':
                 $this->showEmployeeDetail($replyToken, $params['id'] ?? null);
                 break;
+            case 'report_period':
+                $this->sendReportSummary($replyToken, $params['period'] ?? 'all');
+                break;
             default:
                 $this->sendMainMenu($replyToken);
         }
@@ -200,6 +206,11 @@ class LineChatbotController extends Controller
             return;
         }
 
+        if (str_contains($text, 'รายงาน') || $lowerText === 'report') {
+            $this->sendReportMenu($replyToken);
+            return;
+        }
+
         // ไม่รู้จักคำสั่ง - แสดงเมนู
         $this->sendMainMenu($replyToken, "ขอโทษครับ ไม่เข้าใจคำสั่ง \"$text\"\n\nกรุณาเลือกเมนูด้านล่าง:");
     }
@@ -218,6 +229,7 @@ class LineChatbotController extends Controller
             $this->lineService->quickReplyItem('⚡ พลังงาน', 'message'),
             $this->lineService->quickReplyItem('👷 พนักงาน', 'message'),
             $this->lineService->quickReplyItem('⚙️ เครื่องจักร', 'message'),
+            $this->lineService->quickReplyItem('📈 รายงาน', 'message'),
         ];
 
         $message = $this->lineService->quickReply($text, $quickReplyItems);
@@ -716,6 +728,112 @@ class LineChatbotController extends Controller
         );
 
         $flexMessage = $this->lineService->flexMessage('เครื่องจักร', $bubble);
+        $this->lineService->replyMessage($replyToken, [$flexMessage]);
+    }
+
+    /**
+     * ส่งเมนูรายงาน
+     */
+    protected function sendReportMenu(string $replyToken): void
+    {
+        $quickReplyItems = [
+            $this->lineService->quickReplyItem('📊 สรุปวันนี้', 'postback', 'action=report_period&period=today'),
+            $this->lineService->quickReplyItem('📆 สัปดาห์นี้', 'postback', 'action=report_period&period=week'),
+            $this->lineService->quickReplyItem('📅 เดือนนี้', 'postback', 'action=report_period&period=month'),
+            $this->lineService->quickReplyItem('📈 ทั้งหมด', 'postback', 'action=report_period&period=all'),
+        ];
+
+        $message = $this->lineService->quickReply("📈 รายงานสรุป\n\nเลือกช่วงเวลาที่ต้องการ:", $quickReplyItems);
+        $this->lineService->replyMessage($replyToken, [$message]);
+    }
+
+    /**
+     * แสดงรายงานสรุปตามช่วงเวลา
+     */
+    protected function sendReportSummary(string $replyToken, string $period): void
+    {
+        $periodLabels = [
+            'today' => 'วันนี้',
+            'week' => 'สัปดาห์นี้',
+            'month' => 'เดือนนี้',
+            'all' => 'ทั้งหมด',
+        ];
+
+        $periodLabel = $periodLabels[$period] ?? 'ทั้งหมด';
+
+        // คำนวณช่วงเวลา
+        $startDate = null;
+        $endDate = Carbon::now();
+
+        switch ($period) {
+            case 'today':
+                $startDate = Carbon::today();
+                break;
+            case 'week':
+                $startDate = Carbon::now()->startOfWeek();
+                break;
+            case 'month':
+                $startDate = Carbon::now()->startOfMonth();
+                break;
+            case 'all':
+            default:
+                $startDate = null;
+                break;
+        }
+
+        // คำนวณรายได้
+        $incomeQuery = Income::query();
+        if ($startDate) {
+            $incomeQuery->where('created_at', '>=', $startDate);
+        }
+        $totalIncome = $incomeQuery->sum('amount') ?? 0;
+
+        // คำนวณค่าใช้จ่าย
+        $expenseQuery = Expense::query();
+        if ($startDate) {
+            $expenseQuery->where('created_at', '>=', $startDate);
+        }
+        $totalExpense = $expenseQuery->sum('amount') ?? 0;
+
+        // คำนวณกำไร
+        $profit = $totalIncome - $totalExpense;
+        $profitColor = $profit >= 0 ? '#1DB446' : '#FF0000';
+
+        // สร้าง Flex Message
+        $bodyContents = [
+            $this->lineService->infoRow('📅 ช่วงเวลา', $periodLabel),
+            $this->lineService->separator(),
+            $this->lineService->infoRow('💰 รายได้', number_format($totalIncome, 2) . ' ฿', '#1DB446'),
+            $this->lineService->infoRow('💸 ค่าใช้จ่าย', number_format($totalExpense, 2) . ' ฿', '#FF6B35'),
+            $this->lineService->separator(),
+            $this->lineService->infoRow('📊 กำไร/ขาดทุน', number_format($profit, 2) . ' ฿', $profitColor),
+        ];
+
+        // เพิ่มสรุปพลังงานถ้าไม่ใช่ all
+        if ($startDate) {
+            $energyQuery = EnergyResourceLog::with('energyResource')
+                ->where('created_at', '>=', $startDate);
+            $totalEnergyCost = $energyQuery->sum('cost') ?? 0;
+
+            $bodyContents[] = $this->lineService->separator();
+            $bodyContents[] = [
+                'type' => 'text',
+                'text' => '⚡ ค่าพลังงาน',
+                'size' => 'sm',
+                'weight' => 'bold',
+                'margin' => 'md',
+            ];
+            $bodyContents[] = $this->lineService->infoRow('รวมทั้งหมด', number_format($totalEnergyCost, 2) . ' ฿', '#FFD700');
+        }
+
+        $bubble = $this->lineService->bubbleContainer(
+            '📈 รายงานสรุป',
+            $periodLabel,
+            $bodyContents,
+            '#2C3E50'
+        );
+
+        $flexMessage = $this->lineService->flexMessage('รายงานสรุป: ' . $periodLabel, $bubble);
         $this->lineService->replyMessage($replyToken, [$flexMessage]);
     }
 }

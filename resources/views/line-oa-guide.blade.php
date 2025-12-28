@@ -234,6 +234,18 @@
                         <span class="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-xs">ความจุ</span>
                     </div>
                 </div>
+                
+                <!-- Menu 7: Report -->
+                <div class="bg-white rounded-2xl shadow-md p-6 card-hover">
+                    <div class="menu-icon bg-indigo-100">📈</div>
+                    <h3 class="font-semibold text-gray-800 text-lg mb-2">รายงาน</h3>
+                    <p class="text-gray-600 text-sm mb-3">สรุปรายได้-ค่าใช้จ่าย-กำไร</p>
+                    <div class="flex flex-wrap gap-1">
+                        <span class="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-xs">รายได้</span>
+                        <span class="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-xs">ค่าใช้จ่าย</span>
+                        <span class="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-xs">กำไร</span>
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -469,6 +481,46 @@
                         </div>
                     </div>
                 </details>
+
+                <!-- Use Case 7: Report -->
+                <details class="bg-white rounded-2xl shadow-md overflow-hidden group">
+                    <summary class="flex items-center justify-between p-6 cursor-pointer hover:bg-gray-50">
+                        <div class="flex items-center">
+                            <span class="text-2xl mr-4">📈</span>
+                            <div>
+                                <h3 class="font-semibold text-gray-800">รายงาน</h3>
+                                <p class="text-gray-500 text-sm">2 ขั้นตอน - เลือกช่วงเวลา → ดูสรุป</p>
+                            </div>
+                        </div>
+                        <svg class="w-5 h-5 text-gray-400 transform group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </summary>
+                    <div class="px-6 pb-6 border-t border-gray-100 pt-4">
+                        <div class="space-y-4">
+                            <div class="flex items-start">
+                                <span class="flex-shrink-0 w-8 h-8 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-sm font-medium mr-3">1</span>
+                                <div>
+                                    <p class="font-medium text-gray-800">พิมพ์ "📈 รายงาน" หรือ "report"</p>
+                                    <p class="text-gray-500 text-sm">Bot แสดงปุ่มเลือกช่วงเวลา (วันนี้, สัปดาห์นี้, เดือนนี้, ทั้งหมด)</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <span class="flex-shrink-0 w-8 h-8 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-sm font-medium mr-3">2</span>
+                                <div>
+                                    <p class="font-medium text-gray-800">กดเลือกช่วงเวลา</p>
+                                    <p class="text-gray-500 text-sm">Bot แสดงรายงานสรุป:</p>
+                                    <ul class="mt-2 text-sm text-gray-600 space-y-1">
+                                        <li>💰 รายได้รวม</li>
+                                        <li>💸 ค่าใช้จ่ายรวม</li>
+                                        <li>📊 กำไร/ขาดทุน (สีเขียว/แดง)</li>
+                                        <li>⚡ ค่าพลังงานรวม</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </details>
             </div>
         </section>
 
@@ -540,6 +592,13 @@
                                 <td class="py-3 px-4">
                                     <code class="px-2 py-1 bg-gray-100 rounded text-sm">⚙️ เครื่องจักร</code>
                                     <code class="px-2 py-1 bg-gray-100 rounded text-sm ml-1">machine</code>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="py-3 px-4">📈 รายงาน</td>
+                                <td class="py-3 px-4">
+                                    <code class="px-2 py-1 bg-gray-100 rounded text-sm">📈 รายงาน</code>
+                                    <code class="px-2 py-1 bg-gray-100 rounded text-sm ml-1">report</code>
                                 </td>
                             </tr>
                         </tbody>
