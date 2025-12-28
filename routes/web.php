@@ -30,6 +30,11 @@ Route::get('/landing', function () {
     return view('landing');
 });
 
+// LINE OA User Guide - Public page
+Route::get('/line-oa-use-case', function () {
+    return view('line-oa-guide');
+})->name('line-oa-guide');
+
 Auth::routes(['register' => false]);
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

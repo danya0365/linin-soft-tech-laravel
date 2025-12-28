@@ -7,6 +7,7 @@ use App\Models\Customer;
 use App\Models\CustomerGroup;
 use App\Models\Department;
 use App\Models\Employee;
+use App\Models\EmployeeOperationLog;
 use App\Models\EnergyResource;
 use App\Models\EnergyResourceLog;
 use App\Models\Inventory;
@@ -138,6 +139,9 @@ class LineChatbotController extends Controller
                 break;
             case 'department':
                 $this->showEmployeesByDepartment($replyToken, $params['id'] ?? null);
+                break;
+            case 'employee_detail':
+                $this->showEmployeeDetail($replyToken, $params['id'] ?? null);
                 break;
             default:
                 $this->sendMainMenu($replyToken);
@@ -542,7 +546,7 @@ class LineChatbotController extends Controller
     }
 
     /**
-     * แสดงพนักงานตามแผนก
+     * แสดงพนักงานตามแผนก (เป็น Quick Reply เพื่อให้เลือกพนักงานต่อได้)
      */
     protected function showEmployeesByDepartment(string $replyToken, $deptId): void
     {
@@ -556,24 +560,111 @@ class LineChatbotController extends Controller
             return;
         }
 
-        $bodyContents = [];
-        foreach ($employees as $index => $emp) {
+        $quickReplyItems = [];
+        foreach ($employees as $emp) {
+            $quickReplyItems[] = $this->lineService->quickReplyItem(
+                $emp->name,
+                'postback',
+                'action=employee_detail&id=' . $emp->id
+            );
+        }
+
+        $deptName = $department->name ?? 'ไม่ระบุ';
+        $message = $this->lineService->quickReply("👷 แผนก{$deptName}\n\nเลือกพนักงานเพื่อดูสถิติ:", $quickReplyItems);
+        $this->lineService->replyMessage($replyToken, [$message]);
+    }
+
+    /**
+     * แสดงรายละเอียดและสถิติพนักงาน
+     */
+    protected function showEmployeeDetail(string $replyToken, $employeeId): void
+    {
+        $employee = Employee::with('department')->find($employeeId);
+
+        if (!$employee) {
+            $this->lineService->replyMessage($replyToken, [
+                $this->lineService->textMessage('❌ ไม่พบข้อมูลพนักงาน')
+            ]);
+            return;
+        }
+
+        $today = Carbon::today();
+        $thisWeek = Carbon::now()->startOfWeek();
+        $thisMonth = Carbon::now()->startOfMonth();
+
+        // นับจำนวน Operation logs วันนี้
+        $todayLogs = EmployeeOperationLog::where('employee_id', $employeeId)
+            ->whereDate('created_at', $today)
+            ->count();
+
+        // นับจำนวน Operation logs สัปดาห์นี้
+        $weekLogs = EmployeeOperationLog::where('employee_id', $employeeId)
+            ->where('created_at', '>=', $thisWeek)
+            ->count();
+
+        // นับจำนวน Operation logs เดือนนี้
+        $monthLogs = EmployeeOperationLog::where('employee_id', $employeeId)
+            ->where('created_at', '>=', $thisMonth)
+            ->count();
+
+        // นับแยกตามประเภทงาน (วันนี้)
+        $operationStats = EmployeeOperationLog::where('employee_id', $employeeId)
+            ->whereDate('created_at', $today)
+            ->selectRaw('operation_type, COUNT(*) as count')
+            ->groupBy('operation_type')
+            ->pluck('count', 'operation_type')
+            ->toArray();
+
+        // สร้าง Flex Message
+        $bodyContents = [
+            $this->lineService->infoRow('👤 ชื่อ', $employee->name),
+            $this->lineService->infoRow('🏢 แผนก', $employee->department->name ?? 'ไม่ระบุ'),
+            $this->lineService->separator(),
+            [
+                'type' => 'text',
+                'text' => '📊 สถิติการทำงาน',
+                'size' => 'sm',
+                'weight' => 'bold',
+                'margin' => 'md',
+            ],
+            $this->lineService->infoRow('📅 วันนี้', number_format($todayLogs) . ' ครั้ง', '#1DB446'),
+            $this->lineService->infoRow('📆 สัปดาห์นี้', number_format($weekLogs) . ' ครั้ง'),
+            $this->lineService->infoRow('📅 เดือนนี้', number_format($monthLogs) . ' ครั้ง'),
+        ];
+
+        // เพิ่มสถิติแยกตามประเภทงาน (ถ้ามี)
+        if (!empty($operationStats)) {
+            $bodyContents[] = $this->lineService->separator();
             $bodyContents[] = [
                 'type' => 'text',
-                'text' => ($index + 1) . '. ' . $emp->name,
+                'text' => '🔧 งานวันนี้ (แยกประเภท)',
                 'size' => 'sm',
-                'margin' => 'sm',
+                'weight' => 'bold',
+                'margin' => 'md',
             ];
+
+            $operationLabels = [
+                'wash' => '🧺 ซัก',
+                'dry' => '☀️ อบ',
+                'iron' => '👔 รีด',
+                'packing' => '� พับแพ็ค',
+                'collect' => '🏠 จัดเก็บ',
+            ];
+
+            foreach ($operationStats as $type => $count) {
+                $label = $operationLabels[$type] ?? $type;
+                $bodyContents[] = $this->lineService->infoRow($label, number_format($count) . ' ครั้ง');
+            }
         }
 
         $bubble = $this->lineService->bubbleContainer(
-            '👷 แผนก' . ($department->name ?? ''),
-            'รายชื่อพนักงาน',
+            '👷 ข้อมูลพนักงาน',
+            $employee->name,
             $bodyContents,
             '#9B59B6'
         );
 
-        $flexMessage = $this->lineService->flexMessage('พนักงาน', $bubble);
+        $flexMessage = $this->lineService->flexMessage('ข้อมูลพนักงาน: ' . $employee->name, $bubble);
         $this->lineService->replyMessage($replyToken, [$flexMessage]);
     }
 
