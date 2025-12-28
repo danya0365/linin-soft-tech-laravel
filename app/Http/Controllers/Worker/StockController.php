@@ -98,7 +98,22 @@ class StockController extends Controller
 
     public function deleteInventory($inventoryId)
     {
-        $inventoryStockLog = InventoryStockLog::find($inventoryId);
+        $inventory = Inventory::find($inventoryId);
+
+        $inventoryStockLog = InventoryStockLog::where('inventory_id', $inventoryId)->first();
+
+        if ($inventoryStockLog) {
+            return redirect()->back()->with('error', 'ไม่สามารถลบได้ เนื่องจากมีประวัติการใช้งาน');
+        }
+
+        $inventory->delete();
+
+        return redirect()->back()->with('success', 'ลบเรียบร้อย');
+    }
+
+    public function deleteInventoryLog($inventoryLogId)
+    {
+        $inventoryStockLog = InventoryStockLog::find($inventoryLogId);
 
         $inventory = Inventory::find($inventoryStockLog->inventory_id);
 
@@ -125,7 +140,7 @@ class StockController extends Controller
 
         $inventoryStockLog->delete();
 
-        return redirect()->back();
+        return redirect()->back()->with('error', 'ลบเรียบร้อย');
     }
 
     public function getInventoryIncreaseStock($inventoryId)

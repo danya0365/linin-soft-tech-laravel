@@ -7,7 +7,7 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ __('LinenSoftTech') }}</title>
+    <title>{{ __('User Customer - LinenSoftTech') }}</title>
 
     <!-- Scripts -->
     <script src="{{ asset('js/app.js') }}"></script>
@@ -24,7 +24,7 @@
 <body>
     <div id="app">
         <x-header />
-
+        
         <main class="py-4">
             @yield('content')
         </main>
@@ -33,10 +33,6 @@
                 <p>&copy; 2021 {{ config('app.name'); }}, Inc. All rights reserved.</p>
                 <div class="d-flex">
                     v{{ config('app.version'); }}
-                    &nbsp;
-                    <a href="https://www.facebook.com/marosdee7" target="_blank">
-                    พัฒนาโดย: Marosdee7
-                    </a>
                 </div>
             </div>
         </footer>

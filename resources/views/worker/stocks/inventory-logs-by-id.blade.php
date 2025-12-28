@@ -12,6 +12,18 @@
         </ol>
     </nav>
     <div class="row justify-content-center">
+        @if ($message = Session::get('success'))
+        <div class="alert alert-success mb-2">
+            {{ $message }}
+        </div>
+        @endif
+
+        @if ($message = Session::get('error'))
+        <div class="alert alert-danger mb-2">
+            {{ $message }}
+        </div>
+        @endif
+
         <div class="col-md-12 m-2">
             <div class="card">
                 <div class="card-header">
@@ -71,7 +83,7 @@
                                         <td class="text-center">{{ $inventoryLog->quantity }}</td>
                                         <td class="text-center">{{ number_format($inventoryLog->cost) }}</td>
                                         <td>
-                                            <form class="delete-form" action="{{ route('worker.stock.inventory.delete', $inventoryLog->id) }}" method="POST">
+                                            <form class="delete-form" action="{{ route('worker.stock.inventory.logs.delete', $inventoryLog->id) }}" method="POST">
                                                 @csrf
                                                 <button type="submit" class="btn btn-danger btn-sm"><i class="fa fa-fw fa-trash"></i> Delete</button>
                                             </form>

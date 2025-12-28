@@ -2,9 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-
-class SettingController extends Controller
+class UserCustomerController extends Controller
 {
     /**
      * Show the application dashboard.
@@ -13,6 +11,6 @@ class SettingController extends Controller
      */
     public function index()
     {
-        return view('admin.index');
+        return view('user-customer.index');
     }
 }

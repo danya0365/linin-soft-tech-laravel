@@ -1,12 +1,12 @@
-@extends('layouts.worker')
+@extends('layouts.user-customer')
 
 @section('content')
 
 <div class="container">
     <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ route('worker') }}">Worker</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.customer') }}">ลูกค้า</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('user-customer') }}">User Customer</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('user-customer.customer') }}">ลูกค้า</a></li>
             <li class="breadcrumb-item active" aria-current="page">รายการยอดรวม</li>
         </ol>
     </nav>
@@ -16,7 +16,7 @@
                 <div class="card-header">รายการยอดรวมแต่ละลูกค้า</div>
                 <div class="card-body">
 
-                    <form class="row row-cols-lg-auto g-3 align-items-center mb-2" action="{{ route('worker.customer.get-operations-group-by-customer') }}" method="GET">
+                    <form class="row row-cols-lg-auto g-3 align-items-center mb-2" action="{{ route('user-customer.customer.operation-summary') }}" method="GET">
                         
                         <div class="col-12">
                             <div class="input-group">
@@ -39,7 +39,7 @@
 
                         <div class="col-12">
                             <button type="submit" class="btn btn-primary">Submit</button>
-                            <a href="{{ route('worker.customer.get-operations-group-by-customer') }}" role="button" class="btn btn-outline-secondary">Reset</a>
+                            <a href="{{ route('user-customer.customer.operation-summary') }}" role="button" class="btn btn-outline-secondary">Reset</a>
                         </div>
                     </form>
 
@@ -60,9 +60,9 @@
                                 @foreach ($operations as $operation)
                                     <tr>
                                         <td>
-                                            @if ( $operation->operationCustomer )
-                                            <a href="{{ route('worker.customer.get-operations-by-customer', ['customerId' => $operation->operationCustomer->id]) }}">
-                                                {{ $operation->operationCustomer->name }}
+                                            @if ( $operation->customer )
+                                            <a href="{{ route('user-customer.customer.get-operations-by-customer', ['customerId' => $operation->customer->id]) }}">
+                                                {{ $operation->customer->name }}
                                             </a>
                                             @else
                                             <i>ลูกค้าถูกลบ</i>
@@ -77,6 +77,19 @@
                                     </tr>
                                 @endforeach
                             </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td>
+                                        ยอดรวม
+                                    </td>
+                                    <td class="text-center">{{ number_format($summary->total_wet_weight) }}</td>
+                                    <td class="text-center">{{ number_format($summary->total_collect_weight) }}</td>
+                                    <td class="text-center">{{ number_format($summary->total_edit_collect_weight) }}</td>
+                                    <td class="text-center">{{ number_format($summary->total_collect_weight > 0 ? $summary->total_edit_collect_weight*100/$summary->total_collect_weight : 100) }}%</td>
+                                    <td class="text-center">{{ number_format($summary->total_billing_weight) }}</td>
+                                    <td class="text-center">{{ number_format($summary->total_billing_weight-$summary->total_collect_weight) }}</td>
+                                </tr>
+                            </tfoot>
                         </table>
                     </div>
                 </div>

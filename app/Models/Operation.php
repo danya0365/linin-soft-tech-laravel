@@ -159,6 +159,13 @@ class Operation extends Model
   public function toArray()
   {
     $array = parent::toArray();
+    $timeNow = \Carbon\Carbon::now();
+    $array['operation_date'] = $timeNow->format('Y-m-d');
+    $array['operation_time'] = $timeNow->format('H:i');
+    if ($this->created_at) {
+      $array['operation_date'] = $this->created_at->format('Y-m-d');
+      $array['operation_time'] = $this->created_at->format('H:i');
+    }
     return $array;
   }
 

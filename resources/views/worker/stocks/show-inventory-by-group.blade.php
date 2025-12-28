@@ -12,6 +12,19 @@
     </nav>
     <div class="row justify-content-center">
         <div class="col-md-12 m-2">
+
+            @if ($message = Session::get('success'))
+            <div class="alert alert-success mb-2">
+                {{ $message }}
+            </div>
+            @endif
+
+            @if ($message = Session::get('error'))
+            <div class="alert alert-danger mb-2">
+                {{ $message }}
+            </div>
+            @endif
+
             <div class="card">
                 <div class="card-header">
                     <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -50,19 +63,27 @@
                                         <td class="text-center">{{ $inventory->remain_quantity }}</td>
                                         <td class="text-center">{{ $inventory->unit }}</td>
                                         <td class="text-center">
-                                            <a class="btn btn-primary" href="{{ route('worker.stock.edit-inventory', ['inventoryId' => $inventory->id]) }}" role="button">
-                                                <i class="fa-solid fa-edit"></i>
-                                            </a>
 
-                                            <a class="btn btn-primary" href="{{ route('worker.stock.inventory.increase-stock', ['inventoryId' => $inventory->id]) }}" role="button">
-                                                <i class="fa-solid fa-plus"></i>
-                                            </a>
-                                            <a class="btn btn-danger" href="{{ route('worker.stock.inventory.decrease-stock', ['inventoryId' => $inventory->id]) }}" role="button">
-                                                <i class="fa-solid fa-minus"></i>
-                                            </a>
-                                            <a class="btn btn-info" href="{{ route('worker.stock.inventory.logs', ['inventoryId' => $inventory->id]) }}" role="button">
-                                                <i class="fa-solid fa-history"></i>
-                                            </a>
+                                            <form class="delete-form" action="{{ route('worker.stock.delete-inventory', ['inventoryId' => $inventory->id]) }}" method="POST">
+                                                @csrf
+
+                                                <a class="btn btn-primary" href="{{ route('worker.stock.edit-inventory', ['inventoryId' => $inventory->id]) }}" role="button">
+                                                    <i class="fa-solid fa-edit"></i>
+                                                </a>
+    
+                                                <a class="btn btn-primary" href="{{ route('worker.stock.inventory.increase-stock', ['inventoryId' => $inventory->id]) }}" role="button">
+                                                    <i class="fa-solid fa-plus"></i>
+                                                </a>
+                                                <a class="btn btn-danger" href="{{ route('worker.stock.inventory.decrease-stock', ['inventoryId' => $inventory->id]) }}" role="button">
+                                                    <i class="fa-solid fa-minus"></i>
+                                                </a>
+                                                <a class="btn btn-info" href="{{ route('worker.stock.inventory.logs', ['inventoryId' => $inventory->id]) }}" role="button">
+                                                    <i class="fa-solid fa-history"></i>
+                                                </a>
+    
+                                                <button type="submit" class="btn btn-danger"><i class="fa-solid fa-trash"></i></button>
+                                                
+                                            </form>
                                         </td>
                                     </tr>
                                 @endforeach
@@ -78,4 +99,14 @@
         </div>
     </div>
 </div>
+<script>
+    $(function(){
+        $('.delete-form').on('submit', function(e){
+            if (!confirm("Are you sure?")) {
+                return false;
+            }
+            return true
+        })
+    });
+</script>
 @endsection
