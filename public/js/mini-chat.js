@@ -2,33 +2,31 @@
  * Mini Chat JavaScript
  * 
  * Handles chat interactions for the web mini chat popover
+ * Redesigned with menu button and popup system
  */
 
 class MiniChat {
     constructor() {
         this.isOpen = false;
         this.isLoading = false;
+        this.menuOpen = false;
+        this.submenuOpen = false;
         this.csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
 
+        // Elements
         this.container = document.getElementById('mini-chat');
         this.toggleBtn = document.getElementById('mini-chat-toggle');
         this.closeBtn = document.getElementById('mini-chat-close');
         this.window = document.getElementById('mini-chat-window');
         this.messagesArea = document.getElementById('mini-chat-messages');
-        this.quickRepliesArea = document.getElementById('mini-chat-quick-replies');
         this.input = document.getElementById('mini-chat-input');
         this.sendBtn = document.getElementById('mini-chat-send');
-
-        // Main menu for navigation
-        this.mainMenu = [
-            '📊 สรุปวันนี้',
-            '👥 ลูกค้า',
-            '📦 สต๊อก',
-            '⚡ พลังงาน',
-            '👷 พนักงาน',
-            '⚙️ เครื่องจักร',
-            '📈 รายงาน',
-        ];
+        this.menuBtn = document.getElementById('mini-chat-menu-btn');
+        this.menuPopup = document.getElementById('mini-chat-menu-popup');
+        this.submenuPopup = document.getElementById('mini-chat-submenu-popup');
+        this.submenuTitle = document.getElementById('mini-chat-submenu-title');
+        this.submenuItems = document.getElementById('mini-chat-submenu-items');
+        this.submenuBack = document.getElementById('mini-chat-submenu-back');
 
         if (this.container) {
             this.init();
@@ -36,15 +34,43 @@ class MiniChat {
     }
 
     init() {
-        // Toggle button
+        // Prevent all clicks inside the chat window from propagating
+        this.window.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+
+        // Toggle chat button
         this.toggleBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             this.toggle();
         });
         
+        // Close button
         this.closeBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             this.close();
+        });
+
+        // Menu button
+        this.menuBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.toggleMenu();
+        });
+
+        // Menu items
+        this.menuPopup.querySelectorAll('.mini-chat-menu-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const command = item.getAttribute('data-command');
+                this.executeCommand(command);
+            });
+        });
+
+        // Submenu back button
+        this.submenuBack.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.closeSubmenu();
+            this.openMenu();
         });
 
         // Send message
@@ -60,17 +86,13 @@ class MiniChat {
             }
         });
 
-        // Prevent chat window clicks from propagating
-        this.window.addEventListener('click', (e) => {
+        // Click on input closes menus
+        this.input.addEventListener('click', (e) => {
             e.stopPropagation();
+            this.closeAllMenus();
         });
 
-        // Quick replies area - prevent propagation
-        this.quickRepliesArea.addEventListener('click', (e) => {
-            e.stopPropagation();
-        });
-
-        // Close on click outside (only on document, not inside chat)
+        // Close on click outside
         document.addEventListener('click', (e) => {
             if (this.isOpen && !this.container.contains(e.target)) {
                 this.close();
@@ -100,6 +122,68 @@ class MiniChat {
     close() {
         this.isOpen = false;
         this.container.classList.remove('open');
+        this.closeAllMenus();
+    }
+
+    toggleMenu() {
+        if (this.menuOpen) {
+            this.closeMenu();
+        } else {
+            this.closeSubmenu();
+            this.openMenu();
+        }
+    }
+
+    openMenu() {
+        this.menuOpen = true;
+        this.menuPopup.classList.add('show');
+        this.menuBtn.classList.add('active');
+    }
+
+    closeMenu() {
+        this.menuOpen = false;
+        this.menuPopup.classList.remove('show');
+        this.menuBtn.classList.remove('active');
+    }
+
+    openSubmenu(title, items) {
+        this.submenuTitle.textContent = title;
+        this.submenuItems.innerHTML = '';
+
+        items.forEach(item => {
+            const btn = document.createElement('button');
+            btn.className = 'mini-chat-submenu-item';
+            btn.textContent = item.label;
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (item.action) {
+                    this.sendAction(item.action, item.data || {});
+                } else {
+                    this.executeCommand(item.label);
+                }
+                this.closeAllMenus();
+            });
+            this.submenuItems.appendChild(btn);
+        });
+
+        this.submenuOpen = true;
+        this.submenuPopup.classList.add('show');
+    }
+
+    closeSubmenu() {
+        this.submenuOpen = false;
+        this.submenuPopup.classList.remove('show');
+    }
+
+    closeAllMenus() {
+        this.closeMenu();
+        this.closeSubmenu();
+    }
+
+    executeCommand(command) {
+        this.closeAllMenus();
+        this.addMessage(command, 'user');
+        this.processRequest('/api/web-chat/message', { text: command });
     }
 
     async loadWelcome() {
@@ -127,21 +211,18 @@ class MiniChat {
         // Clear input
         this.input.value = '';
 
+        // Close menus
+        this.closeAllMenus();
+
         // Show user message
         this.addMessage(text, 'user');
-
-        // Clear quick replies
-        this.quickRepliesArea.innerHTML = '';
 
         // Send to server
         await this.processRequest('/api/web-chat/message', { text });
     }
 
     async sendAction(action, params) {
-        // Clear quick replies
-        this.quickRepliesArea.innerHTML = '';
-
-        // Send to server
+        this.closeAllMenus();
         await this.processRequest('/api/web-chat/action', { action, params });
     }
 
@@ -190,24 +271,22 @@ class MiniChat {
         switch (data.type) {
             case 'text':
                 this.addMessage(data.text, 'bot');
-                // Show main menu after text message
-                this.renderQuickReplies(this.mainMenu);
                 break;
 
             case 'menu':
                 this.addMessage(data.text, 'bot');
-                this.renderQuickReplies(data.quickReplies);
+                // If there are quick replies with actions, show as submenu
+                if (data.quickReplies && data.quickReplies.length > 0 && typeof data.quickReplies[0] === 'object') {
+                    this.openSubmenu(data.title || 'เลือกรายการ', data.quickReplies);
+                }
                 break;
 
             case 'card':
                 this.renderCard(data);
-                // Always show main menu after card for navigation
-                this.renderQuickReplies(this.mainMenu);
                 break;
 
             default:
                 this.addMessage(JSON.stringify(data), 'bot');
-                this.renderQuickReplies(this.mainMenu);
         }
 
         this.scrollToBottom();
@@ -266,46 +345,7 @@ class MiniChat {
         this.scrollToBottom();
     }
 
-    renderQuickReplies(replies) {
-        this.quickRepliesArea.innerHTML = '';
-
-        if (!replies || !Array.isArray(replies)) return;
-
-        replies.forEach(reply => {
-            const btn = document.createElement('button');
-            btn.className = 'mini-chat-quick-reply';
-
-            // Simple text reply (string)
-            if (typeof reply === 'string') {
-                btn.textContent = reply;
-                btn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    e.preventDefault();
-                    this.input.value = reply;
-                    this.sendMessage();
-                });
-            }
-            // Action reply (object)
-            else if (typeof reply === 'object') {
-                btn.textContent = reply.label;
-                btn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    e.preventDefault();
-                    if (reply.action) {
-                        this.sendAction(reply.action, reply.data || {});
-                    } else {
-                        this.input.value = reply.label;
-                        this.sendMessage();
-                    }
-                });
-            }
-
-            this.quickRepliesArea.appendChild(btn);
-        });
-    }
-
     showTyping() {
-        // Remove existing typing indicator
         this.hideTyping();
 
         const typing = document.createElement('div');
@@ -329,8 +369,6 @@ class MiniChat {
 
     showError(message) {
         this.addMessage('⚠️ ' + message, 'bot');
-        // Show menu after error too
-        this.renderQuickReplies(this.mainMenu);
     }
 
     scrollToBottom() {
