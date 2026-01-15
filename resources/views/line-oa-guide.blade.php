@@ -650,8 +650,7 @@
                 </svg>
                 <span class="text-lg font-semibold">LinenSoftTech LINE OA</span>
             </div>
-            <p class="text-gray-400 text-sm">ระบบจัดการโรงซักรีดอุตสาหกรรม</p>
-            <p class="text-gray-500 text-xs mt-4">© {{ date('Y') }} LinenSoftTech. All rights reserved.</p>
+            <p class="text-gray-500 text-xs">© {{ date('Y') }} LinenSoftTech. All rights reserved.</p>
         </div>
     </footer>
 </body>
