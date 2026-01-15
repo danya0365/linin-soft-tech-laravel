@@ -53,23 +53,33 @@ class ResetAdminPassword extends Command
             return 1;
         }
 
-        $password = $this->secret('Enter new password');
-        $confirmPassword = $this->secret('Confirm new password');
+        $password = $this->ask('Enter new password (leave empty for random password)');
 
-        if ($password !== $confirmPassword) {
-            $this->error('Passwords do not match.');
-            return 1;
-        }
+        // Generate random password if empty
+        if (empty($password)) {
+            $password = \Illuminate\Support\Str::random(12);
+            $this->info("Generated random password: {$password}");
+        } else {
+            $confirmPassword = $this->secret('Confirm new password');
 
-        if (strlen($password) < 8) {
-            $this->error('Password must be at least 8 characters.');
-            return 1;
+            if ($password !== $confirmPassword) {
+                $this->error('Passwords do not match.');
+                return 1;
+            }
+
+            if (strlen($password) < 8) {
+                $this->error('Password must be at least 8 characters.');
+                return 1;
+            }
         }
 
         $user->password = Hash::make($password);
         $user->save();
 
+        $this->newLine();
         $this->info("Password for user '{$user->name}' (ID: {$user->id}) has been reset successfully.");
+        $this->warn("New Password: {$password}");
+        $this->info("Please copy and save this password securely.");
         Log::info("Admin password reset via artisan for user ID: {$user->id}");
 
         return 0;
