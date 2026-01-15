@@ -41,5 +41,8 @@
             </div>
         </footer>
     </div>
+    
+    {{-- Mini Chat Popover --}}
+    <x-mini-chat />
 </body>
 </html>

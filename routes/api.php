@@ -23,6 +23,13 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 // LINE Messaging API Webhook
 Route::post('/line/webhook', [App\Http\Controllers\Api\LineChatbotController::class, 'webhook']);
 
+// Web Chat API (for authenticated users via web session)
+Route::middleware('auth:web')->prefix('web-chat')->group(function () {
+    Route::post('/message', [App\Http\Controllers\Api\WebChatController::class, 'message']);
+    Route::post('/action', [App\Http\Controllers\Api\WebChatController::class, 'action']);
+    Route::get('/welcome', [App\Http\Controllers\Api\WebChatController::class, 'welcome']);
+});
+
 Route::group(['middleware' => ['manager']], function () {
     Route::get('sales-range-days-chart', [App\Http\Controllers\Manager\ReportController::class, 'getSalesRangeDaysChart'])->name('api.sales-range-days-chart');
     Route::get('energy-range-days-chart', [App\Http\Controllers\Manager\ReportController::class, 'getEnergyRangeDaysChart'])->name('api.energy-range-days-chart');
