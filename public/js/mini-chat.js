@@ -301,47 +301,83 @@ class MiniChat {
     }
 
     renderCard(data) {
+        // Create card container
         const card = document.createElement('div');
         card.className = 'mini-chat-card';
 
-        // Header
+        // Create header
         const header = document.createElement('div');
         header.className = 'mini-chat-card-header';
-        header.style.background = data.headerColor || '#1DB446';
-        header.innerHTML = `
-            <div class="mini-chat-card-title">${this.escapeHtml(data.title)}</div>
-            ${data.subtitle ? `<div class="mini-chat-card-subtitle">${this.escapeHtml(data.subtitle)}</div>` : ''}
-        `;
+        header.style.backgroundColor = data.headerColor || '#1DB446';
+        
+        // Title
+        const title = document.createElement('div');
+        title.className = 'mini-chat-card-title';
+        title.textContent = data.title || '';
+        header.appendChild(title);
+        
+        // Subtitle
+        if (data.subtitle) {
+            const subtitle = document.createElement('div');
+            subtitle.className = 'mini-chat-card-subtitle';
+            subtitle.textContent = data.subtitle;
+            header.appendChild(subtitle);
+        }
+        
         card.appendChild(header);
 
-        // Body
+        // Create body
         const body = document.createElement('div');
         body.className = 'mini-chat-card-body';
 
-        if (data.rows && Array.isArray(data.rows)) {
-            data.rows.forEach(row => {
-                if (row.type === 'separator') {
-                    const separator = document.createElement('div');
-                    separator.className = 'mini-chat-card-row separator';
-                    body.appendChild(separator);
-                } else {
-                    const rowEl = document.createElement('div');
-                    rowEl.className = 'mini-chat-card-row';
-                    
-                    const labelClass = row.bold ? 'mini-chat-card-label bold' : 'mini-chat-card-label';
-                    const valueStyle = row.valueColor ? `color: ${row.valueColor}` : '';
-                    
-                    rowEl.innerHTML = `
-                        <span class="${labelClass}">${this.escapeHtml(row.label)}</span>
-                        <span class="mini-chat-card-value" style="${valueStyle}">${this.escapeHtml(row.value)}</span>
-                    `;
-                    body.appendChild(rowEl);
+        // Render rows
+        const rows = data.rows || [];
+        for (let i = 0; i < rows.length; i++) {
+            const row = rows[i];
+            
+            if (!row) continue;
+            
+            if (row.type === 'separator') {
+                const separator = document.createElement('div');
+                separator.className = 'mini-chat-card-row separator';
+                body.appendChild(separator);
+            } else if (row.bold && !row.value) {
+                // Section header (bold with no value)
+                const sectionHeader = document.createElement('div');
+                sectionHeader.className = 'mini-chat-card-row';
+                const label = document.createElement('span');
+                label.className = 'mini-chat-card-label bold';
+                label.textContent = row.label || '';
+                sectionHeader.appendChild(label);
+                body.appendChild(sectionHeader);
+            } else {
+                // Normal row
+                const rowEl = document.createElement('div');
+                rowEl.className = 'mini-chat-card-row';
+                
+                const label = document.createElement('span');
+                label.className = row.bold ? 'mini-chat-card-label bold' : 'mini-chat-card-label';
+                label.textContent = row.label || '';
+                
+                const value = document.createElement('span');
+                value.className = 'mini-chat-card-value';
+                if (row.valueColor) {
+                    value.style.color = row.valueColor;
                 }
-            });
+                value.textContent = row.value || '';
+                
+                rowEl.appendChild(label);
+                rowEl.appendChild(value);
+                body.appendChild(rowEl);
+            }
         }
 
         card.appendChild(body);
         this.messagesArea.appendChild(card);
+        
+        // Force layout recalculation
+        card.offsetHeight;
+        
         this.scrollToBottom();
     }
 

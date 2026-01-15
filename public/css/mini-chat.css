@@ -184,24 +184,27 @@
 
 /* Card Message */
 .mini-chat-card {
+    width: 100%;
     max-width: 100%;
     align-self: flex-start;
     background: white;
     border-radius: 12px;
-    overflow: hidden;
+    overflow: visible;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    animation: messageSlideIn 0.3s ease;
+    margin-bottom: 4px;
 }
 
 .mini-chat-card-header {
     padding: 12px 16px;
     color: white;
+    border-radius: 12px 12px 0 0;
+    min-height: 50px;
 }
 
 .mini-chat-card-title {
     font-weight: 700;
     font-size: 15px;
-    margin-bottom: 2px;
+    margin-bottom: 4px;
 }
 
 .mini-chat-card-subtitle {
@@ -211,6 +214,8 @@
 
 .mini-chat-card-body {
     padding: 12px 16px;
+    background: white;
+    border-radius: 0 0 12px 12px;
 }
 
 .mini-chat-card-row {
@@ -219,16 +224,20 @@
     align-items: center;
     padding: 8px 0;
     font-size: 13px;
+    min-height: 20px;
 }
 
 .mini-chat-card-row.separator {
     border-top: 1px solid #eee;
     margin-top: 8px;
     padding-top: 12px;
+    min-height: 1px;
+    padding-bottom: 0;
 }
 
 .mini-chat-card-label {
     color: var(--mini-chat-text-light);
+    flex-shrink: 0;
 }
 
 .mini-chat-card-label.bold {
@@ -239,6 +248,7 @@
 .mini-chat-card-value {
     font-weight: 600;
     text-align: right;
+    margin-left: 12px;
 }
 
 /* Menu Popup */
