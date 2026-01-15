@@ -3,23 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Customer;
-use App\Models\CustomerGroup;
-use App\Models\Department;
-use App\Models\Employee;
-use App\Models\EmployeeOperationLog;
-use App\Models\EnergyResource;
-use App\Models\EnergyResourceLog;
-use App\Models\Inventory;
-use App\Models\InventoryGroup;
-use App\Models\Operation;
-use App\Models\WashingMachine;
-use App\Models\DryerMachine;
-use App\Models\Expense;
-use App\Models\Income;
-use App\Managers\HighChartManager;
+use App\Services\ChatService;
 use App\Services\LineMessagingService;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -27,26 +12,17 @@ use Illuminate\Support\Facades\Log;
  * LINE Chatbot Controller
  * 
  * รับ Webhook events จาก LINE และตอบกลับอัตโนมัติ
+ * ใช้ ChatService สำหรับ business logic (Single Source of Truth)
  */
 class LineChatbotController extends Controller
 {
     protected LineMessagingService $lineService;
+    protected ChatService $chatService;
 
-    // คำสั่งเมนูหลัก
-    protected array $mainMenuCommands = [
-        '📊 สรุปวันนี้',
-        '👥 ลูกค้า',
-        '📦 สต๊อก',
-        '⚡ พลังงาน',
-        '👷 พนักงาน',
-        '⚙️ เครื่องจักร',
-        'เมนู',
-        'menu',
-    ];
-
-    public function __construct(LineMessagingService $lineService)
+    public function __construct(LineMessagingService $lineService, ChatService $chatService)
     {
         $this->lineService = $lineService;
+        $this->chatService = $chatService;
     }
 
     /**
@@ -105,14 +81,16 @@ class LineChatbotController extends Controller
         $message = $event['message'];
 
         if ($message['type'] !== 'text') {
-            $this->sendMainMenu($replyToken, 'กรุณาเลือกเมนูด้านล่าง หรือพิมพ์ "เมนู"');
+            $response = $this->chatService->getMainMenu('กรุณาเลือกเมนูด้านล่าง หรือพิมพ์ "เมนู"');
+            $this->sendResponse($replyToken, $response);
             return;
         }
 
         $text = trim($message['text']);
 
-        // ตรวจสอบคำสั่งเมนูหลัก
-        $this->processCommand($replyToken, $text);
+        // ใช้ ChatService สำหรับ business logic
+        $response = $this->chatService->processCommand($text);
+        $this->sendResponse($replyToken, $response);
     }
 
     /**
@@ -126,32 +104,11 @@ class LineChatbotController extends Controller
         // Parse postback data (format: action=value)
         parse_str($data, $params);
         $action = $params['action'] ?? '';
+        unset($params['action']);
 
-        switch ($action) {
-            case 'customer_group':
-                $this->showCustomersByGroup($replyToken, $params['id'] ?? null);
-                break;
-            case 'customer_detail':
-                $this->showCustomerDetail($replyToken, $params['id'] ?? null);
-                break;
-            case 'inventory_group':
-                $this->showInventoriesByGroup($replyToken, $params['id'] ?? null);
-                break;
-            case 'energy_type':
-                $this->showEnergyLogs($replyToken, $params['id'] ?? null);
-                break;
-            case 'department':
-                $this->showEmployeesByDepartment($replyToken, $params['id'] ?? null);
-                break;
-            case 'employee_detail':
-                $this->showEmployeeDetail($replyToken, $params['id'] ?? null);
-                break;
-            case 'report_period':
-                $this->sendReportSummary($replyToken, $params['period'] ?? 'all');
-                break;
-            default:
-                $this->sendMainMenu($replyToken);
-        }
+        // ใช้ ChatService สำหรับ business logic
+        $response = $this->chatService->processAction($action, $params);
+        $this->sendResponse($replyToken, $response);
     }
 
     /**
@@ -160,680 +117,106 @@ class LineChatbotController extends Controller
     protected function handleFollow(array $event): void
     {
         $replyToken = $event['replyToken'];
-        $this->sendMainMenu($replyToken, "🎉 ยินดีต้อนรับสู่ LinenSoftTech!\n\nผมพร้อมช่วยเหลือคุณเรื่องข้อมูลโรงซักรีด กรุณาเลือกเมนูด้านล่าง:");
+        $response = $this->chatService->getMainMenu("🎉 ยินดีต้อนรับสู่ LinenSoftTech!\n\nผมพร้อมช่วยเหลือคุณเรื่องข้อมูลโรงซักรีด กรุณาเลือกเมนูด้านล่าง:");
+        $this->sendResponse($replyToken, $response);
     }
 
     /**
-     * ประมวลผลคำสั่ง
+     * ส่ง response กลับไปยัง LINE
+     * แปลง ChatService response เป็น LINE message format
      */
-    protected function processCommand(string $replyToken, string $text): void
+    protected function sendResponse(string $replyToken, array $response): void
     {
-        // แปลงเป็น lowercase สำหรับเปรียบเทียบ
-        $lowerText = mb_strtolower($text);
-
-        if (in_array($text, ['เมนู', 'menu', 'help', 'ช่วยเหลือ', 'start'])) {
-            $this->sendMainMenu($replyToken);
-            return;
-        }
-
-        if (str_contains($text, 'สรุปวันนี้') || $lowerText === 'summary') {
-            $this->sendTodaySummary($replyToken);
-            return;
-        }
-
-        if (str_contains($text, 'ลูกค้า') || $lowerText === 'customer') {
-            $this->sendCustomerMenu($replyToken);
-            return;
-        }
-
-        if (str_contains($text, 'สต๊อก') || $lowerText === 'stock' || $lowerText === 'inventory') {
-            $this->sendInventoryMenu($replyToken);
-            return;
-        }
-
-        if (str_contains($text, 'พลังงาน') || $lowerText === 'energy') {
-            $this->sendEnergyMenu($replyToken);
-            return;
-        }
-
-        if (str_contains($text, 'พนักงาน') || $lowerText === 'employee') {
-            $this->sendEmployeeMenu($replyToken);
-            return;
-        }
-
-        if (str_contains($text, 'เครื่องจักร') || $lowerText === 'machine') {
-            $this->sendMachineStatus($replyToken);
-            return;
-        }
-
-        if (str_contains($text, 'รายงาน') || $lowerText === 'report') {
-            $this->sendReportMenu($replyToken);
-            return;
-        }
-
-        // ไม่รู้จักคำสั่ง - แสดงเมนู
-        $this->sendMainMenu($replyToken, "ขอโทษครับ ไม่เข้าใจคำสั่ง \"$text\"\n\nกรุณาเลือกเมนูด้านล่าง:");
+        $messages = $this->convertToLineMessages($response);
+        $this->lineService->replyMessage($replyToken, $messages);
     }
 
     /**
-     * ส่งเมนูหลัก
+     * แปลง ChatService response เป็น LINE message format
      */
-    protected function sendMainMenu(string $replyToken, string $greeting = null): void
+    protected function convertToLineMessages(array $response): array
     {
-        $text = $greeting ?? "📋 เมนูหลัก LinenSoftTech\n\nกรุณาเลือกข้อมูลที่ต้องการ:";
+        switch ($response['type']) {
+            case 'text':
+                return [$this->lineService->textMessage($response['text'])];
 
-        $quickReplyItems = [
-            $this->lineService->quickReplyItem('📊 สรุปวันนี้', 'message'),
-            $this->lineService->quickReplyItem('👥 ลูกค้า', 'message'),
-            $this->lineService->quickReplyItem('📦 สต๊อก', 'message'),
-            $this->lineService->quickReplyItem('⚡ พลังงาน', 'message'),
-            $this->lineService->quickReplyItem('👷 พนักงาน', 'message'),
-            $this->lineService->quickReplyItem('⚙️ เครื่องจักร', 'message'),
-            $this->lineService->quickReplyItem('📈 รายงาน', 'message'),
-        ];
+            case 'menu':
+                $quickReplyItems = $this->buildQuickReplyItems($response['quickReplies'] ?? []);
+                return [$this->lineService->quickReply($response['text'], $quickReplyItems)];
 
-        $message = $this->lineService->quickReply($text, $quickReplyItems);
-        $this->lineService->replyMessage($replyToken, [$message]);
-    }
+            case 'card':
+                return [$this->buildFlexMessage($response)];
 
-    /**
-     * ส่งสรุปวันนี้
-     */
-    protected function sendTodaySummary(string $replyToken): void
-    {
-        $today = Carbon::today();
-
-        // นับจำนวนลูกค้า
-        $customerCount = Customer::count();
-
-        // นับจำนวน Operations วันนี้
-        $operationCount = Operation::whereDate('created_at', $today)->count();
-
-        // สรุปพลังงานวันนี้
-        $energyLogs = EnergyResourceLog::with('energyResource')
-            ->whereDate('created_at', $today)
-            ->get();
-
-        $energySummary = [];
-        foreach ($energyLogs as $log) {
-            $name = $log->energyResource->name ?? 'ไม่ระบุ';
-            if (!isset($energySummary[$name])) {
-                $energySummary[$name] = 0;
-            }
-            $energySummary[$name] += $log->value;
-        }
-
-        // สร้าง Flex Message
-        $bodyContents = [
-            $this->lineService->infoRow('📅 วันที่', $today->format('d/m/Y')),
-            $this->lineService->infoRow('👥 ลูกค้าทั้งหมด', number_format($customerCount) . ' ราย'),
-            $this->lineService->infoRow('🧺 งานวันนี้', number_format($operationCount) . ' รายการ'),
-            $this->lineService->separator(),
-        ];
-
-        // เพิ่มสรุปพลังงาน
-        if (!empty($energySummary)) {
-            $bodyContents[] = [
-                'type' => 'text',
-                'text' => '⚡ พลังงานวันนี้',
-                'size' => 'sm',
-                'weight' => 'bold',
-                'margin' => 'md',
-            ];
-
-            foreach ($energySummary as $name => $value) {
-                $bodyContents[] = $this->lineService->infoRow($name, number_format($value, 2));
-            }
-        } else {
-            $bodyContents[] = $this->lineService->infoRow('⚡ พลังงาน', 'ยังไม่มีข้อมูล');
-        }
-
-        $bubble = $this->lineService->bubbleContainer(
-            '📊 สรุปวันนี้',
-            'LinenSoftTech',
-            $bodyContents,
-            '#1DB446'
-        );
-
-        $flexMessage = $this->lineService->flexMessage('สรุปวันนี้', $bubble);
-        $this->lineService->replyMessage($replyToken, [$flexMessage]);
-    }
-
-    /**
-     * ส่งเมนูลูกค้า
-     */
-    protected function sendCustomerMenu(string $replyToken): void
-    {
-        $groups = CustomerGroup::take(10)->get();
-
-        if ($groups->isEmpty()) {
-            $this->lineService->replyMessage($replyToken, [
-                $this->lineService->textMessage('❌ ไม่พบข้อมูลกลุ่มลูกค้า')
-            ]);
-            return;
-        }
-
-        $quickReplyItems = [];
-        foreach ($groups as $group) {
-            $quickReplyItems[] = $this->lineService->quickReplyItem(
-                $group->name,
-                'postback',
-                'action=customer_group&id=' . $group->id
-            );
-        }
-
-        $message = $this->lineService->quickReply('👥 เลือกกลุ่มลูกค้า:', $quickReplyItems);
-        $this->lineService->replyMessage($replyToken, [$message]);
-    }
-
-    /**
-     * แสดงลูกค้าตามกลุ่ม
-     */
-    protected function showCustomersByGroup(string $replyToken, $groupId): void
-    {
-        $customers = Customer::where('customer_group_id', $groupId)->take(10)->get();
-
-        if ($customers->isEmpty()) {
-            $this->lineService->replyMessage($replyToken, [
-                $this->lineService->textMessage('❌ ไม่พบลูกค้าในกลุ่มนี้')
-            ]);
-            return;
-        }
-
-        $quickReplyItems = [];
-        foreach ($customers as $customer) {
-            $quickReplyItems[] = $this->lineService->quickReplyItem(
-                $customer->name,
-                'postback',
-                'action=customer_detail&id=' . $customer->id
-            );
-        }
-
-        $message = $this->lineService->quickReply('👥 เลือกลูกค้า:', $quickReplyItems);
-        $this->lineService->replyMessage($replyToken, [$message]);
-    }
-
-    /**
-     * แสดงรายละเอียดลูกค้า
-     */
-    protected function showCustomerDetail(string $replyToken, $customerId): void
-    {
-        $customer = Customer::find($customerId);
-
-        if (!$customer) {
-            $this->lineService->replyMessage($replyToken, [
-                $this->lineService->textMessage('❌ ไม่พบข้อมูลลูกค้า')
-            ]);
-            return;
-        }
-
-        $bodyContents = [
-            $this->lineService->infoRow('🏥 ชื่อ', $customer->name),
-            $this->lineService->separator(),
-            $this->lineService->infoRow('💧 น้ำหนักเปียก', number_format($customer->total_wet_weight, 2) . ' kg'),
-            $this->lineService->infoRow('☀️ น้ำหนักแห้ง', number_format($customer->total_dry_weight, 2) . ' kg'),
-            $this->lineService->infoRow('📝 น้ำหนักแก้ไข', number_format($customer->total_edit_weight, 2) . ' kg'),
-            $this->lineService->separator(),
-            $this->lineService->infoRow('💰 ยอดเงินรวม', number_format($customer->total_billing_payment, 2) . ' ฿', '#1DB446'),
-        ];
-
-        $bubble = $this->lineService->bubbleContainer(
-            '👥 ข้อมูลลูกค้า',
-            $customer->name,
-            $bodyContents,
-            '#0066CC'
-        );
-
-        $flexMessage = $this->lineService->flexMessage('ข้อมูลลูกค้า: ' . $customer->name, $bubble);
-        $this->lineService->replyMessage($replyToken, [$flexMessage]);
-    }
-
-    /**
-     * ส่งเมนูสต๊อก
-     */
-    protected function sendInventoryMenu(string $replyToken): void
-    {
-        $groups = InventoryGroup::take(10)->get();
-
-        if ($groups->isEmpty()) {
-            $this->lineService->replyMessage($replyToken, [
-                $this->lineService->textMessage('❌ ไม่พบข้อมูลกลุ่มวัตถุดิบ')
-            ]);
-            return;
-        }
-
-        $quickReplyItems = [];
-        foreach ($groups as $group) {
-            $quickReplyItems[] = $this->lineService->quickReplyItem(
-                $group->name,
-                'postback',
-                'action=inventory_group&id=' . $group->id
-            );
-        }
-
-        $message = $this->lineService->quickReply('📦 เลือกประเภทวัตถุดิบ:', $quickReplyItems);
-        $this->lineService->replyMessage($replyToken, [$message]);
-    }
-
-    /**
-     * แสดงวัตถุดิบตามกลุ่ม
-     */
-    protected function showInventoriesByGroup(string $replyToken, $groupId): void
-    {
-        $inventories = Inventory::where('inventory_group_id', $groupId)->take(10)->get();
-
-        if ($inventories->isEmpty()) {
-            $this->lineService->replyMessage($replyToken, [
-                $this->lineService->textMessage('❌ ไม่พบวัตถุดิบในกลุ่มนี้')
-            ]);
-            return;
-        }
-
-        $bodyContents = [];
-        foreach ($inventories as $index => $item) {
-            $remainColor = $item->remain_quantity < ($item->total_quantity * 0.2) ? '#FF0000' : '#1DB446';
-            $bodyContents[] = $this->lineService->infoRow(
-                $item->name,
-                number_format($item->remain_quantity) . ' ' . $item->unit,
-                $remainColor
-            );
-
-            if ($index < count($inventories) - 1) {
-                $bodyContents[] = [
-                    'type' => 'separator',
-                    'margin' => 'sm',
-                ];
-            }
-        }
-
-        $group = InventoryGroup::find($groupId);
-        $bubble = $this->lineService->bubbleContainer(
-            '📦 สต๊อกวัตถุดิบ',
-            $group->name ?? 'วัตถุดิบ',
-            $bodyContents,
-            '#FF6B35'
-        );
-
-        $flexMessage = $this->lineService->flexMessage('สต๊อกวัตถุดิบ', $bubble);
-        $this->lineService->replyMessage($replyToken, [$flexMessage]);
-    }
-
-    /**
-     * ส่งเมนูพลังงาน
-     */
-    protected function sendEnergyMenu(string $replyToken): void
-    {
-        $resources = EnergyResource::take(10)->get();
-
-        if ($resources->isEmpty()) {
-            $this->lineService->replyMessage($replyToken, [
-                $this->lineService->textMessage('❌ ไม่พบข้อมูลพลังงาน')
-            ]);
-            return;
-        }
-
-        $quickReplyItems = [];
-        foreach ($resources as $resource) {
-            $quickReplyItems[] = $this->lineService->quickReplyItem(
-                $resource->name,
-                'postback',
-                'action=energy_type&id=' . $resource->id
-            );
-        }
-
-        $message = $this->lineService->quickReply('⚡ เลือกประเภทพลังงาน:', $quickReplyItems);
-        $this->lineService->replyMessage($replyToken, [$message]);
-    }
-
-    /**
-     * แสดง Log พลังงาน
-     */
-    protected function showEnergyLogs(string $replyToken, $resourceId): void
-    {
-        $resource = EnergyResource::find($resourceId);
-
-        if (!$resource) {
-            $this->lineService->replyMessage($replyToken, [
-                $this->lineService->textMessage('❌ ไม่พบข้อมูลพลังงาน')
-            ]);
-            return;
-        }
-
-        $logs = EnergyResourceLog::where('energy_resource_id', $resourceId)
-            ->orderBy('created_at', 'desc')
-            ->take(7)
-            ->get();
-
-        $totalValue = $logs->sum('value');
-
-        $bodyContents = [
-            $this->lineService->infoRow('📊 รวม 7 วัน', number_format($totalValue, 2), '#1DB446'),
-            $this->lineService->separator(),
-        ];
-
-        foreach ($logs as $log) {
-            $date = Carbon::parse($log->created_at)->format('d/m');
-            $bodyContents[] = $this->lineService->infoRow(
-                $date,
-                number_format($log->value, 2) . ' ' . ($log->unit ?? '')
-            );
-        }
-
-        $bubble = $this->lineService->bubbleContainer(
-            '⚡ ' . $resource->name,
-            'ประวัติการใช้งาน',
-            $bodyContents,
-            '#FFD700'
-        );
-
-        $flexMessage = $this->lineService->flexMessage('พลังงาน: ' . $resource->name, $bubble);
-        $this->lineService->replyMessage($replyToken, [$flexMessage]);
-    }
-
-    /**
-     * ส่งเมนูพนักงาน
-     */
-    protected function sendEmployeeMenu(string $replyToken): void
-    {
-        $departments = Department::take(10)->get();
-
-        if ($departments->isEmpty()) {
-            $this->lineService->replyMessage($replyToken, [
-                $this->lineService->textMessage('❌ ไม่พบข้อมูลแผนก')
-            ]);
-            return;
-        }
-
-        $quickReplyItems = [];
-        foreach ($departments as $dept) {
-            $quickReplyItems[] = $this->lineService->quickReplyItem(
-                $dept->name,
-                'postback',
-                'action=department&id=' . $dept->id
-            );
-        }
-
-        $message = $this->lineService->quickReply('👷 เลือกแผนก:', $quickReplyItems);
-        $this->lineService->replyMessage($replyToken, [$message]);
-    }
-
-    /**
-     * แสดงพนักงานตามแผนก (เป็น Quick Reply เพื่อให้เลือกพนักงานต่อได้)
-     */
-    protected function showEmployeesByDepartment(string $replyToken, $deptId): void
-    {
-        $employees = Employee::where('department_id', $deptId)->take(10)->get();
-        $department = Department::find($deptId);
-
-        if ($employees->isEmpty()) {
-            $this->lineService->replyMessage($replyToken, [
-                $this->lineService->textMessage('❌ ไม่พบพนักงานในแผนกนี้')
-            ]);
-            return;
-        }
-
-        $quickReplyItems = [];
-        foreach ($employees as $emp) {
-            $quickReplyItems[] = $this->lineService->quickReplyItem(
-                $emp->name,
-                'postback',
-                'action=employee_detail&id=' . $emp->id
-            );
-        }
-
-        $deptName = $department->name ?? 'ไม่ระบุ';
-        $message = $this->lineService->quickReply("👷 แผนก{$deptName}\n\nเลือกพนักงานเพื่อดูสถิติ:", $quickReplyItems);
-        $this->lineService->replyMessage($replyToken, [$message]);
-    }
-
-    /**
-     * แสดงรายละเอียดและสถิติพนักงาน
-     */
-    protected function showEmployeeDetail(string $replyToken, $employeeId): void
-    {
-        $employee = Employee::with('department')->find($employeeId);
-
-        if (!$employee) {
-            $this->lineService->replyMessage($replyToken, [
-                $this->lineService->textMessage('❌ ไม่พบข้อมูลพนักงาน')
-            ]);
-            return;
-        }
-
-        $today = Carbon::today();
-        $thisWeek = Carbon::now()->startOfWeek();
-        $thisMonth = Carbon::now()->startOfMonth();
-
-        // นับจำนวน Operation logs วันนี้
-        $todayLogs = EmployeeOperationLog::where('employee_id', $employeeId)
-            ->whereDate('created_at', $today)
-            ->count();
-
-        // นับจำนวน Operation logs สัปดาห์นี้
-        $weekLogs = EmployeeOperationLog::where('employee_id', $employeeId)
-            ->where('created_at', '>=', $thisWeek)
-            ->count();
-
-        // นับจำนวน Operation logs เดือนนี้
-        $monthLogs = EmployeeOperationLog::where('employee_id', $employeeId)
-            ->where('created_at', '>=', $thisMonth)
-            ->count();
-
-        // นับแยกตามประเภทงาน (วันนี้)
-        $operationStats = EmployeeOperationLog::where('employee_id', $employeeId)
-            ->whereDate('created_at', $today)
-            ->selectRaw('operation_type, COUNT(*) as count')
-            ->groupBy('operation_type')
-            ->pluck('count', 'operation_type')
-            ->toArray();
-
-        // สร้าง Flex Message
-        $bodyContents = [
-            $this->lineService->infoRow('👤 ชื่อ', $employee->name),
-            $this->lineService->infoRow('🏢 แผนก', $employee->department->name ?? 'ไม่ระบุ'),
-            $this->lineService->separator(),
-            [
-                'type' => 'text',
-                'text' => '📊 สถิติการทำงาน',
-                'size' => 'sm',
-                'weight' => 'bold',
-                'margin' => 'md',
-            ],
-            $this->lineService->infoRow('📅 วันนี้', number_format($todayLogs) . ' ครั้ง', '#1DB446'),
-            $this->lineService->infoRow('📆 สัปดาห์นี้', number_format($weekLogs) . ' ครั้ง'),
-            $this->lineService->infoRow('📅 เดือนนี้', number_format($monthLogs) . ' ครั้ง'),
-        ];
-
-        // เพิ่มสถิติแยกตามประเภทงาน (ถ้ามี)
-        if (!empty($operationStats)) {
-            $bodyContents[] = $this->lineService->separator();
-            $bodyContents[] = [
-                'type' => 'text',
-                'text' => '🔧 งานวันนี้ (แยกประเภท)',
-                'size' => 'sm',
-                'weight' => 'bold',
-                'margin' => 'md',
-            ];
-
-            $operationLabels = [
-                'wash' => '🧺 ซัก',
-                'dry' => '☀️ อบ',
-                'iron' => '👔 รีด',
-                'packing' => '� พับแพ็ค',
-                'collect' => '🏠 จัดเก็บ',
-            ];
-
-            foreach ($operationStats as $type => $count) {
-                $label = $operationLabels[$type] ?? $type;
-                $bodyContents[] = $this->lineService->infoRow($label, number_format($count) . ' ครั้ง');
-            }
-        }
-
-        $bubble = $this->lineService->bubbleContainer(
-            '👷 ข้อมูลพนักงาน',
-            $employee->name,
-            $bodyContents,
-            '#9B59B6'
-        );
-
-        $flexMessage = $this->lineService->flexMessage('ข้อมูลพนักงาน: ' . $employee->name, $bubble);
-        $this->lineService->replyMessage($replyToken, [$flexMessage]);
-    }
-
-    /**
-     * ส่งสถานะเครื่องจักร
-     */
-    protected function sendMachineStatus(string $replyToken): void
-    {
-        $washingMachines = WashingMachine::take(10)->get();
-        $dryerMachines = DryerMachine::take(10)->get();
-
-        $bodyContents = [
-            [
-                'type' => 'text',
-                'text' => '🧺 เครื่องซัก',
-                'size' => 'sm',
-                'weight' => 'bold',
-            ],
-        ];
-
-        foreach ($washingMachines as $machine) {
-            $bodyContents[] = $this->lineService->infoRow(
-                $machine->name,
-                number_format($machine->maximum_weight) . ' kg'
-            );
-        }
-
-        $bodyContents[] = $this->lineService->separator();
-        $bodyContents[] = [
-            'type' => 'text',
-            'text' => '🌡️ เครื่องอบ',
-            'size' => 'sm',
-            'weight' => 'bold',
-            'margin' => 'md',
-        ];
-
-        foreach ($dryerMachines as $machine) {
-            $bodyContents[] = $this->lineService->infoRow(
-                $machine->name,
-                number_format($machine->maximum_weight) . ' kg'
-            );
-        }
-
-        $bubble = $this->lineService->bubbleContainer(
-            '⚙️ เครื่องจักร',
-            'รายการทั้งหมด',
-            $bodyContents,
-            '#34495E'
-        );
-
-        $flexMessage = $this->lineService->flexMessage('เครื่องจักร', $bubble);
-        $this->lineService->replyMessage($replyToken, [$flexMessage]);
-    }
-
-    /**
-     * ส่งเมนูรายงาน
-     */
-    protected function sendReportMenu(string $replyToken): void
-    {
-        $quickReplyItems = [
-            $this->lineService->quickReplyItem('📊 สรุปวันนี้', 'postback', 'action=report_period&period=today'),
-            $this->lineService->quickReplyItem('📆 สัปดาห์นี้', 'postback', 'action=report_period&period=week'),
-            $this->lineService->quickReplyItem('📅 เดือนนี้', 'postback', 'action=report_period&period=month'),
-            $this->lineService->quickReplyItem('📈 ทั้งหมด', 'postback', 'action=report_period&period=all'),
-        ];
-
-        $message = $this->lineService->quickReply("📈 รายงานสรุป\n\nเลือกช่วงเวลาที่ต้องการ:", $quickReplyItems);
-        $this->lineService->replyMessage($replyToken, [$message]);
-    }
-
-    /**
-     * แสดงรายงานสรุปตามช่วงเวลา
-     */
-    protected function sendReportSummary(string $replyToken, string $period): void
-    {
-        $periodLabels = [
-            'today' => 'วันนี้',
-            'week' => 'สัปดาห์นี้',
-            'month' => 'เดือนนี้',
-            'all' => 'ทั้งหมด',
-        ];
-
-        $periodLabel = $periodLabels[$period] ?? 'ทั้งหมด';
-
-        // คำนวณช่วงเวลา
-        $startDate = null;
-        $endDate = Carbon::now();
-
-        switch ($period) {
-            case 'today':
-                $startDate = Carbon::today();
-                break;
-            case 'week':
-                $startDate = Carbon::now()->startOfWeek();
-                break;
-            case 'month':
-                $startDate = Carbon::now()->startOfMonth();
-                break;
-            case 'all':
             default:
-                $startDate = null;
-                break;
+                return [$this->lineService->textMessage(json_encode($response))];
         }
+    }
 
-        // คำนวณรายได้
-        $incomeQuery = Income::query();
-        if ($startDate) {
-            $incomeQuery->where('created_at', '>=', $startDate);
+    /**
+     * สร้าง Quick Reply Items จาก ChatService format
+     */
+    protected function buildQuickReplyItems(array $replies): array
+    {
+        $items = [];
+        foreach ($replies as $reply) {
+            if (is_string($reply)) {
+                // Simple text reply
+                $items[] = $this->lineService->quickReplyItem($reply, 'message');
+            } else {
+                // Action reply
+                $label = $reply['label'] ?? '';
+                $action = $reply['action'] ?? '';
+                $data = $reply['data'] ?? [];
+
+                if ($action) {
+                    // Build postback data string
+                    $postbackData = 'action=' . $action;
+                    foreach ($data as $key => $value) {
+                        $postbackData .= '&' . $key . '=' . $value;
+                    }
+                    $items[] = $this->lineService->quickReplyItem($label, 'postback', $postbackData);
+                } else {
+                    $items[] = $this->lineService->quickReplyItem($label, 'message');
+                }
+            }
         }
-        $totalIncome = $incomeQuery->sum('amount') ?? 0;
+        return $items;
+    }
 
-        // คำนวณค่าใช้จ่าย
-        $expenseQuery = Expense::query();
-        if ($startDate) {
-            $expenseQuery->where('created_at', '>=', $startDate);
-        }
-        $totalExpense = $expenseQuery->sum('amount') ?? 0;
+    /**
+     * สร้าง Flex Message จาก ChatService card format
+     */
+    protected function buildFlexMessage(array $card): array
+    {
+        $bodyContents = [];
 
-        // คำนวณกำไร
-        $profit = $totalIncome - $totalExpense;
-        $profitColor = $profit >= 0 ? '#1DB446' : '#FF0000';
-
-        // สร้าง Flex Message
-        $bodyContents = [
-            $this->lineService->infoRow('📅 ช่วงเวลา', $periodLabel),
-            $this->lineService->separator(),
-            $this->lineService->infoRow('💰 รายได้', number_format($totalIncome, 2) . ' ฿', '#1DB446'),
-            $this->lineService->infoRow('💸 ค่าใช้จ่าย', number_format($totalExpense, 2) . ' ฿', '#FF6B35'),
-            $this->lineService->separator(),
-            $this->lineService->infoRow('📊 กำไร/ขาดทุน', number_format($profit, 2) . ' ฿', $profitColor),
-        ];
-
-        // เพิ่มสรุปพลังงานถ้าไม่ใช่ all
-        if ($startDate) {
-            $energyQuery = EnergyResourceLog::with('energyResource')
-                ->where('created_at', '>=', $startDate);
-            $totalEnergyCost = $energyQuery->sum('cost') ?? 0;
-
-            $bodyContents[] = $this->lineService->separator();
-            $bodyContents[] = [
-                'type' => 'text',
-                'text' => '⚡ ค่าพลังงาน',
-                'size' => 'sm',
-                'weight' => 'bold',
-                'margin' => 'md',
-            ];
-            $bodyContents[] = $this->lineService->infoRow('รวมทั้งหมด', number_format($totalEnergyCost, 2) . ' ฿', '#FFD700');
+        foreach ($card['rows'] ?? [] as $row) {
+            if (isset($row['type']) && $row['type'] === 'separator') {
+                $bodyContents[] = $this->lineService->separator();
+            } elseif (isset($row['bold']) && $row['bold']) {
+                $bodyContents[] = [
+                    'type' => 'text',
+                    'text' => $row['label'],
+                    'size' => 'sm',
+                    'weight' => 'bold',
+                    'margin' => 'md',
+                ];
+            } else {
+                $bodyContents[] = $this->lineService->infoRow(
+                    $row['label'] ?? '',
+                    $row['value'] ?? '',
+                    $row['valueColor'] ?? '#111111'
+                );
+            }
         }
 
         $bubble = $this->lineService->bubbleContainer(
-            '📈 รายงานสรุป',
-            $periodLabel,
+            $card['title'] ?? '',
+            $card['subtitle'] ?? '',
             $bodyContents,
-            '#2C3E50'
+            $card['headerColor'] ?? '#1DB446'
         );
 
-        $flexMessage = $this->lineService->flexMessage('รายงานสรุป: ' . $periodLabel, $bubble);
-        $this->lineService->replyMessage($replyToken, [$flexMessage]);
+        return $this->lineService->flexMessage($card['title'] ?? 'ข้อมูล', $bubble);
     }
 }

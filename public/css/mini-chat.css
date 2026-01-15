@@ -1,0 +1,401 @@
+/* Mini Chat Popover Styles */
+
+:root {
+    --mini-chat-primary: #1DB446;
+    --mini-chat-primary-dark: #18953a;
+    --mini-chat-bg: #ffffff;
+    --mini-chat-header-bg: linear-gradient(135deg, #1DB446 0%, #17a040 100%);
+    --mini-chat-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+    --mini-chat-radius: 16px;
+    --mini-chat-message-user: #1DB446;
+    --mini-chat-message-bot: #f0f2f5;
+    --mini-chat-text: #333333;
+    --mini-chat-text-light: #666666;
+}
+
+/* Container */
+.mini-chat {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 9999;
+    font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Toggle Button */
+.mini-chat-toggle {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: var(--mini-chat-header-bg);
+    border: none;
+    cursor: pointer;
+    box-shadow: var(--mini-chat-shadow);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+}
+
+.mini-chat-toggle:hover {
+    transform: scale(1.1);
+    box-shadow: 0 12px 40px rgba(29, 180, 70, 0.4);
+}
+
+.mini-chat-toggle .chat-icon,
+.mini-chat-toggle .close-icon {
+    font-size: 24px;
+    position: absolute;
+    transition: all 0.3s ease;
+}
+
+.mini-chat-toggle .close-icon {
+    opacity: 0;
+    transform: rotate(-90deg);
+    color: white;
+    font-size: 20px;
+}
+
+.mini-chat.open .mini-chat-toggle .chat-icon {
+    opacity: 0;
+    transform: rotate(90deg);
+}
+
+.mini-chat.open .mini-chat-toggle .close-icon {
+    opacity: 1;
+    transform: rotate(0deg);
+}
+
+/* Chat Window */
+.mini-chat-window {
+    position: absolute;
+    bottom: 80px;
+    right: 0;
+    width: 380px;
+    max-width: calc(100vw - 48px);
+    height: 520px;
+    max-height: calc(100vh - 160px);
+    background: var(--mini-chat-bg);
+    border-radius: var(--mini-chat-radius);
+    box-shadow: var(--mini-chat-shadow);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(20px) scale(0.95);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mini-chat.open .mini-chat-window {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+}
+
+/* Header */
+.mini-chat-header {
+    background: var(--mini-chat-header-bg);
+    color: white;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+}
+
+.mini-chat-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    font-size: 15px;
+}
+
+.mini-chat-avatar {
+    font-size: 24px;
+}
+
+.mini-chat-close {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+
+.mini-chat-close:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Messages Area */
+.mini-chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    background: #fafafa;
+}
+
+/* Message Bubble */
+.mini-chat-message {
+    max-width: 85%;
+    padding: 12px 16px;
+    border-radius: 18px;
+    font-size: 14px;
+    line-height: 1.5;
+    animation: messageSlideIn 0.3s ease;
+}
+
+@keyframes messageSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.mini-chat-message.user {
+    align-self: flex-end;
+    background: var(--mini-chat-message-user);
+    color: white;
+    border-bottom-right-radius: 4px;
+}
+
+.mini-chat-message.bot {
+    align-self: flex-start;
+    background: var(--mini-chat-message-bot);
+    color: var(--mini-chat-text);
+    border-bottom-left-radius: 4px;
+}
+
+/* Card Message */
+.mini-chat-card {
+    max-width: 100%;
+    align-self: flex-start;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    animation: messageSlideIn 0.3s ease;
+}
+
+.mini-chat-card-header {
+    padding: 12px 16px;
+    color: white;
+}
+
+.mini-chat-card-title {
+    font-weight: 700;
+    font-size: 15px;
+    margin-bottom: 2px;
+}
+
+.mini-chat-card-subtitle {
+    font-size: 12px;
+    opacity: 0.85;
+}
+
+.mini-chat-card-body {
+    padding: 12px 16px;
+}
+
+.mini-chat-card-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    font-size: 13px;
+}
+
+.mini-chat-card-row.separator {
+    border-top: 1px solid #eee;
+    margin-top: 8px;
+    padding-top: 12px;
+}
+
+.mini-chat-card-label {
+    color: var(--mini-chat-text-light);
+}
+
+.mini-chat-card-label.bold {
+    color: var(--mini-chat-text);
+    font-weight: 600;
+}
+
+.mini-chat-card-value {
+    font-weight: 600;
+    text-align: right;
+}
+
+/* Quick Replies */
+.mini-chat-quick-replies {
+    padding: 8px 16px 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    background: white;
+    border-top: 1px solid #eee;
+}
+
+.mini-chat-quick-replies:empty {
+    display: none;
+}
+
+.mini-chat-quick-reply {
+    background: white;
+    border: 1.5px solid var(--mini-chat-primary);
+    color: var(--mini-chat-primary);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.mini-chat-quick-reply:hover {
+    background: var(--mini-chat-primary);
+    color: white;
+    transform: translateY(-1px);
+}
+
+/* Input Area */
+.mini-chat-input-area {
+    padding: 12px 16px;
+    background: white;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    border-top: 1px solid #eee;
+}
+
+.mini-chat-input {
+    flex: 1;
+    border: 1.5px solid #e0e0e0;
+    border-radius: 24px;
+    padding: 10px 16px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.mini-chat-input:focus {
+    border-color: var(--mini-chat-primary);
+}
+
+.mini-chat-input::placeholder {
+    color: #999;
+}
+
+.mini-chat-send {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--mini-chat-primary);
+    border: none;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    font-size: 16px;
+}
+
+.mini-chat-send:hover {
+    background: var(--mini-chat-primary-dark);
+    transform: scale(1.05);
+}
+
+.mini-chat-send:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+/* Loading Animation */
+.mini-chat-typing {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 12px 16px;
+    background: var(--mini-chat-message-bot);
+    border-radius: 18px;
+    border-bottom-left-radius: 4px;
+    align-self: flex-start;
+}
+
+.mini-chat-typing-dot {
+    width: 8px;
+    height: 8px;
+    background: #999;
+    border-radius: 50%;
+    animation: typingBounce 1.4s infinite ease-in-out both;
+}
+
+.mini-chat-typing-dot:nth-child(1) { animation-delay: -0.32s; }
+.mini-chat-typing-dot:nth-child(2) { animation-delay: -0.16s; }
+.mini-chat-typing-dot:nth-child(3) { animation-delay: 0s; }
+
+@keyframes typingBounce {
+    0%, 80%, 100% {
+        transform: scale(0.6);
+        opacity: 0.5;
+    }
+    40% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    .mini-chat {
+        bottom: 16px;
+        right: 16px;
+    }
+
+    .mini-chat-window {
+        width: calc(100vw - 32px);
+        height: calc(100vh - 120px);
+        bottom: 70px;
+        right: -8px;
+    }
+
+    .mini-chat-toggle {
+        width: 54px;
+        height: 54px;
+    }
+}
+
+/* Scrollbar Styling */
+.mini-chat-messages::-webkit-scrollbar {
+    width: 6px;
+}
+
+.mini-chat-messages::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.mini-chat-messages::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 3px;
+}
+
+.mini-chat-messages::-webkit-scrollbar-thumb:hover {
+    background: #aaa;
+}
