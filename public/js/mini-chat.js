@@ -19,6 +19,17 @@ class MiniChat {
         this.input = document.getElementById('mini-chat-input');
         this.sendBtn = document.getElementById('mini-chat-send');
 
+        // Main menu for navigation
+        this.mainMenu = [
+            '📊 สรุปวันนี้',
+            '👥 ลูกค้า',
+            '📦 สต๊อก',
+            '⚡ พลังงาน',
+            '👷 พนักงาน',
+            '⚙️ เครื่องจักร',
+            '📈 รายงาน',
+        ];
+
         if (this.container) {
             this.init();
         }
@@ -26,11 +37,22 @@ class MiniChat {
 
     init() {
         // Toggle button
-        this.toggleBtn.addEventListener('click', () => this.toggle());
-        this.closeBtn.addEventListener('click', () => this.close());
+        this.toggleBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.toggle();
+        });
+        
+        this.closeBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.close();
+        });
 
         // Send message
-        this.sendBtn.addEventListener('click', () => this.sendMessage());
+        this.sendBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.sendMessage();
+        });
+        
         this.input.addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
@@ -38,7 +60,17 @@ class MiniChat {
             }
         });
 
-        // Close on click outside
+        // Prevent chat window clicks from propagating
+        this.window.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+
+        // Quick replies area - prevent propagation
+        this.quickRepliesArea.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+
+        // Close on click outside (only on document, not inside chat)
         document.addEventListener('click', (e) => {
             if (this.isOpen && !this.container.contains(e.target)) {
                 this.close();
@@ -158,6 +190,8 @@ class MiniChat {
         switch (data.type) {
             case 'text':
                 this.addMessage(data.text, 'bot');
+                // Show main menu after text message
+                this.renderQuickReplies(this.mainMenu);
                 break;
 
             case 'menu':
@@ -167,10 +201,13 @@ class MiniChat {
 
             case 'card':
                 this.renderCard(data);
+                // Always show main menu after card for navigation
+                this.renderQuickReplies(this.mainMenu);
                 break;
 
             default:
                 this.addMessage(JSON.stringify(data), 'bot');
+                this.renderQuickReplies(this.mainMenu);
         }
 
         this.scrollToBottom();
@@ -241,7 +278,9 @@ class MiniChat {
             // Simple text reply (string)
             if (typeof reply === 'string') {
                 btn.textContent = reply;
-                btn.addEventListener('click', () => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
                     this.input.value = reply;
                     this.sendMessage();
                 });
@@ -249,7 +288,9 @@ class MiniChat {
             // Action reply (object)
             else if (typeof reply === 'object') {
                 btn.textContent = reply.label;
-                btn.addEventListener('click', () => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
                     if (reply.action) {
                         this.sendAction(reply.action, reply.data || {});
                     } else {
@@ -288,6 +329,8 @@ class MiniChat {
 
     showError(message) {
         this.addMessage('⚠️ ' + message, 'bot');
+        // Show menu after error too
+        this.renderQuickReplies(this.mainMenu);
     }
 
     scrollToBottom() {
