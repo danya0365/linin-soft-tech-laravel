@@ -30,9 +30,9 @@
         </main>
         <footer>
             <div class="container d-flex justify-content-between py-4 my-4 border-top">
-                <p>&copy; 2021 {{ config('app.name'); }}, Inc. All rights reserved.</p>
+                <p>&copy; 2021 {{ config('app.name') }}, Inc. All rights reserved.</p>
                 <div class="d-flex">
-                    v{{ config('app.version'); }}
+                    v{{ config('app.version') }} ({{ config('app.build') }})
                     &nbsp;
                     <a href="https://www.facebook.com/marosdee7" target="_blank">
                     พัฒนาโดย: Marosdee7

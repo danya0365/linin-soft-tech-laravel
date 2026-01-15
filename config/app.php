@@ -17,6 +17,7 @@ return [
 
     'name' => env('APP_NAME', 'Linen Soft Tech'),
     'version' => '1.3.1',
+    'build' => trim(exec('git log --pretty="%h" -n1 HEAD')),
 
     /*
     |--------------------------------------------------------------------------
