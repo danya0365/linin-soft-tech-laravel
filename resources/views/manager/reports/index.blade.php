@@ -371,53 +371,53 @@
 <script>
 $(function(){
 
-    // 3 กราฟเปรียบเทียบใหม่
-    (function(){
-        var compareStart = '{{ request()->get('compare-start') }}';
-        var compareEnd = '{{ request()->get('compare-end') }}';
+    // 3 กราฟเปรียบเทียบใหม่ (ปิดชั่วคราว - รอ build production)
+    // (function(){
+    //     var compareStart = '{{ request()->get('compare-start') }}';
+    //     var compareEnd = '{{ request()->get('compare-end') }}';
 
-        // กราฟ 1: ภาพรวมการเงิน
-        var financialData = @json(App\Managers\HighChartManager::getFinancialComparisonSummary(request()->get('compare-start'), request()->get('compare-end')));
-        var financialTitle = "ภาพรวมการเงิน 7 วันล่าสุด";
-        if (compareStart && compareEnd) {
-            $('[name=compare-start]').val(compareStart);
-            $('[name=compare-end]').val(compareEnd);
-            financialTitle = `ภาพรวมการเงิน ${compareStart} ถึง ${compareEnd}`;
-        }
-        $.comparisonLineChart({
-            renderTo: 'financial-comparison-chart',
-            data: financialData,
-            title: financialTitle,
-            yAxisLabel: 'จำนวนเงิน (บาท)',
-            unit: 'บาท'
-        });
+    //     // กราฟ 1: ภาพรวมการเงิน
+    //     var financialData = @json(App\Managers\HighChartManager::getFinancialComparisonSummary(request()->get('compare-start'), request()->get('compare-end')));
+    //     var financialTitle = "ภาพรวมการเงิน 7 วันล่าสุด";
+    //     if (compareStart && compareEnd) {
+    //         $('[name=compare-start]').val(compareStart);
+    //         $('[name=compare-end]').val(compareEnd);
+    //         financialTitle = `ภาพรวมการเงิน ${compareStart} ถึง ${compareEnd}`;
+    //     }
+    //     $.comparisonLineChart({
+    //         renderTo: 'financial-comparison-chart',
+    //         data: financialData,
+    //         title: financialTitle,
+    //         yAxisLabel: 'จำนวนเงิน (บาท)',
+    //         unit: 'บาท'
+    //     });
 
-        // กราฟ 2: ปริมาณงาน
-        var operationData = @json(App\Managers\HighChartManager::getOperationComparisonSummary(request()->get('compare-start'), request()->get('compare-end')));
-        var operationTitle = "ปริมาณงาน 7 วันล่าสุด";
-        if (compareStart && compareEnd) {
-            operationTitle = `ปริมาณงาน ${compareStart} ถึง ${compareEnd}`;
-        }
-        $.comparisonLineChart({
-            renderTo: 'operation-comparison-chart',
-            data: operationData,
-            title: operationTitle,
-            yAxisLabel: 'น้ำหนัก (กก.)',
-            unit: 'กก.'
-        });
+    //     // กราฟ 2: ปริมาณงาน
+    //     var operationData = @json(App\Managers\HighChartManager::getOperationComparisonSummary(request()->get('compare-start'), request()->get('compare-end')));
+    //     var operationTitle = "ปริมาณงาน 7 วันล่าสุด";
+    //     if (compareStart && compareEnd) {
+    //         operationTitle = `ปริมาณงาน ${compareStart} ถึง ${compareEnd}`;
+    //     }
+    //     $.comparisonLineChart({
+    //         renderTo: 'operation-comparison-chart',
+    //         data: operationData,
+    //         title: operationTitle,
+    //         yAxisLabel: 'น้ำหนัก (กก.)',
+    //         unit: 'กก.'
+    //     });
 
-        // กราฟ 3: เปรียบเทียบแนวโน้ม (Normalized %)
-        var trendData = @json(App\Managers\HighChartManager::getTrendComparisonSummary(request()->get('compare-start'), request()->get('compare-end')));
-        var trendTitle = "เปรียบเทียบแนวโน้ม 7 วันล่าสุด";
-        if (compareStart && compareEnd) {
-            trendTitle = `เปรียบเทียบแนวโน้ม ${compareStart} ถึง ${compareEnd}`;
-        }
-        $.trendLineChart({
-            renderTo: 'trend-comparison-chart',
-            data: trendData,
-            title: trendTitle
-        });
-    })();
+    //     // กราฟ 3: เปรียบเทียบแนวโน้ม (Normalized %)
+    //     var trendData = @json(App\Managers\HighChartManager::getTrendComparisonSummary(request()->get('compare-start'), request()->get('compare-end')));
+    //     var trendTitle = "เปรียบเทียบแนวโน้ม 7 วันล่าสุด";
+    //     if (compareStart && compareEnd) {
+    //         trendTitle = `เปรียบเทียบแนวโน้ม ${compareStart} ถึง ${compareEnd}`;
+    //     }
+    //     $.trendLineChart({
+    //         renderTo: 'trend-comparison-chart',
+    //         data: trendData,
+    //         title: trendTitle
+    //     });
+    // })();
 
     // Datepicker สำหรับกราฟเปรียบเทียบ
     $('[name=compare-start]').datepicker({ format: 'yyyy-mm-dd' });
