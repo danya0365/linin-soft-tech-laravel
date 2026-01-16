@@ -292,6 +292,7 @@ class HighChartManager extends Manager
 
     /**
      * กราฟ 2: ปริมาณงาน (น้ำหนักผ้าเปียก, น้ำหนักผ้าแห้ง) หน่วย: กก.
+     * ดึงข้อมูลจากทั้ง customer_operation_daily_summaries และ operations (status=close)
      */
     public static function getOperationComparisonSummary($startDateString = '', $endDateString = ''): array
     {
@@ -308,7 +309,7 @@ class HighChartManager extends Manager
             $dataStructure[$dateYmd] = 0;
         }
 
-        // น้ำหนักผ้าเปียก
+        // น้ำหนักผ้าเปียก - จาก customer_operation_daily_summaries
         $wetWeightData = $dataStructure;
         $wetRows = \App\Models\CustomerOperationDailySummary::query()
             ->select(DB::raw("operation_date as ymd"), DB::raw('SUM(total_wet_weight) as total'))
@@ -316,11 +317,24 @@ class HighChartManager extends Manager
             ->groupBy('ymd')->get();
         foreach ($wetRows as $row) {
             if (isset($wetWeightData[$row->ymd])) {
-                $wetWeightData[$row->ymd] = floatval($row->total);
+                $wetWeightData[$row->ymd] += floatval($row->total);
             }
         }
 
-        // น้ำหนักผ้าแห้ง
+        // น้ำหนักผ้าเปียก - จาก operations (status=close) ที่กรอกผ่าน new-billing
+        $wetRowsOp = \App\Models\Operation::query()
+            ->select(DB::raw("DATE_FORMAT(billing_payment_date, '%Y-%m-%d') as ymd"), DB::raw('SUM(total_wet_weight) as total'))
+            ->where('status', 'close')
+            ->whereNotNull('total_wet_weight')
+            ->whereBetween('billing_payment_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
+            ->groupBy('ymd')->get();
+        foreach ($wetRowsOp as $row) {
+            if (isset($wetWeightData[$row->ymd])) {
+                $wetWeightData[$row->ymd] += floatval($row->total);
+            }
+        }
+
+        // น้ำหนักผ้าแห้ง - จาก customer_operation_daily_summaries
         $dryWeightData = $dataStructure;
         $dryRows = \App\Models\CustomerOperationDailySummary::query()
             ->select(DB::raw("operation_date as ymd"), DB::raw('SUM(total_dry_weight) as total'))
@@ -328,7 +342,20 @@ class HighChartManager extends Manager
             ->groupBy('ymd')->get();
         foreach ($dryRows as $row) {
             if (isset($dryWeightData[$row->ymd])) {
-                $dryWeightData[$row->ymd] = floatval($row->total);
+                $dryWeightData[$row->ymd] += floatval($row->total);
+            }
+        }
+
+        // น้ำหนักผ้าแห้ง - จาก operations (status=close)
+        $dryRowsOp = \App\Models\Operation::query()
+            ->select(DB::raw("DATE_FORMAT(billing_payment_date, '%Y-%m-%d') as ymd"), DB::raw('SUM(total_dry_weight) as total'))
+            ->where('status', 'close')
+            ->whereNotNull('total_dry_weight')
+            ->whereBetween('billing_payment_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
+            ->groupBy('ymd')->get();
+        foreach ($dryRowsOp as $row) {
+            if (isset($dryWeightData[$row->ymd])) {
+                $dryWeightData[$row->ymd] += floatval($row->total);
             }
         }
 
