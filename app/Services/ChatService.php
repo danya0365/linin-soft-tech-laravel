@@ -111,6 +111,13 @@ class ChatService
                 return $this->getEmployeeDetail($params['id'] ?? null);
             case 'report_period':
                 return $this->getReportSummary($params['period'] ?? 'all');
+            case 'report_type':
+                return $this->getReportDateMenu($params['type'] ?? 'summary');
+            case 'report_date':
+                $type = $params['type'] ?? 'summary';
+                $date = $params['date'] ?? null;
+                $range = $params['range'] ?? 'day';
+                return $this->getReportByDate($type, $date, $range);
             default:
                 return $this->getMainMenu();
         }
@@ -555,20 +562,231 @@ class ChatService
     }
 
     /**
-     * ดึงเมนูรายงาน
+     * ดึงเมนูรายงาน - เลือกประเภท (รวม/แยกละเอียด)
      */
     public function getReportMenu(): array
     {
         return [
             'type' => 'menu',
             'title' => '📈 รายงานสรุป',
-            'text' => "📈 รายงานสรุป\n\nเลือกช่วงเวลาที่ต้องการ:",
+            'text' => "📈 รายงานสรุป\n\nเลือกรูปแบบรายงาน:",
             'quickReplies' => [
-                ['label' => '📊 สรุปวันนี้', 'action' => 'report_period', 'data' => ['period' => 'today']],
-                ['label' => '📆 สัปดาห์นี้', 'action' => 'report_period', 'data' => ['period' => 'week']],
-                ['label' => '📅 เดือนนี้', 'action' => 'report_period', 'data' => ['period' => 'month']],
-                ['label' => '📈 ทั้งหมด', 'action' => 'report_period', 'data' => ['period' => 'all']],
+                ['label' => '📊 ดูแบบรวม', 'action' => 'report_type', 'data' => ['type' => 'summary']],
+                ['label' => '📋 ดูแบบแยกละเอียด', 'action' => 'report_type', 'data' => ['type' => 'detailed']],
             ],
+        ];
+    }
+
+    /**
+     * แสดงเมนูเลือกวันที่ 7 วันล่าสุด + สัปดาห์/เดือน/ปี
+     */
+    public function getReportDateMenu(string $type): array
+    {
+        $typeLabel = $type === 'detailed' ? '📋 แยกละเอียด' : '📊 รวม';
+        $dates = [];
+        
+        // 7 วันล่าสุด
+        for ($i = 0; $i < 7; $i++) {
+            $date = Carbon::now()->subDays($i);
+            $dates[] = [
+                'label' => $date->format('d/m') . ($i === 0 ? ' (วันนี้)' : ($i === 1 ? ' (เมื่อวาน)' : '')),
+                'action' => 'report_date',
+                'data' => ['type' => $type, 'date' => $date->format('Y-m-d'), 'range' => 'day'],
+            ];
+        }
+
+        // เพิ่มตัวเลือกช่วงเวลา
+        $dates[] = ['label' => '📆 สัปดาห์นี้', 'action' => 'report_date', 'data' => ['type' => $type, 'range' => 'week']];
+        $dates[] = ['label' => '📅 เดือนนี้', 'action' => 'report_date', 'data' => ['type' => $type, 'range' => 'month']];
+        $dates[] = ['label' => '📈 ปีนี้', 'action' => 'report_date', 'data' => ['type' => $type, 'range' => 'year']];
+
+        return [
+            'type' => 'menu',
+            'title' => "📅 เลือกวันที่ ({$typeLabel})",
+            'text' => "📅 เลือกวันที่ที่ต้องการดู:\n\nรูปแบบ: {$typeLabel}",
+            'quickReplies' => $dates,
+        ];
+    }
+
+    /**
+     * แสดงรายงานตามวันที่/ช่วงเวลาที่เลือก
+     */
+    public function getReportByDate(string $type, ?string $dateString, string $range = 'day'): array
+    {
+        // กำหนดช่วงวันที่ตาม range
+        switch ($range) {
+            case 'week':
+                $startDate = Carbon::now()->startOfWeek();
+                $endDate = Carbon::now()->endOfWeek();
+                $rangeLabel = 'สัปดาห์นี้';
+                break;
+            case 'month':
+                $startDate = Carbon::now()->startOfMonth();
+                $endDate = Carbon::now()->endOfMonth();
+                $rangeLabel = 'เดือนนี้';
+                break;
+            case 'year':
+                $startDate = Carbon::now()->startOfYear();
+                $endDate = Carbon::now()->endOfYear();
+                $rangeLabel = 'ปีนี้';
+                break;
+            case 'day':
+            default:
+                $date = $dateString ? Carbon::parse($dateString) : Carbon::today();
+                $startDate = $date->copy()->startOfDay();
+                $endDate = $date->copy()->endOfDay();
+                $rangeLabel = $date->format('d/m/Y');
+                break;
+        }
+
+        if ($type === 'detailed') {
+            return $this->getDetailedReportByRange($startDate, $endDate, $rangeLabel);
+        }
+
+        return $this->getSummaryReportByRange($startDate, $endDate, $rangeLabel);
+    }
+
+    /**
+     * รายงานแบบรวม (Summary) ตามช่วงเวลา
+     */
+    protected function getSummaryReportByRange(Carbon $startDate, Carbon $endDate, string $rangeLabel): array
+    {
+        // รายได้
+        $totalIncome = Income::whereBetween('created_at', [$startDate, $endDate])->sum('amount') ?? 0;
+
+        // ค่าใช้จ่าย
+        $totalExpense = Expense::whereBetween('created_at', [$startDate, $endDate])->sum('amount') ?? 0;
+
+        // กำไร
+        $profit = $totalIncome - $totalExpense;
+        $profitColor = $profit >= 0 ? '#1DB446' : '#FF0000';
+
+        // ค่าพลังงาน
+        $totalEnergyCost = EnergyResourceLog::whereBetween('created_at', [$startDate, $endDate])->sum('cost') ?? 0;
+
+        // Operations
+        $operationCount = Operation::whereBetween('created_at', [$startDate, $endDate])->count();
+
+        return [
+            'type' => 'card',
+            'title' => '📊 รายงานรวม',
+            'subtitle' => $rangeLabel,
+            'headerColor' => '#2C3E50',
+            'rows' => [
+                ['label' => '📅 ช่วงเวลา', 'value' => $rangeLabel],
+                ['label' => '🧺 จำนวนงาน', 'value' => number_format($operationCount) . ' รายการ'],
+                ['type' => 'separator'],
+                ['label' => '💰 รายได้', 'value' => number_format($totalIncome, 2) . ' ฿', 'valueColor' => '#1DB446'],
+                ['label' => '💸 ค่าใช้จ่าย', 'value' => number_format($totalExpense, 2) . ' ฿', 'valueColor' => '#FF6B35'],
+                ['label' => '⚡ ค่าพลังงาน', 'value' => number_format($totalEnergyCost, 2) . ' ฿', 'valueColor' => '#FFD700'],
+                ['type' => 'separator'],
+                ['label' => '📊 กำไร/ขาดทุน', 'value' => number_format($profit, 2) . ' ฿', 'valueColor' => $profitColor],
+            ],
+        ];
+    }
+
+    /**
+     * รายงานแบบแยกละเอียด (Detailed) ตามช่วงเวลา
+     */
+    protected function getDetailedReportByRange(Carbon $startDate, Carbon $endDate, string $rangeLabel): array
+    {
+        $rows = [
+            ['label' => '📅 ช่วงเวลา', 'value' => $rangeLabel],
+        ];
+
+        // === Operation สรุป ===
+        $rows[] = ['type' => 'separator'];
+        $rows[] = ['label' => '🧺 Operation (สรุป)', 'value' => '', 'bold' => true];
+        
+        $operationCount = Operation::whereBetween('created_at', [$startDate, $endDate])->count();
+        $totalWetWeight = Operation::whereBetween('created_at', [$startDate, $endDate])->sum('total_wet_weight') ?? 0;
+        $totalDryWeight = Operation::whereBetween('created_at', [$startDate, $endDate])->sum('total_dry_weight') ?? 0;
+        $totalBillingWeight = Operation::whereBetween('created_at', [$startDate, $endDate])->sum('total_billing_weight') ?? 0;
+        $totalBillingPayment = Operation::whereBetween('created_at', [$startDate, $endDate])->sum('total_billing_payment') ?? 0;
+        
+        // คำนวณ % หักลบ
+        $weightDiffPercent = ($totalWetWeight > 0 && $totalDryWeight > 0) 
+            ? round(($totalWetWeight - $totalDryWeight) / $totalWetWeight * 100, 2) 
+            : 0;
+        
+        $rows[] = ['label' => 'จำนวนงาน', 'value' => number_format($operationCount) . ' รายการ'];
+        $rows[] = ['label' => '💧 น้ำหนักเปียก', 'value' => number_format($totalWetWeight, 2) . ' kg'];
+        $rows[] = ['label' => '☀️ น้ำหนักแห้ง', 'value' => number_format($totalDryWeight, 2) . ' kg'];
+        $rows[] = ['label' => '📉 % หักลบ', 'value' => $weightDiffPercent . '%', 'valueColor' => $weightDiffPercent > 20 ? '#FF0000' : ($weightDiffPercent > 15 ? '#FFA500' : '#1DB446')];
+        $rows[] = ['label' => '⚖️ น้ำหนักบิล', 'value' => number_format($totalBillingWeight, 2) . ' kg'];
+        $rows[] = ['label' => '💵 ยอดบิล', 'value' => number_format($totalBillingPayment, 2) . ' ฿', 'valueColor' => '#1DB446'];
+
+        // === รายได้แยกประเภท ===
+        $rows[] = ['type' => 'separator'];
+        $rows[] = ['label' => '💰 รายได้ (แยกประเภท)', 'value' => '', 'bold' => true];
+        
+        $incomeByType = Income::whereBetween('created_at', [$startDate, $endDate])
+            ->selectRaw('type_name, SUM(amount) as total')
+            ->groupBy('type_name')
+            ->get();
+        
+        $incomeTotal = 0;
+        foreach ($incomeByType as $item) {
+            $incomeTotal += $item->total;
+            $rows[] = ['label' => $item->type_name ?: 'อื่นๆ', 'value' => number_format($item->total, 2) . ' ฿'];
+        }
+        if ($incomeByType->isEmpty()) {
+            $rows[] = ['label' => '-', 'value' => 'ไม่มีข้อมูล'];
+        }
+        $rows[] = ['label' => 'รวมรายได้', 'value' => number_format($incomeTotal, 2) . ' ฿', 'valueColor' => '#1DB446'];
+
+        // === ค่าใช้จ่ายแยกประเภท ===
+        $rows[] = ['type' => 'separator'];
+        $rows[] = ['label' => '💸 ค่าใช้จ่าย (แยกประเภท)', 'value' => '', 'bold' => true];
+        
+        $expenseByType = Expense::whereBetween('created_at', [$startDate, $endDate])
+            ->selectRaw('type_name, SUM(amount) as total')
+            ->groupBy('type_name')
+            ->get();
+        
+        $expenseTotal = 0;
+        foreach ($expenseByType as $item) {
+            $expenseTotal += $item->total;
+            $rows[] = ['label' => $item->type_name ?: 'อื่นๆ', 'value' => number_format($item->total, 2) . ' ฿'];
+        }
+        if ($expenseByType->isEmpty()) {
+            $rows[] = ['label' => '-', 'value' => 'ไม่มีข้อมูล'];
+        }
+        $rows[] = ['label' => 'รวมค่าใช้จ่าย', 'value' => number_format($expenseTotal, 2) . ' ฿', 'valueColor' => '#FF6B35'];
+
+        // === พลังงานแยกประเภท ===
+        $rows[] = ['type' => 'separator'];
+        $rows[] = ['label' => '⚡ พลังงาน (แยกประเภท)', 'value' => '', 'bold' => true];
+        
+        $energyByType = EnergyResourceLog::with('energyResource')
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->get()
+            ->groupBy(fn($log) => $log->energyResource->name ?? 'อื่นๆ');
+        
+        $energyTotal = 0;
+        foreach ($energyByType as $name => $logs) {
+            $cost = $logs->sum('cost');
+            $value = $logs->sum('value');
+            $energyTotal += $cost;
+            $rows[] = ['label' => $name, 'value' => number_format($cost, 2) . ' ฿'];
+        }
+        if ($energyByType->isEmpty()) {
+            $rows[] = ['label' => '-', 'value' => 'ไม่มีข้อมูล'];
+        }
+        $rows[] = ['label' => 'รวมค่าพลังงาน', 'value' => number_format($energyTotal, 2) . ' ฿', 'valueColor' => '#FFD700'];
+
+        // === สรุปกำไร ===
+        $profit = $incomeTotal - $expenseTotal;
+        $profitColor = $profit >= 0 ? '#1DB446' : '#FF0000';
+        $rows[] = ['type' => 'separator'];
+        $rows[] = ['label' => '📊 กำไร/ขาดทุน', 'value' => number_format($profit, 2) . ' ฿', 'valueColor' => $profitColor, 'bold' => true];
+
+        return [
+            'type' => 'card',
+            'title' => '📋 รายงานละเอียด',
+            'subtitle' => $rangeLabel,
+            'headerColor' => '#8E44AD',
+            'rows' => $rows,
         ];
     }
 

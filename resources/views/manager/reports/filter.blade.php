@@ -67,6 +67,75 @@
         </div>
     </div>
 
+    {{-- Operation Statistics Summary Card --}}
+    @php
+        $operationStats = App\Managers\HighChartManager::getOperationStatsSummary(request()->get('compare-start'), request()->get('compare-end'));
+    @endphp
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-info">
+                <div class="card-header bg-info text-white">
+                    🧺 สรุป Operation 
+                    @if(request()->get('compare-start') && request()->get('compare-end'))
+                        ({{ request()->get('compare-start') }} ถึง {{ request()->get('compare-end') }})
+                    @else
+                        (7 วันล่าสุด)
+                    @endif
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-2 col-6 mb-3">
+                            <div class="border rounded p-3 h-100">
+                                <h5 class="text-muted mb-1">📋 จำนวนงาน</h5>
+                                <h3 class="text-primary mb-0">{{ number_format($operationStats['operationCount']) }}</h3>
+                                <small class="text-muted">รายการ</small>
+                            </div>
+                        </div>
+                        <div class="col-md-2 col-6 mb-3">
+                            <div class="border rounded p-3 h-100">
+                                <h5 class="text-muted mb-1">💧 ผ้าเปียก</h5>
+                                <h3 class="text-info mb-0">{{ number_format($operationStats['totalWetWeight'], 2) }}</h3>
+                                <small class="text-muted">กก.</small>
+                            </div>
+                        </div>
+                        <div class="col-md-2 col-6 mb-3">
+                            <div class="border rounded p-3 h-100">
+                                <h5 class="text-muted mb-1">☀️ ผ้าแห้ง</h5>
+                                <h3 class="text-warning mb-0">{{ number_format($operationStats['totalDryWeight'], 2) }}</h3>
+                                <small class="text-muted">กก.</small>
+                            </div>
+                        </div>
+                        <div class="col-md-2 col-6 mb-3">
+                            <div class="border rounded p-3 h-100">
+                                <h5 class="text-muted mb-1">📉 % หักลบ</h5>
+                                @php
+                                    $diffPercent = $operationStats['weightDiffPercent'];
+                                    $diffColor = $diffPercent > 20 ? 'danger' : ($diffPercent > 15 ? 'warning' : 'success');
+                                @endphp
+                                <h3 class="text-{{ $diffColor }} mb-0">{{ $diffPercent }}%</h3>
+                                <small class="text-muted">เปียก-แห้ง</small>
+                            </div>
+                        </div>
+                        <div class="col-md-2 col-6 mb-3">
+                            <div class="border rounded p-3 h-100">
+                                <h5 class="text-muted mb-1">⚖️ น้ำหนักบิล</h5>
+                                <h3 class="text-secondary mb-0">{{ number_format($operationStats['totalBillingWeight'], 2) }}</h3>
+                                <small class="text-muted">กก.</small>
+                            </div>
+                        </div>
+                        <div class="col-md-2 col-6 mb-3">
+                            <div class="border rounded p-3 h-100">
+                                <h5 class="text-muted mb-1">💵 ยอดบิล</h5>
+                                <h3 class="text-success mb-0">{{ number_format($operationStats['totalBillingPayment'], 2) }}</h3>
+                                <small class="text-muted">บาท</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="row justify-content-center">
         <div class="col-md-12 m-2">
             <div class="card">

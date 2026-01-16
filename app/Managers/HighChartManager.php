@@ -369,6 +369,43 @@ class HighChartManager extends Manager
     }
 
     /**
+     * สรุปสถิติ Operation ตามช่วงวันที่
+     * ใช้แสดงในหน้า report แบบ card
+     */
+    public static function getOperationStatsSummary($startDateString = '', $endDateString = ''): array
+    {
+        $totalDays = 7;
+        $endDate = $endDateString ? \Carbon\Carbon::parse($endDateString) : \Carbon\Carbon::now();
+        $startDate = $startDateString ? \Carbon\Carbon::parse($startDateString) : \Carbon\Carbon::parse($endDate->format('Y-m-d'))->subDays($totalDays);
+
+        $startOfDay = $startDate->copy()->startOfDay();
+        $endOfDay = $endDate->copy()->endOfDay();
+
+        // ดึงจาก operations table
+        $operationCount = \App\Models\Operation::whereBetween('created_at', [$startOfDay, $endOfDay])->count();
+        $totalWetWeight = \App\Models\Operation::whereBetween('created_at', [$startOfDay, $endOfDay])->sum('total_wet_weight') ?? 0;
+        $totalDryWeight = \App\Models\Operation::whereBetween('created_at', [$startOfDay, $endOfDay])->sum('total_dry_weight') ?? 0;
+        $totalBillingWeight = \App\Models\Operation::whereBetween('created_at', [$startOfDay, $endOfDay])->sum('total_billing_weight') ?? 0;
+        $totalBillingPayment = \App\Models\Operation::whereBetween('created_at', [$startOfDay, $endOfDay])->sum('total_billing_payment') ?? 0;
+
+        // คำนวณ % หักลบ
+        $weightDiffPercent = ($totalWetWeight > 0 && $totalDryWeight > 0) 
+            ? round(($totalWetWeight - $totalDryWeight) / $totalWetWeight * 100, 2) 
+            : 0;
+
+        return [
+            'startDate' => $startDate->format('Y-m-d'),
+            'endDate' => $endDate->format('Y-m-d'),
+            'operationCount' => $operationCount,
+            'totalWetWeight' => round($totalWetWeight, 2),
+            'totalDryWeight' => round($totalDryWeight, 2),
+            'weightDiffPercent' => $weightDiffPercent,
+            'totalBillingWeight' => round($totalBillingWeight, 2),
+            'totalBillingPayment' => round($totalBillingPayment, 2),
+        ];
+    }
+
+    /**
      * กราฟ 3: เปรียบเทียบแนวโน้ม (Normalized %) - รวมทุกข้อมูลในกราฟเดียว
      * แปลงค่าเป็น % ของค่าสูงสุดในช่วงเวลา
      */
