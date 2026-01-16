@@ -7,35 +7,28 @@
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{ route('supervisor') }}">Supervisor</a></li>
             <li class="breadcrumb-item"><a href="{{ route('supervisor.customer') }}">{{ __('Customer') }}</a></li>
-            <li class="breadcrumb-item active" aria-current="page">{{ __('เพิ่มบิลรายรับ - New Income Billing') }}</li>
+            <li class="breadcrumb-item"><a href="{{ route('supervisor.customer.billing-logs') }}">{{ __('Billing Logs') }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ __('แก้ไขบิลรายรับ - Edit Billing') }}</li>
         </ol>
     </nav>
     <div class="row justify-content-center">
         <div class="col-md-12 m-2">
             <div class="card">
-                <div class="card-header">น้ำหนักลูกค้าและยอดเก็บเงิน</div>
+                <div class="card-header">แก้ไขบิลรายรับ - ลูกค้า: {{ $operation->customer->name ?? '-' }}</div>
                 <div class="card-body">
-                    <form method="POST" class="row g-3 mb-3" action="{{ route('supervisor.customer.new-billing') }}"  role="form" enctype="multipart/form-data">
+                    <form method="POST" class="row g-3 mb-3" action="{{ route('supervisor.customer.billing-logs.edit', $operation->id) }}" role="form" enctype="multipart/form-data">
                         
                         @csrf
+                        
                         <div class="col-12">
-                            <label for="customer_id" class="form-label">ลูกค้า</label>
-                            <select class="form-select" id="customer_id" name="customer_id">
-                                <option value="">เลือกลูกค้า</option>
-                                @foreach ( $customerGroups as $customerGroup )
-                                <optgroup label="{{ $customerGroup['name'] }}">
-                                    @foreach ( $customerGroup['customers'] as $customer )
-                                    <option value="{{ $customer['id'] }}">{{ $customer['name'] }}</option>
-                                    @endforeach
-                                </optgroup>
-                                @endforeach
-                            </select>
+                            <label class="form-label">ลูกค้า</label>
+                            <input type="text" class="form-control" value="{{ $operation->customer->name ?? '-' }}" disabled>
+                            <small class="text-muted">ไม่สามารถเปลี่ยนลูกค้าได้</small>
                         </div>
-
 
                         <div class="col-12">
                             <label for="total_billing_weight" class="form-label">น้ำหนักลูกค้า (kg.)</label>
-                            <input type="number" step=".01" name="total_billing_weight" class="form-control" id="value">
+                            <input type="number" step=".01" name="total_billing_weight" class="form-control" id="total_billing_weight" value="{{ $operation->total_billing_weight }}">
                             @error('total_billing_weight')
                                 <div class="text-danger">{{ $message }}</div>
                             @enderror
@@ -43,7 +36,7 @@
 
                         <div class="col-md-4">
                             <label for="total_wet_weight" class="form-label">น้ำหนักผ้าเปียก (kg.)</label>
-                            <input type="number" step=".01" name="total_wet_weight" class="form-control" id="total_wet_weight" oninput="calculateWeightDiff()">
+                            <input type="number" step=".01" name="total_wet_weight" class="form-control" id="total_wet_weight" value="{{ $operation->total_wet_weight }}" oninput="calculateWeightDiff()">
                             @error('total_wet_weight')
                                 <div class="text-danger">{{ $message }}</div>
                             @enderror
@@ -51,7 +44,7 @@
 
                         <div class="col-md-4">
                             <label for="total_dry_weight" class="form-label">น้ำหนักผ้าแห้ง (kg.)</label>
-                            <input type="number" step=".01" name="total_dry_weight" class="form-control" id="total_dry_weight" oninput="calculateWeightDiff()">
+                            <input type="number" step=".01" name="total_dry_weight" class="form-control" id="total_dry_weight" value="{{ $operation->total_dry_weight }}" oninput="calculateWeightDiff()">
                             @error('total_dry_weight')
                                 <div class="text-danger">{{ $message }}</div>
                             @enderror
@@ -68,23 +61,19 @@
 
                         <div class="col-12">
                             <label for="total_billing_payment" class="form-label">ยอดเก็บเงิน (Thai Baht)</label>
-                            <input type="number" step=".01" name="total_billing_payment" class="form-control" id="cost">
-                            @error('total_billing_payment')
-                                <div class="text-danger">{{ $message }}</div>
-                            @enderror
+                            <input type="number" step=".01" class="form-control bg-light" id="total_billing_payment" value="{{ $operation->total_billing_payment }}" disabled>
+                            <small class="text-warning"><i class="fa fa-lock"></i> ไม่สามารถแก้ไขได้ เพราะผูกกับรายได้ในระบบ</small>
                         </div>
 
                         <div class="col-12">
                             <label for="billing_payment_date" class="form-label">วันที่เก็บเงิน</label>
-                            <input type="date" name="billing_payment_date" class="form-control" id="billing_payment_date">
-                            @error('billing_payment_date')
-                                <div class="text-danger">{{ $message }}</div>
-                            @enderror
+                            <input type="date" class="form-control bg-light" id="billing_payment_date" value="{{ $operation->billing_payment_date }}" disabled>
+                            <small class="text-warning"><i class="fa fa-lock"></i> ไม่สามารถแก้ไขได้ เพราะผูกกับรายงานสรุปรายวัน</small>
                         </div>
 
                         <div class="col-12">
-                            <button type="submit" class="btn btn-primary">Submit</button>
-                            <button type="reset" class="btn btn-outline-secondary">Reset</button>
+                            <button type="submit" class="btn btn-primary">บันทึกการแก้ไข</button>
+                            <a href="{{ route('supervisor.customer.billing-logs') }}" class="btn btn-outline-secondary">ยกเลิก</a>
                         </div>
                     </form>
 
@@ -106,5 +95,10 @@ function calculateWeightDiff() {
     
     document.getElementById('weight_diff_percent').value = diffPercent;
 }
+
+// คำนวณ % เมื่อโหลดหน้า
+document.addEventListener('DOMContentLoaded', function() {
+    calculateWeightDiff();
+});
 </script>
 @endsection

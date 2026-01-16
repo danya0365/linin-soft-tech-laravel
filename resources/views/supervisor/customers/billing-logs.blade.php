@@ -73,6 +73,9 @@
                                     <th>วันที่บันทึก</th>
                                     <th>ลูกค้า</th>
                                     <th>น้ำหนักที่ลูกค้า (kg.)</th>
+                                    <th>ผ้าเปียก (kg.)</th>
+                                    <th>ผ้าแห้ง (kg.)</th>
+                                    <th>% หักลบ</th>
                                     <th>จำนวนเงิน (Thai Baht)</th>
                                     <th>วันที่เก็บเงิน</th>
                                     <th></th>
@@ -80,6 +83,13 @@
                             </thead>
                             <tbody>
                                 @foreach ($billingLogs as $billingLog)
+                                    @php
+                                        $wetWeight = $billingLog->total_wet_weight ?? 0;
+                                        $dryWeight = $billingLog->total_dry_weight ?? 0;
+                                        $diffPercent = ($wetWeight > 0 && $dryWeight > 0) 
+                                            ? round(($wetWeight - $dryWeight) / $wetWeight * 100, 2) 
+                                            : '-';
+                                    @endphp
                                     <tr>
                                         <td>{{ $billingLog->created_at->format('Y-m-d') }}</td>
                                         <td>{{ $billingLog->customer->name ?? '-' }}</td>
@@ -87,14 +97,30 @@
                                             {{ number_format($billingLog->total_billing_weight) }}
                                         </td>
                                         <td class="text-end">
+                                            {{ $wetWeight ? number_format($wetWeight, 2) : '-' }}
+                                        </td>
+                                        <td class="text-end">
+                                            {{ $dryWeight ? number_format($dryWeight, 2) : '-' }}
+                                        </td>
+                                        <td class="text-end">
+                                            @if($diffPercent !== '-')
+                                                <span class="{{ $diffPercent > 20 ? 'text-danger' : ($diffPercent > 15 ? 'text-warning' : 'text-success') }}">{{ $diffPercent }}%</span>
+                                            @else
+                                                -
+                                            @endif
+                                        </td>
+                                        <td class="text-end">
                                             {{ number_format($billingLog->total_billing_payment) }}
                                         </td>
                                         <td class="text-end">{{ $billingLog->billing_payment_date }}</td>
                                         <td>
-                                            <form class="delete-form" action="{{ route('supervisor.customer.billing-logs.delete', $billingLog->id) }}" method="POST">
-                                                @csrf
-                                                <button type="submit" class="btn btn-danger btn-sm"><i class="fa fa-fw fa-trash"></i> Delete</button>
-                                            </form>
+                                            <div class="btn-group" role="group">
+                                                <a href="{{ route('supervisor.customer.billing-logs.edit', $billingLog->id) }}" class="btn btn-outline-primary btn-sm"><i class="fa fa-edit"></i> Edit</a>
+                                                <form class="delete-form" action="{{ route('supervisor.customer.billing-logs.delete', $billingLog->id) }}" method="POST">
+                                                    @csrf
+                                                    <button type="submit" class="btn btn-danger btn-sm"><i class="fa fa-fw fa-trash"></i></button>
+                                                </form>
+                                            </div>
                                         </td>
                                     </tr>
                                 @endforeach

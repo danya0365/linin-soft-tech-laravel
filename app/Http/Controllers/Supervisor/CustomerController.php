@@ -43,6 +43,8 @@ class CustomerController extends Controller
             $operation->status = OperationStatus::Close();
             $operation->customer_id = request()->get('customer_id');
             $operation->total_billing_weight = request()->get('total_billing_weight');
+            $operation->total_wet_weight = request()->get('total_wet_weight');
+            $operation->total_dry_weight = request()->get('total_dry_weight');
             $operation->total_billing_payment = request()->get('total_billing_payment');
             $operation->billing_payment_date = request()->get('billing_payment_date');
             $operation->save();
@@ -132,5 +134,38 @@ class CustomerController extends Controller
 
         return redirect()->route('supervisor.customer.billing-logs')
             ->with('success', 'BillingLog deleted successfully');
+    }
+
+    public function editBillingLog($id)
+    {
+        $operation = Operation::with('customer')->find($id);
+        
+        if (!$operation) {
+            return redirect()->route('supervisor.customer.billing-logs')
+                ->with('error', 'Billing not found');
+        }
+
+        if (request()->isMethod('post')) {
+            // ตรวจสอบเฉพาะฟิลด์ที่อนุญาตให้แก้ไข
+            request()->validate([
+                'total_billing_weight' => 'required',
+            ]);
+
+            // ⚠️ ห้ามแก้ไข total_billing_payment และ billing_payment_date 
+            // เพราะผูกกับ Income และ Daily Summary
+            $operation->total_billing_weight = request()->get('total_billing_weight');
+            $operation->total_wet_weight = request()->get('total_wet_weight');
+            $operation->total_dry_weight = request()->get('total_dry_weight');
+            $operation->save();
+
+            return redirect()->route('supervisor.customer.billing-logs')
+                ->with('success', 'อัพเดตน้ำหนักเรียบร้อยแล้ว');
+        }
+
+        $customerGroups = CustomerGroup::with('customers')->get();
+        return view('supervisor.customers.edit-billing', [
+            'operation' => $operation,
+            'customerGroups' => $customerGroups
+        ]);
     }
 }
