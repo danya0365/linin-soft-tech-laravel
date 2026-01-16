@@ -218,6 +218,175 @@ class HighChartManager extends Manager
     {
         return SalesYearSummary::getInstance()->getSalesYearSummary();
     }
+
+    /**
+     * กราฟ 1: ภาพรวมการเงิน (รายได้, ต้นทุน, กำไร, ค่าพลังงาน) หน่วย: บาท
+     */
+    public static function getFinancialComparisonSummary($startDateString = '', $endDateString = ''): array
+    {
+        $totalDays = 7;
+        $endDate = $endDateString ? \Carbon\Carbon::parse($endDateString) : \Carbon\Carbon::now();
+        $startDate = $startDateString ? \Carbon\Carbon::parse($startDateString) : \Carbon\Carbon::parse($endDate->format('Y-m-d'))->subDays($totalDays);
+
+        $dates = self::getDates($startDateString, $endDateString);
+        $titles = [];
+        $dataStructure = [];
+        foreach ($dates as $date) {
+            $dateYmd = $date->format('Y-m-d');
+            $titles[] = $date->format('M j');
+            $dataStructure[$dateYmd] = 0;
+        }
+
+        // รายได้
+        $incomeData = $dataStructure;
+        $incomeRows = Income::query()
+            ->select(DB::raw("DATE_FORMAT(created_at, '%Y-%m-%d') as ymd"), DB::raw('SUM(amount) as total'))
+            ->whereBetween('created_at', [$startDate->copy()->startOfDay(), $endDate->copy()->endOfDay()])
+            ->groupBy('ymd')->get();
+        foreach ($incomeRows as $row) {
+            if (isset($incomeData[$row->ymd])) {
+                $incomeData[$row->ymd] = floatval($row->total);
+            }
+        }
+
+        // ต้นทุน
+        $expenseData = $dataStructure;
+        $expenseRows = Expense::query()
+            ->select(DB::raw("DATE_FORMAT(created_at, '%Y-%m-%d') as ymd"), DB::raw('SUM(amount) as total'))
+            ->whereBetween('created_at', [$startDate->copy()->startOfDay(), $endDate->copy()->endOfDay()])
+            ->groupBy('ymd')->get();
+        foreach ($expenseRows as $row) {
+            if (isset($expenseData[$row->ymd])) {
+                $expenseData[$row->ymd] = floatval($row->total);
+            }
+        }
+
+        // กำไร = รายได้ - ต้นทุน
+        $profitData = $dataStructure;
+        foreach ($dataStructure as $ymd => $val) {
+            $profitData[$ymd] = $incomeData[$ymd] - $expenseData[$ymd];
+        }
+
+        // ค่าพลังงานรวม
+        $energyData = $dataStructure;
+        $energyRows = EnergyResourceLog::query()
+            ->select(DB::raw("DATE_FORMAT(created_at, '%Y-%m-%d') as ymd"), DB::raw('SUM(cost) as total'))
+            ->whereBetween('created_at', [$startDate->copy()->startOfDay(), $endDate->copy()->endOfDay()])
+            ->groupBy('ymd')->get();
+        foreach ($energyRows as $row) {
+            if (isset($energyData[$row->ymd])) {
+                $energyData[$row->ymd] = floatval($row->total);
+            }
+        }
+
+        return [
+            'titles' => array_values($titles),
+            'data' => [
+                ['name' => 'รายได้', 'data' => array_values($incomeData)],
+                ['name' => 'ต้นทุน', 'data' => array_values($expenseData)],
+                ['name' => 'กำไร', 'data' => array_values($profitData)],
+                ['name' => 'ค่าพลังงาน', 'data' => array_values($energyData)],
+            ]
+        ];
+    }
+
+    /**
+     * กราฟ 2: ปริมาณงาน (น้ำหนักผ้าเปียก, น้ำหนักผ้าแห้ง) หน่วย: กก.
+     */
+    public static function getOperationComparisonSummary($startDateString = '', $endDateString = ''): array
+    {
+        $totalDays = 7;
+        $endDate = $endDateString ? \Carbon\Carbon::parse($endDateString) : \Carbon\Carbon::now();
+        $startDate = $startDateString ? \Carbon\Carbon::parse($startDateString) : \Carbon\Carbon::parse($endDate->format('Y-m-d'))->subDays($totalDays);
+
+        $dates = self::getDates($startDateString, $endDateString);
+        $titles = [];
+        $dataStructure = [];
+        foreach ($dates as $date) {
+            $dateYmd = $date->format('Y-m-d');
+            $titles[] = $date->format('M j');
+            $dataStructure[$dateYmd] = 0;
+        }
+
+        // น้ำหนักผ้าเปียก
+        $wetWeightData = $dataStructure;
+        $wetRows = \App\Models\CustomerOperationDailySummary::query()
+            ->select(DB::raw("operation_date as ymd"), DB::raw('SUM(total_wet_weight) as total'))
+            ->whereBetween('operation_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
+            ->groupBy('ymd')->get();
+        foreach ($wetRows as $row) {
+            if (isset($wetWeightData[$row->ymd])) {
+                $wetWeightData[$row->ymd] = floatval($row->total);
+            }
+        }
+
+        // น้ำหนักผ้าแห้ง
+        $dryWeightData = $dataStructure;
+        $dryRows = \App\Models\CustomerOperationDailySummary::query()
+            ->select(DB::raw("operation_date as ymd"), DB::raw('SUM(total_dry_weight) as total'))
+            ->whereBetween('operation_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
+            ->groupBy('ymd')->get();
+        foreach ($dryRows as $row) {
+            if (isset($dryWeightData[$row->ymd])) {
+                $dryWeightData[$row->ymd] = floatval($row->total);
+            }
+        }
+
+        return [
+            'titles' => array_values($titles),
+            'data' => [
+                ['name' => 'น้ำหนักผ้าเปียก (กก.)', 'data' => array_values($wetWeightData)],
+                ['name' => 'น้ำหนักผ้าแห้ง (กก.)', 'data' => array_values($dryWeightData)],
+            ]
+        ];
+    }
+
+    /**
+     * กราฟ 3: เปรียบเทียบแนวโน้ม (Normalized %) - รวมทุกข้อมูลในกราฟเดียว
+     * แปลงค่าเป็น % ของค่าสูงสุดในช่วงเวลา
+     */
+    public static function getTrendComparisonSummary($startDateString = '', $endDateString = ''): array
+    {
+        // ดึงข้อมูลจากทั้ง 2 กราฟ
+        $financial = self::getFinancialComparisonSummary($startDateString, $endDateString);
+        $operation = self::getOperationComparisonSummary($startDateString, $endDateString);
+
+        $allSeries = [];
+
+        // Normalize ข้อมูลเป็น % ของค่าสูงสุด
+        $normalizeData = function($data) {
+            $max = max($data);
+            if ($max == 0) return array_fill(0, count($data), 0);
+            return array_map(function($val) use ($max) {
+                return round(($val / $max) * 100, 1);
+            }, $data);
+        };
+
+        // เพิ่มข้อมูลการเงิน (เลือกเฉพาะบางตัว)
+        foreach ($financial['data'] as $series) {
+            if (in_array($series['name'], ['รายได้', 'ต้นทุน', 'ค่าพลังงาน'])) {
+                $allSeries[] = [
+                    'name' => $series['name'],
+                    'data' => $normalizeData($series['data'])
+                ];
+            }
+        }
+
+        // เพิ่มข้อมูลปริมาณงาน (รวมเป็น 1 เส้น: ผ้าเปียก)
+        foreach ($operation['data'] as $series) {
+            if ($series['name'] === 'น้ำหนักผ้าเปียก (กก.)') {
+                $allSeries[] = [
+                    'name' => 'น้ำหนักผ้า',
+                    'data' => $normalizeData($series['data'])
+                ];
+            }
+        }
+
+        return [
+            'titles' => $financial['titles'],
+            'data' => $allSeries
+        ];
+    }
 }
 
 class SalesLatestDaysSummary
