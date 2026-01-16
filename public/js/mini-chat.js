@@ -264,6 +264,27 @@ class MiniChat {
         }
 
         const response = await fetch(url, options);
+        
+        // Handle authentication errors gracefully
+        if (response.status === 401) {
+            return {
+                success: false,
+                error: 'กรุณาเข้าสู่ระบบใหม่เพื่อใช้งานแชท',
+                code: 401
+            };
+        }
+        
+        // Check if response is JSON
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            // Got HTML or other non-JSON response (likely a redirect page)
+            return {
+                success: false,
+                error: 'เกิดข้อผิดพลาดในการเชื่อมต่อ กรุณาลองใหม่',
+                code: response.status
+            };
+        }
+        
         return response.json();
     }
 
