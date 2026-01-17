@@ -49,19 +49,19 @@
         </main>
 
         <!-- Footer -->
-        <footer class="bg-white/80 backdrop-blur-md border-t border-gray-200 mt-auto">
+        <footer class="bg-white/80 dark:bg-dark-card/80 backdrop-blur-md border-t border-gray-200 dark:border-dark-border mt-auto transition-colors duration-200">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
                 <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
-                    <p class="text-sm text-gray-600">
+                    <p class="text-sm text-gray-600 dark:text-gray-300">
                         &copy; {{ date('Y') }} {{ config('app.name') }}. All rights reserved.
                     </p>
-                    <div class="flex items-center gap-4 text-sm text-gray-500">
+                    <div class="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
                         <span class="px-3 py-1 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-full text-xs font-medium">
                             v{{ config('app.version') }} ({{ config('app.build') }})
                         </span>
                         <a href="https://www.facebook.com/marosdee7" 
                            target="_blank" 
-                           class="hover:text-indigo-600 transition-colors duration-200 flex items-center gap-1">
+                           class="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-200 flex items-center gap-1">
                             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                                 <path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm3 8h-1.35c-.538 0-.65.221-.65.778v1.222h2l-.209 2h-1.791v7h-3v-7h-2v-2h2v-2.308c0-1.769.931-2.692 3.029-2.692h1.971v3z"/>
                             </svg>

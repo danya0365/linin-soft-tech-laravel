@@ -401,6 +401,9 @@ Ensure the default browser behavior of the `hidden` attribute.
 .pointer-events-none{
   pointer-events: none;
 }
+.visible{
+  visibility: visible;
+}
 .fixed{
   position: fixed;
 }
@@ -429,12 +432,6 @@ Ensure the default browser behavior of the `hidden` attribute.
 }
 .top-0{
   top: 0px;
-}
-.top-4{
-  top: 1rem;
-}
-.right-4{
-  right: 1rem;
 }
 .left-0{
   left: 0px;
@@ -1366,10 +1363,6 @@ Ensure the default browser behavior of the `hidden` attribute.
 .text-indigo-500{
   --tw-text-opacity: 1;
   color: rgb(99 102 241 / var(--tw-text-opacity));
-}
-.text-primary-600{
-  --tw-text-opacity: 1;
-  color: rgb(2 132 199 / var(--tw-text-opacity));
 }
 .underline{
   -webkit-text-decoration-line: underline;
@@ -30208,6 +30201,10 @@ a:active {
   background-color: rgb(30 41 59 / 0.8);
 }
 
+.dark .dark\:bg-dark-card\/95{
+  background-color: rgb(30 41 59 / 0.95);
+}
+
 .dark .dark\:bg-green-500{
   --tw-bg-opacity: 1;
   background-color: rgb(34 197 94 / var(--tw-bg-opacity));
@@ -30275,14 +30272,14 @@ a:active {
   color: rgb(229 231 235 / var(--tw-text-opacity));
 }
 
-.dark .dark\:text-gray-100{
-  --tw-text-opacity: 1;
-  color: rgb(243 244 246 / var(--tw-text-opacity));
-}
-
 .dark .dark\:text-red-400{
   --tw-text-opacity: 1;
   color: rgb(248 113 113 / var(--tw-text-opacity));
+}
+
+.dark .dark\:text-gray-100{
+  --tw-text-opacity: 1;
+  color: rgb(243 244 246 / var(--tw-text-opacity));
 }
 
 .dark .dark\:placeholder-gray-500::-moz-placeholder{
@@ -30329,6 +30326,10 @@ a:active {
 .dark .dark\:hover\:bg-gray-700:hover{
   --tw-bg-opacity: 1;
   background-color: rgb(55 65 81 / var(--tw-bg-opacity));
+}
+
+.dark .dark\:hover\:bg-red-900\/30:hover{
+  background-color: rgb(127 29 29 / 0.3);
 }
 
 .dark .dark\:hover\:bg-green-600:hover{

@@ -140,7 +140,7 @@
                                        name="remember" 
                                        type="checkbox" 
                                        {{ old('remember') ? 'checked' : '' }}
-                                       class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded cursor-pointer">
+                                       class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 dark:border-gray-600 rounded cursor-pointer dark:bg-gray-700">
                                 <label for="remember" class="ml-2 block text-sm text-gray-700 dark:text-gray-300 cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-200">
                                     {{ __('Remember Me') }}
                                 </label>
