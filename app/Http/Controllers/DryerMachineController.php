@@ -73,9 +73,11 @@ class DryerMachineController extends Controller
         }
         
         $notes = $query->orderBy('created_at', 'desc')->paginate();
-        $existingTags = Note::getExistingTags();
+        
+        // Get tags specific to this dryer machine (cached)
+        $machineTags = Note::getTagsForMachine('dryer_machine', $id);
 
-        return view('dryer-machine.show', compact('dryerMachine', 'notes', 'existingTags', 'selectedTag'));
+        return view('dryer-machine.show', compact('dryerMachine', 'notes', 'machineTags', 'selectedTag'));
     }
 
     /**

@@ -73,9 +73,11 @@ class TruckController extends Controller
         }
         
         $notes = $query->orderBy('created_at', 'desc')->paginate();
-        $existingTags = Note::getExistingTags();
+        
+        // Get tags specific to this truck (cached)
+        $machineTags = Note::getTagsForMachine('truck', $id);
 
-        return view('truck.show', compact('truck', 'notes', 'existingTags', 'selectedTag'));
+        return view('truck.show', compact('truck', 'notes', 'machineTags', 'selectedTag'));
     }
 
     /**

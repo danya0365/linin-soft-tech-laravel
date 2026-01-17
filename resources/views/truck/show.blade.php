@@ -68,25 +68,25 @@
 
                     <div class="card-body">
                         {{-- Tag Filter Section --}}
-                        @if(count($existingTags) > 0)
+                        @if(count($machineTags) > 0)
                         <div class="mb-4">
                             <div class="d-flex flex-wrap gap-2 align-items-center">
-                                <span class="text-muted me-2">กรองตาม Tag:</span>
+                                <span class="text-muted me-2">🏷️ กรองตาม Tag:</span>
                                 <a href="{{ route('trucks.show', $truck->id) }}" 
                                    class="btn btn-sm {{ !$selectedTag ? 'btn-dark' : 'btn-outline-dark' }}">
                                     ทั้งหมด
                                 </a>
-                                @foreach($existingTags as $tag)
+                                @foreach($machineTags as $tag)
                                     <a href="{{ route('trucks.show', ['truck' => $truck->id, 'tag' => $tag]) }}" 
                                        class="btn btn-sm {{ $selectedTag == $tag ? 'btn-primary' : 'btn-outline-secondary' }}">
-                                        {{ $tag }}
+                                        #{{ $tag }}
                                     </a>
                                 @endforeach
                             </div>
                             @if($selectedTag)
                                 <div class="mt-2">
                                     <small class="text-muted">
-                                        แสดงผล: <strong>{{ $selectedTag }}</strong>
+                                        กำลังแสดง: <strong>#{{ $selectedTag }}</strong>
                                         <a href="{{ route('trucks.show', $truck->id) }}" class="text-danger ms-2">
                                             <i class="fa fa-times"></i> ล้าง filter
                                         </a>
@@ -105,9 +105,11 @@
                                     @if($note->tag)
                                         <a href="{{ route('trucks.show', ['truck' => $truck->id, 'tag' => $note->tag]) }}" 
                                            class="badge text-white text-decoration-none" 
-                                           style="background-color: {{ $note->tag_color }}; cursor: pointer;"
-                                           title="คลิกเพื่อกรองตาม tag นี้">
-                                            {{ $note->tag }}
+                                           style="background-color: {{ $note->tag_color }}; cursor: pointer; transition: transform 0.2s;"
+                                           title="คลิกเพื่อกรองตาม #{{ $note->tag }}"
+                                           onmouseover="this.style.transform='scale(1.1)'" 
+                                           onmouseout="this.style.transform='scale(1)'">
+                                            #{{ $note->tag }}
                                         </a>
                                     @endif
                                 </div>
@@ -132,7 +134,7 @@
                     @empty
                         <div class="alert alert-info">
                             @if($selectedTag)
-                                ไม่พบบันทึกที่มี tag "{{ $selectedTag }}"
+                                ไม่พบบันทึกที่มี tag "#{{ $selectedTag }}"
                             @else
                                 ยังไม่มีบันทึก
                             @endif
