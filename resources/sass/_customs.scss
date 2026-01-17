@@ -58,3 +58,37 @@ a:active {
     top: 6px !important;
     font-size: 24px;
 }
+
+/* Dark Mode Overrides - Fix Bootstrap !important conflicts */
+.dark {
+    /* Input borders in dark mode */
+    input.border-gray-300,
+    textarea.border-gray-300,
+    select.border-gray-300 {
+        border-color: rgb(75 85 99) !important; /* gray-600 */
+    }
+    
+    /* Card borders in dark mode */
+    .border-white\/20 {
+        border-color: rgba(55, 65, 81, 0.2) !important; /* gray-700/20 */
+    }
+    
+    .border-gray-700\/20 {
+        border-color: rgba(55, 65, 81, 0.2) !important; /* gray-700/20 */
+    }
+    
+    /* Divider borders */
+    .border-gray-300 {
+        border-color: rgb(75 85 99) !important; /* gray-600 */
+    }
+    
+    /* General border color override */
+    [class*="dark:border-gray-600"] {
+        border-color: rgb(75 85 99) !important;
+    }
+    
+    [class*="dark:border-gray-700"] {
+        border-color: rgb(55 65 81) !important;
+    }
+}
+
