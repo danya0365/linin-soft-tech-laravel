@@ -42,9 +42,11 @@
         </footer>
     </div>
 
-    @if (Auth::user()->isSupervisor() || Auth::user()->isManager() || Auth::user()->isAdmin()) 
-        {{-- Mini Chat Popover --}}
-        <x-mini-chat />
-    @endif
+    @auth
+        @if (Auth::user() && (Auth::user()->isSupervisor() || Auth::user()->isManager() || Auth::user()->isAdmin()))
+            {{-- Mini Chat Popover --}}
+            <x-mini-chat />
+        @endif
+    @endauth
 </body>
 </html>
