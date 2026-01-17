@@ -1,14 +1,10 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 // Fonts
 @import url('https://fonts.googleapis.com/css?family=Nunito');
 
 // Variables
 @import 'variables';
 
-// Bootstrap
+// Bootstrap (imported early so Tailwind can override)
 @import '~bootstrap/scss/bootstrap';
 
 // Icons
@@ -21,7 +17,15 @@
 
 @import 'css.gg/icons/all.css';
 
+// Custom overrides (before Tailwind)
+@import 'customs';
+
+// Tailwind Base
+@tailwind base;
+
 // Tailwind Components (for CRUD views)
 @import '../css/components';
+@tailwind components;
 
-@import 'customs';
+// Tailwind Utilities (LAST - highest priority)
+@tailwind utilities;

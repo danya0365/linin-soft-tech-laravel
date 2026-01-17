@@ -29,7 +29,7 @@
 ])
 
 <div class="overflow-x-auto rounded-lg shadow">
-    <table class="w-full text-sm text-left border-collapse">
+    <table class="w-full text-sm text-left border-collapse bg-white dark:bg-gray-800">
         <thead class="bg-gray-100 dark:bg-gray-700 border-b-2 border-gray-300 dark:border-gray-600">
             <tr>
                 @foreach($headers as $header)
@@ -39,9 +39,9 @@
                 @endforeach
             </tr>
         </thead>
-        <tbody>
+        <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
             @forelse($data as $index => $item)
-                <tr class="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150">
+                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150">
                     {{-- Index Number --}}
                     <td class="px-6 py-4 text-gray-900 dark:text-gray-100">
                         {{ $startIndex + $index + 1 }}
@@ -54,13 +54,13 @@
                                 @if($item->$column)
                                     <img src="{{ asset($item->$column) }}" 
                                          alt="{{ $item->name ?? 'Image' }}" 
-                                         class="h-10 w-10 rounded object-cover"
+                                         class="h-10 w-10 rounded object-cover ring-2 ring-gray-200 dark:ring-gray-600"
                                          onerror="this.onerror=null; this.style.display='none'; this.nextElementSibling.style.display='flex';">
                                     <div class="h-10 w-10 bg-gray-200 dark:bg-gray-700 rounded flex items-center justify-center hidden">
-                                        <i class="fa fa-image text-gray-400"></i>
+                                        <i class="fa fa-image text-gray-400 dark:text-gray-500"></i>
                                     </div>
                                 @else
-                                    <span class="text-gray-400 dark:text-gray-600">No image</span>
+                                    <span class="text-gray-400 dark:text-gray-500">No image</span>
                                 @endif
                             @else
                                 {{ $item->$column ?? '-' }}
