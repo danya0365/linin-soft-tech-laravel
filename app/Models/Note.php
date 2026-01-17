@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property $message
  * @property $image_url
  * @property $cost
+ * @property $tag
  * @property $washing_machine_id
  * @property $dryer_machine_id
  * @property $truck_id
@@ -29,6 +30,53 @@ class Note extends Model
 {
     use SoftDeletes;
 
+    /**
+     * Available tags for notes
+     */
+    const TAG_MAINTENANCE = 'maintenance';
+    const TAG_PARTS = 'parts';
+    const TAG_LABOR = 'labor';
+    const TAG_SERVICE = 'service';
+    const TAG_OTHERS = 'others';
+
+    /**
+     * Get all available tags with labels
+     */
+    public static function getAvailableTags(): array
+    {
+        return [
+            self::TAG_MAINTENANCE => '🔧 ค่าซ่อมบำรุง',
+            self::TAG_PARTS => '🔩 ค่าอะไหล่',
+            self::TAG_LABOR => '👷 ค่าแรงช่าง',
+            self::TAG_SERVICE => '🛠️ ค่าบริการ',
+            self::TAG_OTHERS => '📦 อื่นๆ',
+        ];
+    }
+
+    /**
+     * Get tag label
+     */
+    public function getTagLabelAttribute(): string
+    {
+        $tags = self::getAvailableTags();
+        return $tags[$this->tag] ?? $this->tag ?? '-';
+    }
+
+    /**
+     * Get tag color for display
+     */
+    public function getTagColorAttribute(): string
+    {
+        $colors = [
+            self::TAG_MAINTENANCE => '#dc3545', // red
+            self::TAG_PARTS => '#fd7e14', // orange
+            self::TAG_LABOR => '#6f42c1', // purple
+            self::TAG_SERVICE => '#0dcaf0', // cyan
+            self::TAG_OTHERS => '#6c757d', // gray
+        ];
+        return $colors[$this->tag] ?? '#6c757d';
+    }
+
     static $rules = [
 		'message' => 'required',
 		'cost' => 'required',
@@ -41,7 +89,7 @@ class Note extends Model
      *
      * @var array
      */
-    protected $fillable = ['message','image_url','cost','washing_machine_id','dryer_machine_id','truck_id'];
+    protected $fillable = ['message', 'image_url', 'cost', 'tag', 'washing_machine_id', 'dryer_machine_id', 'truck_id'];
 
 
     /**
@@ -70,3 +118,4 @@ class Note extends Model
     
 
 }
+

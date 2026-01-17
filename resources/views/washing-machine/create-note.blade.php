@@ -24,8 +24,19 @@
                         @csrf
 
                         <div class="col-12">
+                            {{ Form::label('tag', 'ประเภทค่าใช้จ่าย - Category', ['class' => "form-label"]) }}
+                            <select name="tag" id="tag" class="form-select {{ $errors->has('tag') ? 'is-invalid' : '' }}">
+                                <option value="">-- เลือกประเภท --</option>
+                                @foreach(\App\Models\Note::getAvailableTags() as $value => $label)
+                                    <option value="{{ $value }}" {{ old('tag') == $value ? 'selected' : '' }}>{{ $label }}</option>
+                                @endforeach
+                            </select>
+                            {!! $errors->first('tag', '<div class="invalid-feedback">:message</div>') !!}
+                        </div>
+
+                        <div class="col-12">
                             {{ Form::label('message', 'บันทึกข้อความ - Note', ['class' => "form-label"]) }}
-                            {{ Form::textarea('message', $note->message, ['class' => 'form-control' . ($errors->has('message') ? ' is-invalid' : ''), 'placeholder' => '']) }}
+                            {{ Form::textarea('message', $note->message, ['class' => 'form-control' . ($errors->has('message') ? ' is-invalid' : ''), 'placeholder' => '', 'rows' => 3]) }}
                             {!! $errors->first('message', '<div class="invalid-feedback">:message</div>') !!}
                         </div>
 
@@ -60,3 +71,4 @@
     </div>
 </div>
 @endsection
+
