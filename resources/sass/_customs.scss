@@ -59,6 +59,11 @@ a:active {
     font-size: 24px;
 }
 
+/* Fix Bootstrap's .border class - Remove !important to allow Tailwind override */
+.border {
+    border: 1px solid #dee2e6; /* Remove !important so Tailwind can override */
+}
+
 /* Dark Mode Overrides - Fix Bootstrap !important conflicts */
 .dark {
     /* Input borders in dark mode */
