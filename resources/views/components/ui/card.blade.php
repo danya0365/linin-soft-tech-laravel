@@ -1,27 +1,47 @@
+{{--
+    Card Component
+    
+    Usage:
+    <x-ui.card>
+        <x-slot:header>
+            <h2 class="text-xl font-bold">Card Title</h2>
+        </x-slot:header>
+        
+        Card content goes here
+        
+        <x-slot:footer>
+            <button>Action</button>
+        </x-slot:footer>
+    </x-ui.card>
+    
+    Props:
+    - hover: Enable hover effect (default: false)
+    - padding: Custom padding class (default: 'p-6')
+--}}
+
 @props([
-    'variant' => 'default', // default, glass, bordered
-    'padding' => 'md', // none, sm, md, lg
+    'hover' => false,
+    'padding' => null
 ])
 
-@php
-$baseClasses = 'rounded-xl transition-all duration-200';
-
-$variantClasses = [
-    'default' => 'bg-white dark:bg-dark-card shadow-lg dark:shadow-2xl',
-    'glass' => 'bg-white/80 dark:bg-dark-card/80 backdrop-blur-lg shadow-xl',
-    'bordered' => 'bg-white dark:bg-dark-card border-2 border-gray-200 dark:border-dark-border',
-];
-
-$paddingClasses = [
-    'none' => '',
-    'sm' => 'p-4',
-    'md' => 'p-6',
-    'lg' => 'p-8',
-];
-
-$classes = trim("$baseClasses {$variantClasses[$variant]} {$paddingClasses[$padding]}");
-@endphp
-
-<div {{ $attributes->merge(['class' => $classes]) }}>
-    {{ $slot }}
+<div {{ $attributes->merge(['class' => 
+    'bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 transition-all duration-200 overflow-hidden' .
+    ($hover ? ' hover:shadow-2xl hover:-translate-y-1' : '')
+]) }}>
+    
+    @isset($header)
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50">
+            {{ $header }}
+        </div>
+    @endisset
+    
+    <div class="{{ $padding ?? 'p-6' }}">
+        {{ $slot }}
+    </div>
+    
+    @isset($footer)
+        <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50">
+            {{ $footer }}
+        </div>
+    @endisset
 </div>

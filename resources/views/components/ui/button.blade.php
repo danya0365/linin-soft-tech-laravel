@@ -1,56 +1,77 @@
+{{--
+    Button Component
+    
+    Usage:
+    <x-ui.button variant="primary" href="{{ route('...') }}">
+        Click Me
+    </x-ui.button>
+    
+    <x-ui.button variant="danger" type="submit">
+        Delete
+    </x-ui.button>
+    
+    Props:
+    - variant: primary|secondary|success|danger|warning|info|outline (default: primary)
+    - size: sm|md|lg (default: md)
+    - href: Link URL (creates <a> tag)
+    - type: button|submit|reset (for <button> tag)
+    - icon: Icon class (optional)
+    - iconPosition: left|right (default: left)
+--}}
+
 @props([
-    'variant' => 'primary', // primary, secondary, success, danger, ghost
-    'size' => 'md', // sm, md, lg
-    'type' => 'button',
+    'variant' => 'primary',
+    'size' => 'md',
     'href' => null,
+    'type' => 'button',
     'icon' => null,
-    'iconOnly' => false,
+    'iconPosition' => 'left'
 ])
 
 @php
-$baseClasses = 'inline-flex items-center justify-center font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
-
-$sizeClasses = [
-    'sm' => 'px-3 py-1.5 text-sm rounded-md',
-    'md' => 'px-4 py-2 text-base rounded-lg',
-    'lg' => 'px-6 py-3 text-lg rounded-xl',
-];
-
-$variantClasses = [
-    'primary' => 'bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl focus:ring-purple-500 dark:from-purple-500 dark:to-indigo-500',
-    'secondary' => 'bg-gray-200 hover:bg-gray-300 text-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-100 focus:ring-gray-500',
-    'success' => 'bg-green-600 hover:bg-green-700 text-white dark:bg-green-500 dark:hover:bg-green-600 focus:ring-green-500',
-    'danger' => 'bg-red-600 hover:bg-red-700 text-white dark:bg-red-500 dark:hover:bg-red-600 focus:ring-red-500',
-    'ghost' => 'bg-transparent hover:bg-gray-100 text-gray-700 dark:hover:bg-gray-800 dark:text-gray-300 focus:ring-gray-500',
-];
-
-$iconOnlyClasses = $iconOnly ? 'p-2' : '';
-
-$classes = trim("$baseClasses {$sizeClasses[$size]} {$variantClasses[$variant]} $iconOnlyClasses");
+    $baseClasses = 'inline-flex items-center justify-center gap-2 font-semibold rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
+    
+    $sizeClasses = [
+        'sm' => 'px-3 py-1.5 text-sm',
+        'md' => 'px-4 py-2.5 text-base',
+        'lg' => 'px-6 py-3 text-lg',
+    ];
+    
+    $variantClasses = [
+        'primary' => 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:from-indigo-700 hover:to-purple-700 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 focus:ring-indigo-500 dark:focus:ring-indigo-400',
+        'secondary' => 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600 focus:ring-gray-500',
+        'success' => 'bg-green-600 text-white hover:bg-green-700 shadow-lg hover:shadow-xl focus:ring-green-500',
+        'danger' => 'bg-red-600 text-white hover:bg-red-700 shadow-lg hover:shadow-xl focus:ring-red-500',
+        'warning' => 'bg-yellow-500 text-white hover:bg-yellow-600 shadow-lg hover:shadow-xl focus:ring-yellow-500',
+        'info' => 'bg-cyan-600 text-white hover:bg-cyan-700 shadow-lg hover:shadow-xl focus:ring-cyan-500',
+        'outline' => 'border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 focus:ring-gray-500',
+    ];
+    
+    $classes = $baseClasses . ' ' . $sizeClasses[$size] . ' ' . $variantClasses[$variant];
 @endphp
 
 @if($href)
     <a href="{{ $href }}" {{ $attributes->merge(['class' => $classes]) }}>
-        @if($icon && !$iconOnly)
-            <span class="mr-2">{!! $icon !!}</span>
-        @elseif($icon)
-            {!! $icon !!}
+        @if($icon && $iconPosition === 'left')
+            <i class="{{ $icon }}"></i>
         @endif
         
-        @if(!$iconOnly)
-            {{ $slot }}
+        {{ $slot }}
+        
+        @if($icon && $iconPosition === 'right')
+            <i class="{{ $icon }}"></i>
         @endif
     </a>
 @else
     <button type="{{ $type }}" {{ $attributes->merge(['class' => $classes]) }}>
-        @if($icon && !$iconOnly)
-            <span class="mr-2">{!! $icon !!}</span>
-        @elseif($icon)
-            {!! $icon !!}
+        @if($icon && $iconPosition === 'left')
+            <i class="{{ $icon }}"></i>
         @endif
         
-        @if(!$iconOnly)
-            {{ $slot }}
+        {{ $slot }}
+        
+        @if($icon && $iconPosition === 'right')
+            <i class="{{ $icon }}"></i>
         @endif
     </button>
 @endif

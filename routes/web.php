@@ -35,6 +35,11 @@ Route::get('/line-oa-use-case', function () {
     return view('line-oa-guide');
 })->name('line-oa-guide');
 
+// UI Components Showcase - For testing Tailwind components
+Route::get('/components-showcase', function () {
+    return view('components-showcase');
+})->name('components-showcase')->middleware('auth');
+
 Auth::routes(['register' => false]);
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
