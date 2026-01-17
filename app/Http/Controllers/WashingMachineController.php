@@ -73,9 +73,11 @@ class WashingMachineController extends Controller
         }
         
         $notes = $query->orderBy('created_at', 'desc')->paginate();
-        $existingTags = Note::getExistingTags();
+        
+        // Get tags specific to this washing machine (cached)
+        $machineTags = Note::getTagsForMachine('washing_machine', $id);
 
-        return view('washing-machine.show', compact('washingMachine', 'notes', 'existingTags', 'selectedTag'));
+        return view('washing-machine.show', compact('washingMachine', 'notes', 'machineTags', 'selectedTag'));
     }
 
     /**

@@ -51,23 +51,41 @@ class Note extends Model
         // Clear cache when a note with tag is created
         static::created(function ($note) {
             if (!empty($note->tag)) {
-                self::clearTagsCache();
+                self::clearCacheForNote($note);
             }
         });
 
         // Clear cache when a note's tag is updated
         static::updated(function ($note) {
             if ($note->isDirty('tag')) {
-                self::clearTagsCache();
+                self::clearCacheForNote($note);
             }
         });
 
         // Clear cache when a note with tag is deleted
         static::deleted(function ($note) {
             if (!empty($note->tag)) {
-                self::clearTagsCache();
+                self::clearCacheForNote($note);
             }
         });
+    }
+
+    /**
+     * Clear cache for a specific note (determines machine type automatically)
+     */
+    private static function clearCacheForNote($note): void
+    {
+        // Determine which machine this note belongs to
+        if ($note->washing_machine_id) {
+            self::clearTagsCache('washing_machine', $note->washing_machine_id);
+        } elseif ($note->dryer_machine_id) {
+            self::clearTagsCache('dryer_machine', $note->dryer_machine_id);
+        } elseif ($note->truck_id) {
+            self::clearTagsCache('truck', $note->truck_id);
+        } else {
+            // Just clear global cache if no machine specified
+            self::clearTagsCache();
+        }
     }
 
     /**
@@ -89,11 +107,50 @@ class Note extends Model
 
     /**
      * Clear the existing tags cache
-     * Call this when tags are modified
+     * @param string|null $machineType - Optional: 'washing_machine', 'dryer_machine', or 'truck'
+     * @param int|null $machineId - Optional: The ID of the machine
      */
-    public static function clearTagsCache(): void
+    public static function clearTagsCache(?string $machineType = null, ?int $machineId = null): void
     {
+        // Always clear global tags cache
         Cache::forget(self::CACHE_KEY_EXISTING_TAGS);
+        
+        // If machine info provided, clear specific machine cache
+        if ($machineType && $machineId) {
+            $cacheKey = self::getMachineCacheKey($machineType, $machineId);
+            Cache::forget($cacheKey);
+        }
+    }
+
+    /**
+     * Generate cache key for machine-specific tags
+     */
+    private static function getMachineCacheKey(string $machineType, int $machineId): string
+    {
+        return "note_tags_{$machineType}_{$machineId}";
+    }
+
+    /**
+     * Get unique tags for a specific machine (with cache)
+     * @param string $machineType - 'washing_machine', 'dryer_machine', or 'truck'
+     * @param int $machineId - The ID of the machine
+     * @return array
+     */
+    public static function getTagsForMachine(string $machineType, int $machineId): array
+    {
+        $cacheKey = self::getMachineCacheKey($machineType, $machineId);
+        
+        return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($machineType, $machineId) {
+            $column = $machineType . '_id';
+            
+            return self::where($column, $machineId)
+                ->whereNotNull('tag')
+                ->where('tag', '!=', '')
+                ->distinct()
+                ->orderBy('tag')
+                ->pluck('tag')
+                ->toArray();
+        });
     }
 
     /**
