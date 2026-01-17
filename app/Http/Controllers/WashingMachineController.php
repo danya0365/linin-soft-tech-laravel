@@ -64,9 +64,18 @@ class WashingMachineController extends Controller
     {
         $washingMachine = WashingMachine::find($id);
 
-        $notes = Note::where('washing_machine_id', $id)->paginate();
+        $query = Note::where('washing_machine_id', $id);
+        
+        // Filter by tag if provided
+        $selectedTag = request('tag');
+        if ($selectedTag) {
+            $query->where('tag', $selectedTag);
+        }
+        
+        $notes = $query->orderBy('created_at', 'desc')->paginate();
+        $existingTags = Note::getExistingTags();
 
-        return view('washing-machine.show', compact('washingMachine', 'notes'));
+        return view('washing-machine.show', compact('washingMachine', 'notes', 'existingTags', 'selectedTag'));
     }
 
     /**
@@ -149,6 +158,7 @@ class WashingMachineController extends Controller
             $note->message = $post['message'];
             $note->image_url = $post['image_url'] ?? '';
             $note->cost = $post['cost'];
+            $note->tag = $post['tag'] ?? null;
             $note->washing_machine_id = $post['washing_machine_id'];
             if ($post['note_date']) {
                 $note->timestamps = false;
@@ -164,7 +174,8 @@ class WashingMachineController extends Controller
             return redirect()->route('washing-machines.show', $washingMachine)
                 ->with('success', 'Note created successfully');
         }
+        $existingTags = Note::getExistingTags();
 
-        return view('washing-machine.create-note', compact('washingMachine', 'note'));
+        return view('washing-machine.create-note', compact('washingMachine', 'note', 'existingTags'));
     }
 }

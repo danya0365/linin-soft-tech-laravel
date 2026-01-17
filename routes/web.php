@@ -56,6 +56,7 @@ Route::group(['middleware' => ['admin']], function () {
 
     Route::match(array('GET', 'POST'), 'washing-machines/{id}/create-note', [App\Http\Controllers\WashingMachineController::class, 'createNote'])->name('washing-machines.create-note');
     Route::resource('washing-machines', App\Http\Controllers\WashingMachineController::class);
+    Route::match(array('GET', 'POST'), 'dryer-machines/{id}/create-note', [App\Http\Controllers\DryerMachineController::class, 'createNote'])->name('dryer-machines.create-note');
     Route::resource('dryer-machines', App\Http\Controllers\DryerMachineController::class);
     Route::resource('inventories', App\Http\Controllers\InventoryController::class);
 

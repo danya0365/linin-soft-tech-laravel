@@ -67,10 +67,50 @@
                     </div>
 
                     <div class="card-body">
-                    @foreach ($notes as $note)
+                        {{-- Tag Filter Section --}}
+                        @if(count($existingTags) > 0)
+                        <div class="mb-4">
+                            <div class="d-flex flex-wrap gap-2 align-items-center">
+                                <span class="text-muted me-2">กรองตาม Tag:</span>
+                                <a href="{{ route('trucks.show', $truck->id) }}" 
+                                   class="btn btn-sm {{ !$selectedTag ? 'btn-dark' : 'btn-outline-dark' }}">
+                                    ทั้งหมด
+                                </a>
+                                @foreach($existingTags as $tag)
+                                    <a href="{{ route('trucks.show', ['truck' => $truck->id, 'tag' => $tag]) }}" 
+                                       class="btn btn-sm {{ $selectedTag == $tag ? 'btn-primary' : 'btn-outline-secondary' }}">
+                                        {{ $tag }}
+                                    </a>
+                                @endforeach
+                            </div>
+                            @if($selectedTag)
+                                <div class="mt-2">
+                                    <small class="text-muted">
+                                        แสดงผล: <strong>{{ $selectedTag }}</strong>
+                                        <a href="{{ route('trucks.show', $truck->id) }}" class="text-danger ms-2">
+                                            <i class="fa fa-times"></i> ล้าง filter
+                                        </a>
+                                    </small>
+                                </div>
+                            @endif
+                        </div>
+                        @endif
+
+                        {{-- Notes List --}}
+                    @forelse ($notes as $note)
                         <div class="card mb-2">
                             <div class="card-body">
-                                <h5 class="card-title">ค่าใช้จ่าย: {{ $note->cost }}</h5>
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h5 class="card-title mb-0">ค่าใช้จ่าย: {{ number_format($note->cost, 2) }} ฿</h5>
+                                    @if($note->tag)
+                                        <a href="{{ route('trucks.show', ['truck' => $truck->id, 'tag' => $note->tag]) }}" 
+                                           class="badge text-white text-decoration-none" 
+                                           style="background-color: {{ $note->tag_color }}; cursor: pointer;"
+                                           title="คลิกเพื่อกรองตาม tag นี้">
+                                            {{ $note->tag }}
+                                        </a>
+                                    @endif
+                                </div>
                                 <p class="card-text">{{ $note->message }}</p>
                             </div>
                             <ul class="list-group list-group-flush">
@@ -89,10 +129,18 @@
                             <img src="{{ asset($note->image_url) }}" class="card-img-bottom" alt="{{ asset($note->image_url) }}">
                             @endif
                         </div>
-                    @endforeach
+                    @empty
+                        <div class="alert alert-info">
+                            @if($selectedTag)
+                                ไม่พบบันทึกที่มี tag "{{ $selectedTag }}"
+                            @else
+                                ยังไม่มีบันทึก
+                            @endif
+                        </div>
+                    @endforelse
                     </div>
                 </div>
-                {!! $notes->links() !!}
+                {!! $notes->appends(['tag' => $selectedTag])->links() !!}
             </div>
         </div>
     </div>

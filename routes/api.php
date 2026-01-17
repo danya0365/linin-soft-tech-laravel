@@ -23,8 +23,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 // LINE Messaging API Webhook
 Route::post('/line/webhook', [App\Http\Controllers\Api\LineChatbotController::class, 'webhook']);
 
-// Web Chat API (for authenticated users via web session)
-Route::middleware('logged-in')->prefix('web-chat')->group(function () {
+Route::group(['middleware' => ['supervisor', 'manager', 'admin']], function () {
     Route::post('/message', [App\Http\Controllers\Api\WebChatController::class, 'message']);
     Route::post('/action', [App\Http\Controllers\Api\WebChatController::class, 'action']);
     Route::get('/welcome', [App\Http\Controllers\Api\WebChatController::class, 'welcome']);

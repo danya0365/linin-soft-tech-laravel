@@ -24,8 +24,27 @@
                         @csrf
 
                         <div class="col-12">
+                            {{ Form::label('tag', 'ประเภทค่าใช้จ่าย - Tag (พิมพ์หรือเลือกจากรายการ)', ['class' => "form-label"]) }}
+                            <input type="text" 
+                                   name="tag" 
+                                   id="tag" 
+                                   class="form-control {{ $errors->has('tag') ? 'is-invalid' : '' }}" 
+                                   list="tag-suggestions"
+                                   placeholder="พิมพ์หรือเลือก tag เช่น ค่าซ่อม, ค่าอะไหล่, ค่าแรง..."
+                                   value="{{ old('tag') }}"
+                                   autocomplete="off">
+                            <datalist id="tag-suggestions">
+                                @foreach($existingTags as $tag)
+                                    <option value="{{ $tag }}">
+                                @endforeach
+                            </datalist>
+                            <small class="text-muted">เลือกจาก tag ที่เคยใช้ หรือพิมพ์ใหม่ได้</small>
+                            {!! $errors->first('tag', '<div class="invalid-feedback">:message</div>') !!}
+                        </div>
+
+                        <div class="col-12">
                             {{ Form::label('message', 'บันทึกข้อความ - Note', ['class' => "form-label"]) }}
-                            {{ Form::textarea('message', $note->message, ['class' => 'form-control' . ($errors->has('message') ? ' is-invalid' : ''), 'placeholder' => '']) }}
+                            {{ Form::textarea('message', $note->message, ['class' => 'form-control' . ($errors->has('message') ? ' is-invalid' : ''), 'placeholder' => '', 'rows' => 3]) }}
                             {!! $errors->first('message', '<div class="invalid-feedback">:message</div>') !!}
                         </div>
 

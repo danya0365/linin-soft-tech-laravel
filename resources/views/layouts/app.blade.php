@@ -41,5 +41,10 @@
             </div>
         </footer>
     </div>
+
+    @if (Auth::user()->isSupervisor() || Auth::user()->isManager() || Auth::user()->isAdmin()) 
+        {{-- Mini Chat Popover --}}
+        <x-mini-chat />
+    @endif
 </body>
 </html>
