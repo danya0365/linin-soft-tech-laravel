@@ -20,8 +20,8 @@ jobs:
             cd ~/web
             
             # PHP path configuration
-            PHP_PATH="/usr/bin/php8.1"
-            COMPOSER_PATH="/usr/local/bin/composer"
+            PHP_PATH="/usr/bin/php8.2"
+            COMPOSER_PATH="composer.phar"
             
             # Pull latest code
             git fetch origin
@@ -29,10 +29,6 @@ jobs:
             
             # Install PHP dependencies
             $PHP_PATH $COMPOSER_PATH install --no-interaction --prefer-dist --optimize-autoloader --no-dev
-            
-            # Install Node dependencies and build assets
-            # npm ci
-            # npm run production
             
             # Run database migrations
             $PHP_PATH artisan migrate --force
@@ -42,4 +38,4 @@ jobs:
             $PHP_PATH artisan route:cache
             $PHP_PATH artisan view:cache
             
-            echo "✅ Deployment completed successfully!"
+            echo "✅ Production deployment completed successfully!"
