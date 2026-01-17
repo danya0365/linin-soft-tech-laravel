@@ -15,6 +15,7 @@ use App\Models\Operation;
 use App\Models\WashingMachine;
 use App\Models\DryerMachine;
 use App\Models\Expense;
+use App\Models\Note;
 use App\Models\Income;
 use Carbon\Carbon;
 
@@ -79,7 +80,7 @@ class ChatService
 
         // Machine
         if (str_contains($text, 'เครื่องจักร') || $lowerText === 'machine') {
-            return $this->getMachineStatus();
+            return $this->getMachineMenu();
         }
 
         // Report
@@ -118,6 +119,13 @@ class ChatService
                 $date = $params['date'] ?? null;
                 $range = $params['range'] ?? 'day';
                 return $this->getReportByDate($type, $date, $range);
+            // Machine actions
+            case 'machine_all':
+                return $this->getMachineAllList();
+            case 'machine_history':
+                return $this->getMachineHistoryDateMenu();
+            case 'machine_notes_date':
+                return $this->getMachineNotesByDate($params['date'] ?? null);
             default:
                 return $this->getMainMenu();
         }
@@ -524,9 +532,25 @@ class ChatService
     }
 
     /**
-     * ดึงสถานะเครื่องจักร
+     * ดึงเมนูเครื่องจักร - เลือกดูทั้งหมดหรือดูประวัติ
      */
-    public function getMachineStatus(): array
+    public function getMachineMenu(): array
+    {
+        return [
+            'type' => 'menu',
+            'title' => '⚙️ เครื่องจักร',
+            'text' => "⚙️ เครื่องจักร\n\nเลือกเมนูที่ต้องการ:",
+            'quickReplies' => [
+                ['label' => '🔧 เครื่องจักรทั้งหมด', 'action' => 'machine_all', 'data' => []],
+                ['label' => '📜 ดูประวัติ', 'action' => 'machine_history', 'data' => []],
+            ],
+        ];
+    }
+
+    /**
+     * ดึงรายการเครื่องจักรทั้งหมด
+     */
+    public function getMachineAllList(): array
     {
         $washingMachines = WashingMachine::take(10)->get();
         $dryerMachines = DryerMachine::take(10)->get();
@@ -556,6 +580,139 @@ class ChatService
             'type' => 'card',
             'title' => '⚙️ เครื่องจักร',
             'subtitle' => 'รายการทั้งหมด',
+            'headerColor' => '#34495E',
+            'rows' => $rows,
+        ];
+    }
+
+    /**
+     * แสดงเมนูเลือกวันที่ 7 วันล่าสุด สำหรับดูประวัติเครื่องจักร
+     */
+    public function getMachineHistoryDateMenu(): array
+    {
+        $dates = [];
+        
+        // 7 วันล่าสุด
+        for ($i = 0; $i < 7; $i++) {
+            $date = Carbon::now()->subDays($i);
+            $dayLabel = $date->format('d/m');
+            
+            if ($i === 0) {
+                $dayLabel .= ' (วันนี้)';
+            } elseif ($i === 1) {
+                $dayLabel .= ' (เมื่อวาน)';
+            }
+            
+            $dates[] = [
+                'label' => $dayLabel,
+                'action' => 'machine_notes_date',
+                'data' => ['date' => $date->format('Y-m-d')],
+            ];
+        }
+
+        return [
+            'type' => 'menu',
+            'title' => '📅 เลือกวันที่ดูประวัติ',
+            'text' => "📅 เลือกวันที่ที่ต้องการดูประวัติเครื่องจักร:\n\n(7 วันล่าสุด)",
+            'quickReplies' => $dates,
+        ];
+    }
+
+    /**
+     * แสดง Notes ของเครื่องจักรตามวันที่เลือก
+     */
+    public function getMachineNotesByDate(?string $dateString): array
+    {
+        $date = $dateString ? Carbon::parse($dateString) : Carbon::today();
+        $startOfDay = $date->copy()->startOfDay();
+        $endOfDay = $date->copy()->endOfDay();
+
+        // ดึง Notes ที่เกี่ยวกับเครื่องจักร (washing_machine หรือ dryer_machine)
+        $notes = Note::with(['washingMachine', 'dryerMachine'])
+            ->whereBetween('created_at', [$startOfDay, $endOfDay])
+            ->where(function ($query) {
+                $query->whereNotNull('washing_machine_id')
+                    ->orWhereNotNull('dryer_machine_id');
+            })
+            ->orderBy('created_at', 'desc')
+            ->take(20)
+            ->get();
+
+        if ($notes->isEmpty()) {
+            return [
+                'type' => 'card',
+                'title' => '📜 ประวัติเครื่องจักร',
+                'subtitle' => $date->format('d/m/Y'),
+                'headerColor' => '#34495E',
+                'rows' => [
+                    ['label' => '📅 วันที่', 'value' => $date->format('d/m/Y')],
+                    ['type' => 'separator'],
+                    ['label' => 'ℹ️ สถานะ', 'value' => 'ไม่พบประวัติ', 'valueColor' => '#999999'],
+                ],
+            ];
+        }
+
+        $rows = [
+            ['label' => '📅 วันที่', 'value' => $date->format('d/m/Y')],
+            ['label' => '📝 จำนวนรายการ', 'value' => $notes->count() . ' รายการ'],
+            ['type' => 'separator'],
+        ];
+
+        $totalCost = 0;
+        foreach ($notes as $note) {
+            // หาชื่อเครื่องจักร
+            $machineName = '';
+            $machineIcon = '';
+            
+            if ($note->washingMachine) {
+                $machineName = $note->washingMachine->name ?? 'เครื่องซัก';
+                $machineIcon = '🧺';
+            } elseif ($note->dryerMachine) {
+                $machineName = $note->dryerMachine->name ?? 'เครื่องอบ';
+                $machineIcon = '🌡️';
+            }
+
+            $time = Carbon::parse($note->created_at)->format('H:i');
+            $message = mb_substr($note->message ?? '-', 0, 30);
+            if (mb_strlen($note->message ?? '') > 30) {
+                $message .= '...';
+            }
+
+            $rows[] = [
+                'label' => "{$machineIcon} {$machineName}",
+                'value' => $time,
+                'bold' => true,
+            ];
+            $rows[] = [
+                'label' => '    💬 ' . $message,
+                'value' => '',
+            ];
+            
+            if ($note->cost && $note->cost > 0) {
+                $rows[] = [
+                    'label' => '    💰 ค่าใช้จ่าย',
+                    'value' => number_format($note->cost, 2) . ' ฿',
+                    'valueColor' => '#FF6B35',
+                ];
+                $totalCost += $note->cost;
+            }
+        }
+
+        // แสดงรวมค่าใช้จ่ายถ้ามี
+        if ($totalCost > 0) {
+            $rows[] = ['type' => 'separator'];
+            $rows[] = [
+                'label' => '💵 รวมค่าใช้จ่าย',
+                'value' => number_format($totalCost, 2) . ' ฿',
+                'valueColor' => '#FF0000',
+                'bold' => true,
+            ];
+        }
+
+        return [
+            'type' => 'card',
+            'title' => '📜 ประวัติเครื่องจักร',
+            'subtitle' => $date->format('d/m/Y'),
             'headerColor' => '#34495E',
             'rows' => $rows,
         ];
