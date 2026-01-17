@@ -1,24 +1,45 @@
-<div class="box box-info padding-1">
-    <div class="box-body">
-        
-        <div class="form-group">
-            {{ Form::label('name') }}
-            {{ Form::text('name', $dryerMachine->name, ['class' => 'form-control' . ($errors->has('name') ? ' is-invalid' : ''), 'placeholder' => 'Name']) }}
-            {!! $errors->first('name', '<div class="invalid-feedback">:message</div>') !!}
-        </div>
-        <div class="form-group">
-            {{ Form::label('photo') }}
-            {{ Form::text('photo', $dryerMachine->photo, ['class' => 'form-control' . ($errors->has('photo') ? ' is-invalid' : ''), 'placeholder' => 'Photo']) }}
-            {!! $errors->first('photo', '<div class="invalid-feedback">:message</div>') !!}
-        </div>
-        <div class="form-group">
-            {{ Form::label('maximum_weight') }}
-            {{ Form::text('maximum_weight', $dryerMachine->maximum_weight, ['class' => 'form-control' . ($errors->has('maximum_weight') ? ' is-invalid' : ''), 'placeholder' => 'Maximum Weight']) }}
-            {!! $errors->first('maximum_weight', '<div class="invalid-feedback">:message</div>') !!}
-        </div>
+{{-- Dryer Machine Form Fields --}}
 
-    </div>
-    <div class="box-footer mt-4">
-        <button type="submit" class="btn btn-primary">Submit</button>
-    </div>
+<x-crud.form-group 
+    name="name"
+    label="Name"
+    :value="$dryerMachine->name ?? old('name')"
+    placeholder="Enter dryer machine name"
+    required
+/>
+
+<x-crud.form-group 
+    name="photo"
+    label="Photo URL"
+    :value="$dryerMachine->photo ?? old('photo')"
+    placeholder="Enter photo URL or path"
+    help="Enter the URL or file path for the dryer machine photo"
+/>
+
+<x-crud.form-group 
+    name="maximum_weight"
+    label="Maximum Weight (kg)"
+    type="number"
+    :value="$dryerMachine->maximum_weight ?? old('maximum_weight')"
+    placeholder="Enter maximum weight capacity"
+    required
+/>
+
+{{-- Form Actions --}}
+<div class="flex items-center justify-end gap-3 mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+    <x-ui.button 
+        type="submit"
+        variant="primary"
+        icon="fa fa-save"
+    >
+        {{ isset($dryerMachine->id) ? 'Update' : 'Create' }} Dryer Machine
+    </x-ui.button>
+    
+    <x-ui.button 
+        :href="route('dryer-machines.index')"
+        variant="secondary"
+        icon="fa fa-times"
+    >
+        Cancel
+    </x-ui.button>
 </div>
