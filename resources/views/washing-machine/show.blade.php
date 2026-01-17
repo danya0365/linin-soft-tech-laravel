@@ -8,6 +8,12 @@
     <section class="content container">
         <div class="row">
             <div class="col-md-12">
+                @if (session('success'))
+                    <div class="alert alert-success" role="alert">
+                        {{ session('success') }}
+                    </div>
+                @endif
+
                 <div class="card">
                     <div class="card-header">
                         <div class="float-left">
@@ -52,24 +58,25 @@
 
                     <div class="card-body">
                         {{-- Tag Filter Section --}}
+                        @if(count($existingTags) > 0)
                         <div class="mb-4">
                             <div class="d-flex flex-wrap gap-2 align-items-center">
-                                <span class="text-muted me-2">กรองตามประเภท:</span>
+                                <span class="text-muted me-2">กรองตาม Tag:</span>
                                 <a href="{{ route('washing-machines.show', $washingMachine->id) }}" 
                                    class="btn btn-sm {{ !$selectedTag ? 'btn-dark' : 'btn-outline-dark' }}">
                                     ทั้งหมด
                                 </a>
-                                @foreach($availableTags as $tagValue => $tagLabel)
-                                    <a href="{{ route('washing-machines.show', ['washing_machine' => $washingMachine->id, 'tag' => $tagValue]) }}" 
-                                       class="btn btn-sm {{ $selectedTag == $tagValue ? 'btn-primary' : 'btn-outline-secondary' }}">
-                                        {{ $tagLabel }}
+                                @foreach($existingTags as $tag)
+                                    <a href="{{ route('washing-machines.show', ['washing_machine' => $washingMachine->id, 'tag' => $tag]) }}" 
+                                       class="btn btn-sm {{ $selectedTag == $tag ? 'btn-primary' : 'btn-outline-secondary' }}">
+                                        {{ $tag }}
                                     </a>
                                 @endforeach
                             </div>
                             @if($selectedTag)
                                 <div class="mt-2">
                                     <small class="text-muted">
-                                        แสดงผล: <strong>{{ $availableTags[$selectedTag] ?? $selectedTag }}</strong>
+                                        แสดงผล: <strong>{{ $selectedTag }}</strong>
                                         <a href="{{ route('washing-machines.show', $washingMachine->id) }}" class="text-danger ms-2">
                                             <i class="fa fa-times"></i> ล้าง filter
                                         </a>
@@ -77,6 +84,7 @@
                                 </div>
                             @endif
                         </div>
+                        @endif
 
                         {{-- Notes List --}}
                     @forelse ($notes as $note)
@@ -88,8 +96,8 @@
                                         <a href="{{ route('washing-machines.show', ['washing_machine' => $washingMachine->id, 'tag' => $note->tag]) }}" 
                                            class="badge text-white text-decoration-none" 
                                            style="background-color: {{ $note->tag_color }}; cursor: pointer;"
-                                           title="คลิกเพื่อกรองตามประเภทนี้">
-                                            {{ $note->tag_label }}
+                                           title="คลิกเพื่อกรองตาม tag นี้">
+                                            {{ $note->tag }}
                                         </a>
                                     @endif
                                 </div>
@@ -114,7 +122,7 @@
                     @empty
                         <div class="alert alert-info">
                             @if($selectedTag)
-                                ไม่พบบันทึกในประเภท "{{ $availableTags[$selectedTag] ?? $selectedTag }}"
+                                ไม่พบบันทึกที่มี tag "{{ $selectedTag }}"
                             @else
                                 ยังไม่มีบันทึก
                             @endif
@@ -127,4 +135,3 @@
         </div>
     </section>
 @endsection
-

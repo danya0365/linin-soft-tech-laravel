@@ -64,9 +64,18 @@ class TruckController extends Controller
     {
         $truck = Truck::find($id);
 
-        $notes = Note::where('truck_id', $id)->paginate();
+        $query = Note::where('truck_id', $id);
+        
+        // Filter by tag if provided
+        $selectedTag = request('tag');
+        if ($selectedTag) {
+            $query->where('tag', $selectedTag);
+        }
+        
+        $notes = $query->orderBy('created_at', 'desc')->paginate();
+        $existingTags = Note::getExistingTags();
 
-        return view('truck.show', compact('truck', 'notes'));
+        return view('truck.show', compact('truck', 'notes', 'existingTags', 'selectedTag'));
     }
 
     /**
@@ -149,6 +158,7 @@ class TruckController extends Controller
             $note->message = $post['message'];
             $note->image_url = $post['image_url'] ?? '';
             $note->cost = $post['cost'];
+            $note->tag = $post['tag'] ?? null;
             $note->truck_id = $post['truck_id'];
             if ($post['note_date']) {
                 $note->timestamps = false;
@@ -164,7 +174,8 @@ class TruckController extends Controller
             return redirect()->route('trucks.show', $truck)
                 ->with('success', 'Note created successfully');
         }
+        $existingTags = Note::getExistingTags();
 
-        return view('truck.create-note', compact('truck', 'note'));
+        return view('truck.create-note', compact('truck', 'note', 'existingTags'));
     }
 }

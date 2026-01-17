@@ -73,9 +73,9 @@ class WashingMachineController extends Controller
         }
         
         $notes = $query->orderBy('created_at', 'desc')->paginate();
-        $availableTags = Note::getAvailableTags();
+        $existingTags = Note::getExistingTags();
 
-        return view('washing-machine.show', compact('washingMachine', 'notes', 'availableTags', 'selectedTag'));
+        return view('washing-machine.show', compact('washingMachine', 'notes', 'existingTags', 'selectedTag'));
     }
 
     /**
@@ -174,7 +174,8 @@ class WashingMachineController extends Controller
             return redirect()->route('washing-machines.show', $washingMachine)
                 ->with('success', 'Note created successfully');
         }
+        $existingTags = Note::getExistingTags();
 
-        return view('washing-machine.create-note', compact('washingMachine', 'note'));
+        return view('washing-machine.create-note', compact('washingMachine', 'note', 'existingTags'));
     }
 }

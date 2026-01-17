@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Cache;
 
 /**
  * Class Note
@@ -31,50 +32,95 @@ class Note extends Model
     use SoftDeletes;
 
     /**
-     * Available tags for notes
+     * Cache key for existing tags
      */
-    const TAG_MAINTENANCE = 'maintenance';
-    const TAG_PARTS = 'parts';
-    const TAG_LABOR = 'labor';
-    const TAG_SERVICE = 'service';
-    const TAG_OTHERS = 'others';
+    const CACHE_KEY_EXISTING_TAGS = 'note_existing_tags';
+    
+    /**
+     * Cache duration in seconds (1 hour)
+     */
+    const CACHE_TTL = 3600;
 
     /**
-     * Get all available tags with labels
+     * Boot the model - auto clear cache when note is created/updated/deleted
      */
-    public static function getAvailableTags(): array
+    protected static function boot()
     {
-        return [
-            self::TAG_MAINTENANCE => '🔧 ค่าซ่อมบำรุง',
-            self::TAG_PARTS => '🔩 ค่าอะไหล่',
-            self::TAG_LABOR => '👷 ค่าแรงช่าง',
-            self::TAG_SERVICE => '🛠️ ค่าบริการ',
-            self::TAG_OTHERS => '📦 อื่นๆ',
-        ];
+        parent::boot();
+
+        // Clear cache when a note with tag is created
+        static::created(function ($note) {
+            if (!empty($note->tag)) {
+                self::clearTagsCache();
+            }
+        });
+
+        // Clear cache when a note's tag is updated
+        static::updated(function ($note) {
+            if ($note->isDirty('tag')) {
+                self::clearTagsCache();
+            }
+        });
+
+        // Clear cache when a note with tag is deleted
+        static::deleted(function ($note) {
+            if (!empty($note->tag)) {
+                self::clearTagsCache();
+            }
+        });
     }
 
     /**
-     * Get tag label
+     * Get existing tags from cache or database
+     * Returns unique tags that have been used before
+     * Uses file cache by default (no Redis needed)
      */
-    public function getTagLabelAttribute(): string
+    public static function getExistingTags(): array
     {
-        $tags = self::getAvailableTags();
-        return $tags[$this->tag] ?? $this->tag ?? '-';
+        return Cache::remember(self::CACHE_KEY_EXISTING_TAGS, self::CACHE_TTL, function () {
+            return self::whereNotNull('tag')
+                ->where('tag', '!=', '')
+                ->distinct()
+                ->orderBy('tag')
+                ->pluck('tag')
+                ->toArray();
+        });
     }
 
     /**
-     * Get tag color for display
+     * Clear the existing tags cache
+     * Call this when tags are modified
+     */
+    public static function clearTagsCache(): void
+    {
+        Cache::forget(self::CACHE_KEY_EXISTING_TAGS);
+    }
+
+    /**
+     * Get tag color based on hash of tag name (for consistent colors)
      */
     public function getTagColorAttribute(): string
     {
+        if (empty($this->tag)) {
+            return '#6c757d';
+        }
+        
+        // Generate a consistent color based on tag string hash
         $colors = [
-            self::TAG_MAINTENANCE => '#dc3545', // red
-            self::TAG_PARTS => '#fd7e14', // orange
-            self::TAG_LABOR => '#6f42c1', // purple
-            self::TAG_SERVICE => '#0dcaf0', // cyan
-            self::TAG_OTHERS => '#6c757d', // gray
+            '#dc3545', // red
+            '#fd7e14', // orange
+            '#ffc107', // yellow
+            '#28a745', // green
+            '#20c997', // teal
+            '#17a2b8', // cyan
+            '#007bff', // blue
+            '#6f42c1', // purple
+            '#e83e8c', // pink
+            '#6c757d', // gray
         ];
-        return $colors[$this->tag] ?? '#6c757d';
+        
+        $hash = crc32($this->tag);
+        return $colors[abs($hash) % count($colors)];
     }
 
     static $rules = [
@@ -118,4 +164,5 @@ class Note extends Model
     
 
 }
+
 
