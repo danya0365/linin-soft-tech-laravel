@@ -66,10 +66,10 @@ class WashingMachineController extends Controller
 
         $query = Note::where('washing_machine_id', $id);
         
-        // Filter by tag if provided
+        // Filter by tag if provided (search in JSON array)
         $selectedTag = request('tag');
         if ($selectedTag) {
-            $query->where('tag', $selectedTag);
+            $query->whereJsonContains('tags', $selectedTag);
         }
         
         $notes = $query->orderBy('created_at', 'desc')->paginate();
@@ -160,7 +160,15 @@ class WashingMachineController extends Controller
             $note->message = $post['message'];
             $note->image_url = $post['image_url'] ?? '';
             $note->cost = $post['cost'];
-            $note->tag = $post['tag'] ?? null;
+            
+            // Process tags - convert comma-separated string to array
+            $tagsInput = $post['tags'] ?? '';
+            if (!empty($tagsInput)) {
+                $tagsArray = array_map('trim', explode(',', $tagsInput));
+                $tagsArray = array_filter($tagsArray); // Remove empty values
+                $note->tags = array_values(array_unique($tagsArray));
+            }
+            
             $note->washing_machine_id = $post['washing_machine_id'];
             if ($post['note_date']) {
                 $note->timestamps = false;

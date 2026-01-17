@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::table('notes', function (Blueprint $table) {
-            $table->string('tag')->nullable()->after('cost')->comment('maintenance, parts, labor, service, others');
+            $table->string('tag')->nullable()->after('cost')->comment('Single tag for categorizing notes (deprecated - use tags column)');
         });
     }
 
@@ -30,3 +30,5 @@ return new class extends Migration
         });
     }
 };
+
+

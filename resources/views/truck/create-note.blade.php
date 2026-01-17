@@ -24,22 +24,29 @@
                         @csrf
 
                         <div class="col-12">
-                            {{ Form::label('tag', 'ประเภทค่าใช้จ่าย - Tag (พิมพ์หรือเลือกจากรายการ)', ['class' => "form-label"]) }}
+                            {{ Form::label('tags', 'Tags (คั่นด้วย comma เช่น ค่าซ่อม, ค่าอะไหล่)', ['class' => "form-label"]) }}
                             <input type="text" 
-                                   name="tag" 
-                                   id="tag" 
-                                   class="form-control {{ $errors->has('tag') ? 'is-invalid' : '' }}" 
-                                   list="tag-suggestions"
-                                   placeholder="พิมพ์หรือเลือก tag เช่น ค่าซ่อม, ค่าอะไหล่, ค่าแรง..."
-                                   value="{{ old('tag') }}"
+                                   name="tags" 
+                                   id="tags" 
+                                   class="form-control {{ $errors->has('tags') ? 'is-invalid' : '' }}" 
+                                   placeholder="พิมพ์ tags คั่นด้วย comma เช่น ค่าซ่อม, ค่าอะไหล่, ค่าแรง"
+                                   value="{{ old('tags') }}"
                                    autocomplete="off">
-                            <datalist id="tag-suggestions">
-                                @foreach($existingTags as $tag)
-                                    <option value="{{ $tag }}">
-                                @endforeach
-                            </datalist>
-                            <small class="text-muted">เลือกจาก tag ที่เคยใช้ หรือพิมพ์ใหม่ได้</small>
-                            {!! $errors->first('tag', '<div class="invalid-feedback">:message</div>') !!}
+                            @if(count($existingTags) > 0)
+                            <div class="mt-2">
+                                <small class="text-muted">Tags ที่เคยใช้ (คลิกเพื่อเพิ่ม):</small>
+                                <div class="d-flex flex-wrap gap-1 mt-1">
+                                    @foreach($existingTags as $tag)
+                                        <span class="badge bg-secondary tag-suggestion" 
+                                              style="cursor: pointer;"
+                                              onclick="addTag('{{ $tag }}')">
+                                            #{{ $tag }}
+                                        </span>
+                                    @endforeach
+                                </div>
+                            </div>
+                            @endif
+                            {!! $errors->first('tags', '<div class="invalid-feedback">:message</div>') !!}
                         </div>
 
                         <div class="col-12">
@@ -78,4 +85,22 @@
         </div>
     </div>
 </div>
+
+<script>
+function addTag(tag) {
+    const input = document.getElementById('tags');
+    const currentValue = input.value.trim();
+    
+    const existingTags = currentValue.split(',').map(t => t.trim()).filter(t => t);
+    if (existingTags.includes(tag)) {
+        return;
+    }
+    
+    if (currentValue) {
+        input.value = currentValue + ', ' + tag;
+    } else {
+        input.value = tag;
+    }
+}
+</script>
 @endsection

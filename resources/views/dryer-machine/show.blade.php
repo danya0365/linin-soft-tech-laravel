@@ -92,15 +92,19 @@
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-start mb-2">
                                     <h5 class="card-title mb-0">ค่าใช้จ่าย: {{ number_format($note->cost, 2) }} ฿</h5>
-                                    @if($note->tag)
-                                        <a href="{{ route('dryer-machines.show', ['dryer_machine' => $dryerMachine->id, 'tag' => $note->tag]) }}" 
-                                           class="badge text-white text-decoration-none" 
-                                           style="background-color: {{ $note->tag_color }}; cursor: pointer; transition: transform 0.2s;"
-                                           title="คลิกเพื่อกรองตาม #{{ $note->tag }}"
-                                           onmouseover="this.style.transform='scale(1.1)'" 
-                                           onmouseout="this.style.transform='scale(1)'">
-                                            #{{ $note->tag }}
-                                        </a>
+                                    @if($note->tags && count($note->tags) > 0)
+                                        <div class="d-flex flex-wrap gap-1">
+                                            @foreach($note->tags as $tag)
+                                                <a href="{{ route('dryer-machines.show', ['dryer_machine' => $dryerMachine->id, 'tag' => $tag]) }}" 
+                                                   class="badge text-white text-decoration-none" 
+                                                   style="background-color: {{ \App\Models\Note::getTagColor($tag) }}; cursor: pointer; transition: transform 0.2s;"
+                                                   title="คลิกเพื่อกรองตาม #{{ $tag }}"
+                                                   onmouseover="this.style.transform='scale(1.1)'" 
+                                                   onmouseout="this.style.transform='scale(1)'">
+                                                    #{{ $tag }}
+                                                </a>
+                                            @endforeach
+                                        </div>
                                     @endif
                                 </div>
                                 <p class="card-text">{{ $note->message }}</p>

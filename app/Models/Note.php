@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Cache;
  * @property $message
  * @property $image_url
  * @property $cost
- * @property $tag
+ * @property array $tags
  * @property $washing_machine_id
  * @property $dryer_machine_id
  * @property $truck_id
@@ -42,29 +42,36 @@ class Note extends Model
     const CACHE_TTL = 3600;
 
     /**
+     * Cast attributes to native types
+     */
+    protected $casts = [
+        'tags' => 'array',
+    ];
+
+    /**
      * Boot the model - auto clear cache when note is created/updated/deleted
      */
     protected static function boot()
     {
         parent::boot();
 
-        // Clear cache when a note with tag is created
+        // Clear cache when a note with tags is created
         static::created(function ($note) {
-            if (!empty($note->tag)) {
+            if (!empty($note->tags)) {
                 self::clearCacheForNote($note);
             }
         });
 
-        // Clear cache when a note's tag is updated
+        // Clear cache when a note's tags is updated
         static::updated(function ($note) {
-            if ($note->isDirty('tag')) {
+            if ($note->isDirty('tags')) {
                 self::clearCacheForNote($note);
             }
         });
 
-        // Clear cache when a note with tag is deleted
+        // Clear cache when a note with tags is deleted
         static::deleted(function ($note) {
-            if (!empty($note->tag)) {
+            if (!empty($note->tags)) {
                 self::clearCacheForNote($note);
             }
         });
@@ -89,19 +96,27 @@ class Note extends Model
     }
 
     /**
-     * Get existing tags from cache or database
-     * Returns unique tags that have been used before
+     * Get all existing tags from cache or database
+     * Returns unique tags that have been used before (flattened from all notes)
      * Uses file cache by default (no Redis needed)
      */
     public static function getExistingTags(): array
     {
         return Cache::remember(self::CACHE_KEY_EXISTING_TAGS, self::CACHE_TTL, function () {
-            return self::whereNotNull('tag')
-                ->where('tag', '!=', '')
-                ->distinct()
-                ->orderBy('tag')
-                ->pluck('tag')
-                ->toArray();
+            $allTags = [];
+            
+            self::whereNotNull('tags')
+                ->pluck('tags')
+                ->each(function ($tags) use (&$allTags) {
+                    if (is_array($tags)) {
+                        $allTags = array_merge($allTags, $tags);
+                    }
+                });
+            
+            // Return unique, sorted tags
+            $uniqueTags = array_unique($allTags);
+            sort($uniqueTags);
+            return array_values($uniqueTags);
         });
     }
 
@@ -142,27 +157,37 @@ class Note extends Model
         
         return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($machineType, $machineId) {
             $column = $machineType . '_id';
+            $allTags = [];
             
-            return self::where($column, $machineId)
-                ->whereNotNull('tag')
-                ->where('tag', '!=', '')
-                ->distinct()
-                ->orderBy('tag')
-                ->pluck('tag')
-                ->toArray();
+            self::where($column, $machineId)
+                ->whereNotNull('tags')
+                ->pluck('tags')
+                ->each(function ($tags) use (&$allTags) {
+                    if (is_array($tags)) {
+                        $allTags = array_merge($allTags, $tags);
+                    }
+                });
+            
+            // Return unique, sorted tags
+            $uniqueTags = array_unique($allTags);
+            sort($uniqueTags);
+            return array_values($uniqueTags);
         });
     }
 
     /**
-     * Get tag color based on hash of tag name (for consistent colors)
+     * Check if this note has a specific tag
      */
-    public function getTagColorAttribute(): string
+    public function hasTag(string $tag): bool
     {
-        if (empty($this->tag)) {
-            return '#6c757d';
-        }
-        
-        // Generate a consistent color based on tag string hash
+        return is_array($this->tags) && in_array($tag, $this->tags);
+    }
+
+    /**
+     * Get color for a specific tag based on hash (for consistent colors)
+     */
+    public static function getTagColor(string $tag): string
+    {
         $colors = [
             '#dc3545', // red
             '#fd7e14', // orange
@@ -176,7 +201,7 @@ class Note extends Model
             '#6c757d', // gray
         ];
         
-        $hash = crc32($this->tag);
+        $hash = crc32($tag);
         return $colors[abs($hash) % count($colors)];
     }
 
@@ -192,7 +217,7 @@ class Note extends Model
      *
      * @var array
      */
-    protected $fillable = ['message', 'image_url', 'cost', 'tag', 'washing_machine_id', 'dryer_machine_id', 'truck_id'];
+    protected $fillable = ['message', 'image_url', 'cost', 'tags', 'washing_machine_id', 'dryer_machine_id', 'truck_id'];
 
 
     /**
@@ -221,5 +246,3 @@ class Note extends Model
     
 
 }
-
-
