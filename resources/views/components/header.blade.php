@@ -38,11 +38,6 @@
                         {{ __('Admin') }}
                     </a>
 
-                    <!-- Theme Toggle -->
-                    <div class="ml-2">
-                        <x-theme-toggle />
-                    </div>
-
                     <!-- User Dropdown -->
                     <div class="relative ml-3" x-data="{ open: false }">
                         <button @click="open = !open" 
@@ -84,7 +79,7 @@
                 @else
                     @if (Route::has('login'))
                         <a href="{{ route('login') }}" 
-                           class="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 transition-all duration-200">
+                           class="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-gray-700 transition-all duration-200">
                             {{ __('Login') }}
                         </a>
                     @endif
@@ -95,13 +90,22 @@
                         </a>
                     @endif
                 @endauth
+
+                <!-- Theme Toggle - Always visible -->
+                <div class="ml-2">
+                    <x-theme-toggle></x-theme-toggle>
+                </div>
             </div>
 
             <!-- Mobile Menu Button -->
-            <div class="md:hidden">
+            <!-- Mobile Menu Button -->
+            <div class="md:hidden flex items-center gap-2">
+                <!-- Theme Toggle for Mobile -->
+                <x-theme-toggle></x-theme-toggle>
+                
                 <button type="button" 
                         @click="mobileMenuOpen = !mobileMenuOpen"
-                        class="inline-flex items-center justify-center p-2 rounded-lg text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 transition-all duration-200">
+                        class="inline-flex items-center justify-center p-2 rounded-lg text-gray-700 dark:text-gray-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-gray-700 transition-all duration-200">
                     <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
                     </svg>
@@ -118,38 +122,38 @@
          x-transition:leave="transition ease-in duration-150"
          x-transition:leave-start="opacity-100 transform translate-y-0"
          x-transition:leave-end="opacity-0 transform -translate-y-2"
-         class="md:hidden border-t border-gray-200 bg-white/95 backdrop-blur-md">
+         class="md:hidden border-t border-gray-200 dark:border-dark-border bg-white/95 dark:bg-dark-card/95 backdrop-blur-md transition-colors duration-200">
         <div class="px-4 py-3 space-y-1">
             @auth
                 <a href="{{ route('worker') }}" 
-                   class="block px-4 py-3 rounded-lg text-sm font-medium text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 transition-all duration-200">
+                   class="block px-4 py-3 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-gray-700 transition-all duration-200">
                     {{ __('Worker') }}
                 </a>
                 <a href="{{ route('user-customer') }}" 
-                   class="block px-4 py-3 rounded-lg text-sm font-medium text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 transition-all duration-200">
+                   class="block px-4 py-3 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-gray-700 transition-all duration-200">
                     {{ __('User Customer') }}
                 </a>
                 <a href="{{ route('supervisor') }}" 
-                   class="block px-4 py-3 rounded-lg text-sm font-medium text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 transition-all duration-200">
+                   class="block px-4 py-3 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-gray-700 transition-all duration-200">
                     {{ __('Supervisor') }}
                 </a>
                 <a href="{{ route('manager') }}" 
-                   class="block px-4 py-3 rounded-lg text-sm font-medium text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 transition-all duration-200">
+                   class="block px-4 py-3 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-gray-700 transition-all duration-200">
                     {{ __('Manager') }}
                 </a>
                 <a href="{{ route('admin') }}" 
-                   class="block px-4 py-3 rounded-lg text-sm font-medium text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 transition-all duration-200">
+                   class="block px-4 py-3 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-gray-700 transition-all duration-200">
                     {{ __('Admin') }}
                 </a>
                 
-                <div class="border-t border-gray-200 my-2"></div>
+                <div class="border-t border-gray-200 dark:border-gray-700 my-2"></div>
                 
-                <div class="px-4 py-2 text-sm text-gray-500">
+                <div class="px-4 py-2 text-sm text-gray-500 dark:text-gray-400">
                     {{ Auth::user()->name }}
                 </div>
                 <a href="{{ route('logout') }}"
                    onclick="event.preventDefault(); document.getElementById('logout-form-mobile').submit();"
-                   class="block px-4 py-3 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 transition-all duration-200">
+                   class="block px-4 py-3 rounded-lg text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 transition-all duration-200">
                     {{ __('Logout') }}
                 </a>
                 <form id="logout-form-mobile" action="{{ route('logout') }}" method="POST" class="hidden">
@@ -158,7 +162,7 @@
             @else
                 @if (Route::has('login'))
                     <a href="{{ route('login') }}" 
-                       class="block px-4 py-3 rounded-lg text-sm font-medium text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 transition-all duration-200">
+                       class="block px-4 py-3 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-gray-700 transition-all duration-200">
                         {{ __('Login') }}
                     </a>
                 @endif
