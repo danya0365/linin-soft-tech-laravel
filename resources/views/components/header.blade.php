@@ -1,4 +1,4 @@
-<nav class="bg-white/80 backdrop-blur-md shadow-lg border-b border-gray-200 sticky top-0 z-50" x-data="{ mobileMenuOpen: false }">
+<nav class="bg-white/80 dark:bg-dark-card/80 backdrop-blur-md shadow-lg border-b border-gray-200 dark:border-dark-border sticky top-0 z-50" x-data="{ mobileMenuOpen: false }">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center h-16">
             
@@ -18,25 +18,30 @@
             <div class="hidden md:flex items-center space-x-1">
                 @auth
                     <a href="{{ route('worker') }}" 
-                       class="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 transition-all duration-200">
+                       class="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-gray-700 transition-all duration-200">
                         {{ __('Worker') }}
                     </a>
                     <a href="{{ route('user-customer') }}" 
-                       class="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 transition-all duration-200">
+                       class="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-gray-700 transition-all duration-200">
                         {{ __('User Customer') }}
                     </a>
                     <a href="{{ route('supervisor') }}" 
-                       class="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 transition-all duration-200">
+                       class="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-gray-700 transition-all duration-200">
                         {{ __('Supervisor') }}
                     </a>
                     <a href="{{ route('manager') }}" 
-                       class="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 transition-all duration-200">
+                       class="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-gray-700 transition-all duration-200">
                         {{ __('Manager') }}
                     </a>
                     <a href="{{ route('admin') }}" 
-                       class="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 transition-all duration-200">
+                       class="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-gray-700 transition-all duration-200">
                         {{ __('Admin') }}
                     </a>
+
+                    <!-- Theme Toggle -->
+                    <div class="ml-2">
+                        <x-theme-toggle />
+                    </div>
 
                     <!-- User Dropdown -->
                     <div class="relative ml-3" x-data="{ open: false }">
