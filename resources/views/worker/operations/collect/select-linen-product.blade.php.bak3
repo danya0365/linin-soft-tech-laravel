@@ -7,12 +7,11 @@
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{ route('worker') }}">Worker</a></li>
             <li class="breadcrumb-item"><a href="{{ route('worker.operation') }}">ปฏิบัติการ</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.operation.dry.select-employee') }}">พนักงาน: {{ $operation['employee']['name'] }}</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.operation.dry.select-customer', ['operationId' => $operation['id']]) }}">ลูกค้า: {{ $operation['customer']['name'] }}</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.operation.dry.select-dryer-machine', ['operationId' => $operation['id']]) }}">{{ $operation['dryer_machine']['name'] }}</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.operation.dry.employee-summary', ['operationId' => $operation['id']]) }}">สรุปข้อมูลการอบ</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.operation.dry.select-linen-case', ['operationId' => $operation['id'], 'operationLinenProductId' => $operationLinenProduct['id']]) }}">{{ $operationLinenProduct['linen_case']['name'] }}</a></li>
-            <li class="breadcrumb-item active" aria-current="page">อบ - เลือกประเภทผ้า</li>
+            <li class="breadcrumb-item"><a href="{{ route('worker.operation.collect.select-employee') }}">พนักงาน: {{ $operation['employee']['name'] }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('worker.operation.collect.select-customer', ['operationId' => $operation['id']]) }}">ลูกค้า: {{ $operation['customer']['name'] }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('worker.operation.collect.employee-summary', ['operationId' => $operation['id']]) }}">สรุปข้อมูลการจัดเก็บ</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('worker.operation.collect.select-linen-case', ['operationId' => $operation['id'], 'operationLinenProductId' => $operationLinenProduct['id']]) }}">{{ $operationLinenProduct['linen_case']['name'] }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">จัดเก็บ - เลือกประเภทผ้า</li>
         </ol>
     </nav>
     <div class="row justify-content-center">
@@ -55,14 +54,9 @@
         @endforeach
     </div>
 </div>
-
-@push('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    if (typeof jQuery === 'undefined') return;
-    
 var linenProducts = {!! $linenProductJson !!};
-var submitUrl = '{{ route('worker.operation.dry.set-select-linen-product', ['operationId' => $operation['id'], 'operationLinenProductId' => $operationLinenProduct['id'], 'linenProductId' => ':linenProductIds']) }}'
+var submitUrl = '{{ route('worker.operation.collect.set-select-linen-product', ['operationId' => $operation['id'], 'operationLinenProductId' => $operationLinenProduct['id'], 'linenProductId' => ':linenProductIds']) }}'
 function getLinenProductWithId(id){
     return linenProducts.find(linenProduct => linenProduct.id == id)
 }
@@ -78,7 +72,6 @@ $(function(){
             return linenProducts.find(linenProduct => linenProduct.id == element).name
         })
 
-        console.log('selectCheckbox', selectCheckbox);
         if (!selectCheckbox || selectCheckbox.length === 0) {
             Swal.fire('กรุณาเลือก 1 อย่าง', '', 'error')
             return
@@ -109,8 +102,5 @@ $(function(){
         submit();
     })
 })
-
-});
 </script>
-@endpush
 @endsection

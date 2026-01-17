@@ -237,131 +237,135 @@
                     <div id="income-range-days-chart" style="min-width: 400px; height: 400px; margin: 0 auto">
 
                     </div>
-                </div>
-            </div>
-        </div>
     </div>
 </div>
+
+@push('scripts')
 <script>
-$(function(){
-
-    // 3 กราฟเปรียบเทียบใหม่ (ปิดชั่วคราว - รอ build production)
-    // $(function(){
-    //     var compareStart = '{{ request()->get('compare-start') }}';
-    //     var compareEnd = '{{ request()->get('compare-end') }}';
-
-    //     // กราฟ 1: ภาพรวมการเงิน
-    //     var financialData = @json(App\Managers\HighChartManager::getFinancialComparisonSummary(request()->get('compare-start'), request()->get('compare-end')));
-    //     var financialTitle = "ภาพรวมการเงิน 7 วันล่าสุด";
-    //     if (compareStart && compareEnd) {
-    //         $('[name=compare-start]').val(compareStart);
-    //         $('[name=compare-end]').val(compareEnd);
-    //         financialTitle = `ภาพรวมการเงิน ${compareStart} ถึง ${compareEnd}`;
-    //     }
-    //     $.comparisonLineChart({
-    //         renderTo: 'financial-comparison-chart',
-    //         data: financialData,
-    //         title: financialTitle,
-    //         yAxisLabel: 'จำนวนเงิน (บาท)',
-    //         unit: 'บาท'
-    //     });
-
-    //     // กราฟ 2: ปริมาณงาน
-    //     var operationData = @json(App\Managers\HighChartManager::getOperationComparisonSummary(request()->get('compare-start'), request()->get('compare-end')));
-    //     var operationTitle = "ปริมาณงาน 7 วันล่าสุด";
-    //     if (compareStart && compareEnd) {
-    //         operationTitle = `ปริมาณงาน ${compareStart} ถึง ${compareEnd}`;
-    //     }
-    //     $.comparisonLineChart({
-    //         renderTo: 'operation-comparison-chart',
-    //         data: operationData,
-    //         title: operationTitle,
-    //         yAxisLabel: 'น้ำหนัก (กก.)',
-    //         unit: 'กก.'
-    //     });
-
-    //     // กราฟ 3: เปรียบเทียบแนวโน้ม (Normalized %)
-    //     var trendData = @json(App\Managers\HighChartManager::getTrendComparisonSummary(request()->get('compare-start'), request()->get('compare-end')));
-    //     var trendTitle = "เปรียบเทียบแนวโน้ม 7 วันล่าสุด";
-    //     if (compareStart && compareEnd) {
-    //         trendTitle = `เปรียบเทียบแนวโน้ม ${compareStart} ถึง ${compareEnd}`;
-    //     }
-    //     $.trendLineChart({
-    //         renderTo: 'trend-comparison-chart',
-    //         data: trendData,
-    //         title: trendTitle
-    //     });
-    // });
-
-    // Datepicker สำหรับกราฟเปรียบเทียบ
-    $('[name=compare-start]').datepicker({ format: 'yyyy-mm-dd' });
-    $('[name=compare-end]').datepicker({ format: 'yyyy-mm-dd' });
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof jQuery === 'undefined') return;
 
     $(function(){
-        var startAt = '{{ request()->get('sales-range-days-start-at') }}'
-        var endAt = '{{ request()->get('sales-range-days-end-at') }}'
-        var salesLatestDaysSummary = @json(App\Managers\HighChartManager::getSalesLatestDaysSummary(request()->get('sales-range-days-start-at'), request()->get('sales-range-days-end-at')));
-        var title = "ต้นทุน, ยอดขาย, กำไร 7 วันล่าสุด"
-        if ( startAt && endAt ) {
-            $('[name=sales-range-days-start-at]').val(startAt);
-            $('[name=sales-range-days-end-at]').val(endAt);
-            title = `ต้นทุน, ยอดขาย, กำไร วันที่ ${startAt} ถึง ${endAt}`
-        }
-        $.salesLatestDaysChart({ 'renderTo': 'sales-range-days-chart', 'data': salesLatestDaysSummary, 'title': title});
+
+        // 3 กราฟเปรียบเทียบใหม่ (ปิดชั่วคราว - รอ build production)
+        // $(function(){
+        //     var compareStart = '{{ request()->get('compare-start') }}';
+        //     var compareEnd = '{{ request()->get('compare-end') }}';
+
+        //     // กราฟ 1: ภาพรวมการเงิน
+        //     var financialData = @json(App\Managers\HighChartManager::getFinancialComparisonSummary(request()->get('compare-start'), request()->get('compare-end')));
+        //     var financialTitle = "ภาพรวมการเงิน 7 วันล่าสุด";
+        //     if (compareStart && compareEnd) {
+        //         $('[name=compare-start]').val(compareStart);
+        //         $('[name=compare-end]').val(compareEnd);
+        //         financialTitle = `ภาพรวมการเงิน ${compareStart} ถึง ${compareEnd}`;
+        //     }
+        //     $.comparisonLineChart({
+        //         renderTo: 'financial-comparison-chart',
+        //         data: financialData,
+        //         title: financialTitle,
+        //         yAxisLabel: 'จำนวนเงิน (บาท)',
+        //         unit: 'บาท'
+        //     });
+
+        //     // กราฟ 2: ปริมาณงาน
+        //     var operationData = @json(App\Managers\HighChartManager::getOperationComparisonSummary(request()->get('compare-start'), request()->get('compare-end')));
+        //     var operationTitle = "ปริมาณงาน 7 วันล่าสุด";
+        //     if (compareStart && compareEnd) {
+        //         operationTitle = `ปริมาณงาน ${compareStart} ถึง ${compareEnd}`;
+        //     }
+        //     $.comparisonLineChart({
+        //         renderTo: 'operation-comparison-chart',
+        //         data: operationData,
+        //         title: operationTitle,
+        //         yAxisLabel: 'น้ำหนัก (กก.)',
+        //         unit: 'กก.'
+        //     });
+
+        //     // กราฟ 3: เปรียบเทียบแนวโน้ม (Normalized %)
+        //     var trendData = @json(App\Managers\HighChartManager::getTrendComparisonSummary(request()->get('compare-start'), request()->get('compare-end')));
+        //     var trendTitle = "เปรียบเทียบแนวโน้ม 7 วันล่าสุด";
+        //     if (compareStart && compareEnd) {
+        //         trendTitle = `เปรียบเทียบแนวโน้ม ${compareStart} ถึง ${compareEnd}`;
+        //     }
+        //     $.trendLineChart({
+        //         renderTo: 'trend-comparison-chart',
+        //         data: trendData,
+        //         title: trendTitle
+        //     });
+        // });
+
+        // Datepicker สำหรับกราฟเปรียบเทียบ
+        $('[name=compare-start]').datepicker({ format: 'yyyy-mm-dd' });
+        $('[name=compare-end]').datepicker({ format: 'yyyy-mm-dd' });
+
+        $(function(){
+            var startAt = '{{ request()->get('sales-range-days-start-at') }}'
+            var endAt = '{{ request()->get('sales-range-days-end-at') }}'
+            var salesLatestDaysSummary = @json(App\Managers\HighChartManager::getSalesLatestDaysSummary(request()->get('sales-range-days-start-at'), request()->get('sales-range-days-end-at')));
+            var title = "ต้นทุน, ยอดขาย, กำไร 7 วันล่าสุด"
+            if ( startAt && endAt ) {
+                $('[name=sales-range-days-start-at]').val(startAt);
+                $('[name=sales-range-days-end-at]').val(endAt);
+                title = `ต้นทุน, ยอดขาย, กำไร วันที่ ${startAt} ถึง ${endAt}`
+            }
+            $.salesLatestDaysChart({ 'renderTo': 'sales-range-days-chart', 'data': salesLatestDaysSummary, 'title': title});
+        })
+
+
+        $(function(){
+            var startAt = '{{ request()->get('energy-range-days-start-at') }}'
+            var endAt = '{{ request()->get('energy-range-days-end-at') }}'
+            var energyDaysSummary = @json(App\Managers\HighChartManager::getEnergyDaysSummary(request()->get('energy-range-days-start-at'), request()->get('energy-range-days-end-at')));
+            var title = "ยอดการใช้พลังงาน 7 วันล่าสุด"
+            if ( startAt && endAt ) {
+                $('[name=energy-range-days-start-at]').val(startAt);
+                $('[name=energy-range-days-end-at]').val(endAt);
+                title = `ยอดการใช้พลังงาน วันที่ ${startAt} ถึง ${endAt}`
+            }
+            $.energyDaysChart({ 'renderTo': 'energy-range-days-chart', 'data': energyDaysSummary, 'title': title});
+        })
+
+        $(function(){
+            var startAt = '{{ request()->get('expense-range-days-start-at') }}'
+            var endAt = '{{ request()->get('expense-range-days-end-at') }}'
+            var expenseDaysSummary = @json(App\Managers\HighChartManager::getExpenseDaysSummary(request()->get('expense-range-days-start-at'), request()->get('expense-range-days-end-at')));
+            var title = "ยอดต้นทุน 7 วันล่าสุด"
+            if ( startAt && endAt ) {
+                $('[name=expense-range-days-start-at]').val(startAt);
+                $('[name=expense-range-days-end-at]').val(endAt);
+                title = `ยอดต้นทุน วันที่ ${startAt} ถึง ${endAt}`
+            }
+            $.expenseDaysChart({ 'renderTo': 'expense-range-days-chart', 'data': expenseDaysSummary, 'title': title});
+        })
+
+        $(function(){
+            var startAt = '{{ request()->get('income-range-days-start-at') }}'
+            var endAt = '{{ request()->get('income-range-days-end-at') }}'
+            var incomeDaysSummary = @json(App\Managers\HighChartManager::getIncomeDaysSummary(request()->get('income-range-days-start-at'), request()->get('income-range-days-end-at')));
+            var title = "ยอดขาย 7 วันล่าสุด"
+            if ( startAt && endAt ) {
+                $('[name=income-range-days-start-at]').val(startAt);
+                $('[name=income-range-days-end-at]').val(endAt);
+                title = `ยอดขาย วันที่ ${startAt} ถึง ${endAt}`
+            }
+            $.incomeDaysChart({ 'renderTo': 'income-range-days-chart', 'data': incomeDaysSummary, 'title': title});
+        })
+
+        $('[name=energy-range-days-start-at]').datepicker({ format: 'yyyy-mm-dd' });
+        $('[name=energy-range-days-end-at]').datepicker({ format: 'yyyy-mm-dd' });
+
+        $('[name=expense-range-days-start-at]').datepicker({ format: 'yyyy-mm-dd' });
+        $('[name=expense-range-days-end-at]').datepicker({ format: 'yyyy-mm-dd' });
+
+        $('[name=sales-range-days-start-at]').datepicker({ format: 'yyyy-mm-dd' });
+        $('[name=sales-range-days-end-at]').datepicker({ format: 'yyyy-mm-dd' });
+
+        $('[name=income-range-days-start-at]').datepicker({ format: 'yyyy-mm-dd' });
+        $('[name=income-range-days-end-at]').datepicker({ format: 'yyyy-mm-dd' });
+
     })
-
-
-    $(function(){
-        var startAt = '{{ request()->get('energy-range-days-start-at') }}'
-        var endAt = '{{ request()->get('energy-range-days-end-at') }}'
-        var energyDaysSummary = @json(App\Managers\HighChartManager::getEnergyDaysSummary(request()->get('energy-range-days-start-at'), request()->get('energy-range-days-end-at')));
-        var title = "ยอดการใช้พลังงาน 7 วันล่าสุด"
-        if ( startAt && endAt ) {
-            $('[name=energy-range-days-start-at]').val(startAt);
-            $('[name=energy-range-days-end-at]').val(endAt);
-            title = `ยอดการใช้พลังงาน วันที่ ${startAt} ถึง ${endAt}`
-        }
-        $.energyDaysChart({ 'renderTo': 'energy-range-days-chart', 'data': energyDaysSummary, 'title': title});
-    })
-
-    $(function(){
-        var startAt = '{{ request()->get('expense-range-days-start-at') }}'
-        var endAt = '{{ request()->get('expense-range-days-end-at') }}'
-        var expenseDaysSummary = @json(App\Managers\HighChartManager::getExpenseDaysSummary(request()->get('expense-range-days-start-at'), request()->get('expense-range-days-end-at')));
-        var title = "ยอดต้นทุน 7 วันล่าสุด"
-        if ( startAt && endAt ) {
-            $('[name=expense-range-days-start-at]').val(startAt);
-            $('[name=expense-range-days-end-at]').val(endAt);
-            title = `ยอดต้นทุน วันที่ ${startAt} ถึง ${endAt}`
-        }
-        $.expenseDaysChart({ 'renderTo': 'expense-range-days-chart', 'data': expenseDaysSummary, 'title': title});
-    })
-
-    $(function(){
-        var startAt = '{{ request()->get('income-range-days-start-at') }}'
-        var endAt = '{{ request()->get('income-range-days-end-at') }}'
-        var incomeDaysSummary = @json(App\Managers\HighChartManager::getIncomeDaysSummary(request()->get('income-range-days-start-at'), request()->get('income-range-days-end-at')));
-        var title = "ยอดขาย 7 วันล่าสุด"
-        if ( startAt && endAt ) {
-            $('[name=income-range-days-start-at]').val(startAt);
-            $('[name=income-range-days-end-at]').val(endAt);
-            title = `ยอดขาย วันที่ ${startAt} ถึง ${endAt}`
-        }
-        $.incomeDaysChart({ 'renderTo': 'income-range-days-chart', 'data': incomeDaysSummary, 'title': title});
-    })
-
-    $('[name=energy-range-days-start-at]').datepicker({ format: 'yyyy-mm-dd' });
-    $('[name=energy-range-days-end-at]').datepicker({ format: 'yyyy-mm-dd' });
-
-    $('[name=expense-range-days-start-at]').datepicker({ format: 'yyyy-mm-dd' });
-    $('[name=expense-range-days-end-at]').datepicker({ format: 'yyyy-mm-dd' });
-
-    $('[name=sales-range-days-start-at]').datepicker({ format: 'yyyy-mm-dd' });
-    $('[name=sales-range-days-end-at]').datepicker({ format: 'yyyy-mm-dd' });
-
-    $('[name=income-range-days-start-at]').datepicker({ format: 'yyyy-mm-dd' });
-    $('[name=income-range-days-end-at]').datepicker({ format: 'yyyy-mm-dd' });
-
-})
+});
 </script>
+@endpush
 @endsection

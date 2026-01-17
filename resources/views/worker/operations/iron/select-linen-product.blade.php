@@ -54,7 +54,12 @@
         @endforeach
     </div>
 </div>
+
+@push('scripts')
 <script>
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof jQuery === 'undefined') return;
+    
 var linenProducts = {!! $linenProductJson !!};
 var submitUrl = '{{ route('worker.operation.iron.set-select-linen-product', ['operationId' => $operation['id'], 'operationLinenProductId' => $operationLinenProduct['id'], 'linenProductId' => ':linenProductIds']) }}'
 function getLinenProductWithId(id){
@@ -102,5 +107,8 @@ $(function(){
         submit();
     })
 })
+
+});
 </script>
+@endpush
 @endsection

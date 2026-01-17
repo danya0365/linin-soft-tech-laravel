@@ -121,7 +121,11 @@
         </div>
     </div>
 </div>
+
+@push('scripts')
 <script>
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof jQuery === 'undefined') return;
     $(function(){
         $('.delete-form').on('submit', function(e){
             if (!confirm("Are you sure?")) {
@@ -130,5 +134,7 @@
             return true
         })
     });
+});
 </script>
+@endpush
 @endsection

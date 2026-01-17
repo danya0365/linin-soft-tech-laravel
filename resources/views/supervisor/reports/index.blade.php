@@ -48,48 +48,55 @@
         </div>
     </div>
 </div>
+
+@push('scripts')
 <script>
-$(function(){
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof jQuery === 'undefined') return;
+    
+    $(function(){
 
-    var expenseDaysSummary = @json(App\Managers\HighChartManager::getExpenseDaysSummary());
-    $.expenseDaysChart({ 'renderTo': 'expense-latest-day-chart', 'data': expenseDaysSummary});
+        var expenseDaysSummary = @json(App\Managers\HighChartManager::getExpenseDaysSummary());
+        $.expenseDaysChart({ 'renderTo': 'expense-latest-day-chart', 'data': expenseDaysSummary});
 
-    var expenseRangeDaysSummary = () => {
-        var startAt = $('[name=expense-range-days-start-at]').val();
-        var endAt = $('[name=expense-range-days-end-at]').val();
+        var expenseRangeDaysSummary = () => {
+            var startAt = $('[name=expense-range-days-start-at]').val();
+            var endAt = $('[name=expense-range-days-end-at]').val();
 
-        var url = '{!! route('api.expense-range-days-chart', ['startAt' => 'startAtParam', 'endAt' => 'endAtParam']) !!}';
-        
-        url = url.replace('startAtParam', startAt)
-        url = url.replace('endAtParam', endAt)
+            var url = '{!! route('api.expense-range-days-chart', ['startAt' => 'startAtParam', 'endAt' => 'endAtParam']) !!}';
+            
+            url = url.replace('startAtParam', startAt)
+            url = url.replace('endAtParam', endAt)
 
-        Swal.fire({
-            title: 'Loading...',
-            allowOutsideClick: false,
-            didOpen: () => {
-                Swal.showLoading()
-            },
-        });
-
-        $.get(url, function(response){
-            $.expenseDaysChart({ 'renderTo': 'expense-range-days-chart', 'data': response, 'title': `ยอดต้นทุน วันที่ ${startAt} ถึง ${endAt}`});
-        }).fail(function() {
             Swal.fire({
-                icon: 'error',
-                text: 'กรุณาลองใหม่อีกครั้ง'
-            })
-        }).always(function() {
-            Swal.close();
-        });
-    }
+                title: 'Loading...',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading()
+                },
+            });
 
-    $('#expense-range-days-form').on('submit', (e) => {
-        e.preventDefault();
-        expenseRangeDaysSummary();
+            $.get(url, function(response){
+                $.expenseDaysChart({ 'renderTo': 'expense-range-days-chart', 'data': response, 'title': `ยอดต้นทุน วันที่ ${startAt} ถึง ${endAt}`});
+            }).fail(function() {
+                Swal.fire({
+                    icon: 'error',
+                    text: 'กรุณาลองใหม่อีกครั้ง'
+                })
+            }).always(function() {
+                Swal.close();
+            });
+        }
+
+        $('#expense-range-days-form').on('submit', (e) => {
+            e.preventDefault();
+            expenseRangeDaysSummary();
+        })
+
+        $('[name=expense-range-days-start-at]').datepicker({ format: 'yyyy-mm-dd' });
+        $('[name=expense-range-days-end-at]').datepicker({ format: 'yyyy-mm-dd' });
     })
-
-    $('[name=expense-range-days-start-at]').datepicker({ format: 'yyyy-mm-dd' });
-    $('[name=expense-range-days-end-at]').datepicker({ format: 'yyyy-mm-dd' });
-})
+});
 </script>
+@endpush
 @endsection

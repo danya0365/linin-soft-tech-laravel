@@ -138,12 +138,7 @@
         </div>
     </div>
 </div>
-
-@push('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    if (typeof jQuery === 'undefined') return;
-    
 $(function(){
     $('.delete-form').on('submit', function(e){
         if (!confirm("Are you sure?")) {
@@ -152,8 +147,12 @@ $(function(){
         return true
     })
 });
-
-});
 </script>
-@endpush
+<script>
+
+$(function(){
+    var energyDaysSummary = @json(App\Managers\HighChartManager::getEnergyDaysSummary());
+    $.energyDaysChart({ 'renderTo': 'energy-chart', 'data': energyDaysSummary});
+})
+</script>
 @endsection

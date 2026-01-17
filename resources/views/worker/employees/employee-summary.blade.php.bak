@@ -91,12 +91,7 @@
         </div>
     </div>
 </div>
-
-@push('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    if (typeof jQuery === 'undefined') return;
-    
 var weekDayReports = @json($weekDayReports);
 $(function(){
     $.employeeSummaryScatterPlotsChart({
@@ -104,8 +99,5 @@ $(function(){
         data: weekDayReports
     });
 })
-
-});
 </script>
-@endpush
 @endsection

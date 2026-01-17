@@ -176,14 +176,20 @@
         </div>
     </div>
 </div>
+
+@push('scripts')
 <script>
-$(function(){
-    $('.delete-form').on('submit', function(e){
-        if (!confirm("Are you sure?")) {
-            return false;
-        }
-        return true
-    })
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof jQuery === 'undefined') return;
+    $(function(){
+        $('.delete-form').on('submit', function(e){
+            if (!confirm("Are you sure?")) {
+                return false;
+            }
+            return true
+        })
+    });
 });
- </script>
+</script>
+@endpush
 @endsection

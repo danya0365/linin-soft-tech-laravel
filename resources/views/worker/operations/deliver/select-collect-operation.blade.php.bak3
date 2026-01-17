@@ -83,12 +83,7 @@
         </div>
     </div>
 </div>
-
-@push('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    if (typeof jQuery === 'undefined') return;
-    
     var operations = @json($operations);
     $(function(){
 
@@ -115,8 +110,5 @@ document.addEventListener('DOMContentLoaded', function() {
             return validate(e);
         })
     })
-    
-});
-</script>
-@endpush
+    </script>
 @endsection

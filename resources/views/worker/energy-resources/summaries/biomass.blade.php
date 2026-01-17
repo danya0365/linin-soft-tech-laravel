@@ -43,11 +43,16 @@
         </div>
     </div>
 </div>
-<script>
 
-$(function(){
-    var energyDaysSummary = @json(App\Managers\HighChartManager::getEnergyDaysSummary());
-    $.energyDaysChart({ 'renderTo': 'energy-chart', 'data': energyDaysSummary});
-})
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof jQuery === 'undefined') return;
+    $(function(){
+        var energyDaysSummary = @json(App\Managers\HighChartManager::getEnergyDaysSummary());
+        $.energyDaysChart({ 'renderTo': 'energy-chart', 'data': energyDaysSummary});
+    })
+});
 </script>
+@endpush
 @endsection

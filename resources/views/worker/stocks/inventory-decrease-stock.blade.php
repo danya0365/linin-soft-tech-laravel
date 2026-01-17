@@ -84,7 +84,11 @@
         </div>
     </div>
 </div>
+
+@push('scripts')
 <script type="text/javascript">
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof jQuery === 'undefined') return;
     $(function(){
         var remain_quantity = {{ $inventory->remain_quantity }};
         $("#decrease_quantity").on("keyup", function(){
@@ -100,6 +104,8 @@
             $("#remain_quantity").val(remain_quantity - increase_quantity)
         });
     })
+});
 </script>
+@endpush
 
 @endsection

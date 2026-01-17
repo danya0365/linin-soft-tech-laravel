@@ -88,8 +88,14 @@
         </div>
     </div>
 </div>
+
+
+@push('scripts')
 <script type="text/javascript">
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof jQuery === 'undefined') return;
     $(function(){
+
         var operationStatus = '{{ $operation['status'] }}';
 
         function askBeforeExit(e) {
@@ -131,7 +137,9 @@
         setUpOnUnload();
         $("#close-operation").on("click", closeOperation);
         $("#reopen-operation").on("click", reopenOperation);
-    })
+        })
+});
 </script>
+@endpush
 
 @endsection

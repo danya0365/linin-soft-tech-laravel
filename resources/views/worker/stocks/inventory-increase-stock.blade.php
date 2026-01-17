@@ -75,7 +75,11 @@
         </div>
     </div>
 </div>
+
+@push('scripts')
 <script type="text/javascript">
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof jQuery === 'undefined') return;
     $(function(){
         var total_quantity = {{ $inventory->total_quantity }};
         var remain_quantity = {{ $inventory->remain_quantity }};
@@ -90,6 +94,8 @@
             $("#remain_quantity").val(remain_quantity + increase_quantity)
         });
     })
+});
 </script>
+@endpush
 
 @endsection
