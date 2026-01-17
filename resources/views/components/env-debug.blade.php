@@ -1,6 +1,6 @@
 {{-- Environment Debug Component - Only shown in non-production environments --}}
 @if(config('app.env') !== 'production')
-<div id="env-debug-panel" style="position: fixed; bottom: 10px; right: 10px; z-index: 9999;">
+<div id="env-debug-panel" style="position: fixed; bottom: 10px; left: 10px; z-index: 9999;">
     <!-- Minimized Button -->
     <button id="env-debug-toggle" onclick="toggleEnvDebug()" style="display: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 10px 14px; border-radius: 50%; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.3); font-size: 18px; width: 44px; height: 44px; transition: transform 0.2s;">
         🔧
