@@ -41,5 +41,8 @@
             </div>
         </footer>
     </div>
+
+    {{-- Environment Debug Component --}}
+    <x-env-debug />
 </body>
 </html>

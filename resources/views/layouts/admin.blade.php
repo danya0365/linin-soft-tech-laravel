@@ -44,5 +44,8 @@
     
     {{-- Mini Chat Popover --}}
     <x-mini-chat />
+
+    {{-- Environment Debug Component --}}
+    <x-env-debug />
 </body>
 </html>
