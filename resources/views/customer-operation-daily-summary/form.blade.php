@@ -1,54 +1,16 @@
-<div class="box box-info padding-1">
-    <div class="box-body">
-        
-        <div class="form-group">
-            {{ Form::label('customer_id') }}
-            {{ Form::text('customer_id', $customerOperationDailySummary->customer_id, ['class' => 'form-control' . ($errors->has('customer_id') ? ' is-invalid' : ''), 'placeholder' => 'Customer Id']) }}
-            {!! $errors->first('customer_id', '<div class="invalid-feedback">:message</div>') !!}
-        </div>
-        <div class="form-group">
-            {{ Form::label('operation_date') }}
-            {{ Form::text('operation_date', $customerOperationDailySummary->operation_date, ['class' => 'form-control' . ($errors->has('operation_date') ? ' is-invalid' : ''), 'placeholder' => 'Operation Date']) }}
-            {!! $errors->first('operation_date', '<div class="invalid-feedback">:message</div>') !!}
-        </div>
-        <div class="form-group">
-            {{ Form::label('total_wet_weight') }}
-            {{ Form::text('total_wet_weight', $customerOperationDailySummary->total_wet_weight, ['class' => 'form-control' . ($errors->has('total_wet_weight') ? ' is-invalid' : ''), 'placeholder' => 'Total Wet Weight']) }}
-            {!! $errors->first('total_wet_weight', '<div class="invalid-feedback">:message</div>') !!}
-        </div>
-        <div class="form-group">
-            {{ Form::label('total_dry_weight') }}
-            {{ Form::text('total_dry_weight', $customerOperationDailySummary->total_dry_weight, ['class' => 'form-control' . ($errors->has('total_dry_weight') ? ' is-invalid' : ''), 'placeholder' => 'Total Dry Weight']) }}
-            {!! $errors->first('total_dry_weight', '<div class="invalid-feedback">:message</div>') !!}
-        </div>
-        <div class="form-group">
-            {{ Form::label('total_iron_piece') }}
-            {{ Form::text('total_iron_piece', $customerOperationDailySummary->total_iron_piece, ['class' => 'form-control' . ($errors->has('total_iron_piece') ? ' is-invalid' : ''), 'placeholder' => 'Total Iron Piece']) }}
-            {!! $errors->first('total_iron_piece', '<div class="invalid-feedback">:message</div>') !!}
-        </div>
-        <div class="form-group">
-            {{ Form::label('total_packing_piece') }}
-            {{ Form::text('total_packing_piece', $customerOperationDailySummary->total_packing_piece, ['class' => 'form-control' . ($errors->has('total_packing_piece') ? ' is-invalid' : ''), 'placeholder' => 'Total Packing Piece']) }}
-            {!! $errors->first('total_packing_piece', '<div class="invalid-feedback">:message</div>') !!}
-        </div>
-        <div class="form-group">
-            {{ Form::label('total_edit_collect_weight') }}
-            {{ Form::text('total_edit_collect_weight', $customerOperationDailySummary->total_edit_collect_weight, ['class' => 'form-control' . ($errors->has('total_edit_collect_weight') ? ' is-invalid' : ''), 'placeholder' => 'Total Edit Collect Weight']) }}
-            {!! $errors->first('total_edit_collect_weight', '<div class="invalid-feedback">:message</div>') !!}
-        </div>
-        <div class="form-group">
-            {{ Form::label('total_collect_weight') }}
-            {{ Form::text('total_collect_weight', $customerOperationDailySummary->total_collect_weight, ['class' => 'form-control' . ($errors->has('total_collect_weight') ? ' is-invalid' : ''), 'placeholder' => 'Total Collect Weight']) }}
-            {!! $errors->first('total_collect_weight', '<div class="invalid-feedback">:message</div>') !!}
-        </div>
-        <div class="form-group">
-            {{ Form::label('total_billing_weight') }}
-            {{ Form::text('total_billing_weight', $customerOperationDailySummary->total_billing_weight, ['class' => 'form-control' . ($errors->has('total_billing_weight') ? ' is-invalid' : ''), 'placeholder' => 'Total Billing Weight']) }}
-            {!! $errors->first('total_billing_weight', '<div class="invalid-feedback">:message</div>') !!}
-        </div>
+<x-crud.form-group name="customer_id" label="Customer ID" type="number" :value="$customerOperationDailySummary->customer_id ?? old('customer_id')" placeholder="Enter customer ID" required />
+<x-crud.form-group name="operation_date" label="Operation Date" type="date" :value="$customerOperationDailySummary->operation_date ?? old('operation_date')" required />
+<x-crud.form-group name="total_wet_weight" label="Total Wet Weight" type="number" :value="$customerOperationDailySummary->total_wet_weight ?? old('total_wet_weight')" placeholder="0.00" />
+<x-crud.form-group name="total_dry_weight" label="Total Dry Weight" type="number" :value="$customerOperationDailySummary->total_dry_weight ?? old('total_dry_weight')" placeholder="0.00" />
+<x-crud.form-group name="total_iron_piece" label="Total Iron Piece" type="number" :value="$customerOperationDailySummary->total_iron_piece ?? old('total_iron_piece')" placeholder="0" />
+<x-crud.form-group name="total_packing_piece" label="Total Packing Piece" type="number" :value="$customerOperationDailySummary->total_packing_piece ?? old('total_packing_piece')" placeholder="0" />
+<x-crud.form-group name="total_edit_collect_weight" label="Total Edit Collect Weight" type="number" :value="$customerOperationDailySummary->total_edit_collect_weight ?? old('total_edit_collect_weight')" placeholder="0.00" />
+<x-crud.form-group name="total_collect_weight" label="Total Collect Weight" type="number" :value="$customerOperationDailySummary->total_collect_weight ?? old('total_collect_weight')" placeholder="0.00" />
+<x-crud.form-group name="total_billing_weight" label="Total Billing Weight" type="number" :value="$customerOperationDailySummary->total_billing_weight ?? old('total_billing_weight')" placeholder="0.00" />
 
-    </div>
-    <div class="box-footer mt20">
-        <button type="submit" class="btn btn-primary">Submit</button>
-    </div>
+<div class="flex items-center justify-end gap-3 mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+    <x-ui.button type="submit" variant="primary" icon="fa fa-save">
+        {{ isset($customerOperationDailySummary->id) ? 'Update' : 'Create' }} Summary
+    </x-ui.button>
+    <x-ui.button :href="route('customer-operation-daily-summaries.index')" variant="secondary" icon="fa fa-times">Cancel</x-ui.button>
 </div>
