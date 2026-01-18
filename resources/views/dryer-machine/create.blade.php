@@ -1,33 +1,16 @@
 @extends('layouts.app')
-
 @section('template_title')
     Create Dryer Machine
 @endsection
-
 @section('content')
 <div class="container mx-auto px-4 py-6 max-w-4xl">
-    
-    {{-- Breadcrumb --}}
-    <x-crud.breadcrumb :items="[
-        ['label' => 'Admin', 'route' => 'admin'],
-        ['label' => 'Dryer Machines', 'route' => 'dryer-machines.index'],
-        ['label' => 'Create']
-    ]" />
-    
-    {{-- Validation Errors --}}
+    <x-crud.breadcrumb :items="[['label' => 'Admin', 'route' => 'admin'],['label' => 'Dryer Machine', 'route' => 'dryer-machines.index'],['label' => 'Create']]" />
     @includeif('partials.errors')
-    
-    {{-- Create Form Card --}}
     <x-ui.card>
-        <x-slot:header>
-            <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Create Dryer Machine</h2>
-        </x-slot:header>
-        
+        <x-slot:header><h2 class="text-xl font-semibold text-gray-900 dark:text-white">Create Dryer Machine</h2></x-slot:header>
         <form method="POST" action="{{ route('dryer-machines.store') }}" role="form" enctype="multipart/form-data">
             @csrf
-            
             @include('dryer-machine.form')
-            
         </form>
     </x-ui.card>
 </div>
