@@ -19,6 +19,7 @@
             <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Name</p><p class="font-semibold text-gray-900 dark:text-white">{{ $washingMachine->name ?? '-' }}</p></div>
             <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Photo</p><p class="font-semibold text-gray-900 dark:text-white">{{ $washingMachine->photo ?? '-' }}</p></div>
             <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Maximum Weight</p><p class="font-semibold text-gray-900 dark:text-white">{{ $washingMachine->maximum_weight ?? '-' }}</p></div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Operation Id</p><p class="font-semibold text-gray-900 dark:text-white">{{ $washingMachine->operation_id ?? '-' }}</p></div>
         </div>
     </x-ui.card>
 </div>

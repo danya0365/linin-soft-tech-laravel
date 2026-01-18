@@ -15,19 +15,40 @@
         
         <div class="overflow-x-auto rounded-lg shadow">
             <table class="w-full text-sm text-left border-collapse bg-white dark:bg-gray-800">
-                <thead class="bg-gray-100 dark:bg-gray-700 border-b-2 border-gray-300 dark:border-gray-600">
+                <thead class="bg-gradient-to-r from-gray-100 to-gray-50 dark:from-gray-700 dark:to-gray-800 border-b-2 border-gray-300 dark:border-gray-600">
                     <tr>
-                        <th class="px-6 py-3 text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider w-20">No</th>
-                        <th class="px-6 py-3 text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Detail</th>
-                        <th class="px-6 py-3 text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider w-64">Actions</th>
+                        <th class="px-6 py-4 text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider w-20 text-center">ID</th>
+                        <th class="px-6 py-4 text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Detail</th>
+                        <th class="px-6 py-4 text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider w-64 text-center">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
                     @forelse($trucks as $index => $truck)
-                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150">
-                            <td class="px-6 py-4 text-gray-900 dark:text-gray-100">{{ $i + $index + 1 }}</td>
-                            <td class="px-6 py-4 text-gray-900 dark:text-gray-100">
-                                <strong>Name:</strong> {{ $truck->name ?? '-' }}<br><strong>Photo:</strong> {{ $truck->photo ?? '-' }}<br><strong>Plate Number:</strong> {{ $truck->plate_number ?? '-' }}<br><strong>Operation Id:</strong> {{ $truck->operation_id ?? '-' }}
+                        <tr class="hover:bg-gradient-to-r hover:from-blue-50 hover:to-transparent dark:hover:from-gray-700/50 dark:hover:to-transparent transition-all duration-200">
+                            <td class="px-6 py-4 text-center">
+                                <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 text-sm font-semibold">
+                                    {{ $i + $index + 1 }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="space-y-1">
+                                        <div class="mb-2">
+                                            <span class="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">Name:</span>
+                                            <span class="ml-2 text-sm text-gray-900 dark:text-gray-100">{{ $truck->name ?? '-' }}</span>
+                                        </div>
+                                        <div class="mb-2">
+                                            <span class="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">Photo:</span>
+                                            <span class="ml-2 text-sm text-gray-900 dark:text-gray-100">{{ $truck->photo ?? '-' }}</span>
+                                        </div>
+                                        <div class="mb-2">
+                                            <span class="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">Plate Number:</span>
+                                            <span class="ml-2 text-sm text-gray-900 dark:text-gray-100">{{ $truck->plate_number ?? '-' }}</span>
+                                        </div>
+                                        <div class="mb-2">
+                                            <span class="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">Operation Id:</span>
+                                            <span class="ml-2 text-sm text-gray-900 dark:text-gray-100">{{ $truck->operation_id ?? '-' }}</span>
+                                        </div>
+                                </div>
                             </td>
                             <td class="px-6 py-4">
                                 <x-crud.action-buttons :model="$truck" resource="trucks" />

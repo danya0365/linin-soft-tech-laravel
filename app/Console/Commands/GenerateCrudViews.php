@@ -18,34 +18,19 @@ class GenerateCrudViews extends Command
         
         $this->info("Generating CRUD views for: {$module}");
         
-        // Analyze existing form to extract fields
-        $formPath = resource_path("views/{$module}/form.blade.php");
-        if (!File::exists($formPath)) {
-            $this->error("Form file not found: {$formPath}");
-            return 1;
-        }
+        // Extract fields directly from Model's $fillable
+        $fields = $this->extractFieldsFromModel($module);
         
-        $formContent = File::get($formPath);
-        $fields = $this->extractFields($formContent);
-        
-        // If no fields found from form, try to get from Model's $fillable
-        if (empty($fields)) {
-            $this->warn("⚠️  No fields found in form.blade.php, attempting to extract from Model...");
-            $fields = $this->extractFieldsFromModel($module);
-        }
-        
-        // ERROR: If still no fields found, stop execution
+        // ERROR: If no fields found, stop execution
         if (empty($fields)) {
             $this->error("❌ ERROR: No fields found for module '{$module}'!");
-            $this->error("Please ensure either:");
-            $this->error("  1. The form.blade.php contains field definitions (name attributes, Form::label, x-crud.form-group), OR");
-            $this->error("  2. The Model has a \$fillable array defined");
+            $this->error("Please ensure the Model has a \$fillable array defined.");
             $this->error("");
             $this->error("Script execution stopped. Please fix the issue and try again.");
             return 1; // Exit with error code
         }
         
-        $this->info("✓ Found " . count($fields) . " fields");
+        $this->info("✓ Found " . count($fields) . " fields from Model's \$fillable");
         
         // Generate ALL views including form
         $this->generateIndex($module, $fields, $force);
@@ -168,18 +153,21 @@ class GenerateCrudViews extends Command
         $routePrefix = Str::slug(Str::plural($module));
         $title = Str::title(str_replace('-', ' ', $module));
         
-        // Build detail display (all fields combined)
+        // Build beautiful detail display with ALL fields in a grid layout
         $detailParts = [];
         foreach ($fields as $field) {
             if ($field['name'] !== 'id' && !str_contains($field['name'], 'password')) {
                 $label = $field['label'];
-                $detailParts[] = "<strong>{$label}:</strong> {{ \${$modelVar}->{$field['name']} ?? '-' }}";
+                $detailParts[] = "                                        <div class=\"mb-2\">
+                                            <span class=\"text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide\">{$label}:</span>
+                                            <span class=\"ml-2 text-sm text-gray-900 dark:text-gray-100\">{{ \${$modelVar}->{$field['name']} ?? '-' }}</span>
+                                        </div>";
             }
         }
-        $detailContent = implode('<br>', $detailParts);
+        $detailContent = implode("\n", $detailParts);
         
         if (empty($detailParts)) {
-            $detailContent = "{{ \${$modelVar}->name ?? \${$modelVar}->id ?? 'Item #' . \$loop->iteration }}";
+            $detailContent = "                                        <div class=\"text-sm text-gray-900 dark:text-gray-100\">{{ \${$modelVar}->name ?? \${$modelVar}->id ?? 'Item #' . \$loop->iteration }}</div>";
         }
         
         $content = "@extends('layouts.app')
@@ -199,19 +187,25 @@ class GenerateCrudViews extends Command
         
         <div class=\"overflow-x-auto rounded-lg shadow\">
             <table class=\"w-full text-sm text-left border-collapse bg-white dark:bg-gray-800\">
-                <thead class=\"bg-gray-100 dark:bg-gray-700 border-b-2 border-gray-300 dark:border-gray-600\">
+                <thead class=\"bg-gradient-to-r from-gray-100 to-gray-50 dark:from-gray-700 dark:to-gray-800 border-b-2 border-gray-300 dark:border-gray-600\">
                     <tr>
-                        <th class=\"px-6 py-3 text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider w-20\">No</th>
-                        <th class=\"px-6 py-3 text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider\">Detail</th>
-                        <th class=\"px-6 py-3 text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider w-64\">Actions</th>
+                        <th class=\"px-6 py-4 text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider w-20 text-center\">ID</th>
+                        <th class=\"px-6 py-4 text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider\">Detail</th>
+                        <th class=\"px-6 py-4 text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider w-64 text-center\">Actions</th>
                     </tr>
                 </thead>
                 <tbody class=\"divide-y divide-gray-200 dark:divide-gray-700\">
                     @forelse(\${$variableName} as \$index => \${$modelVar})
-                        <tr class=\"hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150\">
-                            <td class=\"px-6 py-4 text-gray-900 dark:text-gray-100\">{{ \$i + \$index + 1 }}</td>
-                            <td class=\"px-6 py-4 text-gray-900 dark:text-gray-100\">
-                                {$detailContent}
+                        <tr class=\"hover:bg-gradient-to-r hover:from-blue-50 hover:to-transparent dark:hover:from-gray-700/50 dark:hover:to-transparent transition-all duration-200\">
+                            <td class=\"px-6 py-4 text-center\">
+                                <span class=\"inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 text-sm font-semibold\">
+                                    {{ \$i + \$index + 1 }}
+                                </span>
+                            </td>
+                            <td class=\"px-6 py-4\">
+                                <div class=\"space-y-1\">
+{$detailContent}
+                                </div>
                             </td>
                             <td class=\"px-6 py-4\">
                                 <x-crud.action-buttons :model=\"\${$modelVar}\" resource=\"{$routePrefix}\" />

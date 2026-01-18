@@ -15,19 +15,96 @@
         
         <div class="overflow-x-auto rounded-lg shadow">
             <table class="w-full text-sm text-left border-collapse bg-white dark:bg-gray-800">
-                <thead class="bg-gray-100 dark:bg-gray-700 border-b-2 border-gray-300 dark:border-gray-600">
+                <thead class="bg-gradient-to-r from-gray-100 to-gray-50 dark:from-gray-700 dark:to-gray-800 border-b-2 border-gray-300 dark:border-gray-600">
                     <tr>
-                        <th class="px-6 py-3 text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider w-20">No</th>
-                        <th class="px-6 py-3 text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Detail</th>
-                        <th class="px-6 py-3 text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider w-64">Actions</th>
+                        <th class="px-6 py-4 text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider w-20 text-center">ID</th>
+                        <th class="px-6 py-4 text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Detail</th>
+                        <th class="px-6 py-4 text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider w-64 text-center">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
                     @forelse($operations as $index => $operation)
-                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150">
-                            <td class="px-6 py-4 text-gray-900 dark:text-gray-100">{{ $i + $index + 1 }}</td>
-                            <td class="px-6 py-4 text-gray-900 dark:text-gray-100">
-                                <strong>Operation Type:</strong> {{ $operation->operation_type ?? '-' }}<br><strong>Employee Id:</strong> {{ $operation->employee_id ?? '-' }}<br><strong>Customer Id:</strong> {{ $operation->customer_id ?? '-' }}<br><strong>Wash Employee Id:</strong> {{ $operation->wash_employee_id ?? '-' }}<br><strong>Dry Employee Id:</strong> {{ $operation->dry_employee_id ?? '-' }}<br><strong>Iron Employee Id:</strong> {{ $operation->iron_employee_id ?? '-' }}<br><strong>Packing Employee Id:</strong> {{ $operation->packing_employee_id ?? '-' }}<br><strong>Collect Employee Id:</strong> {{ $operation->collect_employee_id ?? '-' }}<br><strong>Job Case:</strong> {{ $operation->job_case ?? '-' }}<br><strong>Washing Machine Id:</strong> {{ $operation->washing_machine_id ?? '-' }}<br><strong>Dryer Machine Id:</strong> {{ $operation->dryer_machine_id ?? '-' }}<br><strong>Total Wet Weight:</strong> {{ $operation->total_wet_weight ?? '-' }}<br><strong>Total Dry Weight:</strong> {{ $operation->total_dry_weight ?? '-' }}<br><strong>Total Iron Piece:</strong> {{ $operation->total_iron_piece ?? '-' }}<br><strong>Total Packing Piece:</strong> {{ $operation->total_packing_piece ?? '-' }}<br><strong>Colors:</strong> {{ $operation->colors ?? '-' }}<br><strong>Search Tags:</strong> {{ $operation->search_tags ?? '-' }}<br><strong>Status:</strong> {{ $operation->status ?? '-' }}
+                        <tr class="hover:bg-gradient-to-r hover:from-blue-50 hover:to-transparent dark:hover:from-gray-700/50 dark:hover:to-transparent transition-all duration-200">
+                            <td class="px-6 py-4 text-center">
+                                <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 text-sm font-semibold">
+                                    {{ $i + $index + 1 }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="space-y-1">
+                                        <div class="mb-2">
+                                            <span class="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">Operation Type:</span>
+                                            <span class="ml-2 text-sm text-gray-900 dark:text-gray-100">{{ $operation->operation_type ?? '-' }}</span>
+                                        </div>
+                                        <div class="mb-2">
+                                            <span class="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">Employee Id:</span>
+                                            <span class="ml-2 text-sm text-gray-900 dark:text-gray-100">{{ $operation->employee_id ?? '-' }}</span>
+                                        </div>
+                                        <div class="mb-2">
+                                            <span class="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">Customer Id:</span>
+                                            <span class="ml-2 text-sm text-gray-900 dark:text-gray-100">{{ $operation->customer_id ?? '-' }}</span>
+                                        </div>
+                                        <div class="mb-2">
+                                            <span class="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">Wash Employee Id:</span>
+                                            <span class="ml-2 text-sm text-gray-900 dark:text-gray-100">{{ $operation->wash_employee_id ?? '-' }}</span>
+                                        </div>
+                                        <div class="mb-2">
+                                            <span class="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">Dry Employee Id:</span>
+                                            <span class="ml-2 text-sm text-gray-900 dark:text-gray-100">{{ $operation->dry_employee_id ?? '-' }}</span>
+                                        </div>
+                                        <div class="mb-2">
+                                            <span class="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">Iron Employee Id:</span>
+                                            <span class="ml-2 text-sm text-gray-900 dark:text-gray-100">{{ $operation->iron_employee_id ?? '-' }}</span>
+                                        </div>
+                                        <div class="mb-2">
+                                            <span class="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">Packing Employee Id:</span>
+                                            <span class="ml-2 text-sm text-gray-900 dark:text-gray-100">{{ $operation->packing_employee_id ?? '-' }}</span>
+                                        </div>
+                                        <div class="mb-2">
+                                            <span class="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">Collect Employee Id:</span>
+                                            <span class="ml-2 text-sm text-gray-900 dark:text-gray-100">{{ $operation->collect_employee_id ?? '-' }}</span>
+                                        </div>
+                                        <div class="mb-2">
+                                            <span class="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">Job Case:</span>
+                                            <span class="ml-2 text-sm text-gray-900 dark:text-gray-100">{{ $operation->job_case ?? '-' }}</span>
+                                        </div>
+                                        <div class="mb-2">
+                                            <span class="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">Washing Machine Id:</span>
+                                            <span class="ml-2 text-sm text-gray-900 dark:text-gray-100">{{ $operation->washing_machine_id ?? '-' }}</span>
+                                        </div>
+                                        <div class="mb-2">
+                                            <span class="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">Dryer Machine Id:</span>
+                                            <span class="ml-2 text-sm text-gray-900 dark:text-gray-100">{{ $operation->dryer_machine_id ?? '-' }}</span>
+                                        </div>
+                                        <div class="mb-2">
+                                            <span class="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">Total Wet Weight:</span>
+                                            <span class="ml-2 text-sm text-gray-900 dark:text-gray-100">{{ $operation->total_wet_weight ?? '-' }}</span>
+                                        </div>
+                                        <div class="mb-2">
+                                            <span class="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">Total Dry Weight:</span>
+                                            <span class="ml-2 text-sm text-gray-900 dark:text-gray-100">{{ $operation->total_dry_weight ?? '-' }}</span>
+                                        </div>
+                                        <div class="mb-2">
+                                            <span class="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">Total Iron Piece:</span>
+                                            <span class="ml-2 text-sm text-gray-900 dark:text-gray-100">{{ $operation->total_iron_piece ?? '-' }}</span>
+                                        </div>
+                                        <div class="mb-2">
+                                            <span class="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">Total Packing Piece:</span>
+                                            <span class="ml-2 text-sm text-gray-900 dark:text-gray-100">{{ $operation->total_packing_piece ?? '-' }}</span>
+                                        </div>
+                                        <div class="mb-2">
+                                            <span class="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">Colors:</span>
+                                            <span class="ml-2 text-sm text-gray-900 dark:text-gray-100">{{ $operation->colors ?? '-' }}</span>
+                                        </div>
+                                        <div class="mb-2">
+                                            <span class="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">Search Tags:</span>
+                                            <span class="ml-2 text-sm text-gray-900 dark:text-gray-100">{{ $operation->search_tags ?? '-' }}</span>
+                                        </div>
+                                        <div class="mb-2">
+                                            <span class="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">Status:</span>
+                                            <span class="ml-2 text-sm text-gray-900 dark:text-gray-100">{{ $operation->status ?? '-' }}</span>
+                                        </div>
+                                </div>
                             </td>
                             <td class="px-6 py-4">
                                 <x-crud.action-buttons :model="$operation" resource="operations" />
