@@ -16,7 +16,13 @@
             </div>
         </x-slot:header>
         <div class="grid md:grid-cols-2 gap-6">
-            
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Name</p><p class="font-semibold text-gray-900 dark:text-white">{{ $customer->name ?? '-' }}</p></div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Customer Group Id</p><p class="font-semibold text-gray-900 dark:text-white">{{ $customer->customer_group_id ?? '-' }}</p></div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Total Wet Weight</p><p class="font-semibold text-gray-900 dark:text-white">{{ $customer->total_wet_weight ?? '-' }}</p></div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Total Dry Weight</p><p class="font-semibold text-gray-900 dark:text-white">{{ $customer->total_dry_weight ?? '-' }}</p></div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Total Billing Weight</p><p class="font-semibold text-gray-900 dark:text-white">{{ $customer->total_billing_weight ?? '-' }}</p></div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Total Edit Weight</p><p class="font-semibold text-gray-900 dark:text-white">{{ $customer->total_edit_weight ?? '-' }}</p></div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Total Billing Payment</p><p class="font-semibold text-gray-900 dark:text-white">{{ $customer->total_billing_payment ?? '-' }}</p></div>
         </div>
     </x-ui.card>
 </div>

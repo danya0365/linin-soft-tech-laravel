@@ -28,9 +28,26 @@ class GenerateCrudViews extends Command
         $formContent = File::get($formPath);
         $fields = $this->extractFields($formContent);
         
-        $this->info("Found " . count($fields) . " fields");
+        // If no fields found from form, try to get from Model's $fillable
+        if (empty($fields)) {
+            $this->warn("⚠️  No fields found in form.blade.php, attempting to extract from Model...");
+            $fields = $this->extractFieldsFromModel($module);
+        }
         
-        // Generate views
+        // ERROR: If still no fields found, stop execution
+        if (empty($fields)) {
+            $this->error("❌ ERROR: No fields found for module '{$module}'!");
+            $this->error("Please ensure either:");
+            $this->error("  1. The form.blade.php contains field definitions (name attributes, Form::label, x-crud.form-group), OR");
+            $this->error("  2. The Model has a \$fillable array defined");
+            $this->error("");
+            $this->error("Script execution stopped. Please fix the issue and try again.");
+            return 1; // Exit with error code
+        }
+        
+        $this->info("✓ Found " . count($fields) . " fields");
+        
+        // Generate ALL views including form
         $this->generateIndex($module, $fields, $force);
         $this->generateCreate($module, $force);
         $this->generateEdit($module, $force);
@@ -44,17 +61,89 @@ class GenerateCrudViews extends Command
     protected function extractFields($content)
     {
         $fields = [];
+        $foundFields = [];
         
-        // Extract Form::label or form fields
-        preg_match_all('/Form::label\([\'"](\w+)[\'"]\)/', $content, $matches);
-        if (!empty($matches[1])) {
-            foreach ($matches[1] as $field) {
+        // Pattern 1: Form::label('field_name')
+        preg_match_all('/Form::label\([\'"](\w+)[\'"]\)/', $content, $matches1);
+        if (!empty($matches1[1])) {
+            foreach ($matches1[1] as $field) {
+                $foundFields[$field] = true;
+            }
+        }
+        
+        // Pattern 2: <x-crud.form-group name="field_name"
+        preg_match_all('/<x-crud\.form-group[^>]+name=[\'"](\w+)[\'"]/', $content, $matches2);
+        if (!empty($matches2[1])) {
+            foreach ($matches2[1] as $field) {
+                $foundFields[$field] = true;
+            }
+        }
+        
+        // Pattern 3: name="field_name"
+        preg_match_all('/name=[\'"](\w+)[\'"]/', $content, $matches3);
+        if (!empty($matches3[1])) {
+            foreach ($matches3[1] as $field) {
+                if (!in_array($field, ['_token', '_method'])) {
+                    $foundFields[$field] = true;
+                }
+            }
+        }
+        
+        // Convert to array
+        foreach (array_keys($foundFields) as $field) {
+            $fields[] = [
+                'name' => $field,
+                'label' => Str::title(str_replace('_', ' ', $field)),
+                'type' => $this->guessFieldType($field),
+            ];
+        }
+        
+        return $fields;
+    }
+    
+    protected function extractFieldsFromModel($module)
+    {
+        $fields = [];
+        
+        // Convert module name to Model class name
+        // e.g., 'customer-operation-daily-summary' -> 'CustomerOperationDailySummary'
+        $modelName = Str::studly(Str::singular($module));
+        $modelClass = "App\\Models\\{$modelName}";
+        
+        // Check if model exists
+        if (!class_exists($modelClass)) {
+            $this->warn("Model class not found: {$modelClass}");
+            return [];
+        }
+        
+        // Try to get $fillable from the model
+        try {
+            $model = new $modelClass();
+            $fillable = $model->getFillable();
+            
+            if (empty($fillable)) {
+                $this->warn("Model {$modelClass} has no \$fillable attributes defined");
+                return [];
+            }
+            
+            $this->info("✓ Found " . count($fillable) . " fields in Model's \$fillable array");
+            
+            foreach ($fillable as $fieldName) {
+                // Skip system fields
+                if (in_array($fieldName, ['created_at', 'updated_at', 'deleted_at'])) {
+                    continue;
+                }
+                
                 $fields[] = [
-                    'name' => $field,
-                    'label' => Str::title(str_replace('_', ' ', $field)),
-                    'type' => $this->guessFieldType($field),
+                    'name' => $fieldName,
+                    'label' => Str::title(str_replace('_', ' ', $fieldName)),
+                    'type' => $this->guessFieldType($fieldName),
                 ];
             }
+            
+        } catch (\Exception $e) {
+            $this->error("Error instantiating model {$modelClass}: " . $e->getMessage());
+            return [];
         }
         
         return $fields;
@@ -67,7 +156,8 @@ class GenerateCrudViews extends Command
         if (str_contains($fieldName, 'email')) return 'email';
         if (str_contains($fieldName, 'password')) return 'password';
         if (str_contains($fieldName, 'weight') || str_contains($fieldName, 'price') || str_contains($fieldName, 'cost') || str_contains($fieldName, 'piece')) return 'number';
-        if (str_contains($fieldName, 'description') || str_contains($fieldName, 'message')) return 'textarea';
+        if (str_contains($fieldName, 'description') || str_contains($fieldName, 'message') || str_contains($fieldName, 'note')) return 'textarea';
+        if (str_contains($fieldName, 'is_') || str_contains($fieldName, 'has_')) return 'checkbox';
         return 'text';
     }
     
@@ -75,7 +165,6 @@ class GenerateCrudViews extends Command
     {
         $variableName = Str::camel(Str::plural($module));
         $modelVar = Str::camel(Str::singular($module));
-        // Use plural for route names (Laravel standard)
         $routePrefix = Str::slug(Str::plural($module));
         $title = Str::title(str_replace('-', ' ', $module));
         
@@ -89,7 +178,6 @@ class GenerateCrudViews extends Command
         }
         $detailContent = implode('<br>', $detailParts);
         
-        // If no fields, show a generic message
         if (empty($detailParts)) {
             $detailContent = "{{ \${$modelVar}->name ?? \${$modelVar}->id ?? 'Item #' . \$loop->iteration }}";
         }

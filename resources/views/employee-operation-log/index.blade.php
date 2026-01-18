@@ -12,13 +12,40 @@
         @if ($message = Session::get('success'))
             <x-ui.alert variant="success" dismissible="true">{{ $message }}</x-ui.alert>
         @endif
-        <x-crud.data-table 
-            :headers="['No', 'Actions']"
-            :data="$employeeOperationLogs"
-            :columns="['']"
-            resource="employee-operation-logs"
-            :startIndex="$i"
-        />
+        
+        <div class="overflow-x-auto rounded-lg shadow">
+            <table class="w-full text-sm text-left border-collapse bg-white dark:bg-gray-800">
+                <thead class="bg-gray-100 dark:bg-gray-700 border-b-2 border-gray-300 dark:border-gray-600">
+                    <tr>
+                        <th class="px-6 py-3 text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider w-20">No</th>
+                        <th class="px-6 py-3 text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Detail</th>
+                        <th class="px-6 py-3 text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider w-64">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                    @forelse($employeeOperationLogs as $index => $employeeOperationLog)
+                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150">
+                            <td class="px-6 py-4 text-gray-900 dark:text-gray-100">{{ $i + $index + 1 }}</td>
+                            <td class="px-6 py-4 text-gray-900 dark:text-gray-100">
+                                <strong>Employee Id:</strong> {{ $employeeOperationLog->employee_id ?? '-' }}<br><strong>Operation Type:</strong> {{ $employeeOperationLog->operation_type ?? '-' }}<br><strong>Action Type:</strong> {{ $employeeOperationLog->action_type ?? '-' }}
+                            </td>
+                            <td class="px-6 py-4">
+                                <x-crud.action-buttons :model="$employeeOperationLog" resource="employee-operation-logs" />
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="3" class="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
+                                <div class="flex flex-col items-center gap-2">
+                                    <i class="fa fa-inbox text-4xl text-gray-300 dark:text-gray-600"></i>
+                                    <p>No Employee Operation Log available</p>
+                                </div>
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
     </x-ui.card>
     <div class="mt-6">{{ $employeeOperationLogs->links() }}</div>
 </div>

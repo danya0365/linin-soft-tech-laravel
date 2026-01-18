@@ -27,7 +27,7 @@
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150">
                             <td class="px-6 py-4 text-gray-900 dark:text-gray-100">{{ $i + $index + 1 }}</td>
                             <td class="px-6 py-4 text-gray-900 dark:text-gray-100">
-                                {{ $washingMachine->name ?? $washingMachine->id ?? 'Item #' . $loop->iteration }}
+                                <strong>Name:</strong> {{ $washingMachine->name ?? '-' }}<br><strong>Photo:</strong> {{ $washingMachine->photo ?? '-' }}<br><strong>Maximum Weight:</strong> {{ $washingMachine->maximum_weight ?? '-' }}
                             </td>
                             <td class="px-6 py-4">
                                 <x-crud.action-buttons :model="$washingMachine" resource="washing-machines" />

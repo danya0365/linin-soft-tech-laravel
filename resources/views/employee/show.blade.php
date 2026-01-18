@@ -16,7 +16,11 @@
             </div>
         </x-slot:header>
         <div class="grid md:grid-cols-2 gap-6">
-            
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Code</p><p class="font-semibold text-gray-900 dark:text-white">{{ $employee->code ?? '-' }}</p></div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Name</p><p class="font-semibold text-gray-900 dark:text-white">{{ $employee->name ?? '-' }}</p></div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Photo</p><p class="font-semibold text-gray-900 dark:text-white">{{ $employee->photo ?? '-' }}</p></div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Department Id</p><p class="font-semibold text-gray-900 dark:text-white">{{ $employee->department_id ?? '-' }}</p></div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Image Upload</p><p class="font-semibold text-gray-900 dark:text-white">{{ $employee->image_upload ?? '-' }}</p></div>
         </div>
     </x-ui.card>
 </div>

@@ -1,10 +1,4 @@
-<x-crud.form-group 
-    name="name"
-    label="Name"
-    :value="$customerGroup->name ?? old('name')"
-    placeholder="Enter customer group name"
-    required
-/>
+<x-crud.form-group name="name" label="Name" type="text" :value="$customerGroup->name ?? old('name')" placeholder="Enter Name" />
 
 <div class="flex items-center justify-end gap-3 mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
     <x-ui.button type="submit" variant="primary" icon="fa fa-save">

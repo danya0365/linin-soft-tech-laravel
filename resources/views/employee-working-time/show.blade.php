@@ -16,7 +16,9 @@
             </div>
         </x-slot:header>
         <div class="grid md:grid-cols-2 gap-6">
-            
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Employee Id</p><p class="font-semibold text-gray-900 dark:text-white">{{ $employeeWorkingTime->employee_id ?? '-' }}</p></div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Working Date</p><p class="font-semibold text-gray-900 dark:text-white">{{ $employeeWorkingTime->working_date ?? '-' }}</p></div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Time Duration</p><p class="font-semibold text-gray-900 dark:text-white">{{ $employeeWorkingTime->time_duration ?? '-' }}</p></div>
         </div>
     </x-ui.card>
 </div>

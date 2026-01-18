@@ -27,7 +27,7 @@
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150">
                             <td class="px-6 py-4 text-gray-900 dark:text-gray-100">{{ $i + $index + 1 }}</td>
                             <td class="px-6 py-4 text-gray-900 dark:text-gray-100">
-                                {{ $employee->name ?? $employee->id ?? 'Item #' . $loop->iteration }}
+                                <strong>Code:</strong> {{ $employee->code ?? '-' }}<br><strong>Name:</strong> {{ $employee->name ?? '-' }}<br><strong>Photo:</strong> {{ $employee->photo ?? '-' }}<br><strong>Department Id:</strong> {{ $employee->department_id ?? '-' }}<br><strong>Image Upload:</strong> {{ $employee->image_upload ?? '-' }}
                             </td>
                             <td class="px-6 py-4">
                                 <x-crud.action-buttons :model="$employee" resource="employees" />

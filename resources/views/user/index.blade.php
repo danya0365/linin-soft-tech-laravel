@@ -27,7 +27,7 @@
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150">
                             <td class="px-6 py-4 text-gray-900 dark:text-gray-100">{{ $i + $index + 1 }}</td>
                             <td class="px-6 py-4 text-gray-900 dark:text-gray-100">
-                                {{ $user->name ?? $user->id ?? 'Item #' . $loop->iteration }}
+                                <strong>Name:</strong> {{ $user->name ?? '-' }}<br><strong>Email:</strong> {{ $user->email ?? '-' }}<br><strong>Role:</strong> {{ $user->role ?? '-' }}<br><strong>Customer Account:</strong> {{ $user->customer_account ?? '-' }}<br><strong>Is Can Access Admin:</strong> {{ $user->is_can_access_admin ?? '-' }}<br><strong>Is Can Access Manager:</strong> {{ $user->is_can_access_manager ?? '-' }}<br><strong>Is Can Access Supervisor:</strong> {{ $user->is_can_access_supervisor ?? '-' }}<br><strong>Is Can Access Customer:</strong> {{ $user->is_can_access_customer ?? '-' }}<br><strong>Is Can Access Worker:</strong> {{ $user->is_can_access_worker ?? '-' }}
                             </td>
                             <td class="px-6 py-4">
                                 <x-crud.action-buttons :model="$user" resource="users" />

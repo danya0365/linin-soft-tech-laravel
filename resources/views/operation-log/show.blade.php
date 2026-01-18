@@ -16,7 +16,11 @@
             </div>
         </x-slot:header>
         <div class="grid md:grid-cols-2 gap-6">
-            
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Operation Id</p><p class="font-semibold text-gray-900 dark:text-white">{{ $operationLog->operation_id ?? '-' }}</p></div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Employee Id</p><p class="font-semibold text-gray-900 dark:text-white">{{ $operationLog->employee_id ?? '-' }}</p></div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Action Name</p><p class="font-semibold text-gray-900 dark:text-white">{{ $operationLog->action_name ?? '-' }}</p></div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Old Values</p><p class="font-semibold text-gray-900 dark:text-white">{{ $operationLog->old_values ?? '-' }}</p></div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">New Values</p><p class="font-semibold text-gray-900 dark:text-white">{{ $operationLog->new_values ?? '-' }}</p></div>
         </div>
     </x-ui.card>
 </div>

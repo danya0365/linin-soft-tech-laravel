@@ -16,7 +16,11 @@
             </div>
         </x-slot:header>
         <div class="grid md:grid-cols-2 gap-6">
-            
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Employee Id</p><p class="font-semibold text-gray-900 dark:text-white">{{ $inventoryStockLog->employee_id ?? '-' }}</p></div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Inventory Id</p><p class="font-semibold text-gray-900 dark:text-white">{{ $inventoryStockLog->inventory_id ?? '-' }}</p></div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Type</p><p class="font-semibold text-gray-900 dark:text-white">{{ $inventoryStockLog->type ?? '-' }}</p></div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Quantity</p><p class="font-semibold text-gray-900 dark:text-white">{{ $inventoryStockLog->quantity ?? '-' }}</p></div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Cost</p><p class="font-semibold text-gray-900 dark:text-white">{{ $inventoryStockLog->cost ?? '-' }}</p></div>
         </div>
     </x-ui.card>
 </div>

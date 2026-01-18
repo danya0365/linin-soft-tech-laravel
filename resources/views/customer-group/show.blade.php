@@ -1,14 +1,10 @@
 @extends('layouts.app')
 @section('template_title')
-    {{ $customerGroup->name ?? 'Show Customer Group' }}
+    Show Customer Group
 @endsection
 @section('content')
 <div class="container mx-auto px-4 py-6 max-w-4xl">
-    <x-crud.breadcrumb :items="[
-        ['label' => 'Admin', 'route' => 'admin'],
-        ['label' => 'Customer Groups', 'route' => 'customer-groups.index'],
-        ['label' => $customerGroup->name]
-    ]" />
+    <x-crud.breadcrumb :items="[['label' => 'Admin', 'route' => 'admin'],['label' => 'Customer Group', 'route' => 'customer-groups.index'],['label' => 'Details']]" />
     <x-ui.card>
         <x-slot:header>
             <div class="flex items-center justify-between">
@@ -19,9 +15,8 @@
                 </div>
             </div>
         </x-slot:header>
-        <div>
-            <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Name</p>
-            <p class="font-semibold text-gray-900 dark:text-white">{{ $customerGroup->name }}</p>
+        <div class="grid md:grid-cols-2 gap-6">
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Name</p><p class="font-semibold text-gray-900 dark:text-white">{{ $customerGroup->name ?? '-' }}</p></div>
         </div>
     </x-ui.card>
 </div>

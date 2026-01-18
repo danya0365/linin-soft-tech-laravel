@@ -16,7 +16,11 @@
             </div>
         </x-slot:header>
         <div class="grid md:grid-cols-2 gap-6">
-            
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Energy Resource Id</p><p class="font-semibold text-gray-900 dark:text-white">{{ $energyResourceLog->energy_resource_id ?? '-' }}</p></div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Employee Id</p><p class="font-semibold text-gray-900 dark:text-white">{{ $energyResourceLog->employee_id ?? '-' }}</p></div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Value</p><p class="font-semibold text-gray-900 dark:text-white">{{ $energyResourceLog->value ?? '-' }}</p></div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Unit</p><p class="font-semibold text-gray-900 dark:text-white">{{ $energyResourceLog->unit ?? '-' }}</p></div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Lot Number</p><p class="font-semibold text-gray-900 dark:text-white">{{ $energyResourceLog->lot_number ?? '-' }}</p></div>
         </div>
     </x-ui.card>
 </div>

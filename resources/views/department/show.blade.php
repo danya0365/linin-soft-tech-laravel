@@ -16,7 +16,9 @@
             </div>
         </x-slot:header>
         <div class="grid md:grid-cols-2 gap-6">
-            
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Var Name</p><p class="font-semibold text-gray-900 dark:text-white">{{ $department->var_name ?? '-' }}</p></div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Name</p><p class="font-semibold text-gray-900 dark:text-white">{{ $department->name ?? '-' }}</p></div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Input Unit</p><p class="font-semibold text-gray-900 dark:text-white">{{ $department->input_unit ?? '-' }}</p></div>
         </div>
     </x-ui.card>
 </div>

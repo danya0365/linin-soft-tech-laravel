@@ -16,7 +16,9 @@
             </div>
         </x-slot:header>
         <div class="grid md:grid-cols-2 gap-6">
-            
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Department Id</p><p class="font-semibold text-gray-900 dark:text-white">{{ $departmentDailyCostLog->department_id ?? '-' }}</p></div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Daily Date</p><p class="font-semibold text-gray-900 dark:text-white">{{ $departmentDailyCostLog->daily_date ?? '-' }}</p></div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Cost</p><p class="font-semibold text-gray-900 dark:text-white">{{ $departmentDailyCostLog->cost ?? '-' }}</p></div>
         </div>
     </x-ui.card>
 </div>

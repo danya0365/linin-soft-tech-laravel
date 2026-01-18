@@ -16,7 +16,10 @@
             </div>
         </x-slot:header>
         <div class="grid md:grid-cols-2 gap-6">
-            
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Type Name</p><p class="font-semibold text-gray-900 dark:text-white">{{ $income->type_name ?? '-' }}</p></div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Table Name</p><p class="font-semibold text-gray-900 dark:text-white">{{ $income->table_name ?? '-' }}</p></div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Table Id</p><p class="font-semibold text-gray-900 dark:text-white">{{ $income->table_id ?? '-' }}</p></div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Amount</p><p class="font-semibold text-gray-900 dark:text-white">{{ $income->amount ?? '-' }}</p></div>
         </div>
     </x-ui.card>
 </div>
