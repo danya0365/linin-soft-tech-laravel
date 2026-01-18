@@ -296,7 +296,13 @@ class GenerateCrudViews extends Command
         foreach ($fields as $field) {
             if ($field['name'] === 'id') continue;
             
-            $formGroups[] = "<x-crud.form-group name=\"{$field['name']}\" label=\"{$field['label']}\" type=\"{$field['type']}\" :value=\"\${$modelVar}->{$field['name']} ?? old('{$field['name']}')\" placeholder=\"Enter {$field['label']}\" />";
+            // Special handling for password field
+            if (str_contains($field['name'], 'password')) {
+                $formGroups[] = "{{-- Password field: Leave blank to keep existing password when editing --}}";
+                $formGroups[] = "<x-crud.form-group name=\"{$field['name']}\" label=\"{$field['label']}\" type=\"{$field['type']}\" :value=\"''\" placeholder=\"Enter {$field['label']} (optional for edit)\" />";
+            } else {
+                $formGroups[] = "<x-crud.form-group name=\"{$field['name']}\" label=\"{$field['label']}\" type=\"{$field['type']}\" :value=\"\${$modelVar}->{$field['name']} ?? old('{$field['name']}')\" placeholder=\"Enter {$field['label']}\" />";
+            }
         }
         
         $formGroupsStr = implode("\n", $formGroups);
@@ -321,7 +327,9 @@ class GenerateCrudViews extends Command
         
         $detailFields = [];
         foreach ($fields as $field) {
-            if ($field['name'] === 'id') continue;
+            // Skip ID and password fields in show view
+            if ($field['name'] === 'id' || str_contains($field['name'], 'password')) continue;
+            
             $detailFields[] = "<div><p class=\"text-sm text-gray-500 dark:text-gray-400 mb-1\">{$field['label']}</p><p class=\"font-semibold text-gray-900 dark:text-white\">{{ \${$modelVar}->{$field['name']} ?? '-' }}</p></div>";
         }
         

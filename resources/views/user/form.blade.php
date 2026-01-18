@@ -1,6 +1,7 @@
 <x-crud.form-group name="name" label="Name" type="text" :value="$user->name ?? old('name')" placeholder="Enter Name" />
 <x-crud.form-group name="email" label="Email" type="email" :value="$user->email ?? old('email')" placeholder="Enter Email" />
-<x-crud.form-group name="password" label="Password" type="password" :value="$user->password ?? old('password')" placeholder="Enter Password" />
+{{-- Password field: Leave blank to keep existing password when editing --}}
+<x-crud.form-group name="password" label="Password" type="password" :value="''" placeholder="Enter Password (optional for edit)" />
 <x-crud.form-group name="role" label="Role" type="text" :value="$user->role ?? old('role')" placeholder="Enter Role" />
 <x-crud.form-group name="customer_account" label="Customer Account" type="text" :value="$user->customer_account ?? old('customer_account')" placeholder="Enter Customer Account" />
 <x-crud.form-group name="is_can_access_admin" label="Is Can Access Admin" type="checkbox" :value="$user->is_can_access_admin ?? old('is_can_access_admin')" placeholder="Enter Is Can Access Admin" />
