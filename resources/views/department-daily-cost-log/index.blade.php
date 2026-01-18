@@ -7,16 +7,16 @@
     <x-crud.breadcrumb :items="[['label' => 'Admin', 'route' => 'admin'],['label' => 'Department Daily Cost Log']]" />
     <x-ui.card>
         <x-slot:header>
-            <x-crud.page-header title="Department Daily Cost Log" :createRoute="route('department-daily-cost-log.create')" />
+            <x-crud.page-header title="Department Daily Cost Log" :createRoute="route('department-daily-cost-logs.create')" />
         </x-slot:header>
         @if ($message = Session::get('success'))
             <x-ui.alert variant="success" dismissible="true">{{ $message }}</x-ui.alert>
         @endif
         <x-crud.data-table 
-            :headers="['No', 'Department Id', 'Daily Date', 'Cost', 'Actions']"
+            :headers="['No', 'Actions']"
             :data="$departmentDailyCostLogs"
-            :columns="['department_id', 'daily_date', 'cost']"
-            resource="department-daily-cost-log"
+            :columns="['']"
+            resource="department-daily-cost-logs"
             :startIndex="$i"
         />
     </x-ui.card>

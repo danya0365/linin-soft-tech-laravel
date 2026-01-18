@@ -7,16 +7,16 @@
     <x-crud.breadcrumb :items="[['label' => 'Admin', 'route' => 'admin'],['label' => 'Employee Working Time']]" />
     <x-ui.card>
         <x-slot:header>
-            <x-crud.page-header title="Employee Working Time" :createRoute="route('employee-working-time.create')" />
+            <x-crud.page-header title="Employee Working Time" :createRoute="route('employee-working-times.create')" />
         </x-slot:header>
         @if ($message = Session::get('success'))
             <x-ui.alert variant="success" dismissible="true">{{ $message }}</x-ui.alert>
         @endif
         <x-crud.data-table 
-            :headers="['No', 'Employee Id', 'Working Date', 'Time Duration', 'Actions']"
+            :headers="['No', 'Actions']"
             :data="$employeeWorkingTimes"
-            :columns="['employee_id', 'working_date', 'time_duration']"
-            resource="employee-working-time"
+            :columns="['']"
+            resource="employee-working-times"
             :startIndex="$i"
         />
     </x-ui.card>

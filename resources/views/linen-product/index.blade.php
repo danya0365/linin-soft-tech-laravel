@@ -7,16 +7,16 @@
     <x-crud.breadcrumb :items="[['label' => 'Admin', 'route' => 'admin'],['label' => 'Linen Product']]" />
     <x-ui.card>
         <x-slot:header>
-            <x-crud.page-header title="Linen Product" :createRoute="route('linen-product.create')" />
+            <x-crud.page-header title="Linen Product" :createRoute="route('linen-products.create')" />
         </x-slot:header>
         @if ($message = Session::get('success'))
             <x-ui.alert variant="success" dismissible="true">{{ $message }}</x-ui.alert>
         @endif
         <x-crud.data-table 
-            :headers="['No', 'Linen Type Id', 'Name', 'Actions']"
+            :headers="['No', 'Actions']"
             :data="$linenProducts"
-            :columns="['linen_type_id', 'name']"
-            resource="linen-product"
+            :columns="['']"
+            resource="linen-products"
             :startIndex="$i"
         />
     </x-ui.card>

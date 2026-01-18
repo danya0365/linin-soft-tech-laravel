@@ -74,7 +74,8 @@ class GenerateCrudViews extends Command
     protected function generateIndex($module, $fields, $force)
     {
         $variableName = Str::camel(Str::plural($module));
-        $routePrefix = Str::slug($module);
+        // Use plural for route names (Laravel standard)
+        $routePrefix = Str::slug(Str::plural($module));
         $title = Str::title(str_replace('-', ' ', $module));
         
         $headers = ['No'];
@@ -121,7 +122,7 @@ class GenerateCrudViews extends Command
     
     protected function generateCreate($module, $force)
     {
-        $routePrefix = Str::slug($module);
+        $routePrefix = Str::slug(Str::plural($module));
         $title = Str::title(str_replace('-', ' ', $module));
         
         $content = "@extends('layouts.app')
@@ -148,7 +149,7 @@ class GenerateCrudViews extends Command
     protected function generateEdit($module, $force)
     {
         $modelVar = Str::camel(Str::singular($module));
-        $routePrefix = Str::slug($module);
+        $routePrefix = Str::slug(Str::plural($module));
         $title = Str::title(str_replace('-', ' ', $module));
         
         $content = "@extends('layouts.app')
@@ -176,7 +177,7 @@ class GenerateCrudViews extends Command
     protected function generateForm($module, $fields, $force)
     {
         $modelVar = Str::camel(Str::singular($module));
-        $routePrefix = Str::slug($module);
+        $routePrefix = Str::slug(Str::plural($module));
         $title = Str::title(str_replace('-', ' ', $module));
         
         $formGroups = [];
@@ -203,7 +204,7 @@ class GenerateCrudViews extends Command
     protected function generateShow($module, $fields, $force)
     {
         $modelVar = Str::camel(Str::singular($module));
-        $routePrefix = Str::slug($module);
+        $routePrefix = Str::slug(Str::plural($module));
         $title = Str::title(str_replace('-', ' ', $module));
         
         $detailFields = [];

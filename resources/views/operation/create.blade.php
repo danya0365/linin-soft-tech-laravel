@@ -4,11 +4,11 @@
 @endsection
 @section('content')
 <div class="container mx-auto px-4 py-6 max-w-4xl">
-    <x-crud.breadcrumb :items="[['label' => 'Admin', 'route' => 'admin'],['label' => 'Operation', 'route' => 'operation.index'],['label' => 'Create']]" />
+    <x-crud.breadcrumb :items="[['label' => 'Admin', 'route' => 'admin'],['label' => 'Operation', 'route' => 'operations.index'],['label' => 'Create']]" />
     @includeif('partials.errors')
     <x-ui.card>
         <x-slot:header><h2 class="text-xl font-semibold text-gray-900 dark:text-white">Create Operation</h2></x-slot:header>
-        <form method="POST" action="{{ route('operation.store') }}" role="form" enctype="multipart/form-data">
+        <form method="POST" action="{{ route('operations.store') }}" role="form" enctype="multipart/form-data">
             @csrf
             @include('operation.form')
         </form>

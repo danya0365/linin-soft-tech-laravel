@@ -7,16 +7,16 @@
     <x-crud.breadcrumb :items="[['label' => 'Admin', 'route' => 'admin'],['label' => 'Login History']]" />
     <x-ui.card>
         <x-slot:header>
-            <x-crud.page-header title="Login History" :createRoute="route('login-history.create')" />
+            <x-crud.page-header title="Login History" :createRoute="route('login-histories.create')" />
         </x-slot:header>
         @if ($message = Session::get('success'))
             <x-ui.alert variant="success" dismissible="true">{{ $message }}</x-ui.alert>
         @endif
         <x-crud.data-table 
-            :headers="['No', 'User Id', 'Name', 'Email', 'Actions']"
+            :headers="['No', 'Actions']"
             :data="$loginHistories"
-            :columns="['user_id', 'name', 'email']"
-            resource="login-history"
+            :columns="['']"
+            resource="login-histories"
             :startIndex="$i"
         />
     </x-ui.card>

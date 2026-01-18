@@ -7,7 +7,7 @@
     <x-crud.breadcrumb :items="[['label' => 'Admin', 'route' => 'admin'],['label' => 'User']]" />
     <x-ui.card>
         <x-slot:header>
-            <x-crud.page-header title="User" :createRoute="route('user.create')" />
+            <x-crud.page-header title="User" :createRoute="route('users.create')" />
         </x-slot:header>
         @if ($message = Session::get('success'))
             <x-ui.alert variant="success" dismissible="true">{{ $message }}</x-ui.alert>
@@ -16,7 +16,7 @@
             :headers="['No', 'Actions']"
             :data="$users"
             :columns="['']"
-            resource="user"
+            resource="users"
             :startIndex="$i"
         />
     </x-ui.card>
