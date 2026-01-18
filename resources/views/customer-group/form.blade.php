@@ -1,14 +1,14 @@
-<div class="box box-info padding-1">
-    <div class="box-body">
-        
-        <div class="form-group">
-            {{ Form::label('name') }}
-            {{ Form::text('name', $customerGroup->name, ['class' => 'form-control' . ($errors->has('name') ? ' is-invalid' : ''), 'placeholder' => 'Name']) }}
-            {!! $errors->first('name', '<div class="invalid-feedback">:message</div>') !!}
-        </div>
+<x-crud.form-group 
+    name="name"
+    label="Name"
+    :value="$customerGroup->name ?? old('name')"
+    placeholder="Enter customer group name"
+    required
+/>
 
-    </div>
-    <div class="box-footer mt-4">
-        <button type="submit" class="btn btn-primary">Submit</button>
-    </div>
+<div class="flex items-center justify-end gap-3 mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+    <x-ui.button type="submit" variant="primary" icon="fa fa-save">
+        {{ isset($customerGroup->id) ? 'Update' : 'Create' }} Customer Group
+    </x-ui.button>
+    <x-ui.button :href="route('customer-groups.index')" variant="secondary" icon="fa fa-times">Cancel</x-ui.button>
 </div>
