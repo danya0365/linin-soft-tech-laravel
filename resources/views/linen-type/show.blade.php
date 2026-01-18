@@ -1,33 +1,23 @@
 @extends('layouts.app')
-
 @section('template_title')
-    {{ $linenType->name ?? 'Show Linen Type' }}
+    Show Linen Type
 @endsection
-
 @section('content')
-    <section class="content container">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="card-header">
-                        <div class="float-left">
-                            <span class="card-title">Show Linen Type</span>
-                        </div>
-                        <div class="float-right">
-                            <a class="btn btn-primary" href="{{ route('linen-types.index') }}"> Back</a>
-                        </div>
-                    </div>
-
-                    <div class="card-body">
-                        
-                        <div class="form-group">
-                            <strong>Name:</strong>
-                            {{ $linenType->name }}
-                        </div>
-
-                    </div>
+<div class="container mx-auto px-4 py-6 max-w-4xl">
+    <x-crud.breadcrumb :items="[['label' => 'Admin', 'route' => 'admin'],['label' => 'Linen Type', 'route' => 'linen-type.index'],['label' => 'Details']]" />
+    <x-ui.card>
+        <x-slot:header>
+            <div class="flex items-center justify-between">
+                <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Linen Type Details</h2>
+                <div class="flex items-center gap-2">
+                    <x-ui.button :href="route('linen-type.edit', $linenType->id)" variant="success" size="sm" icon="fa fa-edit">Edit</x-ui.button>
+                    <x-ui.button :href="route('linen-type.index')" variant="secondary" size="sm" icon="fa fa-arrow-left">Back</x-ui.button>
                 </div>
             </div>
+        </x-slot:header>
+        <div class="grid md:grid-cols-2 gap-6">
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Name</p><p class="font-semibold text-gray-900 dark:text-white">{{ $linenType->name ?? '-' }}</p></div>
         </div>
-    </section>
+    </x-ui.card>
+</div>
 @endsection

@@ -1,101 +1,40 @@
 @extends('layouts.app')
-
 @section('template_title')
-    {{ $operation->name ?? 'Show Operation' }}
+    Show Operation
 @endsection
-
 @section('content')
-    <section class="content container">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="card-header">
-                        <div class="float-left">
-                            <span class="card-title">Show Operation</span>
-                        </div>
-                        <div class="float-right">
-                            <a class="btn btn-primary" href="{{ route('operations.index') }}"> Back</a>
-                        </div>
-                    </div>
-
-                    <div class="card-body">
-                        
-                        <div class="form-group">
-                            <strong>Operation Type:</strong>
-                            {{ $operation->operation_type }}
-                        </div>
-                        <div class="form-group">
-                            <strong>Employee Id:</strong>
-                            {{ $operation->employee_id }}
-                        </div>
-                        <div class="form-group">
-                            <strong>Customer Id:</strong>
-                            {{ $operation->customer_id }}
-                        </div>
-                        <div class="form-group">
-                            <strong>Wash Employee Id:</strong>
-                            {{ $operation->wash_employee_id }}
-                        </div>
-                        <div class="form-group">
-                            <strong>Dry Employee Id:</strong>
-                            {{ $operation->dry_employee_id }}
-                        </div>
-                        <div class="form-group">
-                            <strong>Iron Employee Id:</strong>
-                            {{ $operation->iron_employee_id }}
-                        </div>
-                        <div class="form-group">
-                            <strong>Packing Employee Id:</strong>
-                            {{ $operation->packing_employee_id }}
-                        </div>
-                        <div class="form-group">
-                            <strong>Collect Employee Id:</strong>
-                            {{ $operation->collect_employee_id }}
-                        </div>
-                        <div class="form-group">
-                            <strong>Job Case:</strong>
-                            {{ $operation->job_case }}
-                        </div>
-                        <div class="form-group">
-                            <strong>Washing Machine Id:</strong>
-                            {{ $operation->washing_machine_id }}
-                        </div>
-                        <div class="form-group">
-                            <strong>Dryer Machine Id:</strong>
-                            {{ $operation->dryer_machine_id }}
-                        </div>
-                        <div class="form-group">
-                            <strong>Total Wet Weight:</strong>
-                            {{ $operation->total_wet_weight }}
-                        </div>
-                        <div class="form-group">
-                            <strong>Total Dry Weight:</strong>
-                            {{ $operation->total_dry_weight }}
-                        </div>
-                        <div class="form-group">
-                            <strong>Total Iron Piece:</strong>
-                            {{ $operation->total_iron_piece }}
-                        </div>
-                        <div class="form-group">
-                            <strong>Total Packing Piece:</strong>
-                            {{ $operation->total_packing_piece }}
-                        </div>
-                        <div class="form-group">
-                            <strong>Colors:</strong>
-                            {{ $operation->colors }}
-                        </div>
-                        <div class="form-group">
-                            <strong>Search Tags:</strong>
-                            {{ $operation->search_tags }}
-                        </div>
-                        <div class="form-group">
-                            <strong>Status:</strong>
-                            {{ $operation->status }}
-                        </div>
-
-                    </div>
+<div class="container mx-auto px-4 py-6 max-w-4xl">
+    <x-crud.breadcrumb :items="[['label' => 'Admin', 'route' => 'admin'],['label' => 'Operation', 'route' => 'operation.index'],['label' => 'Details']]" />
+    <x-ui.card>
+        <x-slot:header>
+            <div class="flex items-center justify-between">
+                <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Operation Details</h2>
+                <div class="flex items-center gap-2">
+                    <x-ui.button :href="route('operation.edit', $operation->id)" variant="success" size="sm" icon="fa fa-edit">Edit</x-ui.button>
+                    <x-ui.button :href="route('operation.index')" variant="secondary" size="sm" icon="fa fa-arrow-left">Back</x-ui.button>
                 </div>
             </div>
+        </x-slot:header>
+        <div class="grid md:grid-cols-2 gap-6">
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Operation Type</p><p class="font-semibold text-gray-900 dark:text-white">{{ $operation->operation_type ?? '-' }}</p></div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Employee Id</p><p class="font-semibold text-gray-900 dark:text-white">{{ $operation->employee_id ?? '-' }}</p></div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Customer Id</p><p class="font-semibold text-gray-900 dark:text-white">{{ $operation->customer_id ?? '-' }}</p></div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Wash Employee Id</p><p class="font-semibold text-gray-900 dark:text-white">{{ $operation->wash_employee_id ?? '-' }}</p></div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Dry Employee Id</p><p class="font-semibold text-gray-900 dark:text-white">{{ $operation->dry_employee_id ?? '-' }}</p></div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Iron Employee Id</p><p class="font-semibold text-gray-900 dark:text-white">{{ $operation->iron_employee_id ?? '-' }}</p></div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Packing Employee Id</p><p class="font-semibold text-gray-900 dark:text-white">{{ $operation->packing_employee_id ?? '-' }}</p></div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Collect Employee Id</p><p class="font-semibold text-gray-900 dark:text-white">{{ $operation->collect_employee_id ?? '-' }}</p></div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Job Case</p><p class="font-semibold text-gray-900 dark:text-white">{{ $operation->job_case ?? '-' }}</p></div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Washing Machine Id</p><p class="font-semibold text-gray-900 dark:text-white">{{ $operation->washing_machine_id ?? '-' }}</p></div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Dryer Machine Id</p><p class="font-semibold text-gray-900 dark:text-white">{{ $operation->dryer_machine_id ?? '-' }}</p></div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Total Wet Weight</p><p class="font-semibold text-gray-900 dark:text-white">{{ $operation->total_wet_weight ?? '-' }}</p></div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Total Dry Weight</p><p class="font-semibold text-gray-900 dark:text-white">{{ $operation->total_dry_weight ?? '-' }}</p></div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Total Iron Piece</p><p class="font-semibold text-gray-900 dark:text-white">{{ $operation->total_iron_piece ?? '-' }}</p></div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Total Packing Piece</p><p class="font-semibold text-gray-900 dark:text-white">{{ $operation->total_packing_piece ?? '-' }}</p></div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Colors</p><p class="font-semibold text-gray-900 dark:text-white">{{ $operation->colors ?? '-' }}</p></div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Search Tags</p><p class="font-semibold text-gray-900 dark:text-white">{{ $operation->search_tags ?? '-' }}</p></div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Status</p><p class="font-semibold text-gray-900 dark:text-white">{{ $operation->status ?? '-' }}</p></div>
         </div>
-    </section>
+    </x-ui.card>
+</div>
 @endsection

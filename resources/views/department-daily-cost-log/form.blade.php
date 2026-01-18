@@ -1,24 +1,10 @@
-<div class="box box-info padding-1">
-    <div class="box-body">
-        
-        <div class="form-group">
-            {{ Form::label('department_id') }}
-            {{ Form::text('department_id', $departmentDailyCostLog->department_id, ['class' => 'form-control' . ($errors->has('department_id') ? ' is-invalid' : ''), 'placeholder' => 'Department Id']) }}
-            {!! $errors->first('department_id', '<div class="invalid-feedback">:message</div>') !!}
-        </div>
-        <div class="form-group">
-            {{ Form::label('daily_date') }}
-            {{ Form::text('daily_date', $departmentDailyCostLog->daily_date, ['class' => 'form-control' . ($errors->has('daily_date') ? ' is-invalid' : ''), 'placeholder' => 'Daily Date']) }}
-            {!! $errors->first('daily_date', '<div class="invalid-feedback">:message</div>') !!}
-        </div>
-        <div class="form-group">
-            {{ Form::label('cost') }}
-            {{ Form::text('cost', $departmentDailyCostLog->cost, ['class' => 'form-control' . ($errors->has('cost') ? ' is-invalid' : ''), 'placeholder' => 'Cost']) }}
-            {!! $errors->first('cost', '<div class="invalid-feedback">:message</div>') !!}
-        </div>
+<x-crud.form-group name="department_id" label="Department Id" type="select" :value="$departmentDailyCostLog->department_id ?? old('department_id')" placeholder="Enter Department Id" />
+<x-crud.form-group name="daily_date" label="Daily Date" type="date" :value="$departmentDailyCostLog->daily_date ?? old('daily_date')" placeholder="Enter Daily Date" />
+<x-crud.form-group name="cost" label="Cost" type="number" :value="$departmentDailyCostLog->cost ?? old('cost')" placeholder="Enter Cost" />
 
-    </div>
-    <div class="box-footer mt20">
-        <button type="submit" class="btn btn-primary">Submit</button>
-    </div>
+<div class="flex items-center justify-end gap-3 mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+    <x-ui.button type="submit" variant="primary" icon="fa fa-save">
+        {{ isset($departmentDailyCostLog->id) ? 'Update' : 'Create' }} Department Daily Cost Log
+    </x-ui.button>
+    <x-ui.button :href="route('department-daily-cost-log.index')" variant="secondary" icon="fa fa-times">Cancel</x-ui.button>
 </div>

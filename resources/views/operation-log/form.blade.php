@@ -1,34 +1,12 @@
-<div class="box box-info padding-1">
-    <div class="box-body">
-        
-        <div class="form-group">
-            {{ Form::label('operation_id') }}
-            {{ Form::text('operation_id', $operationLog->operation_id, ['class' => 'form-control' . ($errors->has('operation_id') ? ' is-invalid' : ''), 'placeholder' => 'Operation Id']) }}
-            {!! $errors->first('operation_id', '<div class="invalid-feedback">:message</div>') !!}
-        </div>
-        <div class="form-group">
-            {{ Form::label('employee_id') }}
-            {{ Form::text('employee_id', $operationLog->employee_id, ['class' => 'form-control' . ($errors->has('employee_id') ? ' is-invalid' : ''), 'placeholder' => 'Employee Id']) }}
-            {!! $errors->first('employee_id', '<div class="invalid-feedback">:message</div>') !!}
-        </div>
-        <div class="form-group">
-            {{ Form::label('action_name') }}
-            {{ Form::text('action_name', $operationLog->action_name, ['class' => 'form-control' . ($errors->has('action_name') ? ' is-invalid' : ''), 'placeholder' => 'Action Name']) }}
-            {!! $errors->first('action_name', '<div class="invalid-feedback">:message</div>') !!}
-        </div>
-        <div class="form-group">
-            {{ Form::label('old_values') }}
-            {{ Form::text('old_values', $operationLog->old_values, ['class' => 'form-control' . ($errors->has('old_values') ? ' is-invalid' : ''), 'placeholder' => 'Old Values']) }}
-            {!! $errors->first('old_values', '<div class="invalid-feedback">:message</div>') !!}
-        </div>
-        <div class="form-group">
-            {{ Form::label('new_values') }}
-            {{ Form::text('new_values', $operationLog->new_values, ['class' => 'form-control' . ($errors->has('new_values') ? ' is-invalid' : ''), 'placeholder' => 'New Values']) }}
-            {!! $errors->first('new_values', '<div class="invalid-feedback">:message</div>') !!}
-        </div>
+<x-crud.form-group name="operation_id" label="Operation Id" type="select" :value="$operationLog->operation_id ?? old('operation_id')" placeholder="Enter Operation Id" />
+<x-crud.form-group name="employee_id" label="Employee Id" type="select" :value="$operationLog->employee_id ?? old('employee_id')" placeholder="Enter Employee Id" />
+<x-crud.form-group name="action_name" label="Action Name" type="text" :value="$operationLog->action_name ?? old('action_name')" placeholder="Enter Action Name" />
+<x-crud.form-group name="old_values" label="Old Values" type="text" :value="$operationLog->old_values ?? old('old_values')" placeholder="Enter Old Values" />
+<x-crud.form-group name="new_values" label="New Values" type="text" :value="$operationLog->new_values ?? old('new_values')" placeholder="Enter New Values" />
 
-    </div>
-    <div class="box-footer mt20">
-        <button type="submit" class="btn btn-primary">Submit</button>
-    </div>
+<div class="flex items-center justify-end gap-3 mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+    <x-ui.button type="submit" variant="primary" icon="fa fa-save">
+        {{ isset($operationLog->id) ? 'Update' : 'Create' }} Operation Log
+    </x-ui.button>
+    <x-ui.button :href="route('operation-log.index')" variant="secondary" icon="fa fa-times">Cancel</x-ui.button>
 </div>

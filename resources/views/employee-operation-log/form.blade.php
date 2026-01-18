@@ -1,24 +1,10 @@
-<div class="box box-info padding-1">
-    <div class="box-body">
-        
-        <div class="form-group">
-            {{ Form::label('employee_id') }}
-            {{ Form::text('employee_id', $employeeOperationLog->employee_id, ['class' => 'form-control' . ($errors->has('employee_id') ? ' is-invalid' : ''), 'placeholder' => 'Employee Id']) }}
-            {!! $errors->first('employee_id', '<div class="invalid-feedback">:message</div>') !!}
-        </div>
-        <div class="form-group">
-            {{ Form::label('operation_type') }}
-            {{ Form::text('operation_type', $employeeOperationLog->operation_type, ['class' => 'form-control' . ($errors->has('operation_type') ? ' is-invalid' : ''), 'placeholder' => 'Operation Type']) }}
-            {!! $errors->first('operation_type', '<div class="invalid-feedback">:message</div>') !!}
-        </div>
-        <div class="form-group">
-            {{ Form::label('action_type') }}
-            {{ Form::text('action_type', $employeeOperationLog->action_type, ['class' => 'form-control' . ($errors->has('action_type') ? ' is-invalid' : ''), 'placeholder' => 'Action Type']) }}
-            {!! $errors->first('action_type', '<div class="invalid-feedback">:message</div>') !!}
-        </div>
+<x-crud.form-group name="employee_id" label="Employee Id" type="select" :value="$employeeOperationLog->employee_id ?? old('employee_id')" placeholder="Enter Employee Id" />
+<x-crud.form-group name="operation_type" label="Operation Type" type="text" :value="$employeeOperationLog->operation_type ?? old('operation_type')" placeholder="Enter Operation Type" />
+<x-crud.form-group name="action_type" label="Action Type" type="text" :value="$employeeOperationLog->action_type ?? old('action_type')" placeholder="Enter Action Type" />
 
-    </div>
-    <div class="box-footer mt-4">
-        <button type="submit" class="btn btn-primary">Submit</button>
-    </div>
+<div class="flex items-center justify-end gap-3 mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+    <x-ui.button type="submit" variant="primary" icon="fa fa-save">
+        {{ isset($employeeOperationLog->id) ? 'Update' : 'Create' }} Employee Operation Log
+    </x-ui.button>
+    <x-ui.button :href="route('employee-operation-log.index')" variant="secondary" icon="fa fa-times">Cancel</x-ui.button>
 </div>

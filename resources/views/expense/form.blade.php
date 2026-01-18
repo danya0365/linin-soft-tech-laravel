@@ -1,29 +1,11 @@
-<div class="box box-info padding-1">
-    <div class="box-body">
-        
-        <div class="form-group">
-            {{ Form::label('type_name') }}
-            {{ Form::text('type_name', $expense->type_name, ['class' => 'form-control' . ($errors->has('type_name') ? ' is-invalid' : ''), 'placeholder' => 'Type Name']) }}
-            {!! $errors->first('type_name', '<div class="invalid-feedback">:message</div>') !!}
-        </div>
-        <div class="form-group">
-            {{ Form::label('table_name') }}
-            {{ Form::text('table_name', $expense->table_name, ['class' => 'form-control' . ($errors->has('table_name') ? ' is-invalid' : ''), 'placeholder' => 'Table Name']) }}
-            {!! $errors->first('table_name', '<div class="invalid-feedback">:message</div>') !!}
-        </div>
-        <div class="form-group">
-            {{ Form::label('table_id') }}
-            {{ Form::text('table_id', $expense->table_id, ['class' => 'form-control' . ($errors->has('table_id') ? ' is-invalid' : ''), 'placeholder' => 'Table Id']) }}
-            {!! $errors->first('table_id', '<div class="invalid-feedback">:message</div>') !!}
-        </div>
-        <div class="form-group">
-            {{ Form::label('amount') }}
-            {{ Form::text('amount', $expense->amount, ['class' => 'form-control' . ($errors->has('amount') ? ' is-invalid' : ''), 'placeholder' => 'Amount']) }}
-            {!! $errors->first('amount', '<div class="invalid-feedback">:message</div>') !!}
-        </div>
+<x-crud.form-group name="type_name" label="Type Name" type="text" :value="$expense->type_name ?? old('type_name')" placeholder="Enter Type Name" />
+<x-crud.form-group name="table_name" label="Table Name" type="text" :value="$expense->table_name ?? old('table_name')" placeholder="Enter Table Name" />
+<x-crud.form-group name="table_id" label="Table Id" type="select" :value="$expense->table_id ?? old('table_id')" placeholder="Enter Table Id" />
+<x-crud.form-group name="amount" label="Amount" type="text" :value="$expense->amount ?? old('amount')" placeholder="Enter Amount" />
 
-    </div>
-    <div class="box-footer mt20">
-        <button type="submit" class="btn btn-primary">Submit</button>
-    </div>
+<div class="flex items-center justify-end gap-3 mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+    <x-ui.button type="submit" variant="primary" icon="fa fa-save">
+        {{ isset($expense->id) ? 'Update' : 'Create' }} Expense
+    </x-ui.button>
+    <x-ui.button :href="route('expense.index')" variant="secondary" icon="fa fa-times">Cancel</x-ui.button>
 </div>

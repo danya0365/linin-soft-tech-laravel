@@ -1,24 +1,10 @@
-<div class="box box-info padding-1">
-    <div class="box-body">
-        
-        <div class="form-group">
-            {{ Form::label('user_id') }}
-            {{ Form::text('user_id', $loginHistory->user_id, ['class' => 'form-control' . ($errors->has('user_id') ? ' is-invalid' : ''), 'placeholder' => 'User Id']) }}
-            {!! $errors->first('user_id', '<div class="invalid-feedback">:message</div>') !!}
-        </div>
-        <div class="form-group">
-            {{ Form::label('name') }}
-            {{ Form::text('name', $loginHistory->name, ['class' => 'form-control' . ($errors->has('name') ? ' is-invalid' : ''), 'placeholder' => 'Name']) }}
-            {!! $errors->first('name', '<div class="invalid-feedback">:message</div>') !!}
-        </div>
-        <div class="form-group">
-            {{ Form::label('email') }}
-            {{ Form::text('email', $loginHistory->email, ['class' => 'form-control' . ($errors->has('email') ? ' is-invalid' : ''), 'placeholder' => 'Email']) }}
-            {!! $errors->first('email', '<div class="invalid-feedback">:message</div>') !!}
-        </div>
+<x-crud.form-group name="user_id" label="User Id" type="select" :value="$loginHistory->user_id ?? old('user_id')" placeholder="Enter User Id" />
+<x-crud.form-group name="name" label="Name" type="text" :value="$loginHistory->name ?? old('name')" placeholder="Enter Name" />
+<x-crud.form-group name="email" label="Email" type="email" :value="$loginHistory->email ?? old('email')" placeholder="Enter Email" />
 
-    </div>
-    <div class="box-footer mt-4">
-        <button type="submit" class="btn btn-primary">Submit</button>
-    </div>
+<div class="flex items-center justify-end gap-3 mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+    <x-ui.button type="submit" variant="primary" icon="fa fa-save">
+        {{ isset($loginHistory->id) ? 'Update' : 'Create' }} Login History
+    </x-ui.button>
+    <x-ui.button :href="route('login-history.index')" variant="secondary" icon="fa fa-times">Cancel</x-ui.button>
 </div>

@@ -1,53 +1,28 @@
 @extends('layouts.app')
-
 @section('template_title')
-    {{ $note->name ?? 'Show Note' }}
+    Show Note
 @endsection
-
 @section('content')
-    <section class="content container-fluid">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="card-header">
-                        <div class="float-left">
-                            <span class="card-title">Show Note</span>
-                        </div>
-                        <div class="float-right">
-                            <a class="btn btn-primary" href="{{ route('notes.index') }}"> Back</a>
-                        </div>
-                    </div>
-
-                    <div class="card-body">
-                        
-                        <div class="form-group">
-                            <strong>Message:</strong>
-                            {{ $note->message }}
-                        </div>
-                        <div class="form-group">
-                            <strong>Image Url:</strong>
-                            {{ $note->image_url }}
-                        </div>
-                        <div class="form-group">
-                            <strong>Cost:</strong>
-                            {{ $note->cost }}
-                        </div>
-                        <div class="form-group">
-                            <strong>Washing Machine Id:</strong>
-                            {{ $note->washing_machine_id }}
-                        </div>
-                        <div class="form-group">
-                            <strong>Dryer Machine Id:</strong>
-                            {{ $note->dryer_machine_id }}
-                        </div>
-                        <div class="form-group">
-                            <strong>Truck Id:</strong>
-                            {{ $note->truck_id }}
-                        </div>
-
-                    </div>
+<div class="container mx-auto px-4 py-6 max-w-4xl">
+    <x-crud.breadcrumb :items="[['label' => 'Admin', 'route' => 'admin'],['label' => 'Note', 'route' => 'note.index'],['label' => 'Details']]" />
+    <x-ui.card>
+        <x-slot:header>
+            <div class="flex items-center justify-between">
+                <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Note Details</h2>
+                <div class="flex items-center gap-2">
+                    <x-ui.button :href="route('note.edit', $note->id)" variant="success" size="sm" icon="fa fa-edit">Edit</x-ui.button>
+                    <x-ui.button :href="route('note.index')" variant="secondary" size="sm" icon="fa fa-arrow-left">Back</x-ui.button>
                 </div>
             </div>
+        </x-slot:header>
+        <div class="grid md:grid-cols-2 gap-6">
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Message</p><p class="font-semibold text-gray-900 dark:text-white">{{ $note->message ?? '-' }}</p></div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Image Url</p><p class="font-semibold text-gray-900 dark:text-white">{{ $note->image_url ?? '-' }}</p></div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Cost</p><p class="font-semibold text-gray-900 dark:text-white">{{ $note->cost ?? '-' }}</p></div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Washing Machine Id</p><p class="font-semibold text-gray-900 dark:text-white">{{ $note->washing_machine_id ?? '-' }}</p></div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Dryer Machine Id</p><p class="font-semibold text-gray-900 dark:text-white">{{ $note->dryer_machine_id ?? '-' }}</p></div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Truck Id</p><p class="font-semibold text-gray-900 dark:text-white">{{ $note->truck_id ?? '-' }}</p></div>
         </div>
-    </section>
+    </x-ui.card>
+</div>
 @endsection

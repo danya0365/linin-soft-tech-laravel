@@ -1,24 +1,10 @@
-<div class="box box-info padding-1">
-    <div class="box-body">
-        
-        <div class="form-group">
-            {{ Form::label('var_name') }}
-            {{ Form::text('var_name', $department->var_name, ['class' => 'form-control' . ($errors->has('var_name') ? ' is-invalid' : ''), 'placeholder' => 'Var Name']) }}
-            {!! $errors->first('var_name', '<div class="invalid-feedback">:message</div>') !!}
-        </div>
-        <div class="form-group">
-            {{ Form::label('name') }}
-            {{ Form::text('name', $department->name, ['class' => 'form-control' . ($errors->has('name') ? ' is-invalid' : ''), 'placeholder' => 'Name']) }}
-            {!! $errors->first('name', '<div class="invalid-feedback">:message</div>') !!}
-        </div>
-        <div class="form-group">
-            {{ Form::label('input_unit') }}
-            {{ Form::text('input_unit', $department->input_unit, ['class' => 'form-control' . ($errors->has('input_unit') ? ' is-invalid' : ''), 'placeholder' => 'Input Unit']) }}
-            {!! $errors->first('input_unit', '<div class="invalid-feedback">:message</div>') !!}
-        </div>
+<x-crud.form-group name="var_name" label="Var Name" type="text" :value="$department->var_name ?? old('var_name')" placeholder="Enter Var Name" />
+<x-crud.form-group name="name" label="Name" type="text" :value="$department->name ?? old('name')" placeholder="Enter Name" />
+<x-crud.form-group name="input_unit" label="Input Unit" type="text" :value="$department->input_unit ?? old('input_unit')" placeholder="Enter Input Unit" />
 
-    </div>
-    <div class="box-footer mt-4">
-        <button type="submit" class="btn btn-primary">Submit</button>
-    </div>
+<div class="flex items-center justify-end gap-3 mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+    <x-ui.button type="submit" variant="primary" icon="fa fa-save">
+        {{ isset($department->id) ? 'Update' : 'Create' }} Department
+    </x-ui.button>
+    <x-ui.button :href="route('department.index')" variant="secondary" icon="fa fa-times">Cancel</x-ui.button>
 </div>

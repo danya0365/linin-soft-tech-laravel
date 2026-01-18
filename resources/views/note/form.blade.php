@@ -1,39 +1,13 @@
-<div class="box box-info padding-1">
-    <div class="box-body">
-        
-        <div class="form-group">
-            {{ Form::label('message') }}
-            {{ Form::text('message', $note->message, ['class' => 'form-control' . ($errors->has('message') ? ' is-invalid' : ''), 'placeholder' => 'Message']) }}
-            {!! $errors->first('message', '<div class="invalid-feedback">:message</div>') !!}
-        </div>
-        <div class="form-group">
-            {{ Form::label('image_url') }}
-            {{ Form::text('image_url', $note->image_url, ['class' => 'form-control' . ($errors->has('image_url') ? ' is-invalid' : ''), 'placeholder' => 'Image Url']) }}
-            {!! $errors->first('image_url', '<div class="invalid-feedback">:message</div>') !!}
-        </div>
-        <div class="form-group">
-            {{ Form::label('cost') }}
-            {{ Form::text('cost', $note->cost, ['class' => 'form-control' . ($errors->has('cost') ? ' is-invalid' : ''), 'placeholder' => 'Cost']) }}
-            {!! $errors->first('cost', '<div class="invalid-feedback">:message</div>') !!}
-        </div>
-        <div class="form-group">
-            {{ Form::label('washing_machine_id') }}
-            {{ Form::text('washing_machine_id', $note->washing_machine_id, ['class' => 'form-control' . ($errors->has('washing_machine_id') ? ' is-invalid' : ''), 'placeholder' => 'Washing Machine Id']) }}
-            {!! $errors->first('washing_machine_id', '<div class="invalid-feedback">:message</div>') !!}
-        </div>
-        <div class="form-group">
-            {{ Form::label('dryer_machine_id') }}
-            {{ Form::text('dryer_machine_id', $note->dryer_machine_id, ['class' => 'form-control' . ($errors->has('dryer_machine_id') ? ' is-invalid' : ''), 'placeholder' => 'Dryer Machine Id']) }}
-            {!! $errors->first('dryer_machine_id', '<div class="invalid-feedback">:message</div>') !!}
-        </div>
-        <div class="form-group">
-            {{ Form::label('truck_id') }}
-            {{ Form::text('truck_id', $note->truck_id, ['class' => 'form-control' . ($errors->has('truck_id') ? ' is-invalid' : ''), 'placeholder' => 'Truck Id']) }}
-            {!! $errors->first('truck_id', '<div class="invalid-feedback">:message</div>') !!}
-        </div>
+<x-crud.form-group name="message" label="Message" type="textarea" :value="$note->message ?? old('message')" placeholder="Enter Message" />
+<x-crud.form-group name="image_url" label="Image Url" type="text" :value="$note->image_url ?? old('image_url')" placeholder="Enter Image Url" />
+<x-crud.form-group name="cost" label="Cost" type="number" :value="$note->cost ?? old('cost')" placeholder="Enter Cost" />
+<x-crud.form-group name="washing_machine_id" label="Washing Machine Id" type="select" :value="$note->washing_machine_id ?? old('washing_machine_id')" placeholder="Enter Washing Machine Id" />
+<x-crud.form-group name="dryer_machine_id" label="Dryer Machine Id" type="select" :value="$note->dryer_machine_id ?? old('dryer_machine_id')" placeholder="Enter Dryer Machine Id" />
+<x-crud.form-group name="truck_id" label="Truck Id" type="select" :value="$note->truck_id ?? old('truck_id')" placeholder="Enter Truck Id" />
 
-    </div>
-    <div class="box-footer mt20">
-        <button type="submit" class="btn btn-primary">Submit</button>
-    </div>
+<div class="flex items-center justify-end gap-3 mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+    <x-ui.button type="submit" variant="primary" icon="fa fa-save">
+        {{ isset($note->id) ? 'Update' : 'Create' }} Note
+    </x-ui.button>
+    <x-ui.button :href="route('note.index')" variant="secondary" icon="fa fa-times">Cancel</x-ui.button>
 </div>

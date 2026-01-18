@@ -1,30 +1,17 @@
 @extends('layouts.app')
-
 @section('template_title')
     Create Note
 @endsection
-
 @section('content')
-    <section class="content container-fluid">
-        <div class="row">
-            <div class="col-md-12">
-
-                @includeif('partials.errors')
-
-                <div class="card card-default">
-                    <div class="card-header">
-                        <span class="card-title">Create Note</span>
-                    </div>
-                    <div class="card-body">
-                        <form method="POST" action="{{ route('notes.store') }}"  role="form" enctype="multipart/form-data">
-                            @csrf
-
-                            @include('note.form')
-
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+<div class="container mx-auto px-4 py-6 max-w-4xl">
+    <x-crud.breadcrumb :items="[['label' => 'Admin', 'route' => 'admin'],['label' => 'Note', 'route' => 'note.index'],['label' => 'Create']]" />
+    @includeif('partials.errors')
+    <x-ui.card>
+        <x-slot:header><h2 class="text-xl font-semibold text-gray-900 dark:text-white">Create Note</h2></x-slot:header>
+        <form method="POST" action="{{ route('note.store') }}" role="form" enctype="multipart/form-data">
+            @csrf
+            @include('note.form')
+        </form>
+    </x-ui.card>
+</div>
 @endsection

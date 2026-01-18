@@ -1,49 +1,27 @@
 @extends('layouts.app')
-
 @section('template_title')
-    {{ $operationLog->name ?? 'Show Operation Log' }}
+    Show Operation Log
 @endsection
-
 @section('content')
-    <section class="content container">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="card-header">
-                        <div class="float-left">
-                            <span class="card-title">Show Operation Log</span>
-                        </div>
-                        <div class="float-right">
-                            <a class="btn btn-primary" href="{{ route('operation-logs.index') }}"> Back</a>
-                        </div>
-                    </div>
-
-                    <div class="card-body">
-                        
-                        <div class="form-group">
-                            <strong>Operation Id:</strong>
-                            {{ $operationLog->operation_id }}
-                        </div>
-                        <div class="form-group">
-                            <strong>Employee Id:</strong>
-                            {{ $operationLog->employee_id }}
-                        </div>
-                        <div class="form-group">
-                            <strong>Action Name:</strong>
-                            {{ $operationLog->action_name }}
-                        </div>
-                        <div class="form-group">
-                            <strong>Old Values:</strong>
-                            {{ $operationLog->old_values }}
-                        </div>
-                        <div class="form-group">
-                            <strong>New Values:</strong>
-                            {{ $operationLog->new_values }}
-                        </div>
-
-                    </div>
+<div class="container mx-auto px-4 py-6 max-w-4xl">
+    <x-crud.breadcrumb :items="[['label' => 'Admin', 'route' => 'admin'],['label' => 'Operation Log', 'route' => 'operation-log.index'],['label' => 'Details']]" />
+    <x-ui.card>
+        <x-slot:header>
+            <div class="flex items-center justify-between">
+                <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Operation Log Details</h2>
+                <div class="flex items-center gap-2">
+                    <x-ui.button :href="route('operation-log.edit', $operationLog->id)" variant="success" size="sm" icon="fa fa-edit">Edit</x-ui.button>
+                    <x-ui.button :href="route('operation-log.index')" variant="secondary" size="sm" icon="fa fa-arrow-left">Back</x-ui.button>
                 </div>
             </div>
+        </x-slot:header>
+        <div class="grid md:grid-cols-2 gap-6">
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Operation Id</p><p class="font-semibold text-gray-900 dark:text-white">{{ $operationLog->operation_id ?? '-' }}</p></div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Employee Id</p><p class="font-semibold text-gray-900 dark:text-white">{{ $operationLog->employee_id ?? '-' }}</p></div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Action Name</p><p class="font-semibold text-gray-900 dark:text-white">{{ $operationLog->action_name ?? '-' }}</p></div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Old Values</p><p class="font-semibold text-gray-900 dark:text-white">{{ $operationLog->old_values ?? '-' }}</p></div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">New Values</p><p class="font-semibold text-gray-900 dark:text-white">{{ $operationLog->new_values ?? '-' }}</p></div>
         </div>
-    </section>
+    </x-ui.card>
+</div>
 @endsection

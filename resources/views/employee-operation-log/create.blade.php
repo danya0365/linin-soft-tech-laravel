@@ -1,30 +1,17 @@
 @extends('layouts.app')
-
 @section('template_title')
     Create Employee Operation Log
 @endsection
-
 @section('content')
-    <section class="content container">
-        <div class="row">
-            <div class="col-md-12">
-
-                @includeif('partials.errors')
-
-                <div class="card card-default">
-                    <div class="card-header">
-                        <span class="card-title">Create Employee Operation Log</span>
-                    </div>
-                    <div class="card-body">
-                        <form method="POST" action="{{ route('employee-operation-logs.store') }}"  role="form" enctype="multipart/form-data">
-                            @csrf
-
-                            @include('employee-operation-log.form')
-
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+<div class="container mx-auto px-4 py-6 max-w-4xl">
+    <x-crud.breadcrumb :items="[['label' => 'Admin', 'route' => 'admin'],['label' => 'Employee Operation Log', 'route' => 'employee-operation-log.index'],['label' => 'Create']]" />
+    @includeif('partials.errors')
+    <x-ui.card>
+        <x-slot:header><h2 class="text-xl font-semibold text-gray-900 dark:text-white">Create Employee Operation Log</h2></x-slot:header>
+        <form method="POST" action="{{ route('employee-operation-log.store') }}" role="form" enctype="multipart/form-data">
+            @csrf
+            @include('employee-operation-log.form')
+        </form>
+    </x-ui.card>
+</div>
 @endsection

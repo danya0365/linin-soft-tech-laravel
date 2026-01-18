@@ -1,34 +1,12 @@
-<div class="box box-info padding-1">
-    <div class="box-body">
-        
-        <div class="form-group">
-            {{ Form::label('energy_resource_id') }}
-            {{ Form::text('energy_resource_id', $energyResourceLog->energy_resource_id, ['class' => 'form-control' . ($errors->has('energy_resource_id') ? ' is-invalid' : ''), 'placeholder' => 'Energy Resource Id']) }}
-            {!! $errors->first('energy_resource_id', '<div class="invalid-feedback">:message</div>') !!}
-        </div>
-        <div class="form-group">
-            {{ Form::label('employee_id') }}
-            {{ Form::text('employee_id', $energyResourceLog->employee_id, ['class' => 'form-control' . ($errors->has('employee_id') ? ' is-invalid' : ''), 'placeholder' => 'Employee Id']) }}
-            {!! $errors->first('employee_id', '<div class="invalid-feedback">:message</div>') !!}
-        </div>
-        <div class="form-group">
-            {{ Form::label('value') }}
-            {{ Form::text('value', $energyResourceLog->value, ['class' => 'form-control' . ($errors->has('value') ? ' is-invalid' : ''), 'placeholder' => 'Value']) }}
-            {!! $errors->first('value', '<div class="invalid-feedback">:message</div>') !!}
-        </div>
-        <div class="form-group">
-            {{ Form::label('unit') }}
-            {{ Form::text('unit', $energyResourceLog->unit, ['class' => 'form-control' . ($errors->has('unit') ? ' is-invalid' : ''), 'placeholder' => 'Unit']) }}
-            {!! $errors->first('unit', '<div class="invalid-feedback">:message</div>') !!}
-        </div>
-        <div class="form-group">
-            {{ Form::label('lot_number') }}
-            {{ Form::text('lot_number', $energyResourceLog->lot_number, ['class' => 'form-control' . ($errors->has('lot_number') ? ' is-invalid' : ''), 'placeholder' => 'Lot Number']) }}
-            {!! $errors->first('lot_number', '<div class="invalid-feedback">:message</div>') !!}
-        </div>
+<x-crud.form-group name="energy_resource_id" label="Energy Resource Id" type="select" :value="$energyResourceLog->energy_resource_id ?? old('energy_resource_id')" placeholder="Enter Energy Resource Id" />
+<x-crud.form-group name="employee_id" label="Employee Id" type="select" :value="$energyResourceLog->employee_id ?? old('employee_id')" placeholder="Enter Employee Id" />
+<x-crud.form-group name="value" label="Value" type="text" :value="$energyResourceLog->value ?? old('value')" placeholder="Enter Value" />
+<x-crud.form-group name="unit" label="Unit" type="text" :value="$energyResourceLog->unit ?? old('unit')" placeholder="Enter Unit" />
+<x-crud.form-group name="lot_number" label="Lot Number" type="text" :value="$energyResourceLog->lot_number ?? old('lot_number')" placeholder="Enter Lot Number" />
 
-    </div>
-    <div class="box-footer mt20">
-        <button type="submit" class="btn btn-primary">Submit</button>
-    </div>
+<div class="flex items-center justify-end gap-3 mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+    <x-ui.button type="submit" variant="primary" icon="fa fa-save">
+        {{ isset($energyResourceLog->id) ? 'Update' : 'Create' }} Energy Resource Log
+    </x-ui.button>
+    <x-ui.button :href="route('energy-resource-log.index')" variant="secondary" icon="fa fa-times">Cancel</x-ui.button>
 </div>

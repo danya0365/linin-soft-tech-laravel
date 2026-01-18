@@ -1,41 +1,25 @@
 @extends('layouts.app')
-
 @section('template_title')
-    {{ $employeeWorkingTime->name ?? 'Show Employee Working Time' }}
+    Show Employee Working Time
 @endsection
-
 @section('content')
-    <section class="content container">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="card-header">
-                        <div class="float-left">
-                            <span class="card-title">Show Employee Working Time</span>
-                        </div>
-                        <div class="float-right">
-                            <a class="btn btn-primary" href="{{ route('employee-working-times.index') }}"> Back</a>
-                        </div>
-                    </div>
-
-                    <div class="card-body">
-                        
-                        <div class="form-group">
-                            <strong>Employee Id:</strong>
-                            {{ $employeeWorkingTime->employee_id }}
-                        </div>
-                        <div class="form-group">
-                            <strong>Working Date:</strong>
-                            {{ $employeeWorkingTime->working_date }}
-                        </div>
-                        <div class="form-group">
-                            <strong>Time Duration:</strong>
-                            {{ $employeeWorkingTime->time_duration }}
-                        </div>
-
-                    </div>
+<div class="container mx-auto px-4 py-6 max-w-4xl">
+    <x-crud.breadcrumb :items="[['label' => 'Admin', 'route' => 'admin'],['label' => 'Employee Working Time', 'route' => 'employee-working-time.index'],['label' => 'Details']]" />
+    <x-ui.card>
+        <x-slot:header>
+            <div class="flex items-center justify-between">
+                <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Employee Working Time Details</h2>
+                <div class="flex items-center gap-2">
+                    <x-ui.button :href="route('employee-working-time.edit', $employeeWorkingTime->id)" variant="success" size="sm" icon="fa fa-edit">Edit</x-ui.button>
+                    <x-ui.button :href="route('employee-working-time.index')" variant="secondary" size="sm" icon="fa fa-arrow-left">Back</x-ui.button>
                 </div>
             </div>
+        </x-slot:header>
+        <div class="grid md:grid-cols-2 gap-6">
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Employee Id</p><p class="font-semibold text-gray-900 dark:text-white">{{ $employeeWorkingTime->employee_id ?? '-' }}</p></div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Working Date</p><p class="font-semibold text-gray-900 dark:text-white">{{ $employeeWorkingTime->working_date ?? '-' }}</p></div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Time Duration</p><p class="font-semibold text-gray-900 dark:text-white">{{ $employeeWorkingTime->time_duration ?? '-' }}</p></div>
         </div>
-    </section>
+    </x-ui.card>
+</div>
 @endsection

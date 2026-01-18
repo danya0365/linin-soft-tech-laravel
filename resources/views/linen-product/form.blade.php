@@ -1,26 +1,9 @@
-<div class="box box-info padding-1">
-    <div class="box-body">
-        
-        <div class="form-group">
-            {{ Form::label('linen_type_id') }}
-            <select name="linen_type_id" class="form-select">
-                <option value=""></option>
-            @foreach (App\Models\LinenType::get() as $linenType)
-                <option value="{{ $linenType->id }}" @selected($linenProduct->linen_type_id == $linenType->id)>
-                    {{ $linenType->name }}
-                </option>
-            @endforeach
-            </select>
-            {!! $errors->first('linen_type_id', '<div class="invalid-feedback">:message</div>') !!}
-        </div>
-        <div class="form-group">
-            {{ Form::label('name') }}
-            {{ Form::text('name', $linenProduct->name, ['class' => 'form-control' . ($errors->has('name') ? ' is-invalid' : ''), 'placeholder' => 'Name']) }}
-            {!! $errors->first('name', '<div class="invalid-feedback">:message</div>') !!}
-        </div>
+<x-crud.form-group name="linen_type_id" label="Linen Type Id" type="select" :value="$linenProduct->linen_type_id ?? old('linen_type_id')" placeholder="Enter Linen Type Id" />
+<x-crud.form-group name="name" label="Name" type="text" :value="$linenProduct->name ?? old('name')" placeholder="Enter Name" />
 
-    </div>
-    <div class="box-footer mt-4">
-        <button type="submit" class="btn btn-primary">Submit</button>
-    </div>
+<div class="flex items-center justify-end gap-3 mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+    <x-ui.button type="submit" variant="primary" icon="fa fa-save">
+        {{ isset($linenProduct->id) ? 'Update' : 'Create' }} Linen Product
+    </x-ui.button>
+    <x-ui.button :href="route('linen-product.index')" variant="secondary" icon="fa fa-times">Cancel</x-ui.button>
 </div>
