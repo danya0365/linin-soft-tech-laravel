@@ -5,139 +5,75 @@
 @endsection
 
 @section('content')
-    <section class="content container">
-        <div class="row">
-            <div class="col-md-12">
-                @if (session('success'))
-                    <div class="alert alert-success" role="alert">
-                        {{ session('success') }}
-                    </div>
-                @endif
-
-                <div class="card">
-                    <div class="card-header">
-                        <div class="float-left">
-                            <span class="card-title">Show Washing Machine</span>
-                        </div>
-                        <div class="float-right">
-                            <a class="btn btn-primary" href="{{ route('washing-machines.create-note', ['id' => $washingMachine->id]) }}"> Add Note</a>
-                            <a class="btn btn-primary" href="{{ route('washing-machines.index') }}"> Back</a>
-                        </div>
-                    </div>
-
-                    <div class="card-body">
-                        
-                        <div class="form-group">
-                            <strong>Name:</strong>
-                            {{ $washingMachine->name }}
-                        </div>
-                        <div class="form-group">
-                            <strong>Photo:</strong>
-                            {{ $washingMachine->photo }}
-                        </div>
-                        <div class="form-group">
-                            <strong>Maximum Weight:</strong>
-                            {{ $washingMachine->maximum_weight }}
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="row mt-2">
-            <div class="col-sm-12">
-                <div class="card">
-                    <div class="card-header">
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-
-                            <span id="card_title">
-                                {{ __('Note') }}
-                            </span>
-                        </div>
-                    </div>
-
-                    <div class="card-body">
-                        {{-- Tag Filter Section --}}
-                        @if(count($machineTags) > 0)
-                        <div class="mb-4">
-                            <div class="d-flex flex-wrap gap-2 align-items-center">
-                                <span class="text-muted me-2">🏷️ กรองตาม Tag:</span>
-                                <a href="{{ route('washing-machines.show', $washingMachine->id) }}" 
-                                   class="btn btn-sm {{ !$selectedTag ? 'btn-dark' : 'btn-outline-dark' }}">
-                                    ทั้งหมด
-                                </a>
-                                @foreach($machineTags as $tag)
-                                    <a href="{{ route('washing-machines.show', ['washing_machine' => $washingMachine->id, 'tag' => $tag]) }}" 
-                                       class="btn btn-sm {{ $selectedTag == $tag ? 'btn-primary' : 'btn-outline-secondary' }}">
-                                        #{{ $tag }}
-                                    </a>
-                                @endforeach
-                            </div>
-                            @if($selectedTag)
-                                <div class="mt-2">
-                                    <small class="text-muted">
-                                        กำลังแสดง: <strong>#{{ $selectedTag }}</strong>
-                                        <a href="{{ route('washing-machines.show', $washingMachine->id) }}" class="text-danger ms-2">
-                                            <i class="fa fa-times"></i> ล้าง filter
-                                        </a>
-                                    </small>
-                                </div>
-                            @endif
-                        </div>
-                        @endif
-
-                        {{-- Notes List --}}
-                    @forelse ($notes as $note)
-                        <div class="card mb-2">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between align-items-start mb-2">
-                                    <h5 class="card-title mb-0">ค่าใช้จ่าย: {{ number_format($note->cost, 2) }} ฿</h5>
-                                    @if($note->tags && count($note->tags) > 0)
-                                        <div class="d-flex flex-wrap gap-1">
-                                            @foreach($note->tags as $tag)
-                                                <a href="{{ route('washing-machines.show', ['washing_machine' => $washingMachine->id, 'tag' => $tag]) }}" 
-                                                   class="badge text-white text-decoration-none" 
-                                                   style="background-color: {{ \App\Models\Note::getTagColor($tag) }}; cursor: pointer; transition: transform 0.2s;"
-                                                   title="คลิกเพื่อกรองตาม #{{ $tag }}"
-                                                   onmouseover="this.style.transform='scale(1.1)'" 
-                                                   onmouseout="this.style.transform='scale(1)'">
-                                                    #{{ $tag }}
-                                                </a>
-                                            @endforeach
-                                        </div>
-                                    @endif
-                                </div>
-                                <p class="card-text">{{ $note->message }}</p>
-                            </div>
-                            <ul class="list-group list-group-flush">
-                                <li class="list-group-item">
-                                    <small class="text-muted">วันที่: {{ $note->created_at->format('Y-m-d') }}</small>
-                                </li>
-                            </ul>
-                            <div class="card-body">
-                                <form action="{{ route('notes.destroy',$note->id) }}" method="POST">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-danger btn-sm"><i class="fa fa-fw fa-trash"></i> Delete</button>
-                                </form>
-                            </div>
-                            @if ( $note->image_url != '' )
-                            <img src="{{ asset($note->image_url) }}" class="card-img-bottom" alt="{{ asset($note->image_url) }}">
-                            @endif
-                        </div>
-                    @empty
-                        <div class="alert alert-info">
-                            @if($selectedTag)
-                                ไม่พบบันทึกที่มี tag "#{{ $selectedTag }}"
-                            @else
-                                ยังไม่มีบันทึก
-                            @endif
-                        </div>
-                    @endforelse
+<div class="container mx-auto px-4 py-6 max-w-7xl">
+    
+    {{-- Breadcrumb --}}
+    <x-crud.breadcrumb :items="[
+        ['label' => 'Admin', 'route' => 'admin'],
+        ['label' => 'Washing Machines', 'route' => 'washing-machines.index'],
+        ['label' => $washingMachine->name]
+    ]" />
+    
+    {{-- Success Alert --}}
+    @if (session('success'))
+        <x-ui.alert variant="success" dismissible="true">
+            {{ session('success') }}
+        </x-ui.alert>
+    @endif
+    
+    <div class="grid gap-6">
+        {{-- Detail Card --}}
+        <x-ui.card>
+            <x-slot:header>
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Washing Machine Details</h2>
+                    <div class="flex items-center gap-2">
+                        <x-ui.button 
+                            :href="route('washing-machines.create-note', ['id' => $washingMachine->id])"
+                            variant="primary"
+                            size="sm"
+                            icon="fa fa-plus"
+                        >
+                            Add Note
+                        </x-ui.button>
+                        <x-ui.button 
+                            :href="route('washing-machines.edit', $washingMachine->id)"
+                            variant="success"
+                            size="sm"
+                            icon="fa fa-edit"
+                        >
+                            Edit
+                        </x-ui.button>
+                        <x-ui.button 
+                            :href="route('washing-machines.index')"
+                            variant="secondary"
+                            size="sm"
+                            icon="fa fa-arrow-left"
+                        >
+                            Back
+                        </x-ui.button>
                     </div>
                 </div>
-                {!! $notes->appends(['tag' => $selectedTag])->links() !!}
-            </div>
-        </div>
-    </section>
+            </x-slot:header>
+            
+            <x-crud.detail-card 
+                :model="$washingMachine" 
+                :fields="[
+                    'name' => 'Name',
+                    'photo' => 'Photo',
+                    'maximum_weight' => 'Maximum Weight (kg)'
+                ]"
+            />
+        </x-ui.card>
+        
+        {{-- Notes Section --}}
+        <x-crud.notes-section 
+            :notes="$notes"
+            :tags="$machineTags"
+            :selectedTag="$selectedTag"
+            :model="$washingMachine"
+            resource="washing-machines"
+        />
+    </div>
+</div>
 @endsection
