@@ -74,22 +74,25 @@ class GenerateCrudViews extends Command
     protected function generateIndex($module, $fields, $force)
     {
         $variableName = Str::camel(Str::plural($module));
+        $modelVar = Str::camel(Str::singular($module));
         // Use plural for route names (Laravel standard)
         $routePrefix = Str::slug(Str::plural($module));
         $title = Str::title(str_replace('-', ' ', $module));
         
-        $headers = ['No'];
-        $columns = [];
+        // Build detail display (all fields combined)
+        $detailParts = [];
         foreach ($fields as $field) {
             if ($field['name'] !== 'id' && !str_contains($field['name'], 'password')) {
-                $headers[] = $field['label'];
-                $columns[] = $field['name'];
+                $label = $field['label'];
+                $detailParts[] = "<strong>{$label}:</strong> {{ \${$modelVar}->{$field['name']} ?? '-' }}";
             }
         }
-        $headers[] = 'Actions';
+        $detailContent = implode('<br>', $detailParts);
         
-        $headersStr = "'" . implode("', '", $headers) . "'";
-        $columnsStr = "'" . implode("', '", $columns) . "'";
+        // If no fields, show a generic message
+        if (empty($detailParts)) {
+            $detailContent = "{{ \${$modelVar}->name ?? \${$modelVar}->id ?? 'Item #' . \$loop->iteration }}";
+        }
         
         $content = "@extends('layouts.app')
 @section('template_title')
@@ -105,13 +108,40 @@ class GenerateCrudViews extends Command
         @if (\$message = Session::get('success'))
             <x-ui.alert variant=\"success\" dismissible=\"true\">{{ \$message }}</x-ui.alert>
         @endif
-        <x-crud.data-table 
-            :headers=\"[{$headersStr}]\"
-            :data=\"\${$variableName}\"
-            :columns=\"[{$columnsStr}]\"
-            resource=\"{$routePrefix}\"
-            :startIndex=\"\$i\"
-        />
+        
+        <div class=\"overflow-x-auto rounded-lg shadow\">
+            <table class=\"w-full text-sm text-left border-collapse bg-white dark:bg-gray-800\">
+                <thead class=\"bg-gray-100 dark:bg-gray-700 border-b-2 border-gray-300 dark:border-gray-600\">
+                    <tr>
+                        <th class=\"px-6 py-3 text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider w-20\">No</th>
+                        <th class=\"px-6 py-3 text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider\">Detail</th>
+                        <th class=\"px-6 py-3 text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider w-64\">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class=\"divide-y divide-gray-200 dark:divide-gray-700\">
+                    @forelse(\${$variableName} as \$index => \${$modelVar})
+                        <tr class=\"hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150\">
+                            <td class=\"px-6 py-4 text-gray-900 dark:text-gray-100\">{{ \$i + \$index + 1 }}</td>
+                            <td class=\"px-6 py-4 text-gray-900 dark:text-gray-100\">
+                                {$detailContent}
+                            </td>
+                            <td class=\"px-6 py-4\">
+                                <x-crud.action-buttons :model=\"\${$modelVar}\" resource=\"{$routePrefix}\" />
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan=\"3\" class=\"px-6 py-8 text-center text-gray-500 dark:text-gray-400\">
+                                <div class=\"flex flex-col items-center gap-2\">
+                                    <i class=\"fa fa-inbox text-4xl text-gray-300 dark:text-gray-600\"></i>
+                                    <p>No {$title} available</p>
+                                </div>
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
     </x-ui.card>
     <div class=\"mt-6\">{{ \${$variableName}->links() }}</div>
 </div>
