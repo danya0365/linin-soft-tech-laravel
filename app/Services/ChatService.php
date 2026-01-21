@@ -1291,18 +1291,26 @@ class ChatService
         $operationCount = Operation::whereBetween('created_at', [$startDate, $endDate])->count();
         $totalWetWeight = Operation::whereBetween('created_at', [$startDate, $endDate])->sum('total_wet_weight') ?? 0;
         $totalDryWeight = Operation::whereBetween('created_at', [$startDate, $endDate])->sum('total_dry_weight') ?? 0;
+        $totalEditWeight = Operation::whereBetween('created_at', [$startDate, $endDate])->sum('total_edit_weight') ?? 0;
         $totalBillingWeight = Operation::whereBetween('created_at', [$startDate, $endDate])->sum('total_billing_weight') ?? 0;
         $totalBillingPayment = Operation::whereBetween('created_at', [$startDate, $endDate])->sum('total_billing_payment') ?? 0;
         
-        // คำนวณ % หักลบ
+        // คำนวณ % หักลบ (เปียก-แห้ง)
         $weightDiffPercent = ($totalWetWeight > 0 && $totalDryWeight > 0) 
             ? round(($totalWetWeight - $totalDryWeight) / $totalWetWeight * 100, 2) 
+            : 0;
+        
+        // คำนวณ % ผ้าแก้ไข
+        $editWeightPercent = ($totalBillingWeight > 0 && $totalEditWeight > 0) 
+            ? round(($totalEditWeight / $totalBillingWeight) * 100, 2) 
             : 0;
         
         $rows[] = ['label' => 'จำนวนงาน', 'value' => number_format($operationCount) . ' รายการ'];
         $rows[] = ['label' => '💧 น้ำหนักเปียก', 'value' => number_format($totalWetWeight, 2) . ' kg'];
         $rows[] = ['label' => '☀️ น้ำหนักแห้ง', 'value' => number_format($totalDryWeight, 2) . ' kg'];
-        $rows[] = ['label' => '📉 % หักลบ', 'value' => $weightDiffPercent . '%', 'valueColor' => $weightDiffPercent > 20 ? '#FF0000' : ($weightDiffPercent > 15 ? '#FFA500' : '#1DB446')];
+        $rows[] = ['label' => '📉 % หักลบ (เปียก-แห้ง)', 'value' => $weightDiffPercent . '%', 'valueColor' => $weightDiffPercent > 20 ? '#FF0000' : ($weightDiffPercent > 15 ? '#FFA500' : '#1DB446')];
+        $rows[] = ['label' => '✂️ น้ำหนักผ้าแก้ไข', 'value' => number_format($totalEditWeight, 2) . ' kg'];
+        $rows[] = ['label' => '📊 % ผ้าแก้ไข', 'value' => $editWeightPercent . '%', 'valueColor' => '#17A2B8'];
         $rows[] = ['label' => '⚖️ น้ำหนักบิล', 'value' => number_format($totalBillingWeight, 2) . ' kg'];
         $rows[] = ['label' => '💵 ยอดบิล', 'value' => number_format($totalBillingPayment, 2) . ' ฿', 'valueColor' => '#1DB446'];
 
