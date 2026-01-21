@@ -94,4 +94,32 @@ class OperationManager extends Manager
         $operationLog->total_billing_payment = $operationSummary->total_billing_payment ?? 0;
         $operationLog->save();
     }
+
+    /**
+     * Recalculate CustomerOperationDailySummary for a specific customer and date
+     * Used when operations are deleted or modified
+     * 
+     * @param int $customerId
+     * @param string $date (Y-m-d format)
+     */
+    public static function recalculateCustomerOperationDailySummary($customerId, $date)
+    {
+        $operationDate = \Carbon\Carbon::parse($date)->format('Y-m-d');
+        
+        // ดึง Operation ทั้งหมดในวันนั้นที่ยังไม่ถูกลบ
+        $operations = Operation::where('customer_id', $customerId)
+            ->whereDate('created_at', $operationDate)
+            ->where('status', OperationStatus::Close())
+            ->get();
+        
+        if ($operations->isEmpty()) {
+            // ถ้าไม่มี operation ในวันนั้นแล้ว ให้ลบ summary
+            CustomerOperationDailySummary::where('customer_id', $customerId)
+                ->where('operation_date', $operationDate)
+                ->delete();
+        } else {
+            // คำนวณใหม่โดยใช้ operation แรกที่เจอ (จะ recalculate ทั้งวัน)
+            self::createCustomerOperationDailySummary($operations->first());
+        }
+    }
 }

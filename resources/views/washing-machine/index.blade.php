@@ -45,8 +45,12 @@
                                             <span class="ml-2 text-sm text-gray-900 dark:text-gray-100">{{ $washingMachine->maximum_weight ?? '-' }}</span>
                                         </div>
                                         <div class="mb-2">
-                                            <span class="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">Operation Id:</span>
-                                            <span class="ml-2 text-sm text-gray-900 dark:text-gray-100">{{ $washingMachine->operation_id ?? '-' }}</span>
+                                            <span class="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">สถานะ:</span>
+                                            @if($washingMachine->service_status === 'available')
+                                                <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">✅ พร้อมใช้งาน</span>
+                                            @else
+                                                <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400">🔧 เสีย</span>
+                                            @endif
                                         </div>
                                 </div>
                             </td>

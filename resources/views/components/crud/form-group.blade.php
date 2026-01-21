@@ -86,6 +86,23 @@
             @endforeach
         </select>
     
+    @elseif($type === 'radio')
+        <div class="flex flex-wrap items-center gap-6">
+            @foreach($options as $optValue => $optLabel)
+                <label class="inline-flex items-center cursor-pointer group">
+                    <input 
+                        type="radio" 
+                        name="{{ $name }}" 
+                        value="{{ $optValue }}"
+                        {{ old($name, $value) == $optValue ? 'checked' : '' }}
+                        {{ $required ? 'required' : '' }}
+                        class="form-radio w-5 h-5 text-indigo-600 border-gray-300 dark:border-gray-600 focus:ring-indigo-500 dark:focus:ring-indigo-400 dark:bg-gray-700 transition-all duration-200"
+                    >
+                    <span class="ml-2 text-sm text-gray-700 dark:text-gray-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors duration-200">{{ $optLabel }}</span>
+                </label>
+            @endforeach
+        </div>
+    
     @else
         <input 
             type="{{ $type }}" 

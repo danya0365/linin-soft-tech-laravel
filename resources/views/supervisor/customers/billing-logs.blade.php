@@ -76,6 +76,8 @@
                                     <th>ผ้าเปียก (kg.)</th>
                                     <th>ผ้าแห้ง (kg.)</th>
                                     <th>% หักลบ</th>
+                                    <th>ผ้าแก้ไข (kg.)</th>
+                                    <th>% แก้ไข</th>
                                     <th>จำนวนเงิน (Thai Baht)</th>
                                     <th>วันที่เก็บเงิน</th>
                                     <th></th>
@@ -86,8 +88,13 @@
                                     @php
                                         $wetWeight = $billingLog->total_wet_weight ?? 0;
                                         $dryWeight = $billingLog->total_dry_weight ?? 0;
+                                        $editWeight = $billingLog->total_edit_weight ?? 0;
+                                        $billingWeight = $billingLog->total_billing_weight ?? 0;
                                         $diffPercent = ($wetWeight > 0 && $dryWeight > 0) 
                                             ? round(($wetWeight - $dryWeight) / $wetWeight * 100, 2) 
+                                            : '-';
+                                        $editPercent = ($billingWeight > 0 && $editWeight > 0)
+                                            ? round(($editWeight / $billingWeight) * 100, 2)
                                             : '-';
                                     @endphp
                                     <tr>
@@ -105,6 +112,16 @@
                                         <td class="text-end">
                                             @if($diffPercent !== '-')
                                                 <span class="{{ $diffPercent > 20 ? 'text-danger' : ($diffPercent > 15 ? 'text-warning' : 'text-success') }}">{{ $diffPercent }}%</span>
+                                            @else
+                                                -
+                                            @endif
+                                        </td>
+                                        <td class="text-end">
+                                            {{ $editWeight ? number_format($editWeight, 2) : '-' }}
+                                        </td>
+                                        <td class="text-end">
+                                            @if($editPercent !== '-')
+                                                <span class="text-info">{{ $editPercent }}%</span>
                                             @else
                                                 -
                                             @endif
