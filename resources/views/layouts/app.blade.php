@@ -48,5 +48,8 @@
             <x-mini-chat />
         @endif
     @endauth
+
+    {{-- Environment Debug Component --}}
+    <x-env-debug />
 </body>
 </html>
