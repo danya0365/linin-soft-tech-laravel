@@ -1292,8 +1292,14 @@ class ChatService
         $totalWetWeight = Operation::whereBetween('created_at', [$startDate, $endDate])->sum('total_wet_weight') ?? 0;
         $totalDryWeight = Operation::whereBetween('created_at', [$startDate, $endDate])->sum('total_dry_weight') ?? 0;
         $totalEditWeight = Operation::whereBetween('created_at', [$startDate, $endDate])->sum('total_edit_weight') ?? 0;
-        $totalBillingWeight = Operation::whereBetween('created_at', [$startDate, $endDate])->sum('total_billing_weight') ?? 0;
-        $totalBillingPayment = Operation::whereBetween('created_at', [$startDate, $endDate])->sum('total_billing_payment') ?? 0;
+        
+        // Billing stats - filter by operation_type=payment and billing_payment_date
+        $totalBillingWeight = Operation::where('operation_type', 'payment')
+            ->whereBetween('billing_payment_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
+            ->sum('total_billing_weight') ?? 0;
+        $totalBillingPayment = Operation::where('operation_type', 'payment')
+            ->whereBetween('billing_payment_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
+            ->sum('total_billing_payment') ?? 0;
         
         // คำนวณ % หักลบ (เปียก-แห้ง)
         $weightDiffPercent = ($totalWetWeight > 0 && $totalDryWeight > 0) 
