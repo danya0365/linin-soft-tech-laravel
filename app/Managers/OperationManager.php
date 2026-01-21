@@ -57,7 +57,9 @@ class OperationManager extends Manager
             DB::raw('sum(dry_weight) as total_dry_weight'),
             DB::raw('sum(iron_piece) as total_iron_piece'),
             DB::raw('sum(packing_piece) as total_packing_piece'),
-            DB::raw('sum(collect_weight) as total_collect_weight')
+            DB::raw('sum(collect_weight) as total_collect_weight'),
+            DB::raw('sum(collect_pack) as total_collect_pack'),
+            DB::raw('sum(deliver_pack) as total_delivery_pack')
         )
             ->join('operations', 'operations.id', '=', 'operation_id');
         $query->where('operations.customer_id', $operation->customer_id);
@@ -90,6 +92,8 @@ class OperationManager extends Manager
         $operationLog->total_packing_piece = $operationLinenProductSummary->total_packing_piece ?? 0;
         $operationLog->total_edit_collect_weight = $totalEditCollectWeightQuery->total_collect_weight ?? 0;
         $operationLog->total_collect_weight = $operationLinenProductSummary->total_collect_weight ?? 0;
+        $operationLog->total_collect_pack = $operationLinenProductSummary->total_collect_pack ?? 0;
+        $operationLog->total_delivery_pack = $operationLinenProductSummary->total_delivery_pack ?? 0;
         $operationLog->total_billing_weight = $operationSummary->total_billing_weight ?? 0;
         $operationLog->total_billing_payment = $operationSummary->total_billing_payment ?? 0;
         $operationLog->save();

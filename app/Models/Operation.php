@@ -53,7 +53,7 @@ class Operation extends Model
    *
    * @var array
    */
-  protected $fillable = ['operation_type', 'employee_id', 'customer_id', 'wash_employee_id', 'dry_employee_id', 'iron_employee_id', 'packing_employee_id', 'collect_employee_id', 'job_case', 'washing_machine_id', 'dryer_machine_id', 'total_wet_weight', 'total_dry_weight', 'total_iron_piece', 'total_packing_piece', 'colors', 'search_tags', 'status'];
+  protected $fillable = ['operation_type', 'employee_id', 'customer_id', 'wash_employee_id', 'dry_employee_id', 'iron_employee_id', 'packing_employee_id', 'collect_employee_id', 'job_case', 'washing_machine_id', 'dryer_machine_id', 'total_wet_weight', 'total_dry_weight', 'total_edit_weight', 'total_iron_piece', 'total_packing_piece', 'total_collect_weight', 'total_collect_pack', 'total_deliver_pack', 'total_billing_weight', 'total_billing_payment', 'colors', 'search_tags', 'status'];
 
 
   public function employee()
