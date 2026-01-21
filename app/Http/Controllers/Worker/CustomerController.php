@@ -40,6 +40,7 @@ class CustomerController extends Controller
         $query = CustomerOperationDailySummary::with('customer')->select(
             DB::raw('sum(total_wet_weight) as total_wet_weight'),
             DB::raw('sum(total_edit_collect_weight) as total_edit_collect_weight'),
+            DB::raw('sum(total_edit_weight) as total_edit_weight'),
             DB::raw('sum(total_collect_weight) as total_collect_weight'),
             DB::raw('sum(total_billing_weight) as total_billing_weight'),
             'customer_id'
@@ -62,6 +63,7 @@ class CustomerController extends Controller
             $query = CustomerOperationDailySummary::select(
                 DB::raw('sum(total_wet_weight) as total_wet_weight'),
                 DB::raw('sum(total_edit_collect_weight) as total_edit_collect_weight'),
+                DB::raw('sum(total_edit_weight) as total_edit_weight'),
                 DB::raw('sum(total_collect_weight) as total_collect_weight'),
                 DB::raw('sum(total_billing_weight) as total_billing_weight')
             );

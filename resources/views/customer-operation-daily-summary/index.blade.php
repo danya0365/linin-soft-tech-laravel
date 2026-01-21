@@ -42,7 +42,8 @@
 										<th>Total Dry Weight</th>
 										<th>Total Iron Piece</th>
 										<th>Total Packing Piece</th>
-										<th>Total Edit Collect Weight</th>
+										<th title="คำนวณอัตโนมัติจาก linen_case='edit'">Edit Weight (ระบบ) <i class="fa fa-info-circle text-success"></i></th>
+										<th title="กรอกโดย Supervisor ตอนออกบิล">Edit Weight (บันทึกมือ) <i class="fa fa-info-circle text-warning"></i></th>
 										<th>Total Collect Weight</th>
 										<th>Total Billing Weight</th>
 
@@ -60,7 +61,8 @@
 											<td>{{ $customerOperationDailySummary->total_dry_weight }}</td>
 											<td>{{ $customerOperationDailySummary->total_iron_piece }}</td>
 											<td>{{ $customerOperationDailySummary->total_packing_piece }}</td>
-											<td>{{ $customerOperationDailySummary->total_edit_collect_weight }}</td>
+											<td class="text-success">{{ $customerOperationDailySummary->total_edit_collect_weight }}</td>
+											<td class="text-warning">{{ $customerOperationDailySummary->total_edit_weight ?? 0 }}</td>
 											<td>{{ $customerOperationDailySummary->total_collect_weight }}</td>
 											<td>{{ $customerOperationDailySummary->total_billing_weight }}</td>
 

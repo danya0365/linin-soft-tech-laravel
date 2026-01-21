@@ -71,14 +71,59 @@ class OperationManager extends Manager
         $operationLinenCase = OperationLinenCase::getEdit();
         $totalEditCollectWeightQuery = $queryEdit->where('operations_linen_products.linen_case', $operationLinenCase['var'])->first();
 
-        $query = Operation::query()->select(
+        /**
+         * ============================================================================
+         * ⚠️ ทำไมต้อง Query 2 ครั้ง?
+         * ============================================================================
+         * 
+         * เนื่องจากระบบมี Operation 2 ประเภท ที่ใช้ "วันที่" ต่างกันในการนับ:
+         * 
+         * 1. Non-payment Operations (ซัก, อบ, รีด, แพ็ค, ส่ง ฯลฯ)
+         *    - ใช้ "created_at" เป็นวันที่ที่ operation เกิดขึ้น
+         *    - เช่น ซักผ้าวันที่ 1 มกราคม → นับเป็นวันที่ 1 มกราคม
+         * 
+         * 2. Payment Operations (เก็บเงิน/ออกบิล)
+         *    - ใช้ "billing_payment_date" เป็นวันที่เก็บเงินจริง
+         *    - created_at อาจเป็นวันที่สร้าง record ซึ่งอาจต่างจากวันที่เก็บเงิน
+         *    - เช่น สร้างบิลวันที่ 1 มกราคม แต่เก็บเงินวันที่ 5 มกราคม 
+         *      → ต้องนับเป็นวันที่ 5 มกราคม (ตามวันเก็บเงินจริง)
+         * 
+         * ถ้าใช้ created_at อย่างเดียว → ข้อมูล billing จะอยู่ผิดวัน ทำให้รายงานไม่ตรง
+         * ============================================================================
+         */
+
+        // === Query 1: Non-payment operations ===
+        // ใช้ created_at เพราะ non-payment operations (ซัก, อบ, รีด ฯลฯ) นับวันตาม created_at
+        $nonPaymentQuery = Operation::query()->select(
             DB::raw('sum(total_billing_weight) as total_billing_weight'),
             DB::raw('sum(total_billing_payment) as total_billing_payment'),
+            DB::raw('sum(total_edit_weight) as total_edit_weight'),
         );
-        $query->where('customer_id', $operation->customer_id);
-        $query->whereBetween('created_at', [$operationDate . ' 00:00:00', $operationDate . ' 23:59:59']);
-        $query->where('status', OperationStatus::Close());
-        $operationSummary = $query->first();
+        $nonPaymentQuery->where('customer_id', $operation->customer_id);
+        $nonPaymentQuery->where('operation_type', '!=', 'payment');
+        $nonPaymentQuery->whereBetween('created_at', [$operationDate . ' 00:00:00', $operationDate . ' 23:59:59']);
+        $nonPaymentQuery->where('status', OperationStatus::Close());
+        $nonPaymentSummary = $nonPaymentQuery->first();
+
+        // === Query 2: Payment operations ===
+        // ใช้ billing_payment_date เพราะ payment operations ต้องนับตามวันที่เก็บเงินจริง
+        // ไม่ใช่วันที่สร้าง record (created_at)
+        $paymentQuery = Operation::query()->select(
+            DB::raw('sum(total_billing_weight) as total_billing_weight'),
+            DB::raw('sum(total_billing_payment) as total_billing_payment'),
+            DB::raw('sum(total_edit_weight) as total_edit_weight'),
+        );
+        $paymentQuery->where('customer_id', $operation->customer_id);
+        $paymentQuery->where('operation_type', 'payment');
+        $paymentQuery->whereDate('billing_payment_date', $operationDate);
+        $paymentQuery->where('status', OperationStatus::Close());
+        $paymentSummary = $paymentQuery->first();
+
+        // === รวมผลลัพธ์จากทั้ง 2 กลุ่ม ===
+        // เนื่องจากข้อมูลมาจากคนละ query ต้องนำมาบวกกัน
+        $totalBillingWeight = ($nonPaymentSummary->total_billing_weight ?? 0) + ($paymentSummary->total_billing_weight ?? 0);
+        $totalBillingPayment = ($nonPaymentSummary->total_billing_payment ?? 0) + ($paymentSummary->total_billing_payment ?? 0);
+        $totalEditWeight = ($nonPaymentSummary->total_edit_weight ?? 0) + ($paymentSummary->total_edit_weight ?? 0);
 
         $operationLog = CustomerOperationDailySummary::where(['customer_id' => $operation->customer_id, 'operation_date' => $operationDate])->first();
         if (!$operationLog) {
@@ -91,11 +136,12 @@ class OperationManager extends Manager
         $operationLog->total_iron_piece = $operationLinenProductSummary->total_iron_piece ?? 0;
         $operationLog->total_packing_piece = $operationLinenProductSummary->total_packing_piece ?? 0;
         $operationLog->total_edit_collect_weight = $totalEditCollectWeightQuery->total_collect_weight ?? 0;
+        $operationLog->total_edit_weight = $totalEditWeight;
         $operationLog->total_collect_weight = $operationLinenProductSummary->total_collect_weight ?? 0;
         $operationLog->total_collect_pack = $operationLinenProductSummary->total_collect_pack ?? 0;
         $operationLog->total_delivery_pack = $operationLinenProductSummary->total_delivery_pack ?? 0;
-        $operationLog->total_billing_weight = $operationSummary->total_billing_weight ?? 0;
-        $operationLog->total_billing_payment = $operationSummary->total_billing_payment ?? 0;
+        $operationLog->total_billing_weight = $totalBillingWeight;
+        $operationLog->total_billing_payment = $totalBillingPayment;
         $operationLog->save();
     }
 

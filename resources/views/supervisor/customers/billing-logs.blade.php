@@ -76,7 +76,7 @@
                                     <th>ผ้าเปียก (kg.)</th>
                                     <th>ผ้าแห้ง (kg.)</th>
                                     <th>% หักลบ</th>
-                                    <th>ผ้าแก้ไข (kg.)</th>
+                                    <th>ผ้าแก้ไข (บันทึกมือ) <i class="fa fa-info-circle text-muted" title="ข้อมูลกรอกโดย Supervisor อาจไม่ตรงกับข้อมูล Operation จริง"></i></th>
                                     <th>% แก้ไข</th>
                                     <th>จำนวนเงิน (Thai Baht)</th>
                                     <th>วันที่เก็บเงิน</th>

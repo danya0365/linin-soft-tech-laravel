@@ -28,26 +28,6 @@
                             <strong>Customer Group:</strong>
                             {{ $customer->customerGroup ? $customer->customerGroup->name : '-' }}
                         </div>
-                        <div class="form-group">
-                            <strong>Total Wet Weight:</strong>
-                            {{ $customer->total_wet_weight }}
-                        </div>
-                        <div class="form-group">
-                            <strong>Total Dry Weight:</strong>
-                            {{ $customer->total_dry_weight }}
-                        </div>
-                        <div class="form-group">
-                            <strong>Total Billing Weight:</strong>
-                            {{ $customer->total_billing_weight }}
-                        </div>
-                        <div class="form-group">
-                            <strong>Total Edit Weight:</strong>
-                            {{ $customer->total_edit_weight }}
-                        </div>
-                        <div class="form-group">
-                            <strong>Total Billing Payment:</strong>
-                            {{ $customer->total_billing_payment }}
-                        </div>
 
                     </div>
                 </div>

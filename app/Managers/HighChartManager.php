@@ -421,12 +421,21 @@ class HighChartManager extends Manager
         $totalBillingWeight = $nonPaymentBillingWeight + $paymentBillingWeight;
         $totalBillingPayment = $nonPaymentBillingPayment + $paymentBillingPayment;
 
+        // === ผ้าแก้ไข จาก CustomerOperationDailySummary (คำนวณจาก linen_case='edit') ===
+        $totalEditCollectWeight = \App\Models\CustomerOperationDailySummary::whereBetween('operation_date', [$startDateStr, $endDateStr])
+            ->sum('total_edit_collect_weight') ?? 0;
+
         // คำนวณ % หักลบ (เปียก-แห้ง)
         $weightDiffPercent = ($totalWetWeight > 0 && $totalDryWeight > 0) 
             ? round(($totalWetWeight - $totalDryWeight) / $totalWetWeight * 100, 2) 
             : 0;
 
-        // คำนวณ % ผ้าแก้ไข
+        // คำนวณ % ผ้าแก้ไข (จากระบบ)
+        $editCollectWeightPercent = ($totalBillingWeight > 0 && $totalEditCollectWeight > 0) 
+            ? round(($totalEditCollectWeight / $totalBillingWeight) * 100, 2) 
+            : 0;
+
+        // คำนวณ % ผ้าแก้ไข (กรอกมือ)
         $editWeightPercent = ($totalBillingWeight > 0 && $totalEditWeight > 0) 
             ? round(($totalEditWeight / $totalBillingWeight) * 100, 2) 
             : 0;
@@ -438,6 +447,8 @@ class HighChartManager extends Manager
             'totalWetWeight' => round($totalWetWeight, 2),
             'totalDryWeight' => round($totalDryWeight, 2),
             'weightDiffPercent' => $weightDiffPercent,
+            'totalEditCollectWeight' => round($totalEditCollectWeight, 2),
+            'editCollectWeightPercent' => $editCollectWeightPercent,
             'totalEditWeight' => round($totalEditWeight, 2),
             'editWeightPercent' => $editWeightPercent,
             'totalBillingWeight' => round($totalBillingWeight, 2),
