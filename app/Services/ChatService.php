@@ -129,6 +129,8 @@ class ChatService
                 return $this->getMachineHistoryDateMenuByType($params['type'] ?? 'washing');
             case 'machine_notes_date_type':
                 return $this->getMachineNotesByDateAndType($params['date'] ?? null, $params['type'] ?? 'washing');
+            case 'machine_notes_recent':
+                return $this->getMachineRecentNotesByType($params['type'] ?? 'washing');
             // Legacy machine actions
             case 'machine_all':
                 return $this->getMachineAllList();
@@ -741,7 +743,14 @@ class ChatService
 
         $dates = [];
         
-        // 7 วันล่าสุด
+        // ตัวเลือกดู 7 วันล่าสุด (ไม่ต้องเลือกวัน)
+        $dates[] = [
+            'label' => '📊 7 วันล่าสุด (10 รายการ)',
+            'action' => 'machine_notes_recent',
+            'data' => ['type' => $type],
+        ];
+        
+        // 7 วันล่าสุด แยกตามวัน
         for ($i = 0; $i < 7; $i++) {
             $date = Carbon::now()->subDays($i);
             $dayLabel = $date->format('d/m');
@@ -762,7 +771,7 @@ class ChatService
         return [
             'type' => 'menu',
             'title' => "📅 ประวัติ{$label}",
-            'text' => "📅 เลือกวันที่ที่ต้องการดูประวัติ{$label}:\n\n(7 วันล่าสุด)",
+            'text' => "📅 เลือกวันที่ที่ต้องการดูประวัติ{$label}:\n\nหรือเลือก '7 วันล่าสุด' เพื่อดูรายการล่าสุด",
             'quickReplies' => $dates,
         ];
     }
@@ -986,6 +995,125 @@ class ChatService
             'type' => 'card',
             'title' => "📜 ประวัติ{$label}",
             'subtitle' => $date->format('d/m/Y'),
+            'headerColor' => '#34495E',
+            'rows' => $rows,
+        ];
+    }
+
+    /**
+     * แสดง Notes ล่าสุดของเครื่องจักรตามประเภท (7 วันล่าสุด, limit 10 รายการ)
+     */
+    public function getMachineRecentNotesByType(string $type): array
+    {
+        $startDate = Carbon::now()->subDays(7)->startOfDay();
+        $endDate = Carbon::now()->endOfDay();
+
+        $typeLabels = [
+            'washing' => '🧺 เครื่องซักผ้า',
+            'dryer' => '🌡️ เครื่องอบผ้า',
+            'truck' => '🚚 รถบรรทุก',
+        ];
+        $label = $typeLabels[$type] ?? 'เครื่องจักร';
+
+        // ดึง Notes ตามประเภท (7 วันล่าสุด, limit 10)
+        $query = Note::whereBetween('created_at', [$startDate, $endDate]);
+
+        switch ($type) {
+            case 'washing':
+                $query->with('washingMachine')->whereNotNull('washing_machine_id');
+                break;
+            case 'dryer':
+                $query->with('dryerMachine')->whereNotNull('dryer_machine_id');
+                break;
+            case 'truck':
+                $query->with('truck')->whereNotNull('truck_id');
+                break;
+        }
+
+        $notes = $query->orderBy('created_at', 'desc')->take(10)->get();
+
+        if ($notes->isEmpty()) {
+            return [
+                'type' => 'card',
+                'title' => "📜 ประวัติ{$label}",
+                'subtitle' => '7 วันล่าสุด',
+                'headerColor' => '#34495E',
+                'rows' => [
+                    ['label' => '📅 ช่วงเวลา', 'value' => '7 วันล่าสุด'],
+                    ['type' => 'separator'],
+                    ['label' => 'ℹ️ สถานะ', 'value' => 'ไม่พบประวัติ', 'valueColor' => '#999999'],
+                ],
+            ];
+        }
+
+        $rows = [
+            ['label' => '📅 ช่วงเวลา', 'value' => '7 วันล่าสุด'],
+            ['label' => '📝 จำนวนรายการ', 'value' => $notes->count() . ' รายการ (สูงสุด 10)'],
+            ['type' => 'separator'],
+        ];
+
+        $totalCost = 0;
+        foreach ($notes as $note) {
+            // หาชื่อเครื่องจักร
+            $machineName = '';
+            $machineIcon = '';
+            
+            switch ($type) {
+                case 'washing':
+                    $machineName = $note->washingMachine->name ?? 'เครื่องซัก';
+                    $machineIcon = '🧺';
+                    break;
+                case 'dryer':
+                    $machineName = $note->dryerMachine->name ?? 'เครื่องอบ';
+                    $machineIcon = '🌡️';
+                    break;
+                case 'truck':
+                    $machineName = $note->truck->name ?? 'รถบรรทุก';
+                    $machineIcon = '🚚';
+                    break;
+            }
+
+            $dateTime = Carbon::parse($note->created_at)->format('d/m H:i');
+            $message = mb_substr($note->message ?? '-', 0, 25);
+            if (mb_strlen($note->message ?? '') > 25) {
+                $message .= '...';
+            }
+
+            $rows[] = [
+                'label' => "{$machineIcon} {$machineName}",
+                'value' => $dateTime,
+                'bold' => true,
+            ];
+            $rows[] = [
+                'label' => '    💬 ' . $message,
+                'value' => '',
+            ];
+            
+            if ($note->cost && $note->cost > 0) {
+                $rows[] = [
+                    'label' => '    💰',
+                    'value' => number_format($note->cost, 2) . ' ฿',
+                    'valueColor' => '#FF6B35',
+                ];
+                $totalCost += $note->cost;
+            }
+        }
+
+        // แสดงรวมค่าใช้จ่ายถ้ามี
+        if ($totalCost > 0) {
+            $rows[] = ['type' => 'separator'];
+            $rows[] = [
+                'label' => '💵 รวมค่าใช้จ่าย',
+                'value' => number_format($totalCost, 2) . ' ฿',
+                'valueColor' => '#FF0000',
+                'bold' => true,
+            ];
+        }
+
+        return [
+            'type' => 'card',
+            'title' => "📜 ประวัติ{$label}",
+            'subtitle' => '7 วันล่าสุด (10 รายการ)',
             'headerColor' => '#34495E',
             'rows' => $rows,
         ];
