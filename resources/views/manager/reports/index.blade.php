@@ -137,54 +137,6 @@
             </div>
         </div>
 
-        {{-- 3 กราฟเปรียบเทียบใหม่ --}}
-        <div class="col-md-12 m-2">
-            <div class="card border-primary">
-                <div class="card-header bg-primary text-white">📊 กราฟเปรียบเทียบภาพรวม (เลือกวันที่ร่วมกัน)</div>
-                <div class="card-body">
-                    <form id="comparison-form" class="row row-cols-lg-auto g-3 align-items-center mb-3" action="{{ request()->url() }}" method="GET">
-                        <div class="col-12">
-                            <div class="input-group">
-                                <input type="text" name="compare-start" value="" class="form-control" placeholder="วันที่เริ่ม">
-                                <span class="input-group-text">ถึง</span>
-                                <input type="text" name="compare-end" value="" class="form-control" placeholder="วันที่สิ้นสุด">
-                            </div>
-                        </div>
-                        <div class="col-12">
-                            <button type="submit" class="btn btn-primary">ดูกราฟ</button>
-                            <button type="reset" class="btn btn-outline-secondary">Reset</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-6 m-2">
-            <div class="card h-100">
-                <div class="card-header">📊 ภาพรวมการเงิน (บาท)</div>
-                <div class="card-body">
-                    <div id="financial-comparison-chart" style="min-width: 100%; height: 350px;"></div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6 m-2">
-            <div class="card h-100">
-                <div class="card-header">📦 ปริมาณงาน (กก.)</div>
-                <div class="card-body">
-                    <div id="operation-comparison-chart" style="min-width: 100%; height: 350px;"></div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-12 m-2">
-            <div class="card border-success">
-                <div class="card-header bg-success text-white">📈 เปรียบเทียบแนวโน้ม (Normalized %)</div>
-                <div class="card-body">
-                    <div id="trend-comparison-chart" style="min-width: 100%; height: 400px;"></div>
-                </div>
-            </div>
-        </div>
-
         <div class="col-md-12 m-2">
             <div class="card">
                 <div class="card-header">ต้นทุน, ยอดขาย, กำไร ต่อเดือน</div>
@@ -371,58 +323,6 @@
 <script>
 $(function(){
 
-    // 3 กราฟเปรียบเทียบใหม่ (ปิดชั่วคราว - รอ build production)
-    // (function(){
-    //     var compareStart = '{{ request()->get('compare-start') }}';
-    //     var compareEnd = '{{ request()->get('compare-end') }}';
-
-    //     // กราฟ 1: ภาพรวมการเงิน
-    //     var financialData = @json(App\Managers\HighChartManager::getFinancialComparisonSummary(request()->get('compare-start'), request()->get('compare-end')));
-    //     var financialTitle = "ภาพรวมการเงิน 7 วันล่าสุด";
-    //     if (compareStart && compareEnd) {
-    //         $('[name=compare-start]').val(compareStart);
-    //         $('[name=compare-end]').val(compareEnd);
-    //         financialTitle = `ภาพรวมการเงิน ${compareStart} ถึง ${compareEnd}`;
-    //     }
-    //     $.comparisonLineChart({
-    //         renderTo: 'financial-comparison-chart',
-    //         data: financialData,
-    //         title: financialTitle,
-    //         yAxisLabel: 'จำนวนเงิน (บาท)',
-    //         unit: 'บาท'
-    //     });
-
-    //     // กราฟ 2: ปริมาณงาน
-    //     var operationData = @json(App\Managers\HighChartManager::getOperationComparisonSummary(request()->get('compare-start'), request()->get('compare-end')));
-    //     var operationTitle = "ปริมาณงาน 7 วันล่าสุด";
-    //     if (compareStart && compareEnd) {
-    //         operationTitle = `ปริมาณงาน ${compareStart} ถึง ${compareEnd}`;
-    //     }
-    //     $.comparisonLineChart({
-    //         renderTo: 'operation-comparison-chart',
-    //         data: operationData,
-    //         title: operationTitle,
-    //         yAxisLabel: 'น้ำหนัก (กก.)',
-    //         unit: 'กก.'
-    //     });
-
-    //     // กราฟ 3: เปรียบเทียบแนวโน้ม (Normalized %)
-    //     var trendData = @json(App\Managers\HighChartManager::getTrendComparisonSummary(request()->get('compare-start'), request()->get('compare-end')));
-    //     var trendTitle = "เปรียบเทียบแนวโน้ม 7 วันล่าสุด";
-    //     if (compareStart && compareEnd) {
-    //         trendTitle = `เปรียบเทียบแนวโน้ม ${compareStart} ถึง ${compareEnd}`;
-    //     }
-    //     $.trendLineChart({
-    //         renderTo: 'trend-comparison-chart',
-    //         data: trendData,
-    //         title: trendTitle
-    //     });
-    // })();
-
-    // Datepicker สำหรับกราฟเปรียบเทียบ
-    $('[name=compare-start]').datepicker({ format: 'yyyy-mm-dd' });
-    $('[name=compare-end]').datepicker({ format: 'yyyy-mm-dd' });
-
     var salesYearSummary = @json(App\Managers\HighChartManager::getSalesYearSummary());
     $.salesChart({ 'renderTo': "sales-bar-chart", 'data': salesYearSummary});
 
@@ -576,12 +476,6 @@ $(function(){
         e.preventDefault();
         incomeRangeDaysSummary();
     })
-
-    // $('.date').each(function(element){
-    //     new Datepicker($(element), {
-    //         // options
-    //     }); 
-    // })
 
     $('[name=energy-range-days-start-at]').datepicker({ format: 'yyyy-mm-dd' });
     $('[name=energy-range-days-end-at]').datepicker({ format: 'yyyy-mm-dd' });
