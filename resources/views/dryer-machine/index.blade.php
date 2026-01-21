@@ -45,6 +45,7 @@
 										<th>Name</th>
 										<th>Photo</th>
 										<th>Maximum Weight</th>
+										<th>สถานะ</th>
 
                                         <th></th>
                                     </tr>
@@ -57,6 +58,13 @@
 											<td>{{ $dryerMachine->name }}</td>
 											<td>{{ $dryerMachine->photo }}</td>
 											<td>{{ $dryerMachine->maximum_weight }}</td>
+											<td>
+												@if($dryerMachine->service_status === 'available')
+													<span class="badge bg-success">✅ พร้อมใช้งาน</span>
+												@else
+													<span class="badge bg-danger">🔧 เสีย</span>
+												@endif
+											</td>
 
                                             <td>
                                                 <form action="{{ route('dryer-machines.destroy',$dryerMachine->id) }}" method="POST">

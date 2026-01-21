@@ -37,7 +37,7 @@ class Truck extends Model
    *
    * @var array
    */
-  protected $fillable = ['name', 'photo', 'plate_number', 'operation_id'];
+  protected $fillable = ['name', 'photo', 'plate_number', 'operation_id', 'service_status'];
 
   public function operation()
   {

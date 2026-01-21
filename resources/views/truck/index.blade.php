@@ -46,6 +46,7 @@
 										<th>Photo</th>
 										<th>Plate Number</th>
 										<th>Operation Id</th>
+										<th>สถานะ</th>
 
                                         <th></th>
                                     </tr>
@@ -59,6 +60,13 @@
 											<td>{{ $truck->photo }}</td>
 											<td>{{ $truck->plate_number }}</td>
 											<td>{{ $truck->operation_id }}</td>
+											<td>
+												@if($truck->service_status === 'available')
+													<span class="badge bg-success">✅ พร้อมใช้งาน</span>
+												@else
+													<span class="badge bg-danger">🔧 เสีย</span>
+												@endif
+											</td>
 
                                             <td>
                                                 <form action="{{ route('trucks.destroy',$truck->id) }}" method="POST">

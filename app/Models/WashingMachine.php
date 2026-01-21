@@ -37,7 +37,7 @@ class WashingMachine extends Model
    *
    * @var array
    */
-  protected $fillable = ['name', 'photo', 'maximum_weight', 'operation_id'];
+  protected $fillable = ['name', 'photo', 'maximum_weight', 'operation_id', 'service_status'];
 
 
   public function operation()

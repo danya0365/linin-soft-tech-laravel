@@ -37,7 +37,7 @@ class DryerMachine extends Model
    *
    * @var array
    */
-  protected $fillable = ['name', 'photo', 'maximum_weight'];
+  protected $fillable = ['name', 'photo', 'maximum_weight', 'service_status'];
 
   public function operation()
   {

@@ -21,6 +21,14 @@
             {{ Form::text('operation_id', $truck->operation_id, ['class' => 'form-control' . ($errors->has('operation_id') ? ' is-invalid' : ''), 'placeholder' => 'Operation Id']) }}
             {!! $errors->first('operation_id', '<div class="invalid-feedback">:message</div>') !!}
         </div>
+        <div class="form-group">
+            {{ Form::label('service_status', 'สถานะเครื่อง') }}
+            {{ Form::select('service_status', [
+                'available' => '✅ พร้อมใช้งาน',
+                'broken' => '🔧 เสีย/ซ่อม'
+            ], $truck->service_status ?? 'available', ['class' => 'form-control' . ($errors->has('service_status') ? ' is-invalid' : '')]) }}
+            {!! $errors->first('service_status', '<div class="invalid-feedback">:message</div>') !!}
+        </div>
 
     </div>
     <div class="box-footer mt20">
