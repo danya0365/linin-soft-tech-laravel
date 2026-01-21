@@ -10,99 +10,6 @@
         </ol>
     </nav>
 
-    {{-- 3 กราฟเปรียบเทียบใหม่ --}}
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card border-primary">
-                <div class="card-header bg-primary text-white">📊 กราฟเปรียบเทียบภาพรวม (เลือกวันที่ร่วมกัน)</div>
-                <div class="card-body">
-                    <form id="comparison-form" class="row row-cols-lg-auto g-3 align-items-center mb-3" action="{{ request()->url() }}" method="GET">
-                        <div class="col-12">
-                            <div class="input-group">
-                                <input type="text" name="compare-start" value="" class="form-control" placeholder="วันที่เริ่ม">
-                                <span class="input-group-text">ถึง</span>
-                                <input type="text" name="compare-end" value="" class="form-control" placeholder="วันที่สิ้นสุด">
-                            </div>
-                        </div>
-                        <div class="col-12">
-                            <button type="submit" class="btn btn-primary">ดูกราฟ</button>
-                            <button type="reset" class="btn btn-outline-secondary">Reset</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    {{-- Operation Statistics Summary Card --}}
-    @php
-        $operationStats = App\Managers\HighChartManager::getOperationStatsSummary(request()->get('compare-start'), request()->get('compare-end'));
-    @endphp
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card border-info">
-                <div class="card-header bg-info text-white">
-                    🧺 สรุป Operation 
-                    @if(request()->get('compare-start') && request()->get('compare-end'))
-                        ({{ request()->get('compare-start') }} ถึง {{ request()->get('compare-end') }})
-                    @else
-                        (7 วันล่าสุด)
-                    @endif
-                </div>
-                <div class="card-body">
-                    <div class="row text-center">
-                        <div class="col-md-2 col-6 mb-3">
-                            <div class="border rounded p-3 h-100">
-                                <h5 class="text-muted mb-1">📋 จำนวนงาน</h5>
-                                <h3 class="text-primary mb-0">{{ number_format($operationStats['operationCount']) }}</h3>
-                                <small class="text-muted">รายการ</small>
-                            </div>
-                        </div>
-                        <div class="col-md-2 col-6 mb-3">
-                            <div class="border rounded p-3 h-100">
-                                <h5 class="text-muted mb-1">💧 ผ้าเปียก</h5>
-                                <h3 class="text-info mb-0">{{ number_format($operationStats['totalWetWeight'], 2) }}</h3>
-                                <small class="text-muted">กก.</small>
-                            </div>
-                        </div>
-                        <div class="col-md-2 col-6 mb-3">
-                            <div class="border rounded p-3 h-100">
-                                <h5 class="text-muted mb-1">☀️ ผ้าแห้ง</h5>
-                                <h3 class="text-warning mb-0">{{ number_format($operationStats['totalDryWeight'], 2) }}</h3>
-                                <small class="text-muted">กก.</small>
-                            </div>
-                        </div>
-                        <div class="col-md-2 col-6 mb-3">
-                            <div class="border rounded p-3 h-100">
-                                <h5 class="text-muted mb-1">📉 % หักลบ</h5>
-                                @php
-                                    $diffPercent = $operationStats['weightDiffPercent'];
-                                    $diffColor = $diffPercent > 20 ? 'danger' : ($diffPercent > 15 ? 'warning' : 'success');
-                                @endphp
-                                <h3 class="text-{{ $diffColor }} mb-0">{{ $diffPercent }}%</h3>
-                                <small class="text-muted">เปียก-แห้ง</small>
-                            </div>
-                        </div>
-                        <div class="col-md-2 col-6 mb-3">
-                            <div class="border rounded p-3 h-100">
-                                <h5 class="text-muted mb-1">⚖️ น้ำหนักบิล</h5>
-                                <h3 class="text-secondary mb-0">{{ number_format($operationStats['totalBillingWeight'], 2) }}</h3>
-                                <small class="text-muted">กก.</small>
-                            </div>
-                        </div>
-                        <div class="col-md-2 col-6 mb-3">
-                            <div class="border rounded p-3 h-100">
-                                <h5 class="text-muted mb-1">💵 ยอดบิล</h5>
-                                <h3 class="text-success mb-0">{{ number_format($operationStats['totalBillingPayment'], 2) }}</h3>
-                                <small class="text-muted">บาท</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <div class="row justify-content-center">
         <div class="col-md-12 m-2">
             <div class="card">
@@ -212,10 +119,6 @@
 <script>
 $(function(){
 
-    // Datepicker สำหรับกราฟเปรียบเทียบ
-    $('[name=compare-start]').datepicker({ format: 'yyyy-mm-dd' });
-    $('[name=compare-end]').datepicker({ format: 'yyyy-mm-dd' });
-
     $(function(){
         var startAt = '{{ request()->get('sales-range-days-start-at') }}'
         var endAt = '{{ request()->get('sales-range-days-end-at') }}'
@@ -228,7 +131,6 @@ $(function(){
         }
         $.salesLatestDaysChart({ 'renderTo': 'sales-range-days-chart', 'data': salesLatestDaysSummary, 'title': title});
     })
-
 
     $(function(){
         var startAt = '{{ request()->get('energy-range-days-start-at') }}'

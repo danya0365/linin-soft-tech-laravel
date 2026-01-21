@@ -323,10 +323,6 @@
 <script>
 $(function(){
 
-    // Datepicker สำหรับกราฟเปรียบเทียบ
-    $('[name=compare-start]').datepicker({ format: 'yyyy-mm-dd' });
-    $('[name=compare-end]').datepicker({ format: 'yyyy-mm-dd' });
-
     var salesYearSummary = @json(App\Managers\HighChartManager::getSalesYearSummary());
     $.salesChart({ 'renderTo': "sales-bar-chart", 'data': salesYearSummary});
 
@@ -480,12 +476,6 @@ $(function(){
         e.preventDefault();
         incomeRangeDaysSummary();
     })
-
-    // $('.date').each(function(element){
-    //     new Datepicker($(element), {
-    //         // options
-    //     }); 
-    // })
 
     $('[name=energy-range-days-start-at]').datepicker({ format: 'yyyy-mm-dd' });
     $('[name=energy-range-days-end-at]').datepicker({ format: 'yyyy-mm-dd' });
