@@ -69,20 +69,12 @@
 
         {{-- Operation Statistics Summary Card --}}
         @php
-            $operationStats = App\Managers\HighChartManager::getOperationStatsSummary(
-                request()->input('overall.date_start_at'), 
-                request()->input('overall.date_end_at')
-            );
+            $operationStats = App\Managers\HighChartManager::getOperationStatsSummary();
         @endphp
         <div class="col-md-12 m-2">
             <div class="card border-info">
                 <div class="card-header bg-info text-white">
-                    🧺 สรุป Operation 
-                    @if(request()->input('overall.date_start_at') && request()->input('overall.date_end_at'))
-                        ({{ request()->input('overall.date_start_at') }} ถึง {{ request()->input('overall.date_end_at') }})
-                    @else
-                        (7 วันล่าสุด)
-                    @endif
+                    🧺 สรุป Operation (7 วันล่าสุด)
                 </div>
                 <div class="card-body">
                     <div class="row text-center">
