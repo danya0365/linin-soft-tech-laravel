@@ -45,8 +45,12 @@
                             {{ $customerOperationDailySummary->total_packing_piece }}
                         </div>
                         <div class="form-group">
-                            <strong>Total Edit Collect Weight:</strong>
-                            {{ $customerOperationDailySummary->total_edit_collect_weight }}
+                            <strong>Edit Weight (ระบบ):</strong>
+                            <span class="text-success" title="คำนวณอัตโนมัติจาก linen_case='edit'">{{ $customerOperationDailySummary->total_edit_collect_weight }} <i class="fa fa-info-circle"></i></span>
+                        </div>
+                        <div class="form-group">
+                            <strong>Edit Weight (บันทึกมือ):</strong>
+                            <span class="text-warning" title="กรอกโดย Supervisor ตอนออกบิล">{{ $customerOperationDailySummary->total_edit_weight ?? 0 }} <i class="fa fa-info-circle"></i></span>
                         </div>
                         <div class="form-group">
                             <strong>Total Collect Weight:</strong>

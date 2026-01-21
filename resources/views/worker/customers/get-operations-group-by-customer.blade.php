@@ -50,7 +50,7 @@
                                     <th>ลูกค้า</th>
                                     <th>น้ำหนักผ้าเปียก</th>
                                     <th>น้ำหนักผ้าสะอาด</th>
-                                    <th>น้ำหนักผ้าแก้ไข</th>
+                                    <th title="คำนวณอัตโนมัติจาก linen_case='edit'">ผ้าแก้ไข (ระบบ) <i class="fa fa-info-circle text-success"></i></th>
                                     <th>% ของเสีย</th>
                                     <th>น้ำหนักลูกค้า</th>
                                     <th>มากกว่าหรือน้อยกว่า</th>
@@ -70,8 +70,8 @@
                                         </td>
                                         <td class="text-center">{{ number_format($operation->total_wet_weight) }}</td>
                                         <td class="text-center">{{ number_format($operation->total_collect_weight) }}</td>
-                                        <td class="text-center">{{ number_format($operation->total_edit_collect_weight) }}</td>
-                                        <td class="text-center">{{ number_format($operation->total_collect_weight > 0 ? $operation->total_edit_collect_weight*100/$operation->total_collect_weight : 100) }}%</td>
+                                        <td class="text-center text-success">{{ number_format($operation->total_edit_collect_weight) }}</td>
+                                        <td class="text-center">{{ number_format($operation->total_collect_weight > 0 ? $operation->total_edit_collect_weight*100/$operation->total_collect_weight : 0) }}%</td>
                                         <td class="text-center">{{ number_format($operation->total_billing_weight) }}</td>
                                         <td class="text-center">{{ number_format($operation->total_billing_weight-$operation->total_collect_weight) }}</td>
                                     </tr>

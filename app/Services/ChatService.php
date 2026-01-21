@@ -267,6 +267,18 @@ class ChatService
             ];
         }
 
+        // === ดึงยอดสะสมจาก CustomerOperationDailySummary ===
+        $summary = \App\Models\CustomerOperationDailySummary::where('customer_id', $customerId)
+            ->selectRaw('
+                SUM(total_wet_weight) as total_wet_weight,
+                SUM(total_dry_weight) as total_dry_weight,
+                SUM(total_edit_collect_weight) as total_edit_collect_weight,
+                SUM(total_edit_weight) as total_edit_weight,
+                SUM(total_billing_weight) as total_billing_weight,
+                SUM(total_billing_payment) as total_billing_payment
+            ')
+            ->first();
+
         return [
             'type' => 'card',
             'title' => '👥 ข้อมูลลูกค้า',
@@ -274,12 +286,15 @@ class ChatService
             'headerColor' => '#0066CC',
             'rows' => [
                 ['label' => '🏥 ชื่อ', 'value' => $customer->name],
+                ['label' => '🏢 กลุ่มลูกค้า', 'value' => $customer->customerGroup ? $customer->customerGroup->name : '-'],
                 ['type' => 'separator'],
-                ['label' => '💧 น้ำหนักเปียก', 'value' => number_format($customer->total_wet_weight, 2) . ' kg'],
-                ['label' => '☀️ น้ำหนักแห้ง', 'value' => number_format($customer->total_dry_weight, 2) . ' kg'],
-                ['label' => '📝 น้ำหนักแก้ไข', 'value' => number_format($customer->total_edit_weight, 2) . ' kg'],
+                ['label' => '💧 น้ำหนักเปียก (สะสม)', 'value' => number_format($summary->total_wet_weight ?? 0, 2) . ' kg'],
+                ['label' => '☀️ น้ำหนักแห้ง (สะสม)', 'value' => number_format($summary->total_dry_weight ?? 0, 2) . ' kg'],
+                ['label' => '🔧 ผ้าแก้ไข (ระบบ)', 'value' => number_format($summary->total_edit_collect_weight ?? 0, 2) . ' kg', 'valueColor' => '#28A745'],
+                ['label' => '✏️ ผ้าแก้ไข (กรอกมือ)', 'value' => number_format($summary->total_edit_weight ?? 0, 2) . ' kg', 'valueColor' => '#FFA500'],
                 ['type' => 'separator'],
-                ['label' => '💰 ยอดเงินรวม', 'value' => number_format($customer->total_billing_payment, 2) . ' ฿', 'valueColor' => '#1DB446'],
+                ['label' => '⚖️ น้ำหนักบิล (สะสม)', 'value' => number_format($summary->total_billing_weight ?? 0, 2) . ' kg'],
+                ['label' => '💰 ยอดเงินรวม', 'value' => number_format($summary->total_billing_payment ?? 0, 2) . ' ฿', 'valueColor' => '#1DB446'],
             ],
         ];
     }
@@ -1288,19 +1303,60 @@ class ChatService
         $rows[] = ['type' => 'separator'];
         $rows[] = ['label' => '🧺 Operation (สรุป)', 'value' => '', 'bold' => true];
         
-        $operationCount = Operation::whereBetween('created_at', [$startDate, $endDate])->count();
-        $totalWetWeight = Operation::whereBetween('created_at', [$startDate, $endDate])->sum('total_wet_weight') ?? 0;
-        $totalDryWeight = Operation::whereBetween('created_at', [$startDate, $endDate])->sum('total_dry_weight') ?? 0;
-        $totalEditWeight = Operation::whereBetween('created_at', [$startDate, $endDate])->sum('total_edit_weight') ?? 0;
-        $totalBillingWeight = Operation::whereBetween('created_at', [$startDate, $endDate])->sum('total_billing_weight') ?? 0;
-        $totalBillingPayment = Operation::whereBetween('created_at', [$startDate, $endDate])->sum('total_billing_payment') ?? 0;
+        // === Group 1: Non-payment operations - filter by created_at ===
+        $nonPaymentCount = Operation::where('operation_type', '!=', 'payment')
+            ->whereBetween('created_at', [$startDate, $endDate])->count();
+        $nonPaymentWetWeight = Operation::where('operation_type', '!=', 'payment')
+            ->whereBetween('created_at', [$startDate, $endDate])->sum('total_wet_weight') ?? 0;
+        $nonPaymentDryWeight = Operation::where('operation_type', '!=', 'payment')
+            ->whereBetween('created_at', [$startDate, $endDate])->sum('total_dry_weight') ?? 0;
+        $nonPaymentEditWeight = Operation::where('operation_type', '!=', 'payment')
+            ->whereBetween('created_at', [$startDate, $endDate])->sum('total_edit_weight') ?? 0;
+        $nonPaymentBillingWeight = Operation::where('operation_type', '!=', 'payment')
+            ->whereBetween('created_at', [$startDate, $endDate])->sum('total_billing_weight') ?? 0;
+        $nonPaymentBillingPayment = Operation::where('operation_type', '!=', 'payment')
+            ->whereBetween('created_at', [$startDate, $endDate])->sum('total_billing_payment') ?? 0;
+        
+        // === Group 2: Payment operations - filter by billing_payment_date ===
+        $paymentDateStart = $startDate->format('Y-m-d');
+        $paymentDateEnd = $endDate->format('Y-m-d');
+        
+        $paymentCount = Operation::where('operation_type', 'payment')
+            ->whereBetween('billing_payment_date', [$paymentDateStart, $paymentDateEnd])->count();
+        $paymentWetWeight = Operation::where('operation_type', 'payment')
+            ->whereBetween('billing_payment_date', [$paymentDateStart, $paymentDateEnd])->sum('total_wet_weight') ?? 0;
+        $paymentDryWeight = Operation::where('operation_type', 'payment')
+            ->whereBetween('billing_payment_date', [$paymentDateStart, $paymentDateEnd])->sum('total_dry_weight') ?? 0;
+        $paymentEditWeight = Operation::where('operation_type', 'payment')
+            ->whereBetween('billing_payment_date', [$paymentDateStart, $paymentDateEnd])->sum('total_edit_weight') ?? 0;
+        $paymentBillingWeight = Operation::where('operation_type', 'payment')
+            ->whereBetween('billing_payment_date', [$paymentDateStart, $paymentDateEnd])->sum('total_billing_weight') ?? 0;
+        $paymentBillingPayment = Operation::where('operation_type', 'payment')
+            ->whereBetween('billing_payment_date', [$paymentDateStart, $paymentDateEnd])->sum('total_billing_payment') ?? 0;
+        
+        // === รวมทั้ง 2 กลุ่ม ===
+        $operationCount = $nonPaymentCount + $paymentCount;
+        $totalWetWeight = $nonPaymentWetWeight + $paymentWetWeight;
+        $totalDryWeight = $nonPaymentDryWeight + $paymentDryWeight;
+        $totalEditWeight = $nonPaymentEditWeight + $paymentEditWeight;
+        $totalBillingWeight = $nonPaymentBillingWeight + $paymentBillingWeight;
+        $totalBillingPayment = $nonPaymentBillingPayment + $paymentBillingPayment;
+        
+        // === ผ้าแก้ไข จาก CustomerOperationDailySummary (คำนวณจาก linen_case='edit') ===
+        $totalEditCollectWeight = \App\Models\CustomerOperationDailySummary::whereBetween('operation_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
+            ->sum('total_edit_collect_weight') ?? 0;
         
         // คำนวณ % หักลบ (เปียก-แห้ง)
         $weightDiffPercent = ($totalWetWeight > 0 && $totalDryWeight > 0) 
             ? round(($totalWetWeight - $totalDryWeight) / $totalWetWeight * 100, 2) 
             : 0;
         
-        // คำนวณ % ผ้าแก้ไข
+        // คำนวณ % ผ้าแก้ไข (จากระบบ)
+        $editCollectWeightPercent = ($totalBillingWeight > 0 && $totalEditCollectWeight > 0) 
+            ? round(($totalEditCollectWeight / $totalBillingWeight) * 100, 2) 
+            : 0;
+        
+        // คำนวณ % ผ้าแก้ไข (กรอกมือ)
         $editWeightPercent = ($totalBillingWeight > 0 && $totalEditWeight > 0) 
             ? round(($totalEditWeight / $totalBillingWeight) * 100, 2) 
             : 0;
@@ -1309,8 +1365,10 @@ class ChatService
         $rows[] = ['label' => '💧 น้ำหนักเปียก', 'value' => number_format($totalWetWeight, 2) . ' kg'];
         $rows[] = ['label' => '☀️ น้ำหนักแห้ง', 'value' => number_format($totalDryWeight, 2) . ' kg'];
         $rows[] = ['label' => '📉 % หักลบ (เปียก-แห้ง)', 'value' => $weightDiffPercent . '%', 'valueColor' => $weightDiffPercent > 20 ? '#FF0000' : ($weightDiffPercent > 15 ? '#FFA500' : '#1DB446')];
-        $rows[] = ['label' => '✂️ น้ำหนักผ้าแก้ไข', 'value' => number_format($totalEditWeight, 2) . ' kg'];
-        $rows[] = ['label' => '📊 % ผ้าแก้ไข', 'value' => $editWeightPercent . '%', 'valueColor' => '#17A2B8'];
+        $rows[] = ['label' => '🔧 ผ้าแก้ไข (จากระบบ)', 'value' => number_format($totalEditCollectWeight, 2) . ' kg', 'valueColor' => '#FFC107'];
+        $rows[] = ['label' => '📊 % ผ้าแก้ไข (จากระบบ)', 'value' => $editCollectWeightPercent . '%', 'valueColor' => '#FFC107'];
+        $rows[] = ['label' => '✏️ ผ้าแก้ไข (กรอกมือ)', 'value' => number_format($totalEditWeight, 2) . ' kg', 'valueColor' => '#17A2B8'];
+        $rows[] = ['label' => '📊 % ผ้าแก้ไข (กรอกมือ)', 'value' => $editWeightPercent . '%', 'valueColor' => '#17A2B8'];
         $rows[] = ['label' => '⚖️ น้ำหนักบิล', 'value' => number_format($totalBillingWeight, 2) . ' kg'];
         $rows[] = ['label' => '💵 ยอดบิล', 'value' => number_format($totalBillingPayment, 2) . ' ฿', 'valueColor' => '#1DB446'];
 

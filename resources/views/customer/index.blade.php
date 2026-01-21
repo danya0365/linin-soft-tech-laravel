@@ -44,11 +44,6 @@
                                         
 										<th>Name</th>
 										<th>Customer Group</th>
-										<th>Total Wet Weight</th>
-										<th>Total Dry Weight</th>
-										<th>Total Billing Weight</th>
-										<th>Total Edit Weight</th>
-										<th>Total Billing Payment</th>
 
                                         <th></th>
                                     </tr>
@@ -60,11 +55,6 @@
                                             
 											<td>{{ $customer->name }}</td>
 											<td>{{ $customer->customerGroup ? $customer->customerGroup->name : '-' }}</td>
-											<td>{{ $customer->total_wet_weight }}</td>
-											<td>{{ $customer->total_dry_weight }}</td>
-											<td>{{ $customer->total_billing_weight }}</td>
-											<td>{{ $customer->total_edit_weight }}</td>
-											<td>{{ $customer->total_billing_payment }}</td>
 
                                             <td>
                                                 <form action="{{ route('customers.destroy',$customer->id) }}" method="POST">
