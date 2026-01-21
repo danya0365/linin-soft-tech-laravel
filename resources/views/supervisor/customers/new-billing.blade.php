@@ -35,7 +35,7 @@
 
                         <div class="col-12">
                             <label for="total_billing_weight" class="form-label">น้ำหนักลูกค้า (kg.)</label>
-                            <input type="number" step=".01" name="total_billing_weight" class="form-control" id="value">
+                            <input type="number" step=".01" name="total_billing_weight" class="form-control" id="total_billing_weight">
                             @error('total_billing_weight')
                                 <div class="text-danger">{{ $message }}</div>
                             @enderror
@@ -64,6 +64,23 @@
                                 <span class="input-group-text">%</span>
                             </div>
                             <small class="text-muted">คำนวณอัตโนมัติ</small>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="total_edit_weight" class="form-label">น้ำหนักผ้าแก้ไข (kg.)</label>
+                            <input type="number" step=".01" name="total_edit_weight" class="form-control" id="total_edit_weight" oninput="calculateEditWeightPercent()">
+                            @error('total_edit_weight')
+                                <div class="text-danger">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">% ผ้าแก้ไข</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="edit_weight_percent" readonly>
+                                <span class="input-group-text">%</span>
+                            </div>
+                            <small class="text-muted">คำนวณจาก (น้ำหนักผ้าแก้ไข / น้ำหนักลูกค้า) × 100</small>
                         </div>
 
                         <div class="col-12">
@@ -106,5 +123,25 @@ function calculateWeightDiff() {
     
     document.getElementById('weight_diff_percent').value = diffPercent;
 }
+
+function calculateEditWeightPercent() {
+    var billingWeight = parseFloat(document.getElementById('total_billing_weight').value) || 0;
+    var editWeight = parseFloat(document.getElementById('total_edit_weight').value) || 0;
+    var editPercent = 0;
+    
+    if (billingWeight > 0 && editWeight > 0) {
+        editPercent = (editWeight / billingWeight * 100).toFixed(2);
+    }
+    
+    document.getElementById('edit_weight_percent').value = editPercent;
+}
+
+// เรียกคำนวณเมื่อน้ำหนักลูกค้าเปลี่ยน
+document.addEventListener('DOMContentLoaded', function() {
+    var billingWeightInput = document.getElementById('total_billing_weight');
+    if (billingWeightInput) {
+        billingWeightInput.addEventListener('input', calculateEditWeightPercent);
+    }
+});
 </script>
 @endsection
