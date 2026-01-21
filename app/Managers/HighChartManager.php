@@ -385,12 +385,18 @@ class HighChartManager extends Manager
         $operationCount = \App\Models\Operation::whereBetween('created_at', [$startOfDay, $endOfDay])->count();
         $totalWetWeight = \App\Models\Operation::whereBetween('created_at', [$startOfDay, $endOfDay])->sum('total_wet_weight') ?? 0;
         $totalDryWeight = \App\Models\Operation::whereBetween('created_at', [$startOfDay, $endOfDay])->sum('total_dry_weight') ?? 0;
+        $totalEditWeight = \App\Models\Operation::whereBetween('created_at', [$startOfDay, $endOfDay])->sum('total_edit_weight') ?? 0;
         $totalBillingWeight = \App\Models\Operation::whereBetween('created_at', [$startOfDay, $endOfDay])->sum('total_billing_weight') ?? 0;
         $totalBillingPayment = \App\Models\Operation::whereBetween('created_at', [$startOfDay, $endOfDay])->sum('total_billing_payment') ?? 0;
 
-        // คำนวณ % หักลบ
+        // คำนวณ % หักลบ (เปียก-แห้ง)
         $weightDiffPercent = ($totalWetWeight > 0 && $totalDryWeight > 0) 
             ? round(($totalWetWeight - $totalDryWeight) / $totalWetWeight * 100, 2) 
+            : 0;
+
+        // คำนวณ % ผ้าแก้ไข
+        $editWeightPercent = ($totalBillingWeight > 0 && $totalEditWeight > 0) 
+            ? round(($totalEditWeight / $totalBillingWeight) * 100, 2) 
             : 0;
 
         return [
@@ -400,6 +406,8 @@ class HighChartManager extends Manager
             'totalWetWeight' => round($totalWetWeight, 2),
             'totalDryWeight' => round($totalDryWeight, 2),
             'weightDiffPercent' => $weightDiffPercent,
+            'totalEditWeight' => round($totalEditWeight, 2),
+            'editWeightPercent' => $editWeightPercent,
             'totalBillingWeight' => round($totalBillingWeight, 2),
             'totalBillingPayment' => round($totalBillingPayment, 2),
         ];

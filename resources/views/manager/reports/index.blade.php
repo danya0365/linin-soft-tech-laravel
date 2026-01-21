@@ -112,6 +112,20 @@
                         </div>
                         <div class="col-md-2 col-6 mb-3">
                             <div class="border rounded p-3 h-100">
+                                <h5 class="text-muted mb-1">✂️ ผ้าแก้ไข</h5>
+                                <h3 class="text-info mb-0">{{ number_format($operationStats['totalEditWeight'], 2) }}</h3>
+                                <small class="text-muted">กก.</small>
+                            </div>
+                        </div>
+                        <div class="col-md-2 col-6 mb-3">
+                            <div class="border rounded p-3 h-100">
+                                <h5 class="text-muted mb-1">📊 % ผ้าแก้ไข</h5>
+                                <h3 class="text-primary mb-0">{{ $operationStats['editWeightPercent'] }}%</h3>
+                                <small class="text-muted">แก้ไข/บิล</small>
+                            </div>
+                        </div>
+                        <div class="col-md-2 col-6 mb-3">
+                            <div class="border rounded p-3 h-100">
                                 <h5 class="text-muted mb-1">⚖️ น้ำหนักบิล</h5>
                                 <h3 class="text-secondary mb-0">{{ number_format($operationStats['totalBillingWeight'], 2) }}</h3>
                                 <small class="text-muted">กก.</small>
