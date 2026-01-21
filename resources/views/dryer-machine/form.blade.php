@@ -16,6 +16,14 @@
             {{ Form::text('maximum_weight', $dryerMachine->maximum_weight, ['class' => 'form-control' . ($errors->has('maximum_weight') ? ' is-invalid' : ''), 'placeholder' => 'Maximum Weight']) }}
             {!! $errors->first('maximum_weight', '<div class="invalid-feedback">:message</div>') !!}
         </div>
+        <div class="form-group">
+            {{ Form::label('service_status', 'สถานะเครื่อง') }}
+            {{ Form::select('service_status', [
+                'available' => '✅ พร้อมใช้งาน',
+                'broken' => '🔧 เสีย/ซ่อม'
+            ], $dryerMachine->service_status ?? 'available', ['class' => 'form-control' . ($errors->has('service_status') ? ' is-invalid' : '')]) }}
+            {!! $errors->first('service_status', '<div class="invalid-feedback">:message</div>') !!}
+        </div>
 
     </div>
     <div class="box-footer mt-4">

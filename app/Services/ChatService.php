@@ -596,6 +596,8 @@ class ChatService
         $label = $typeLabels[$type] ?? 'เครื่องจักร';
 
         $rows = [];
+        $availableCount = 0;
+        $brokenCount = 0;
 
         switch ($type) {
             case 'washing':
@@ -604,10 +606,19 @@ class ChatService
                     $rows[] = ['label' => 'ไม่พบข้อมูล', 'value' => '-'];
                 } else {
                     foreach ($machines as $machine) {
-                        $statusColor = $machine->status === 'available' ? '#1DB446' : '#FF6B35';
+                        $statusIcon = $machine->service_status === 'available' ? '✅' : '🔧';
+                        $statusColor = $machine->service_status === 'available' ? '#1DB446' : '#FF0000';
+                        
+                        if ($machine->service_status === 'available') {
+                            $availableCount++;
+                        } else {
+                            $brokenCount++;
+                        }
+                        
                         $rows[] = [
-                            'label' => $machine->name,
+                            'label' => "{$statusIcon} {$machine->name}",
                             'value' => number_format($machine->maximum_weight) . ' kg',
+                            'valueColor' => $statusColor,
                         ];
                     }
                 }
@@ -619,9 +630,19 @@ class ChatService
                     $rows[] = ['label' => 'ไม่พบข้อมูล', 'value' => '-'];
                 } else {
                     foreach ($machines as $machine) {
+                        $statusIcon = $machine->service_status === 'available' ? '✅' : '🔧';
+                        $statusColor = $machine->service_status === 'available' ? '#1DB446' : '#FF0000';
+                        
+                        if ($machine->service_status === 'available') {
+                            $availableCount++;
+                        } else {
+                            $brokenCount++;
+                        }
+                        
                         $rows[] = [
-                            'label' => $machine->name,
+                            'label' => "{$statusIcon} {$machine->name}",
                             'value' => number_format($machine->maximum_weight) . ' kg',
+                            'valueColor' => $statusColor,
                         ];
                     }
                 }
@@ -633,15 +654,18 @@ class ChatService
                     $rows[] = ['label' => 'ไม่พบข้อมูล', 'value' => '-'];
                 } else {
                     foreach ($trucks as $truck) {
-                        $status = $truck->operation_id ? 'ไม่ว่าง' : 'พร้อมใช้งาน';
-                        $statusColor = $truck->operation_id ? '#FF6B35' : '#1DB446';
+                        $statusIcon = $truck->service_status === 'available' ? '✅' : '🔧';
+                        $statusColor = $truck->service_status === 'available' ? '#1DB446' : '#FF0000';
+                        
+                        if ($truck->service_status === 'available') {
+                            $availableCount++;
+                        } else {
+                            $brokenCount++;
+                        }
+                        
                         $rows[] = [
-                            'label' => $truck->name,
+                            'label' => "{$statusIcon} {$truck->name}",
                             'value' => $truck->plate_number ?? '-',
-                        ];
-                        $rows[] = [
-                            'label' => '    สถานะ',
-                            'value' => $status,
                             'valueColor' => $statusColor,
                         ];
                     }
@@ -649,12 +673,20 @@ class ChatService
                 break;
         }
 
+        // เพิ่มสรุปสถานะด้านบน
+        $summaryRows = [
+            ['label' => '📊 สรุปสถานะ', 'value' => '', 'bold' => true],
+            ['label' => '✅ พร้อมใช้งาน', 'value' => "{$availableCount} เครื่อง", 'valueColor' => '#1DB446'],
+            ['label' => '🔧 เสีย/ซ่อม', 'value' => "{$brokenCount} เครื่อง", 'valueColor' => '#FF0000'],
+            ['type' => 'separator'],
+        ];
+
         return [
             'type' => 'card',
             'title' => $label,
             'subtitle' => 'รายการทั้งหมด',
             'headerColor' => '#34495E',
-            'rows' => $rows,
+            'rows' => array_merge($summaryRows, $rows),
         ];
     }
 

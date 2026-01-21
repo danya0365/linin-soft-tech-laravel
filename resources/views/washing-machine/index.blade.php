@@ -45,6 +45,7 @@
 										<th>Name</th>
 										<th>Photo</th>
 										<th>Maximum Weight</th>
+										<th>สถานะ</th>
 
                                         <th></th>
                                     </tr>
@@ -57,6 +58,13 @@
 											<td>{{ $washingMachine->name }}</td>
 											<td>{{ $washingMachine->photo }}</td>
 											<td>{{ $washingMachine->maximum_weight }}</td>
+											<td>
+												@if($washingMachine->service_status === 'available')
+													<span class="badge bg-success">✅ พร้อมใช้งาน</span>
+												@else
+													<span class="badge bg-danger">🔧 เสีย</span>
+												@endif
+											</td>
 
                                             <td>
                                                 <form action="{{ route('washing-machines.destroy',$washingMachine->id) }}" method="POST">
