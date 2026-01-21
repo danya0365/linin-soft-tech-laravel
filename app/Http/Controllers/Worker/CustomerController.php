@@ -218,28 +218,4 @@ class CustomerController extends Controller
         )
             ->with('i', (request()->input('page', 1) - 1) * $operations->perPage());
     }
-
-    public function getNewBilling($customerId)
-    {
-        $customer = Customer::find($customerId);
-        return view('worker.customers.new-billing', ['customer' => $customer]);
-    }
-
-    public function submitBilling($customerId)
-    {
-        request()->validate(['total_billing_weight' => 'required', 'total_billing_payment' => 'required', 'billing_payment_date' => 'required']);
-
-        $operation = new Operation();
-        $operation->operation_type = OperationType::Payment();
-        $operation->status = OperationStatus::Close();
-        $operation->customer_id = $customerId;
-        $operation->total_billing_weight = request()->get('total_billing_weight');
-        $operation->total_billing_payment = request()->get('total_billing_payment');
-        $operation->billing_payment_date = request()->get('billing_payment_date');
-        $operation->save();
-
-        OperationManager::createCustomerOperationDailySummary($operation);
-        IncomeManager::create(IncomeType::CustomerBilling(), $operation, $operation->total_billing_payment, $operation->billing_payment_date);
-        return redirect(route('worker.customer.operation-summary'));
-    }
 }

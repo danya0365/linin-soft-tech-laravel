@@ -1288,18 +1288,44 @@ class ChatService
         $rows[] = ['type' => 'separator'];
         $rows[] = ['label' => '🧺 Operation (สรุป)', 'value' => '', 'bold' => true];
         
-        $operationCount = Operation::whereBetween('created_at', [$startDate, $endDate])->count();
-        $totalWetWeight = Operation::whereBetween('created_at', [$startDate, $endDate])->sum('total_wet_weight') ?? 0;
-        $totalDryWeight = Operation::whereBetween('created_at', [$startDate, $endDate])->sum('total_dry_weight') ?? 0;
-        $totalEditWeight = Operation::whereBetween('created_at', [$startDate, $endDate])->sum('total_edit_weight') ?? 0;
+        // === Group 1: Non-payment operations - filter by created_at ===
+        $nonPaymentCount = Operation::where('operation_type', '!=', 'payment')
+            ->whereBetween('created_at', [$startDate, $endDate])->count();
+        $nonPaymentWetWeight = Operation::where('operation_type', '!=', 'payment')
+            ->whereBetween('created_at', [$startDate, $endDate])->sum('total_wet_weight') ?? 0;
+        $nonPaymentDryWeight = Operation::where('operation_type', '!=', 'payment')
+            ->whereBetween('created_at', [$startDate, $endDate])->sum('total_dry_weight') ?? 0;
+        $nonPaymentEditWeight = Operation::where('operation_type', '!=', 'payment')
+            ->whereBetween('created_at', [$startDate, $endDate])->sum('total_edit_weight') ?? 0;
+        $nonPaymentBillingWeight = Operation::where('operation_type', '!=', 'payment')
+            ->whereBetween('created_at', [$startDate, $endDate])->sum('total_billing_weight') ?? 0;
+        $nonPaymentBillingPayment = Operation::where('operation_type', '!=', 'payment')
+            ->whereBetween('created_at', [$startDate, $endDate])->sum('total_billing_payment') ?? 0;
         
-        // Billing stats - filter by operation_type=payment and billing_payment_date
-        $totalBillingWeight = Operation::where('operation_type', 'payment')
-            ->whereBetween('billing_payment_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
-            ->sum('total_billing_weight') ?? 0;
-        $totalBillingPayment = Operation::where('operation_type', 'payment')
-            ->whereBetween('billing_payment_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
-            ->sum('total_billing_payment') ?? 0;
+        // === Group 2: Payment operations - filter by billing_payment_date ===
+        $paymentDateStart = $startDate->format('Y-m-d');
+        $paymentDateEnd = $endDate->format('Y-m-d');
+        
+        $paymentCount = Operation::where('operation_type', 'payment')
+            ->whereBetween('billing_payment_date', [$paymentDateStart, $paymentDateEnd])->count();
+        $paymentWetWeight = Operation::where('operation_type', 'payment')
+            ->whereBetween('billing_payment_date', [$paymentDateStart, $paymentDateEnd])->sum('total_wet_weight') ?? 0;
+        $paymentDryWeight = Operation::where('operation_type', 'payment')
+            ->whereBetween('billing_payment_date', [$paymentDateStart, $paymentDateEnd])->sum('total_dry_weight') ?? 0;
+        $paymentEditWeight = Operation::where('operation_type', 'payment')
+            ->whereBetween('billing_payment_date', [$paymentDateStart, $paymentDateEnd])->sum('total_edit_weight') ?? 0;
+        $paymentBillingWeight = Operation::where('operation_type', 'payment')
+            ->whereBetween('billing_payment_date', [$paymentDateStart, $paymentDateEnd])->sum('total_billing_weight') ?? 0;
+        $paymentBillingPayment = Operation::where('operation_type', 'payment')
+            ->whereBetween('billing_payment_date', [$paymentDateStart, $paymentDateEnd])->sum('total_billing_payment') ?? 0;
+        
+        // === รวมทั้ง 2 กลุ่ม ===
+        $operationCount = $nonPaymentCount + $paymentCount;
+        $totalWetWeight = $nonPaymentWetWeight + $paymentWetWeight;
+        $totalDryWeight = $nonPaymentDryWeight + $paymentDryWeight;
+        $totalEditWeight = $nonPaymentEditWeight + $paymentEditWeight;
+        $totalBillingWeight = $nonPaymentBillingWeight + $paymentBillingWeight;
+        $totalBillingPayment = $nonPaymentBillingPayment + $paymentBillingPayment;
         
         // คำนวณ % หักลบ (เปียก-แห้ง)
         $weightDiffPercent = ($totalWetWeight > 0 && $totalDryWeight > 0) 

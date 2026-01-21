@@ -43,8 +43,6 @@ class CustomerController extends Controller
             $operation->status = OperationStatus::Close();
             $operation->customer_id = request()->get('customer_id');
             $operation->total_billing_weight = request()->get('total_billing_weight');
-            $operation->total_wet_weight = request()->get('total_wet_weight');
-            $operation->total_dry_weight = request()->get('total_dry_weight');
             $operation->total_edit_weight = request()->get('total_edit_weight');
             $operation->total_billing_payment = request()->get('total_billing_payment');
             $operation->billing_payment_date = request()->get('billing_payment_date');
@@ -163,9 +161,8 @@ class CustomerController extends Controller
 
             // ⚠️ ห้ามแก้ไข total_billing_payment และ billing_payment_date 
             // เพราะผูกกับ Income และ Daily Summary
+            // ⚠️ ห้ามใส่ total_wet_weight, total_dry_weight เพราะจะซ้ำกับ non-payment operations
             $operation->total_billing_weight = request()->get('total_billing_weight');
-            $operation->total_wet_weight = request()->get('total_wet_weight');
-            $operation->total_dry_weight = request()->get('total_dry_weight');
             $operation->total_edit_weight = request()->get('total_edit_weight');
             $operation->save();
 
