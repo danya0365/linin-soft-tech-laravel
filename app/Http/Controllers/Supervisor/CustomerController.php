@@ -169,6 +169,9 @@ class CustomerController extends Controller
             $operation->total_edit_weight = request()->get('total_edit_weight');
             $operation->save();
 
+            // Recalculate CustomerOperationDailySummary
+            OperationManager::createCustomerOperationDailySummary($operation);
+
             return redirect()->route('supervisor.customer.billing-logs')
                 ->with('success', 'อัพเดตน้ำหนักเรียบร้อยแล้ว');
         }
