@@ -45,6 +45,7 @@ class CustomerController extends Controller
             $operation->total_billing_weight = request()->get('total_billing_weight');
             $operation->total_wet_weight = request()->get('total_wet_weight');
             $operation->total_dry_weight = request()->get('total_dry_weight');
+            $operation->total_edit_weight = request()->get('total_edit_weight');
             $operation->total_billing_payment = request()->get('total_billing_payment');
             $operation->billing_payment_date = request()->get('billing_payment_date');
             $operation->save();
@@ -128,9 +129,18 @@ class CustomerController extends Controller
     {
         $billingLog = Operation::find($id);
 
+        // เก็บข้อมูลก่อนลบ เพื่อใช้ recalculate
+        $customerId = $billingLog->customer_id;
+        $operationDate = $billingLog->created_at->format('Y-m-d');
+
         $billingLog->delete();
 
         IncomeManager::delete($billingLog);
+
+        // Recalculate CustomerOperationDailySummary สำหรับวันนั้น
+        if ($customerId && $operationDate) {
+            OperationManager::recalculateCustomerOperationDailySummary($customerId, $operationDate);
+        }
 
         return redirect()->route('supervisor.customer.billing-logs')
             ->with('success', 'BillingLog deleted successfully');
@@ -156,6 +166,7 @@ class CustomerController extends Controller
             $operation->total_billing_weight = request()->get('total_billing_weight');
             $operation->total_wet_weight = request()->get('total_wet_weight');
             $operation->total_dry_weight = request()->get('total_dry_weight');
+            $operation->total_edit_weight = request()->get('total_edit_weight');
             $operation->save();
 
             return redirect()->route('supervisor.customer.billing-logs')
