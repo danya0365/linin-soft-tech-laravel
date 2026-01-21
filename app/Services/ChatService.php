@@ -279,6 +279,20 @@ class ChatService
             ')
             ->first();
 
+        // คำนวณ % ผ้าแก้ไข (ระบบ)
+        $totalBillingWeight = $summary->total_billing_weight ?? 0;
+        $totalEditCollectWeight = $summary->total_edit_collect_weight ?? 0;
+        $totalEditWeight = $summary->total_edit_weight ?? 0;
+
+        $editCollectWeightPercent = ($totalBillingWeight > 0 && $totalEditCollectWeight > 0) 
+            ? round(($totalEditCollectWeight / $totalBillingWeight) * 100, 2) 
+            : 0;
+
+        // คำนวณ % ผ้าแก้ไข (กรอกมือ)
+        $editWeightPercent = ($totalBillingWeight > 0 && $totalEditWeight > 0) 
+            ? round(($totalEditWeight / $totalBillingWeight) * 100, 2) 
+            : 0;
+
         return [
             'type' => 'card',
             'title' => '👥 ข้อมูลลูกค้า',
@@ -290,10 +304,13 @@ class ChatService
                 ['type' => 'separator'],
                 ['label' => '💧 น้ำหนักเปียก (สะสม)', 'value' => number_format($summary->total_wet_weight ?? 0, 2) . ' kg'],
                 ['label' => '☀️ น้ำหนักแห้ง (สะสม)', 'value' => number_format($summary->total_dry_weight ?? 0, 2) . ' kg'],
-                ['label' => '🔧 ผ้าแก้ไข (ระบบ)', 'value' => number_format($summary->total_edit_collect_weight ?? 0, 2) . ' kg', 'valueColor' => '#28A745'],
-                ['label' => '✏️ ผ้าแก้ไข (กรอกมือ)', 'value' => number_format($summary->total_edit_weight ?? 0, 2) . ' kg', 'valueColor' => '#FFA500'],
                 ['type' => 'separator'],
-                ['label' => '⚖️ น้ำหนักบิล (สะสม)', 'value' => number_format($summary->total_billing_weight ?? 0, 2) . ' kg'],
+                ['label' => '🔧 ผ้าแก้ไข (ระบบ)', 'value' => number_format($totalEditCollectWeight, 2) . ' kg', 'valueColor' => '#28A745'],
+                ['label' => '📊 % ผ้าแก้ไข (ระบบ)', 'value' => $editCollectWeightPercent . '%', 'valueColor' => '#28A745'],
+                ['label' => '✏️ ผ้าแก้ไข (กรอกมือ)', 'value' => number_format($totalEditWeight, 2) . ' kg', 'valueColor' => '#FFA500'],
+                ['label' => '📊 % ผ้าแก้ไข (กรอกมือ)', 'value' => $editWeightPercent . '%', 'valueColor' => '#FFA500'],
+                ['type' => 'separator'],
+                ['label' => '⚖️ น้ำหนักบิล (สะสม)', 'value' => number_format($totalBillingWeight, 2) . ' kg'],
                 ['label' => '💰 ยอดเงินรวม', 'value' => number_format($summary->total_billing_payment ?? 0, 2) . ' ฿', 'valueColor' => '#1DB446'],
             ],
         ];
