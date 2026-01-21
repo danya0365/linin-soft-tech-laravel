@@ -69,20 +69,12 @@
 
         {{-- Operation Statistics Summary Card --}}
         @php
-            $operationStats = App\Managers\HighChartManager::getOperationStatsSummary(
-                request()->input('overall.date_start_at'), 
-                request()->input('overall.date_end_at')
-            );
+            $operationStats = App\Managers\HighChartManager::getOperationStatsSummary();
         @endphp
         <div class="col-md-12 m-2">
             <div class="card border-info">
                 <div class="card-header bg-info text-white">
-                    🧺 สรุป Operation 
-                    @if(request()->input('overall.date_start_at') && request()->input('overall.date_end_at'))
-                        ({{ request()->input('overall.date_start_at') }} ถึง {{ request()->input('overall.date_end_at') }})
-                    @else
-                        (7 วันล่าสุด)
-                    @endif
+                    🧺 สรุป Operation (7 วันล่าสุด)
                 </div>
                 <div class="card-body">
                     <div class="row text-center">
@@ -116,6 +108,20 @@
                                 @endphp
                                 <h3 class="text-{{ $diffColor }} mb-0">{{ $diffPercent }}%</h3>
                                 <small class="text-muted">เปียก-แห้ง</small>
+                            </div>
+                        </div>
+                        <div class="col-md-2 col-6 mb-3">
+                            <div class="border rounded p-3 h-100">
+                                <h5 class="text-muted mb-1">✂️ ผ้าแก้ไข</h5>
+                                <h3 class="text-info mb-0">{{ number_format($operationStats['totalEditWeight'], 2) }}</h3>
+                                <small class="text-muted">กก.</small>
+                            </div>
+                        </div>
+                        <div class="col-md-2 col-6 mb-3">
+                            <div class="border rounded p-3 h-100">
+                                <h5 class="text-muted mb-1">📊 % ผ้าแก้ไข</h5>
+                                <h3 class="text-primary mb-0">{{ $operationStats['editWeightPercent'] }}%</h3>
+                                <small class="text-muted">แก้ไข/บิล</small>
                             </div>
                         </div>
                         <div class="col-md-2 col-6 mb-3">
