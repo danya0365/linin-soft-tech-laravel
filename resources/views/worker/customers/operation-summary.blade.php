@@ -1,106 +1,111 @@
 @extends('layouts.worker')
 
 @section('content')
+<x-menu.page-layout 
+    title="{{ __('รายการยอดรวม') }}"
+    subtitle="สรุปยอดการซักแต่ละลูกค้า"
+    icon="fa-chart-bar"
+    icon-color="text-amber-600"
+    :breadcrumbs="[
+        ['label' => 'Worker', 'url' => route('worker')],
+        ['label' => 'ลูกค้า', 'url' => route('worker.customer')],
+        ['label' => 'รายการยอดรวม']
+    ]"
+>
+    {{-- Filter Form --}}
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 sm:p-6 mb-6 border border-gray-200 dark:border-gray-700">
+        <x-worker.date-filter 
+            :action="route('worker.customer.operation-summary')"
+            :date-start-at="$dateStartAt"
+            :date-end-at="$dateEndAt"
+            :reset-url="route('worker.customer.get-operations-group-by-customer')"
+        >
+            <x-worker.select-filter 
+                name="sort_order"
+                label="เรียงโดย"
+                :options="collect($sortOrders)->pluck('name', 'var')->toArray()"
+                :selected="$sortOrderSelected"
+                :show-all="false"
+            />
+        </x-worker.date-filter>
+    </div>
 
-<div class="container">
-    <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ route('worker') }}">Worker</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.customer') }}">ลูกค้า</a></li>
-            <li class="breadcrumb-item active" aria-current="page">รายการยอดรวม</li>
-        </ol>
-    </nav>
-    <div class="row justify-content-center">
-        <div class="col-md-12 m-2">
-            <div class="card">
-                <div class="card-header">รายการยอดรวมแต่ละลูกค้า</div>
-                <div class="card-body">
-
-                    <form class="row row-cols-lg-auto g-3 align-items-center mb-2" action="{{ route('worker.customer.operation-summary') }}" method="GET">
-                        
-                        <div class="col-12">
-                            <div class="input-group">
-                                <input type="date" name="date_start_at" value="{{ $dateStartAt }}" class="form-control" placeholder="วันที่เริ่ม" aria-label="วันที่เริ่ม">
-                                <span class="input-group-text"> ถึง </span>
-                                <input type="date" name="date_end_at" value="{{ $dateEndAt }}" class="form-control" placeholder="วันที่สิ้นสุด" aria-label="วันที่สิ้นสุด">
-                            </div>
-                        </div>
-
-                        <div class="col-12">
-                            <div class="input-group">
-                                <label class="input-group-text" for="sort_order">เรียงโดย</label>
-                                <select class="form-select" id="sort_order" name="sort_order" onchange="this.form.submit()">
-                                    @foreach ( $sortOrders as $sortOrder )
-                                    <option value="{{ $sortOrder['var'] }}" {{ $sortOrderSelected == $sortOrder['var'] ? 'selected' : '' }}>{{ $sortOrder['name'] }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="col-12">
-                            <button type="submit" class="btn btn-primary">Submit</button>
-                            <a href="{{ route('worker.customer.get-operations-group-by-customer') }}" role="button" class="btn btn-outline-secondary">Reset</a>
-                        </div>
-                    </form>
-
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-hover">
-                            <thead class="thead">
-                                <tr>
-                                    <th>ลูกค้า</th>
-                                    <th>น้ำหนักผ้าเปียก</th>
-                                    <th>น้ำหนักผ้าสะอาด</th>
-                                    <th title="คำนวณอัตโนมัติจาก linen_case='edit'">ผ้าแก้ไข (ระบบ) <i class="fa fa-info-circle text-success"></i></th>
-                                    <th title="กรอกโดย Supervisor ตอนออกบิล">ผ้าแก้ไข (บันทึกมือ) <i class="fa fa-info-circle text-warning"></i></th>
-                                    <th>% ของเสีย</th>
-                                    <th>น้ำหนักลูกค้า</th>
-                                    <th>มากกว่าหรือน้อยกว่า</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($operations as $operation)
-                                    <tr>
-                                        <td>
-                                            @if ( $operation->customer )
-                                            <a href="{{ route('worker.customer.get-operations-by-customer', ['customerId' => $operation->customer->id]) }}">
-                                                {{ $operation->customer->name }}
-                                            </a>
-                                            @else
-                                            <i>ลูกค้าถูกลบ</i>
-                                            @endif
-                                        </td>
-                                        <td class="text-center">{{ number_format($operation->total_wet_weight) }}</td>
-                                        <td class="text-center">{{ number_format($operation->total_collect_weight) }}</td>
-                                        <td class="text-center text-success">{{ number_format($operation->total_edit_collect_weight) }}</td>
-                                        <td class="text-center text-warning">{{ number_format($operation->total_edit_weight ?? 0) }}</td>
-                                        <td class="text-center">{{ number_format($operation->total_collect_weight > 0 ? $operation->total_edit_collect_weight*100/$operation->total_collect_weight : 0) }}%</td>
-                                        <td class="text-center">{{ number_format($operation->total_billing_weight) }}</td>
-                                        <td class="text-center">{{ number_format($operation->total_billing_weight-$operation->total_collect_weight) }}</td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                            <tfoot>
-                                <tr>
-                                    <td>
-                                        ยอดรวม
-                                    </td>
-                                    <td class="text-center">{{ number_format($summary->total_wet_weight) }}</td>
-                                    <td class="text-center">{{ number_format($summary->total_collect_weight) }}</td>
-                                    <td class="text-center text-success">{{ number_format($summary->total_edit_collect_weight) }}</td>
-                                    <td class="text-center text-warning">{{ number_format($summary->total_edit_weight ?? 0) }}</td>
-                                    <td class="text-center">{{ number_format($summary->total_collect_weight > 0 ? $summary->total_edit_collect_weight*100/$summary->total_collect_weight : 0) }}%</td>
-                                    <td class="text-center">{{ number_format($summary->total_billing_weight) }}</td>
-                                    <td class="text-center">{{ number_format($summary->total_billing_weight-$summary->total_collect_weight) }}</td>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </div>
-                </div>
-                <div class="card-footer">
-                    {!! $operations->withQueryString()->links() !!}
-                </div>
+    {{-- Data Table --}}
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+        <div class="px-4 sm:px-6 py-4 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">รายการยอดรวมแต่ละลูกค้า</h3>
+        </div>
+        <div class="p-4 sm:p-6">
+            <div class="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700">
+                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                    <thead class="bg-gray-50 dark:bg-gray-800">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase">ลูกค้า</th>
+                            <th class="px-4 py-3 text-center text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase">น้ำหนักผ้าเปียก</th>
+                            <th class="px-4 py-3 text-center text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase">น้ำหนักผ้าสะอาด</th>
+                            <th class="px-4 py-3 text-center text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase" title="คำนวณอัตโนมัติจาก linen_case='edit'">
+                                ผ้าแก้ไข (ระบบ) <i class="fa fa-info-circle text-green-500"></i>
+                            </th>
+                            <th class="px-4 py-3 text-center text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase" title="กรอกโดย Supervisor ตอนออกบิล">
+                                ผ้าแก้ไข (บันทึกมือ) <i class="fa fa-info-circle text-yellow-500"></i>
+                            </th>
+                            <th class="px-4 py-3 text-center text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase">% ของเสีย</th>
+                            <th class="px-4 py-3 text-center text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase">น้ำหนักลูกค้า</th>
+                            <th class="px-4 py-3 text-center text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase">มากกว่า/น้อยกว่า</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
+                        @foreach ($operations as $operation)
+                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-800">
+                            <td class="px-4 py-3 text-sm text-gray-900 dark:text-gray-200">
+                                @if ($operation->customer)
+                                <a href="{{ route('worker.customer.get-operations-by-customer', ['customerId' => $operation->customer->id]) }}" class="text-blue-600 hover:text-blue-800 hover:underline">
+                                    {{ $operation->customer->name }}
+                                </a>
+                                @else
+                                <i class="text-gray-400">ลูกค้าถูกลบ</i>
+                                @endif
+                            </td>
+                            <td class="px-4 py-3 text-sm text-gray-900 dark:text-gray-200 text-center">{{ number_format($operation->total_wet_weight) }}</td>
+                            <td class="px-4 py-3 text-sm text-gray-900 dark:text-gray-200 text-center">{{ number_format($operation->total_collect_weight) }}</td>
+                            <td class="px-4 py-3 text-sm text-green-600 dark:text-green-400 text-center font-medium">{{ number_format($operation->total_edit_collect_weight) }}</td>
+                            <td class="px-4 py-3 text-sm text-yellow-600 dark:text-yellow-400 text-center font-medium">{{ number_format($operation->total_edit_weight ?? 0) }}</td>
+                            <td class="px-4 py-3 text-sm text-gray-900 dark:text-gray-200 text-center">
+                                <span class="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700">
+                                    {{ number_format($operation->total_collect_weight > 0 ? $operation->total_edit_collect_weight*100/$operation->total_collect_weight : 0) }}%
+                                </span>
+                            </td>
+                            <td class="px-4 py-3 text-sm text-gray-900 dark:text-gray-200 text-center">{{ number_format($operation->total_billing_weight) }}</td>
+                            <td class="px-4 py-3 text-sm text-center">
+                                @php $diff = $operation->total_billing_weight - $operation->total_collect_weight; @endphp
+                                <span class="px-2 py-1 rounded-full text-xs font-medium {{ $diff >= 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
+                                    {{ number_format($diff) }}
+                                </span>
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                    <tfoot class="bg-gray-100 dark:bg-gray-700">
+                        <tr class="font-semibold">
+                            <td class="px-4 py-3 text-sm text-gray-900 dark:text-gray-200">ยอดรวม</td>
+                            <td class="px-4 py-3 text-sm text-gray-900 dark:text-gray-200 text-center">{{ number_format($summary->total_wet_weight) }}</td>
+                            <td class="px-4 py-3 text-sm text-gray-900 dark:text-gray-200 text-center">{{ number_format($summary->total_collect_weight) }}</td>
+                            <td class="px-4 py-3 text-sm text-green-600 dark:text-green-400 text-center">{{ number_format($summary->total_edit_collect_weight) }}</td>
+                            <td class="px-4 py-3 text-sm text-yellow-600 dark:text-yellow-400 text-center">{{ number_format($summary->total_edit_weight ?? 0) }}</td>
+                            <td class="px-4 py-3 text-sm text-gray-900 dark:text-gray-200 text-center">
+                                {{ number_format($summary->total_collect_weight > 0 ? $summary->total_edit_collect_weight*100/$summary->total_collect_weight : 0) }}%
+                            </td>
+                            <td class="px-4 py-3 text-sm text-gray-900 dark:text-gray-200 text-center">{{ number_format($summary->total_billing_weight) }}</td>
+                            <td class="px-4 py-3 text-sm text-gray-900 dark:text-gray-200 text-center">{{ number_format($summary->total_billing_weight - $summary->total_collect_weight) }}</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            
+            <div class="mt-4">
+                {!! $operations->withQueryString()->links() !!}
             </div>
         </div>
     </div>
-</div>
+</x-menu.page-layout>
 @endsection
