@@ -97,3 +97,23 @@ a:active {
     }
 }
 
+/* Global Responsive Container - Mobile-First */
+.container {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 0;      /* Mobile: no padding */
+    padding-right: 0;
+    max-width: 100%;
+    
+    @media (min-width: 640px) {
+        padding-left: 1rem;   /* sm: 16px */
+        padding-right: 1rem;
+    }
+    
+    @media (min-width: 1024px) {
+        padding-left: 1.5rem; /* lg: 24px */
+        padding-right: 1.5rem;
+        max-width: 1280px;    /* max-w-7xl */
+    }
+}
