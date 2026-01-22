@@ -1,57 +1,82 @@
 @extends('layouts.supervisor')
 
 @section('content')
+<div class="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-gray-900 dark:to-gray-800">
+    <div class="container mx-auto px-4 py-8 max-w-7xl">
+        <!-- Breadcrumb -->
+        <nav class="flex mb-8" aria-label="Breadcrumb">
+            <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                <li class="inline-flex items-center">
+                    <a href="/" class="inline-flex items-center text-sm font-medium text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white transition-colors">
+                        <i class="fa fa-home mr-2"></i>
+                        Home
+                    </a>
+                </li>
+                <li>
+                    <div class="flex items-center">
+                        <i class="fa fa-chevron-right text-gray-400 mx-2 text-xs"></i>
+                        <span class="text-sm font-semibold text-gray-700 dark:text-white">{{ __('Supervisor') }}</span>
+                    </div>
+                </li>
+            </ol>
+        </nav>
 
-<div class="container">
-    <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="/">Home</a></li>
-          <li class="breadcrumb-item active" aria-current="page">{{ __('Supervisor') }}</li>
-        </ol>
-    </nav>
-    <div class="row justify-content-center">
-        <div class="col-md-12 m-2">
-            <div class="card">
-                <div class="card-header">{{ __('Supervisor Menu') }}</div>
-                <div class="card-body">
-                    <div class="row g-2">
-                        <div class="col-sm-4">
-                            <a href="{{ route('supervisor.customer') }}">
-                                <div class="p-3 border bg-success" style="min-height: 150px">
-                                    <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 110px">
-                                        <div class="text-center">
-                                            <div class="fa-solid fa-hospital text-light" style="font-size: 3em"></div>
-                                            <div class="text-center mt-3 text-light">{{ __('ลูกค้า - Customer') }}</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </a>
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+                <i class="fa fa-user-tie mr-3 text-indigo-600"></i>{{ __('Supervisor Menu') }}
+            </h1>
+            <p class="text-gray-500 dark:text-gray-400">จัดการข้อมูลลูกค้า แผนก และรายงานสถิติ</p>
+        </div>
+
+        <!-- Menu Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            
+            <!-- Customer -->
+            <a href="{{ route('supervisor.customer') }}" class="group">
+                <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 p-6 h-44 shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300">
+                    <div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-white/10 rounded-full blur-xl"></div>
+                    <div class="absolute bottom-0 left-0 -mb-8 -ml-8 w-32 h-32 bg-white/5 rounded-full blur-2xl"></div>
+                    <div class="relative z-10 flex flex-col items-center justify-center h-full text-white">
+                        <div class="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                            <i class="fa-solid fa-hospital text-3xl"></i>
                         </div>
-                        <div class="col-sm-4">
-                            <a href="{{ route('supervisor.department') }}">
-                                <div class="p-3 border bg-info" style="min-height: 150px">
-                                    <div class="rounded-3 d-flex align-items-center justify-content-center">
-                                        <div class="bi bi-people-fill text-light" style="font-size: 3em"></div>
-                                    </div>
-                                    <div class="text-center text-light">{{ __('แผนก - Department') }}</div>
-                                </div>
-                            </a>
-                        </div>
-                        <div class="col-sm-4">
-                            <a href="{{ route('supervisor.report') }}">
-                                <div class="p-3 border bg-warning" style="min-height: 150px">
-                                    <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 110px">
-                                        <div class="text-center">
-                                            <div class="fa-solid fa-chart-pie text-light" style="font-size: 3em"></div>
-                                            <div class="text-center mt-3 text-light">{{ __('รายงานสถิติ - Report') }}</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </a>
-                        </div>
+                        <h3 class="text-lg font-bold">{{ __('ลูกค้า') }}</h3>
+                        <p class="text-sm text-emerald-100">Customer</p>
                     </div>
                 </div>
-            </div>
+            </a>
+
+            <!-- Department -->
+            <a href="{{ route('supervisor.department') }}" class="group">
+                <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-cyan-500 to-blue-600 p-6 h-44 shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300">
+                    <div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-white/10 rounded-full blur-xl"></div>
+                    <div class="absolute bottom-0 left-0 -mb-8 -ml-8 w-32 h-32 bg-white/5 rounded-full blur-2xl"></div>
+                    <div class="relative z-10 flex flex-col items-center justify-center h-full text-white">
+                        <div class="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                            <i class="fa-solid fa-users-rectangle text-3xl"></i>
+                        </div>
+                        <h3 class="text-lg font-bold">{{ __('แผนก') }}</h3>
+                        <p class="text-sm text-cyan-100">Department</p>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Report -->
+            <a href="{{ route('supervisor.report') }}" class="group">
+                <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 p-6 h-44 shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300">
+                    <div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-white/10 rounded-full blur-xl"></div>
+                    <div class="absolute bottom-0 left-0 -mb-8 -ml-8 w-32 h-32 bg-white/5 rounded-full blur-2xl"></div>
+                    <div class="relative z-10 flex flex-col items-center justify-center h-full text-white">
+                        <div class="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                            <i class="fa-solid fa-chart-pie text-3xl"></i>
+                        </div>
+                        <h3 class="text-lg font-bold">{{ __('รายงานสถิติ') }}</h3>
+                        <p class="text-sm text-amber-100">Report</p>
+                    </div>
+                </div>
+            </a>
+
         </div>
     </div>
 </div>
