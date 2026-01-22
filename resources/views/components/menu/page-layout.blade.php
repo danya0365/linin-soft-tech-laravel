@@ -7,7 +7,7 @@
 ])
 
 <div class="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-gray-900 dark:to-gray-800">
-    <div class="container mx-auto px-0 sm:px-4 sm:py-4 max-w-7xl">
+    <div class="container">
         <!-- Breadcrumb -->
         <nav class="flex mb-8" aria-label="Breadcrumb">
             <ol class="inline-flex items-center space-x-1 md:space-x-3">

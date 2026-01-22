@@ -6,7 +6,7 @@
     'breadcrumbs' => [] // Array of ['label' => '...', 'route' => '...'] or ['label' => '...'] for active item
 ])
 
-<div class="max-w-7xl mx-auto px-0 sm:px-6 lg:px-8">
+<div class="container">
     {{-- Breadcrumb Navigation --}}
     @if(count($breadcrumbs) > 0)
     <nav class="flex py-3" aria-label="Breadcrumb">
