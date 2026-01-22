@@ -29857,6 +29857,9 @@ Ensure the default browser behavior of the `hidden` attribute.
 .w-16{
   width: 4rem;
 }
+.w-1\/2{
+  width: 50%;
+}
 .w-3{
   width: 0.75rem;
 }
@@ -32357,9 +32360,6 @@ Ensure the default browser behavior of the `hidden` attribute.
   }
   .sm\:h-20{
     height: 5rem;
-  }
-  .sm\:w-1\/2{
-    width: 50%;
   }
   .sm\:flex-1{
     flex: 1 1 0%;
