@@ -32,7 +32,7 @@
         @endphp
         <x-menu.card 
             href="{{ route('worker.product.get-operations-by-linen-case', ['linenCase' => $operationLinenCase['var']]) }}"
-            icon="{{ str_replace('bi-', 'fa-solid fa-', $operationLinenCase['icon']) }}"
+            icon="bi {{ $operationLinenCase['icon'] }}"
             title="{{ $operationLinenCase['name'] }}"
             subtitle="Linen Case"
             gradient="{{ $gradient }}"
