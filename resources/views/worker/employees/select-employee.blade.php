@@ -2,39 +2,27 @@
 
 @section('content')
 
-<div class="container">
-    <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="{{ route('worker') }}">Worker</a></li>
-          <li class="breadcrumb-item active" aria-current="page">เลือกพนักงาน</li>
-        </ol>
-    </nav>
-    <div class="row justify-content-center">
-        @foreach ($departments as $department)
-        <div class="col-md-12 m-2">
-            <div class="card">
-                <div class="card-header">{{ $department['name'] }}</div>
-                <div class="card-body">
-                    <div class="row g-2">
-                        @foreach ($department['employees'] as $employee)
-                        <div class="col-sm-4">
-                            <a href="{{ route('worker.employee.employee-summary', ['employeeId' => $employee['id']]) }}">
-                                <div class="p-3 border bg-light" style="min-height: 150px">
-                                    <div class="rounded-3 d-flex align-items-center justify-content-center">
-                                        <div style="max-width: 150px">
-                                            <x-employee-avatar :photo="$employee['photo']" />
-                                        </div>
-                                    </div>
-                                    <div class="text-center">{{ $employee['name'] }}</div>
-                                </div>
-                            </a>
+<x-worker.page :breadcrumbs="[['label' => __('เลือกพนักงาน')]]">
+    @foreach ($departments as $department)
+    <x-worker.card title="{{ $department['name'] }}">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            @foreach ($department['employees'] as $employee)
+            <a href="{{ route('worker.employee.employee-summary', ['employeeId' => $employee['id']]) }}" class="block group">
+                <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-xl border border-gray-200 dark:border-gray-600 hover:shadow-lg hover:border-blue-300 dark:hover:border-blue-500 transition-all duration-200 min-h-[150px]">
+                    <div class="flex flex-col items-center justify-center h-full">
+                        <div class="w-20 h-20 mb-3">
+                            <x-employee-avatar :photo="$employee['photo']" />
                         </div>
-                        @endforeach
+                        <div class="text-center text-gray-900 dark:text-white font-medium group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                            {{ $employee['name'] }}
+                        </div>
                     </div>
                 </div>
-            </div>
+            </a>
+            @endforeach
         </div>
-        @endforeach
-    </div>
-</div>
+    </x-worker.card>
+    @endforeach
+</x-worker.page>
+
 @endsection

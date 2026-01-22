@@ -2,49 +2,37 @@
 
 @section('content')
 
-<div class="container">
-    <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="{{ route('worker') }}">Worker</a></li>
-          <li class="breadcrumb-item active" aria-current="page">{{ __('Stocks') }}</li>
-        </ol>
-    </nav>
-    <div class="row justify-content-center">
-        <div class="col-md-12 m-2">
-            <div class="card">
-                <div class="card-header">{{ __('Stocks') }}</div>
-                <div class="card-body">
-                    <div class="row g-2">
-                        @foreach ( $inventoryGroups as $inventoryGroup )
-                        <div class="col-sm-4">
-                            <a href="{{ route('worker.stock.show-inventory-by-group', ['inventoryGroupId' => $inventoryGroup->id]) }}">
-                                <div class="p-3 border bg-navy" style="min-height: 150px">
-                                    <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 150px">
-                                        <div class="text-center">
-                                            <div class="{{ $inventoryGroup->icon }} text-light" style="font-size: 3em"></div>
-                                            <div class="text-center mt-3 text-light">{{ __($inventoryGroup->name) }}</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </a>
-                        </div>
-                        @endforeach
-                        <div class="col-sm-12">
-                            <a href="{{ route('worker.stock.inventories-log') }}">
-                                <div class="p-3 border bg-navy" style="min-height: 150px">
-                                    <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 150px">
-                                        <div class="text-center">
-                                            <div class="fa-solid fa-history text-light" style="font-size: 3em"></div>
-                                            <div class="text-center mt-3 text-light">{{ __('ประวัติการเพิ่ม/ลดสต๊อก - Logs') }}</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
+<x-worker.page :breadcrumbs="[['label' => __('Stocks')]]">
+    <x-worker.card title="{{ __('Stocks') }}">
+        <div class="flex flex-wrap -m-2">
+            @php
+                $gradients = [
+                    'from-blue-500 to-blue-700',
+                    'from-green-500 to-green-700',
+                    'from-purple-500 to-purple-700',
+                    'from-orange-500 to-orange-700',
+                    'from-teal-500 to-teal-700',
+                    'from-pink-500 to-pink-700',
+                ];
+            @endphp
+            @foreach ($inventoryGroups as $index => $inventoryGroup)
+            <x-worker.action-card 
+                href="{{ route('worker.stock.show-inventory-by-group', ['inventoryGroupId' => $inventoryGroup->id]) }}"
+                icon="{{ $inventoryGroup->icon }}"
+                title="{{ __($inventoryGroup->name) }}"
+                gradient="{{ $gradients[$index % count($gradients)] }}"
+            />
+            @endforeach
+            
+            <x-worker.action-card 
+                href="{{ route('worker.stock.inventories-log') }}"
+                icon="fa-solid fa-history"
+                title="{{ __('ประวัติการเพิ่ม/ลดสต๊อก - Logs') }}"
+                gradient="from-gray-600 to-gray-800"
+                size="full"
+            />
         </div>
-    </div>
-</div>
+    </x-worker.card>
+</x-worker.page>
+
 @endsection
