@@ -101,8 +101,16 @@ class ChatService
         switch ($action) {
             case 'customer_group':
                 return $this->getCustomersByGroup($params['id'] ?? null);
+            case 'customer_date_filter':
+                return $this->getCustomerDateFilterMenu($params['id'] ?? null);
             case 'customer_detail':
                 return $this->getCustomerDetail($params['id'] ?? null);
+            case 'customer_detail_date':
+                return $this->getCustomerDetail(
+                    $params['id'] ?? null,
+                    $params['dateFrom'] ?? null,
+                    $params['dateTo'] ?? null
+                );
             case 'inventory_group':
                 return $this->getInventoriesByGroup($params['id'] ?? null);
             case 'energy_type':
@@ -247,16 +255,86 @@ class ChatService
             'text' => '👥 เลือกลูกค้า:',
             'quickReplies' => $customers->map(fn($c) => [
                 'label' => $c->name,
-                'action' => 'customer_detail',
+                'action' => 'customer_date_filter',
                 'data' => ['id' => $c->id],
             ])->toArray(),
         ];
     }
 
     /**
+     * แสดงเมนูเลือกช่วงวันที่สำหรับดูรายละเอียดลูกค้า
+     */
+    public function getCustomerDateFilterMenu($customerId): array
+    {
+        $customer = Customer::find($customerId);
+
+        if (!$customer) {
+            return [
+                'type' => 'text',
+                'text' => '❌ ไม่พบข้อมูลลูกค้า',
+            ];
+        }
+
+        // คำนวณช่วงเวลาต่างๆ
+        $today = Carbon::now()->format('Y-m-d');
+        
+        // สัปดาห์นี้ (เริ่มวันจันทร์)
+        $startOfWeek = Carbon::now()->startOfWeek()->format('Y-m-d');
+        $startOfWeekLabel = Carbon::now()->startOfWeek()->format('d/m');
+        
+        // เดือนนี้
+        $firstDayOfMonth = Carbon::now()->startOfMonth()->format('Y-m-d');
+        $monthLabel = Carbon::now()->format('m/Y');
+        
+        // ปีนี้
+        $firstDayOfYear = Carbon::now()->startOfYear()->format('Y-m-d');
+        $yearLabel = Carbon::now()->format('Y');
+
+        return [
+            'type' => 'menu',
+            'title' => '📅 เลือกช่วงเวลา',
+            'text' => "👥 ลูกค้า: {$customer->name}\n\n📅 เลือกช่วงเวลาที่ต้องการดูข้อมูล:",
+            'quickReplies' => [
+                [
+                    'label' => '📊 ข้อมูลโดยรวม (ทั้งหมด)',
+                    'action' => 'customer_detail',
+                    'data' => ['id' => $customerId],
+                ],
+                [
+                    'label' => '� สัปดาห์นี้ (เริ่ม ' . $startOfWeekLabel . ')',
+                    'action' => 'customer_detail_date',
+                    'data' => [
+                        'id' => $customerId,
+                        'dateFrom' => $startOfWeek,
+                        'dateTo' => $today,
+                    ],
+                ],
+                [
+                    'label' => '📅 เดือนนี้ (' . $monthLabel . ')',
+                    'action' => 'customer_detail_date',
+                    'data' => [
+                        'id' => $customerId,
+                        'dateFrom' => $firstDayOfMonth,
+                        'dateTo' => $today,
+                    ],
+                ],
+                [
+                    'label' => '📅 ปีนี้ (' . $yearLabel . ')',
+                    'action' => 'customer_detail_date',
+                    'data' => [
+                        'id' => $customerId,
+                        'dateFrom' => $firstDayOfYear,
+                        'dateTo' => $today,
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    /**
      * ดึงรายละเอียดลูกค้า
      */
-    public function getCustomerDetail($customerId): array
+    public function getCustomerDetail($customerId, ?string $dateFrom = null, ?string $dateTo = null): array
     {
         $customer = Customer::find($customerId);
 
@@ -268,8 +346,14 @@ class ChatService
         }
 
         // === ดึงยอดสะสมจาก CustomerOperationDailySummary ===
-        $summary = \App\Models\CustomerOperationDailySummary::where('customer_id', $customerId)
-            ->selectRaw('
+        $query = \App\Models\CustomerOperationDailySummary::where('customer_id', $customerId);
+
+        // กรองตามช่วงวันที่ถ้ามี
+        if ($dateFrom && $dateTo) {
+            $query->whereBetween('date', [$dateFrom, $dateTo]);
+        }
+
+        $summary = $query->selectRaw('
                 SUM(total_wet_weight) as total_wet_weight,
                 SUM(total_dry_weight) as total_dry_weight,
                 SUM(total_edit_collect_weight) as total_edit_collect_weight,
@@ -278,6 +362,12 @@ class ChatService
                 SUM(total_billing_payment) as total_billing_payment
             ')
             ->first();
+
+        // สร้าง label สำหรับช่วงวันที่
+        $dateLabel = 'ยอดสะสมทั้งหมด';
+        if ($dateFrom && $dateTo) {
+            $dateLabel = Carbon::parse($dateFrom)->format('d/m/Y') . ' - ' . Carbon::parse($dateTo)->format('d/m/Y');
+        }
 
         // คำนวณ % ผ้าแก้ไข (ระบบ)
         $totalBillingWeight = $summary->total_billing_weight ?? 0;
@@ -301,16 +391,17 @@ class ChatService
             'rows' => [
                 ['label' => '🏥 ชื่อ', 'value' => $customer->name],
                 ['label' => '🏢 กลุ่มลูกค้า', 'value' => $customer->customerGroup ? $customer->customerGroup->name : '-'],
+                ['label' => '📅 ช่วงเวลา', 'value' => $dateLabel, 'valueColor' => '#0066CC'],
                 ['type' => 'separator'],
-                ['label' => '💧 น้ำหนักเปียก (สะสม)', 'value' => number_format($summary->total_wet_weight ?? 0, 2) . ' kg'],
-                ['label' => '☀️ น้ำหนักแห้ง (สะสม)', 'value' => number_format($summary->total_dry_weight ?? 0, 2) . ' kg'],
+                ['label' => '💧 น้ำหนักเปียก', 'value' => number_format($summary->total_wet_weight ?? 0, 2) . ' kg'],
+                ['label' => '☀️ น้ำหนักแห้ง', 'value' => number_format($summary->total_dry_weight ?? 0, 2) . ' kg'],
                 ['type' => 'separator'],
                 ['label' => '🔧 ผ้าแก้ไข (ระบบ)', 'value' => number_format($totalEditCollectWeight, 2) . ' kg', 'valueColor' => '#28A745'],
                 ['label' => '📊 % ผ้าแก้ไข (ระบบ)', 'value' => $editCollectWeightPercent . '%', 'valueColor' => '#28A745'],
                 ['label' => '✏️ ผ้าแก้ไข (กรอกมือ)', 'value' => number_format($totalEditWeight, 2) . ' kg', 'valueColor' => '#FFA500'],
                 ['label' => '📊 % ผ้าแก้ไข (กรอกมือ)', 'value' => $editWeightPercent . '%', 'valueColor' => '#FFA500'],
                 ['type' => 'separator'],
-                ['label' => '⚖️ น้ำหนักบิล (สะสม)', 'value' => number_format($totalBillingWeight, 2) . ' kg'],
+                ['label' => '⚖️ น้ำหนักบิล', 'value' => number_format($totalBillingWeight, 2) . ' kg'],
                 ['label' => '💰 ยอดเงินรวม', 'value' => number_format($summary->total_billing_payment ?? 0, 2) . ' ฿', 'valueColor' => '#1DB446'],
             ],
         ];
@@ -1207,6 +1298,19 @@ class ChatService
         $typeLabel = $type === 'detailed' ? '📋 แยกละเอียด' : '📊 รวม';
         $dates = [];
         
+        // คำนวณช่วงเวลาต่างๆ
+        $today = Carbon::now()->format('Y-m-d');
+        
+        // สัปดาห์นี้ (เริ่มวันจันทร์)
+        $startOfWeek = Carbon::now()->startOfWeek()->format('Y-m-d');
+        $startOfWeekLabel = Carbon::now()->startOfWeek()->format('d/m');
+        
+        // เดือนนี้
+        $monthLabel = Carbon::now()->format('m/Y');
+        
+        // ปีนี้
+        $yearLabel = Carbon::now()->format('Y');
+        
         // 7 วันล่าสุด
         for ($i = 0; $i < 7; $i++) {
             $date = Carbon::now()->subDays($i);
@@ -1217,10 +1321,10 @@ class ChatService
             ];
         }
 
-        // เพิ่มตัวเลือกช่วงเวลา
-        $dates[] = ['label' => '📆 สัปดาห์นี้', 'action' => 'report_date', 'data' => ['type' => $type, 'range' => 'week']];
-        $dates[] = ['label' => '📅 เดือนนี้', 'action' => 'report_date', 'data' => ['type' => $type, 'range' => 'month']];
-        $dates[] = ['label' => '📈 ปีนี้', 'action' => 'report_date', 'data' => ['type' => $type, 'range' => 'year']];
+        // เพิ่มตัวเลือกช่วงเวลา พร้อมกำกับวันที่เริ่ม
+        $dates[] = ['label' => '📆 สัปดาห์นี้ (เริ่ม ' . $startOfWeekLabel . ')', 'action' => 'report_date', 'data' => ['type' => $type, 'range' => 'week']];
+        $dates[] = ['label' => '📅 เดือนนี้ (' . $monthLabel . ')', 'action' => 'report_date', 'data' => ['type' => $type, 'range' => 'month']];
+        $dates[] = ['label' => '📅 ปีนี้ (' . $yearLabel . ')', 'action' => 'report_date', 'data' => ['type' => $type, 'range' => 'year']];
 
         return [
             'type' => 'menu',
