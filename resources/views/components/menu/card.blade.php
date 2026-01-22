@@ -8,7 +8,7 @@
 ])
 
 <a href="{{ $href }}" class="group">
-    <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br {{ $gradient }} p-6 h-44 shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300">
+    <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br {{ $gradient }} p-4 sm:p-6 h-44 shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300">
         <div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-white/10 rounded-full blur-xl"></div>
         <div class="absolute bottom-0 left-0 -mb-8 -ml-8 w-32 h-32 bg-white/5 rounded-full blur-2xl"></div>
         

@@ -11,6 +11,6 @@
     };
 @endphp
 
-<div class="grid {{ $gridClass }} gap-6">
+<div class="grid {{ $gridClass }} gap-4 sm:gap-6">
     {{ $slot }}
 </div>
