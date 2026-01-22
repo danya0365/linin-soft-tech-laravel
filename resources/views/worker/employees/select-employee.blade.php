@@ -1,28 +1,39 @@
 @extends('layouts.worker')
 
 @section('content')
-
-<x-worker.page :breadcrumbs="[['label' => __('เลือกพนักงาน')]]">
+<x-menu.page-layout 
+    title="{{ __('เลือกพนักงาน') }}"
+    subtitle="ดูสรุปข้อมูลพนักงานแต่ละคน"
+    icon="fa-users"
+    icon-color="text-cyan-600"
+    :breadcrumbs="[
+        ['label' => 'Worker', 'url' => route('worker')],
+        ['label' => 'พนักงาน']
+    ]"
+>
     @foreach ($departments as $department)
-    <x-worker.card title="{{ $department['name'] }}">
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            @foreach ($department['employees'] as $employee)
-            <a href="{{ route('worker.employee.employee-summary', ['employeeId' => $employee['id']]) }}" class="block group">
-                <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-xl border border-gray-200 dark:border-gray-600 hover:shadow-lg hover:border-blue-300 dark:hover:border-blue-500 transition-all duration-200 min-h-[150px]">
-                    <div class="flex flex-col items-center justify-center h-full">
-                        <div class="w-20 h-20 mb-3">
-                            <x-employee-avatar :photo="$employee['photo']" />
-                        </div>
-                        <div class="text-center text-gray-900 dark:text-white font-medium group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                            {{ $employee['name'] }}
-                        </div>
+    <x-menu.section 
+        title="{{ $department['name'] }}"
+        icon="fa-building"
+        icon-color="text-gray-500"
+    >
+        @foreach ($department['employees'] as $employee)
+        <a href="{{ route('worker.employee.employee-summary', ['employeeId' => $employee['id']]) }}" class="group block">
+            <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-100 to-slate-200 dark:from-gray-700 dark:to-gray-800 p-4 sm:p-6 h-44 shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 border border-gray-200 dark:border-gray-600">
+                <div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-blue-500/10 rounded-full blur-xl"></div>
+                
+                <div class="relative flex flex-col items-center justify-center h-full">
+                    <div class="w-16 h-16 sm:w-20 sm:h-20 mb-3 rounded-full overflow-hidden border-2 border-white shadow-md">
+                        <x-employee-avatar :photo="$employee['photo']" />
+                    </div>
+                    <div class="text-center text-gray-900 dark:text-white font-semibold group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                        {{ $employee['name'] }}
                     </div>
                 </div>
-            </a>
-            @endforeach
-        </div>
-    </x-worker.card>
+            </div>
+        </a>
+        @endforeach
+    </x-menu.section>
     @endforeach
-</x-worker.page>
-
+</x-menu.page-layout>
 @endsection
