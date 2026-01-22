@@ -382,19 +382,60 @@ class HighChartManager extends Manager
         $endOfDay = $endDate->copy()->endOfDay();
 
         // ดึงจาก operations table
-        $operationCount = \App\Models\Operation::whereBetween('created_at', [$startOfDay, $endOfDay])->count();
-        $totalWetWeight = \App\Models\Operation::whereBetween('created_at', [$startOfDay, $endOfDay])->sum('total_wet_weight') ?? 0;
-        $totalDryWeight = \App\Models\Operation::whereBetween('created_at', [$startOfDay, $endOfDay])->sum('total_dry_weight') ?? 0;
-        $totalEditWeight = \App\Models\Operation::whereBetween('created_at', [$startOfDay, $endOfDay])->sum('total_edit_weight') ?? 0;
-        $totalBillingWeight = \App\Models\Operation::whereBetween('created_at', [$startOfDay, $endOfDay])->sum('total_billing_weight') ?? 0;
-        $totalBillingPayment = \App\Models\Operation::whereBetween('created_at', [$startOfDay, $endOfDay])->sum('total_billing_payment') ?? 0;
+        // === Group 1: Non-payment operations - filter by created_at ===
+        $nonPaymentCount = \App\Models\Operation::where('operation_type', '!=', 'payment')
+            ->whereBetween('created_at', [$startOfDay, $endOfDay])->count();
+        $nonPaymentWetWeight = \App\Models\Operation::where('operation_type', '!=', 'payment')
+            ->whereBetween('created_at', [$startOfDay, $endOfDay])->sum('total_wet_weight') ?? 0;
+        $nonPaymentDryWeight = \App\Models\Operation::where('operation_type', '!=', 'payment')
+            ->whereBetween('created_at', [$startOfDay, $endOfDay])->sum('total_dry_weight') ?? 0;
+        $nonPaymentEditWeight = \App\Models\Operation::where('operation_type', '!=', 'payment')
+            ->whereBetween('created_at', [$startOfDay, $endOfDay])->sum('total_edit_weight') ?? 0;
+        $nonPaymentBillingWeight = \App\Models\Operation::where('operation_type', '!=', 'payment')
+            ->whereBetween('created_at', [$startOfDay, $endOfDay])->sum('total_billing_weight') ?? 0;
+        $nonPaymentBillingPayment = \App\Models\Operation::where('operation_type', '!=', 'payment')
+            ->whereBetween('created_at', [$startOfDay, $endOfDay])->sum('total_billing_payment') ?? 0;
+        
+        // === Group 2: Payment operations - filter by billing_payment_date ===
+        $startDateStr = $startDate->format('Y-m-d');
+        $endDateStr = $endDate->format('Y-m-d');
+        
+        $paymentCount = \App\Models\Operation::where('operation_type', 'payment')
+            ->whereBetween('billing_payment_date', [$startDateStr, $endDateStr])->count();
+        $paymentWetWeight = \App\Models\Operation::where('operation_type', 'payment')
+            ->whereBetween('billing_payment_date', [$startDateStr, $endDateStr])->sum('total_wet_weight') ?? 0;
+        $paymentDryWeight = \App\Models\Operation::where('operation_type', 'payment')
+            ->whereBetween('billing_payment_date', [$startDateStr, $endDateStr])->sum('total_dry_weight') ?? 0;
+        $paymentEditWeight = \App\Models\Operation::where('operation_type', 'payment')
+            ->whereBetween('billing_payment_date', [$startDateStr, $endDateStr])->sum('total_edit_weight') ?? 0;
+        $paymentBillingWeight = \App\Models\Operation::where('operation_type', 'payment')
+            ->whereBetween('billing_payment_date', [$startDateStr, $endDateStr])->sum('total_billing_weight') ?? 0;
+        $paymentBillingPayment = \App\Models\Operation::where('operation_type', 'payment')
+            ->whereBetween('billing_payment_date', [$startDateStr, $endDateStr])->sum('total_billing_payment') ?? 0;
+        
+        // === รวมทั้ง 2 กลุ่ม ===
+        $operationCount = $nonPaymentCount + $paymentCount;
+        $totalWetWeight = $nonPaymentWetWeight + $paymentWetWeight;
+        $totalDryWeight = $nonPaymentDryWeight + $paymentDryWeight;
+        $totalEditWeight = $nonPaymentEditWeight + $paymentEditWeight;
+        $totalBillingWeight = $nonPaymentBillingWeight + $paymentBillingWeight;
+        $totalBillingPayment = $nonPaymentBillingPayment + $paymentBillingPayment;
+
+        // === ผ้าแก้ไข จาก CustomerOperationDailySummary (คำนวณจาก linen_case='edit') ===
+        $totalEditCollectWeight = \App\Models\CustomerOperationDailySummary::whereBetween('operation_date', [$startDateStr, $endDateStr])
+            ->sum('total_edit_collect_weight') ?? 0;
 
         // คำนวณ % หักลบ (เปียก-แห้ง)
         $weightDiffPercent = ($totalWetWeight > 0 && $totalDryWeight > 0) 
             ? round(($totalWetWeight - $totalDryWeight) / $totalWetWeight * 100, 2) 
             : 0;
 
-        // คำนวณ % ผ้าแก้ไข
+        // คำนวณ % ผ้าแก้ไข (จากระบบ)
+        $editCollectWeightPercent = ($totalBillingWeight > 0 && $totalEditCollectWeight > 0) 
+            ? round(($totalEditCollectWeight / $totalBillingWeight) * 100, 2) 
+            : 0;
+
+        // คำนวณ % ผ้าแก้ไข (กรอกมือ)
         $editWeightPercent = ($totalBillingWeight > 0 && $totalEditWeight > 0) 
             ? round(($totalEditWeight / $totalBillingWeight) * 100, 2) 
             : 0;
@@ -406,6 +447,8 @@ class HighChartManager extends Manager
             'totalWetWeight' => round($totalWetWeight, 2),
             'totalDryWeight' => round($totalDryWeight, 2),
             'weightDiffPercent' => $weightDiffPercent,
+            'totalEditCollectWeight' => round($totalEditCollectWeight, 2),
+            'editCollectWeightPercent' => $editCollectWeightPercent,
             'totalEditWeight' => round($totalEditWeight, 2),
             'editWeightPercent' => $editWeightPercent,
             'totalBillingWeight' => round($totalBillingWeight, 2),

@@ -28,35 +28,10 @@
 
                         <div class="col-12">
                             <label for="total_billing_weight" class="form-label">น้ำหนักลูกค้า (kg.)</label>
-                            <input type="number" step=".01" name="total_billing_weight" class="form-control" id="total_billing_weight" value="{{ $operation->total_billing_weight }}">
+                            <input type="number" step=".01" name="total_billing_weight" class="form-control" id="total_billing_weight" value="{{ $operation->total_billing_weight }}" oninput="calculateEditWeightPercent()">
                             @error('total_billing_weight')
                                 <div class="text-danger">{{ $message }}</div>
                             @enderror
-                        </div>
-
-                        <div class="col-md-4">
-                            <label for="total_wet_weight" class="form-label">น้ำหนักผ้าเปียก (kg.)</label>
-                            <input type="number" step=".01" name="total_wet_weight" class="form-control" id="total_wet_weight" value="{{ $operation->total_wet_weight }}" oninput="calculateWeightDiff()">
-                            @error('total_wet_weight')
-                                <div class="text-danger">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="col-md-4">
-                            <label for="total_dry_weight" class="form-label">น้ำหนักผ้าแห้ง (kg.)</label>
-                            <input type="number" step=".01" name="total_dry_weight" class="form-control" id="total_dry_weight" value="{{ $operation->total_dry_weight }}" oninput="calculateWeightDiff()">
-                            @error('total_dry_weight')
-                                <div class="text-danger">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="col-md-4">
-                            <label class="form-label">% หักลบ (เปียก-แห้ง)</label>
-                            <div class="input-group">
-                                <input type="text" class="form-control" id="weight_diff_percent" readonly>
-                                <span class="input-group-text">%</span>
-                            </div>
-                            <small class="text-muted">คำนวณอัตโนมัติ</small>
                         </div>
 
                         <div class="col-md-6">
@@ -101,18 +76,6 @@
 </div>
 
 <script>
-function calculateWeightDiff() {
-    var wetWeight = parseFloat(document.getElementById('total_wet_weight').value) || 0;
-    var dryWeight = parseFloat(document.getElementById('total_dry_weight').value) || 0;
-    var diffPercent = 0;
-    
-    if (wetWeight > 0 && dryWeight > 0) {
-        diffPercent = ((wetWeight - dryWeight) / wetWeight * 100).toFixed(2);
-    }
-    
-    document.getElementById('weight_diff_percent').value = diffPercent;
-}
-
 function calculateEditWeightPercent() {
     var billingWeight = parseFloat(document.getElementById('total_billing_weight').value) || 0;
     var editWeight = parseFloat(document.getElementById('total_edit_weight').value) || 0;
@@ -127,14 +90,7 @@ function calculateEditWeightPercent() {
 
 // คำนวณ % เมื่อโหลดหน้า
 document.addEventListener('DOMContentLoaded', function() {
-    calculateWeightDiff();
     calculateEditWeightPercent();
-    
-    // เรียกคำนวณเมื่อน้ำหนักลูกค้าเปลี่ยน
-    var billingWeightInput = document.getElementById('total_billing_weight');
-    if (billingWeightInput) {
-        billingWeightInput.addEventListener('input', calculateEditWeightPercent);
-    }
 });
 </script>
 @endsection

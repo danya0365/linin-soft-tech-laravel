@@ -111,17 +111,17 @@
                             </div>
                         </div>
                         <div class="col-md-2 col-6 mb-3">
-                            <div class="border rounded p-3 h-100">
-                                <h5 class="text-muted mb-1">✂️ ผ้าแก้ไข</h5>
-                                <h3 class="text-info mb-0">{{ number_format($operationStats['totalEditWeight'], 2) }}</h3>
-                                <small class="text-muted">กก.</small>
+                            <div class="border rounded p-3 h-100" style="background-color: #FFF3CD;">
+                                <h5 class="text-muted mb-1">🔧 ผ้าแก้ไข (ระบบ)</h5>
+                                <h3 class="text-warning mb-0">{{ number_format($operationStats['totalEditCollectWeight'] ?? 0, 2) }}</h3>
+                                <small class="text-muted">กก. | {{ $operationStats['editCollectWeightPercent'] ?? 0 }}%</small>
                             </div>
                         </div>
                         <div class="col-md-2 col-6 mb-3">
-                            <div class="border rounded p-3 h-100">
-                                <h5 class="text-muted mb-1">📊 % ผ้าแก้ไข</h5>
-                                <h3 class="text-primary mb-0">{{ $operationStats['editWeightPercent'] }}%</h3>
-                                <small class="text-muted">แก้ไข/บิล</small>
+                            <div class="border rounded p-3 h-100" style="background-color: #D1ECF1;">
+                                <h5 class="text-muted mb-1">✏️ ผ้าแก้ไข (กรอกมือ)</h5>
+                                <h3 class="text-info mb-0">{{ number_format($operationStats['totalEditWeight'], 2) }}</h3>
+                                <small class="text-muted">กก. | {{ $operationStats['editWeightPercent'] }}%</small>
                             </div>
                         </div>
                         <div class="col-md-2 col-6 mb-3">

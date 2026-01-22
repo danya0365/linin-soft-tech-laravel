@@ -27,7 +27,7 @@
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150">
                             <td class="px-6 py-4 text-gray-900 dark:text-gray-100">{{ $i + $index + 1 }}</td>
                             <td class="px-6 py-4 text-gray-900 dark:text-gray-100">
-                                <strong>Name:</strong> {{ $customer->name ?? '-' }}<br><strong>Customer Group Id:</strong> {{ $customer->customer_group_id ?? '-' }}<br><strong>Total Wet Weight:</strong> {{ $customer->total_wet_weight ?? '-' }}<br><strong>Total Dry Weight:</strong> {{ $customer->total_dry_weight ?? '-' }}<br><strong>Total Billing Weight:</strong> {{ $customer->total_billing_weight ?? '-' }}<br><strong>Total Edit Weight:</strong> {{ $customer->total_edit_weight ?? '-' }}<br><strong>Total Billing Payment:</strong> {{ $customer->total_billing_payment ?? '-' }}
+                                <strong>Name:</strong> {{ $customer->name ?? '-' }}<br><strong>Customer Group:</strong> {{ $customer->customerGroup ? $customer->customerGroup->name : '-' }}
                             </td>
                             <td class="px-6 py-4">
                                 <x-crud.action-buttons :model="$customer" resource="customers" />

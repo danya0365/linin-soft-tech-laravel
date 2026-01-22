@@ -45,7 +45,7 @@ class CustomerOperationDailySummary extends Model
    *
    * @var array
    */
-  protected $fillable = ['customer_id', 'operation_date', 'total_wet_weight', 'total_dry_weight', 'total_iron_piece', 'total_packing_piece', 'total_edit_collect_weight', 'total_collect_weight', 'total_billing_weight'];
+  protected $fillable = ['customer_id', 'operation_date', 'total_wet_weight', 'total_dry_weight', 'total_iron_piece', 'total_packing_piece', 'total_edit_collect_weight', 'total_edit_weight', 'total_collect_weight', 'total_collect_pack', 'total_delivery_pack', 'total_billing_weight', 'total_billing_payment'];
 
   public function customer()
   {
