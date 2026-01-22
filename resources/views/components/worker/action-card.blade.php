@@ -10,7 +10,7 @@
 ])
 
 @php
-    $sizeClass = $size === 'full' ? 'w-full' : 'w-full sm:w-1/2 lg:w-1/3';
+    $sizeClass = $size === 'full' ? 'w-full' : 'w-1/2 lg:w-1/3';
 @endphp
 
 <div class="{{ $sizeClass }} p-2">
