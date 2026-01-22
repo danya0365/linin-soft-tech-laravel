@@ -350,7 +350,7 @@ class ChatService
 
         // กรองตามช่วงวันที่ถ้ามี
         if ($dateFrom && $dateTo) {
-            $query->whereBetween('date', [$dateFrom, $dateTo]);
+            $query->whereBetween('operation_date', [$dateFrom, $dateTo]);
         }
 
         $summary = $query->selectRaw('
