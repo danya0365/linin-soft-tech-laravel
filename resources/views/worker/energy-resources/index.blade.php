@@ -1,13 +1,11 @@
 @extends('layouts.worker')
 
 @section('content')
-<x-menu.page-layout 
+<x-worker.page 
     title="{{ __('พลังงาน') }}"
     subtitle="บันทึกการใช้พลังงานและทรัพยากร"
     icon="fa-bolt"
-    icon-color="text-yellow-500"
     :breadcrumbs="[
-        ['label' => 'Worker', 'url' => route('worker')],
         ['label' => 'Energy Resource']
     ]"
 >
@@ -82,5 +80,5 @@
             </div>
         </a>
     </div>
-</x-menu.page-layout>
+</x-worker.page>
 @endsection

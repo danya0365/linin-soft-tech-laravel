@@ -1,13 +1,11 @@
 @extends('layouts.worker')
 
 @section('content')
-<x-menu.page-layout 
+<x-worker.page 
     title="{{ __('เลือกพนักงาน') }}"
     subtitle="ดูสรุปข้อมูลพนักงานแต่ละคน"
     icon="fa-users"
-    icon-color="text-cyan-600"
     :breadcrumbs="[
-        ['label' => 'Worker', 'url' => route('worker')],
         ['label' => 'พนักงาน']
     ]"
 >
@@ -35,5 +33,5 @@
         @endforeach
     </x-menu.section>
     @endforeach
-</x-menu.page-layout>
+</x-worker.page>
 @endsection

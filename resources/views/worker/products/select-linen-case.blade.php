@@ -1,14 +1,12 @@
 @extends('layouts.worker')
 
 @section('content')
-<x-menu.page-layout 
+<x-worker.page 
     title="{{ __('เคสงาน') }}"
     subtitle="เลือกประเภทเคสงานที่ต้องการดู"
     icon="fa-layer-group"
-    icon-color="text-blue-600"
     :breadcrumbs="[
-        ['label' => 'Worker', 'url' => route('worker')],
-        ['label' => 'สินค้า', 'url' => route('worker.product')],
+        ['label' => 'สินค้า', 'route' => route('worker.product')],
         ['label' => 'เลือกเคสงาน']
     ]"
 >
@@ -39,5 +37,5 @@
         />
         @endforeach
     </x-menu.grid>
-</x-menu.page-layout>
+</x-worker.page>
 @endsection

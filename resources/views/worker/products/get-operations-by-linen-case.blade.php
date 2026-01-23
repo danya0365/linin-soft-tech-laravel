@@ -1,15 +1,13 @@
 @extends('layouts.worker')
 
 @section('content')
-<x-menu.page-layout 
+<x-worker.page 
     title="{{ $linenCase['name'] }}"
     subtitle="รายการทั้งหมด"
     icon="bi {{ $linenCase['icon'] ?? 'bi-list' }}"
-    icon-color="text-blue-600"
     :breadcrumbs="[
-        ['label' => 'Worker', 'url' => route('worker')],
-        ['label' => 'สินค้า', 'url' => route('worker.product')],
-        ['label' => 'เคสงาน', 'url' => route('worker.product.select-linen-case')],
+        ['label' => 'สินค้า', 'route' => route('worker.product')],
+        ['label' => 'เคสงาน', 'route' => route('worker.product.select-linen-case')],
         ['label' => $linenCase['name']]
     ]"
 >
@@ -102,5 +100,5 @@
             </x-worker.data-table>
         </div>
     </div>
-</x-menu.page-layout>
+</x-worker.page>
 @endsection

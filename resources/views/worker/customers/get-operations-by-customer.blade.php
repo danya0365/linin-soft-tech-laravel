@@ -1,15 +1,13 @@
 @extends('layouts.worker')
 
 @section('content')
-<x-menu.page-layout 
+<x-worker.page 
     title="{{ $customer['name'] }}"
     subtitle="รายการทั้งหมด"
     icon="fa-hospital"
-    icon-color="text-amber-600"
     :breadcrumbs="[
-        ['label' => 'Worker', 'url' => route('worker')],
-        ['label' => 'ลูกค้า', 'url' => route('worker.customer')],
-        ['label' => 'ยอดรวม', 'url' => route('worker.customer.operation-summary')],
+        ['label' => 'ลูกค้า', 'route' => route('worker.customer')],
+        ['label' => 'ยอดรวม', 'route' => route('worker.customer.operation-summary')],
         ['label' => $customer['name']]
     ]"
 >
@@ -96,5 +94,5 @@
             </x-worker.data-table>
         </div>
     </div>
-</x-menu.page-layout>
+</x-worker.page>
 @endsection

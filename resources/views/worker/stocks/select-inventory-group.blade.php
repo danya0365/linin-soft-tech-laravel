@@ -1,13 +1,11 @@
 @extends('layouts.worker')
 
 @section('content')
-<x-menu.page-layout 
+<x-worker.page 
     title="{{ __('สต๊อก') }}"
     subtitle="จัดการสินค้าคงคลัง"
     icon="fa-warehouse"
-    icon-color="text-violet-600"
     :breadcrumbs="[
-        ['label' => 'Worker', 'url' => route('worker')],
         ['label' => 'Stocks']
     ]"
 >
@@ -49,5 +47,5 @@
             </div>
         </a>
     </div>
-</x-menu.page-layout>
+</x-worker.page>
 @endsection

@@ -1,14 +1,12 @@
 @extends('layouts.worker')
 
 @section('content')
-<x-menu.page-layout 
+<x-worker.page 
     title="{{ __('รายการยอดรวม') }}"
     subtitle="สรุปยอดการซักแต่ละลูกค้า"
     icon="fa-chart-bar"
-    icon-color="text-amber-600"
     :breadcrumbs="[
-        ['label' => 'Worker', 'url' => route('worker')],
-        ['label' => 'ลูกค้า', 'url' => route('worker.customer')],
+        ['label' => 'ลูกค้า', 'route' => route('worker.customer')],
         ['label' => 'รายการยอดรวม']
     ]"
 >
@@ -107,5 +105,5 @@
             </div>
         </div>
     </div>
-</x-menu.page-layout>
+</x-worker.page>
 @endsection

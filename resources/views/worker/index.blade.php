@@ -1,12 +1,10 @@
 @extends('layouts.worker')
 
 @section('content')
-<x-menu.page-layout 
+<x-worker.page 
     title="{{ __('Worker Menu') }}"
     subtitle="เลือกเมนูที่ต้องการเข้าใช้งาน"
     icon="fa-th-large"
-    icon-color="text-blue-600"
-    :breadcrumbs="[['label' => 'Worker']]"
 >
     <x-menu.grid :columns="3">
         <x-menu.card 
@@ -63,5 +61,5 @@
             subtitle-color="text-violet-100"
         />
     </x-menu.grid>
-</x-menu.page-layout>
+</x-worker.page>
 @endsection
