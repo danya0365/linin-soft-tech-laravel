@@ -6,8 +6,7 @@
     subtitle="เลือกประเภทเคสงานที่ต้องการดู"
     icon="fa-layer-group"
     :breadcrumbs="[
-        ['label' => 'สินค้า', 'route' => route('worker.product')],
-        ['label' => 'เลือกเคสงาน']
+        ['label' => 'สินค้า', 'route' => route('worker.product')]
     ]"
 >
     @php

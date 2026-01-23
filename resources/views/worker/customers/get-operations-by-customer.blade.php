@@ -7,8 +7,7 @@
     icon="fa-hospital"
     :breadcrumbs="[
         ['label' => 'ลูกค้า', 'route' => route('worker.customer')],
-        ['label' => 'ยอดรวม', 'route' => route('worker.customer.operation-summary')],
-        ['label' => $customer['name']]
+        ['label' => 'ยอดรวม', 'route' => route('worker.customer.operation-summary')]
     ]"
 >
 

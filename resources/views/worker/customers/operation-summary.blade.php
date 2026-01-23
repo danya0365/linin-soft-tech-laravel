@@ -6,8 +6,7 @@
     subtitle="สรุปยอดการซักแต่ละลูกค้า"
     icon="fa-chart-bar"
     :breadcrumbs="[
-        ['label' => 'ลูกค้า', 'route' => route('worker.customer')],
-        ['label' => 'รายการยอดรวม']
+        ['label' => 'ลูกค้า', 'route' => route('worker.customer')]
     ]"
 >
     {{-- Filter Form --}}
