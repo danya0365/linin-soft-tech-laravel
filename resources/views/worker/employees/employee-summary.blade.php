@@ -1,110 +1,121 @@
 @extends('layouts.worker')
 
 @section('content')
+<x-worker.page
+    :breadcrumbs="[
+        ['label' => 'พนักงาน', 'route' => route('worker.employee')],
+        ['label' => $employee['name'], 'route' => route('worker.employee.select-employee')]
+    ]"
+    title="{{ $employee['name'] }}"
+    subtitle="สรุปข้อมูลพนักงาน"
+    icon="fa-user"
+>
+    <x-worker.card title="สรุปข้อมูลของพนักงาน">
+        {{-- Date Filter --}}
+        <x-worker.date-filter 
+            :action="route('worker.employee.employee-summary', ['employeeId' => $employee['id']])"
+            :date-start-at="$dateStartAt"
+            :date-end-at="$dateEndAt"
+            :reset-url="route('worker.employee.employee-summary', ['employeeId' => $employee['id']])"
+        />
 
-<div class="container">
-    <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ route('worker') }}">Worker</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.employee') }}">พนักงาน</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.employee.select-employee') }}">พนักงาน: {{ $employee['name'] }}</a></li>
-            <li class="breadcrumb-item active" aria-current="page">สรุปข้อมูลของพนักงาน</li>
-        </ol>
-    </nav>
-    <div class="row justify-content-center">
-        <div class="col-md-12 m-2">
-            <div class="card">
-                <div class="card-header text-center">สรุปข้อมูลของพนักงาน</div>
-                <div class="card-body">
-                    <form class="row row-cols-lg-auto g-3 align-items-center mb-2" action="{{ route('worker.employee.employee-summary', ['employeeId' => $employee['id']]) }}" method="GET">
-                        
-                        <div class="col-12">
-                            <div class="input-group">
-                                <input type="date" name="date_start_at" value="{{ $dateStartAt }}" class="form-control" placeholder="วันที่เริ่ม" aria-label="วันที่เริ่ม">
-                                <span class="input-group-text"> ถึง </span>
-                                <input type="date" name="date_end_at" value="{{ $dateEndAt }}" class="form-control" placeholder="วันที่สิ้นสุด" aria-label="วันที่สิ้นสุด">
-                            </div>
-                        </div>
-
-                        <div class="col-12">
-                            <button type="submit" class="btn btn-primary">Submit</button>
-                            <a href="{{ route('worker.employee.employee-summary', ['employeeId' => $employee['id']]) }}" role="button" class="btn btn-outline-secondary">Reset</a>
-                        </div>
-                    </form>
-
-                    <div class="row mb-3 text-center">
-                        <div class="col-12">
-                            <div class="rounded-3 d-flex align-items-center justify-content-center p-3 py-6">
-                                <div style="max-width: 150px">
-                                    <x-employee-avatar :photo="$employee['photo']" />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <h5 class="card-title text-center">{{ $employee['name'] }}</h5>
-                    <dl class="row">
-                        <dt class="col-sm-3">Employee Code</dt>
-                        <dd class="col-sm-9">{{ $employee['code'] }}</dd>
-                    </dl>
-                </div>
-                <ul class="list-group list-group-flush">
-                @if (isset($summaryReports['wash']))
-                    @foreach ($summaryReports['wash'] as $summaryReport)
-                    <li class="list-group-item">{{ $summaryReport['title'] }}: {{ number_format($summaryReport['value']) }} kg.</li>
-                    @endforeach
-                @endif
-                @if (isset($summaryReports['dry']))
-                    @foreach ($summaryReports['dry'] as $summaryReport)
-                    <li class="list-group-item">{{ $summaryReport['title'] }}: {{ number_format($summaryReport['value']) }} kg.</li>
-                    @endforeach
-                @endif
-                @if (isset($summaryReports['iron']))
-                    @foreach ($summaryReports['iron'] as $summaryReport)
-                    <li class="list-group-item">{{ $summaryReport['title'] }}: {{ number_format($summaryReport['value']) }} piece</li>
-                    @endforeach
-                @endif
-                @if (isset($summaryReports['packing']))
-                    @foreach ($summaryReports['packing'] as $summaryReport)
-                    <li class="list-group-item">{{ $summaryReport['title'] }}: {{ number_format($summaryReport['value']) }} piece</li>
-                    @endforeach
-                @endif
-                @if (isset($summaryReports['collect']))
-                    @foreach ($summaryReports['collect'] as $summaryReport)
-                    <li class="list-group-item">{{ $summaryReport['title'] }}: {{ number_format($summaryReport['value']) }} kg.</li>
-                    @endforeach
-                @endif
-                @if (isset($summaryReports['collect_pack']))
-                    @foreach ($summaryReports['collect_pack'] as $summaryReport)
-                    <li class="list-group-item">{{ $summaryReport['title'] }}: {{ number_format($summaryReport['value']) }} pack</li>
-                    @endforeach
-                @endif
-                </ul>
-                <div class="card-body text-center">
-                    <div id="employee-summary-scatter-plots-chart" style="min-width: 400px; height: 400px; margin: 0 auto">
-
-                    </div>
-                </div>
-                <div class="card-footer text-muted text-center">
-                    เวลาการทำงานทั้งหมด: {{ $workingDuration }}
-                </div>
+        {{-- Employee Profile --}}
+        <div class="flex flex-col items-center py-6">
+            <div class="w-32 h-32 rounded-full overflow-hidden border-4 border-white shadow-xl mb-4">
+                <x-employee-avatar :photo="$employee['photo']" />
             </div>
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-white">{{ $employee['name'] }}</h2>
+            <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium mt-2">
+                <i class="fa fa-id-badge mr-1"></i> {{ $employee['code'] }}
+            </span>
         </div>
-    </div>
-</div>
+
+        {{-- Summary Stats --}}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+            @if (isset($summaryReports['wash']))
+                @foreach ($summaryReports['wash'] as $summaryReport)
+                <div class="bg-blue-50 dark:bg-blue-900/30 rounded-xl p-4 border border-blue-200 dark:border-blue-800">
+                    <div class="text-sm text-blue-600 dark:text-blue-400 font-medium">{{ $summaryReport['title'] }}</div>
+                    <div class="text-2xl font-bold text-blue-700 dark:text-blue-300">{{ number_format($summaryReport['value']) }} <span class="text-sm font-normal">kg.</span></div>
+                </div>
+                @endforeach
+            @endif
+
+            @if (isset($summaryReports['dry']))
+                @foreach ($summaryReports['dry'] as $summaryReport)
+                <div class="bg-orange-50 dark:bg-orange-900/30 rounded-xl p-4 border border-orange-200 dark:border-orange-800">
+                    <div class="text-sm text-orange-600 dark:text-orange-400 font-medium">{{ $summaryReport['title'] }}</div>
+                    <div class="text-2xl font-bold text-orange-700 dark:text-orange-300">{{ number_format($summaryReport['value']) }} <span class="text-sm font-normal">kg.</span></div>
+                </div>
+                @endforeach
+            @endif
+
+            @if (isset($summaryReports['iron']))
+                @foreach ($summaryReports['iron'] as $summaryReport)
+                <div class="bg-purple-50 dark:bg-purple-900/30 rounded-xl p-4 border border-purple-200 dark:border-purple-800">
+                    <div class="text-sm text-purple-600 dark:text-purple-400 font-medium">{{ $summaryReport['title'] }}</div>
+                    <div class="text-2xl font-bold text-purple-700 dark:text-purple-300">{{ number_format($summaryReport['value']) }} <span class="text-sm font-normal">piece</span></div>
+                </div>
+                @endforeach
+            @endif
+
+            @if (isset($summaryReports['packing']))
+                @foreach ($summaryReports['packing'] as $summaryReport)
+                <div class="bg-green-50 dark:bg-green-900/30 rounded-xl p-4 border border-green-200 dark:border-green-800">
+                    <div class="text-sm text-green-600 dark:text-green-400 font-medium">{{ $summaryReport['title'] }}</div>
+                    <div class="text-2xl font-bold text-green-700 dark:text-green-300">{{ number_format($summaryReport['value']) }} <span class="text-sm font-normal">piece</span></div>
+                </div>
+                @endforeach
+            @endif
+
+            @if (isset($summaryReports['collect']))
+                @foreach ($summaryReports['collect'] as $summaryReport)
+                <div class="bg-teal-50 dark:bg-teal-900/30 rounded-xl p-4 border border-teal-200 dark:border-teal-800">
+                    <div class="text-sm text-teal-600 dark:text-teal-400 font-medium">{{ $summaryReport['title'] }}</div>
+                    <div class="text-2xl font-bold text-teal-700 dark:text-teal-300">{{ number_format($summaryReport['value']) }} <span class="text-sm font-normal">kg.</span></div>
+                </div>
+                @endforeach
+            @endif
+
+            @if (isset($summaryReports['collect_pack']))
+                @foreach ($summaryReports['collect_pack'] as $summaryReport)
+                <div class="bg-cyan-50 dark:bg-cyan-900/30 rounded-xl p-4 border border-cyan-200 dark:border-cyan-800">
+                    <div class="text-sm text-cyan-600 dark:text-cyan-400 font-medium">{{ $summaryReport['title'] }}</div>
+                    <div class="text-2xl font-bold text-cyan-700 dark:text-cyan-300">{{ number_format($summaryReport['value']) }} <span class="text-sm font-normal">pack</span></div>
+                </div>
+                @endforeach
+            @endif
+        </div>
+
+        {{-- Chart --}}
+        <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-4">
+            <div id="employee-summary-scatter-plots-chart" style="min-width: 400px; height: 400px; margin: 0 auto"></div>
+        </div>
+
+        {{-- Working Duration Footer --}}
+        <x-slot name="footer">
+            <div class="text-center">
+                <span class="text-gray-500 dark:text-gray-400">
+                    <i class="fa fa-clock mr-2"></i>เวลาการทำงานทั้งหมด: 
+                    <span class="font-semibold text-gray-900 dark:text-white">{{ $workingDuration }}</span>
+                </span>
+            </div>
+        </x-slot>
+    </x-worker.card>
+</x-worker.page>
 
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     if (typeof jQuery === 'undefined') return;
     
-var weekDayReports = @json($weekDayReports);
-$(function(){
-    $.employeeSummaryScatterPlotsChart({
-        renderTo: "employee-summary-scatter-plots-chart",
-        data: weekDayReports
+    var weekDayReports = @json($weekDayReports);
+    $(function(){
+        $.employeeSummaryScatterPlotsChart({
+            renderTo: "employee-summary-scatter-plots-chart",
+            data: weekDayReports
+        });
     });
-})
-
 });
 </script>
 @endpush
