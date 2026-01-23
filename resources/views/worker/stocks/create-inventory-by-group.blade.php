@@ -1,51 +1,44 @@
 @extends('layouts.worker')
 
 @section('content')
+<x-worker.page
+    :breadcrumbs="[
+        ['label' => __('Stocks'), 'route' => route('worker.stock')],
+        ['label' => $inventoryGroup->name, 'route' => route('worker.stock.show-inventory-by-group', ['inventoryGroupId' => $inventoryGroup->id])],
+        ['label' => __('Create New')]
+    ]"
+>
+    <x-worker.card :title="__('Create New Inventory') . ' - ' . $inventoryGroup->name">
+        <form method="POST" action="{{ request()->url() }}" enctype="multipart/form-data">
+            @csrf
 
-<div class="container">
-    <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ route('worker') }}">Worker</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.stock') }}">Stocks</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.stock.show-inventory-by-group', ['inventoryGroupId' => $inventoryGroup->id]) }}">รายการทั้งหมดของ {{ $inventoryGroup->name }} - Show Inventory by {{ $inventoryGroup->name }}</a></li>
-            <li class="breadcrumb-item active" aria-current="page">เพิ่มรายการของ {{ $inventoryGroup->name }} - Create new Inventory by {{ $inventoryGroup->name }}</li>
-        </ol>
-    </nav>
-    <div class="row justify-content-center">
-        <div class="col-md-12 m-2">
-            <div class="card">
-            <form method="POST" action="{{ request()->url() }}"  role="form" enctype="multipart/form-data">
-                @csrf
+            <input type="hidden" name="inventory_group_id" value="{{ $inventoryGroup->id }}" />
 
-                <div class="card-header">
-                    เพิ่มรายการของ {{ $inventoryGroup->name }} - Create new Inventory by {{ $inventoryGroup->name }}
-                </div>
-                <div class="card-body">
-                    <div class="row row-cols-lg-auto g-3 align-items-center mb-2">
-                        {{ Form::hidden('inventory_group_id', $inventoryGroup->id) }}
-                        <div class="col-12">
-                            <div class="input-group">
-                                {{ Form::label('name', 'ชื่อ - Name', ['class' => "input-group-text"]) }}
-                                {{ Form::text('name', $inventory->name, ['class' => 'form-control' . ($errors->has('name') ? ' is-invalid' : ''), 'placeholder' => 'Name']) }}
-                                {!! $errors->first('name', '<div class="invalid-feedback">:message</div>') !!}
-                            </div>
-                        </div>
-                        <div class="col-12">
-                            <div class="input-group">
-                                {{ Form::label('unit', 'Unit', ['class' => "input-group-text"]) }}
-                                {{ Form::text('unit', $inventory->unit, ['class' => 'form-control' . ($errors->has('unit') ? ' is-invalid' : ''), 'placeholder' => 'Unit']) }}
-                                {!! $errors->first('unit', '<div class="invalid-feedback">:message</div>') !!}
-                            </div>
-                        </div>
-                    </div>
-                    
-                </div>
-                <div class="card-footer">
-                    <button type="submit" class="btn btn-primary">Submit</button>
-                </div>
-            </form>
+            <x-crud.form-group 
+                name="name" 
+                label="ชื่อ - Name" 
+                type="text" 
+                :value="$inventory->name ?? old('name')" 
+                placeholder="Enter Name" 
+            />
+
+            <x-crud.form-group 
+                name="unit" 
+                label="หน่วย - Unit" 
+                type="text" 
+                :value="$inventory->unit ?? old('unit')" 
+                placeholder="e.g., pcs, kg, liters" 
+            />
+
+            <div class="flex items-center justify-end gap-3 mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+                <x-ui.button type="submit" variant="primary" icon="fa fa-save">
+                    {{ __('Save') }}
+                </x-ui.button>
+                <x-ui.button :href="route('worker.stock.show-inventory-by-group', ['inventoryGroupId' => $inventoryGroup->id])" variant="secondary" icon="fa fa-times">
+                    {{ __('Cancel') }}
+                </x-ui.button>
             </div>
-        </div>
-    </div>
-</div>
+        </form>
+    </x-worker.card>
+</x-worker.page>
 @endsection
