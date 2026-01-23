@@ -6,7 +6,7 @@
     'breadcrumbs' => []
 ])
 
-<div class="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-gray-900 dark:to-gray-800">
+<div class="bg-gradient-to-br from-slate-50 to-slate-100 dark:from-gray-900 dark:to-gray-800">
     <div class="container">
         <!-- Breadcrumb -->
         <nav class="flex mb-6 sm:mb-8" aria-label="Breadcrumb">
