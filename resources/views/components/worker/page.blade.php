@@ -61,8 +61,6 @@
         @endif
 
         {{-- Page Content --}}
-        <div class="flex flex-wrap justify-center">
-            {{ $slot }}
-        </div>
+        {{ $slot }}
     </div>
 </div>
