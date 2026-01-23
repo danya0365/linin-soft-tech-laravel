@@ -21,7 +21,10 @@
     </div>
     @endforeach
 </div>
+@push('scripts')
 <script type="text/javascript">
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof jQuery === 'undefined') return;
     $(function(){
         var {{ $inputName }} = $('[name={{ $inputName }}]').val();
         var setPadResult = (color) => {
@@ -35,4 +38,6 @@
             setPadResult({{ $inputName }});
         })
     })
-    </script>
+});
+</script>
+@endpush
