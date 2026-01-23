@@ -13,12 +13,6 @@
         ['label' => $customer['name']]
     ]"
 >
-    {{-- Action Button --}}
-    <div class="flex justify-end mb-4">
-        <a href="{{ route('worker.customer.new-billing', ['customerId' => $customer['id']]) }}" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg text-sm transition-colors duration-200 shadow-sm hover:shadow">
-            <i class="fa fa-file-invoice mr-2"></i>{{ __('Submit Billing') }}
-        </a>
-    </div>
 
     {{-- Filter Form --}}
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 sm:p-6 mb-6 border border-gray-200 dark:border-gray-700">
