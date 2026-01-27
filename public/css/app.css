@@ -30110,10 +30110,6 @@ Ensure the default browser behavior of the `hidden` attribute.
 .border-2{
   border-width: 2px;
 }
-.border-y{
-  border-top-width: 1px;
-  border-bottom-width: 1px;
-}
 .border-t{
   border-top-width: 1px;
 }
@@ -30125,6 +30121,9 @@ Ensure the default browser behavior of the `hidden` attribute.
 }
 .border-r-0{
   border-right-width: 0px;
+}
+.border-l-0{
+  border-left-width: 0px;
 }
 .border-dashed{
   border-style: dashed;
