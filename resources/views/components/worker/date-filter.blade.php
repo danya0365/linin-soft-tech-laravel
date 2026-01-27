@@ -24,16 +24,16 @@
                 type="date" 
                 name="date_start_at" 
                 value="{{ $dateStartAt }}" 
-                class="px-2 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-amber-500 focus:border-amber-500 w-full min-w-0"
+                class="px-2 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-amber-500 focus:border-amber-500 w-full min-w-0 z-10 relative"
                 placeholder="Start" 
                 aria-label="Start Date"
             >
-            <span class="px-2 py-2 bg-gray-100 dark:bg-gray-600 border-y border-gray-300 dark:border-gray-600 text-gray-500 text-xs">-</span>
+            <span class="px-2 py-2 bg-gray-100 dark:bg-gray-600 border-y border-gray-300 dark:border-gray-600 text-gray-500 text-xs z-0 relative">-</span>
             <input 
                 type="date" 
                 name="date_end_at" 
                 value="{{ $dateEndAt }}" 
-                class="px-2 py-2 bg-white dark:bg-gray-700 border border-left-0 border-gray-300 dark:border-gray-600 rounded-r-lg text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-amber-500 focus:border-amber-500 w-full min-w-0"
+                class="px-2 py-2 bg-white dark:bg-gray-700 border border-left-0 border-gray-300 dark:border-gray-600 rounded-r-lg text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-amber-500 focus:border-amber-500 w-full min-w-0 z-10 relative"
                 placeholder="End" 
                 aria-label="End Date"
             >
