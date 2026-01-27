@@ -46,7 +46,7 @@ module.exports = {
                 },
             },
             fontFamily: {
-                sans: ['Inter', 'system-ui', 'sans-serif'],
+                sans: ['Google Sans', 'sans-serif'],
             },
             backdropBlur: {
                 xs: '2px',
