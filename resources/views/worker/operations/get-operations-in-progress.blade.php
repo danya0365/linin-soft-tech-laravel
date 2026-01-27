@@ -11,82 +11,37 @@
     ]"
 >
     <x-worker.card>
-        {{-- Filters --}}
+        {{-- Filter Form --}}
         <div class="mb-6">
-            <form action="{{ route('worker.operation.in-progress') }}" method="GET" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                
-                {{-- Linen Type --}}
-                <div>
-                    <label for="linen-type" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">ชนิดผ้า</label>
-                    <div class="relative">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <i class="fa fa-tshirt text-gray-400"></i>
-                        </div>
-                        <select id="linen-type" name="linenType" onchange="this.form.submit()" 
-                            class="pl-10 block w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-amber-500 focus:ring-amber-500 sm:text-sm">
-                            <option value="">ไม่เลือก</option>
-                            @foreach ( $linenTypes as $linenType )
-                            <option value="{{ $linenType->id }}" {{ $linenTypeSelected == $linenType->id ? 'selected' : '' }}>{{ $linenType->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
+            <x-worker.date-filter 
+                :action="route('worker.operation.in-progress')"
+                :date-start-at="$dateStartAt"
+                :date-end-at="$dateEndAt"
+                :reset-url="route('worker.operation.in-progress')"
+            >
+                <x-worker.select-filter 
+                    name="linenType"
+                    label="ชนิดผ้า"
+                    :options="$linenTypes->pluck('name', 'id')->toArray()"
+                    :selected="$linenTypeSelected"
+                    show-all-label="ไม่เลือก"
+                />
 
-                {{-- Operation Type --}}
-                <div>
-                    <label for="operation_type" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">ประเภทงาน</label>
-                    <div class="relative">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <i class="fa fa-cogs text-gray-400"></i>
-                        </div>
-                        <select id="operation_type" name="operation_type" onchange="this.form.submit()"
-                            class="pl-10 block w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-amber-500 focus:ring-amber-500 sm:text-sm">
-                            <option value="">แสดงทั้งหมด - Show All</option>
-                            @foreach ( $operationTypes as $key => $operationType )
-                            <option value="{{ $key }}" {{ $operationTypeSelected == $key ? 'selected' : '' }}>{{ $operationType }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
+                <x-worker.select-filter 
+                    name="operation_type"
+                    label="ประเภทงาน"
+                    :options="$operationTypes"
+                    :selected="$operationTypeSelected"
+                />
 
-                {{-- Date Range --}}
-                <div class="md:col-span-2 lg:col-span-1">
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">วันที่</label>
-                    <div class="flex items-center gap-2">
-                        <input type="date" name="date_start_at" value="{{ $dateStartAt }}" 
-                            class="block w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-amber-500 focus:ring-amber-500 sm:text-sm">
-                        <span class="text-gray-500">-</span>
-                        <input type="date" name="date_end_at" value="{{ $dateEndAt }}" 
-                            class="block w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-amber-500 focus:ring-amber-500 sm:text-sm">
-                    </div>
-                </div>
-
-                {{-- Sort Order --}}
-                <div>
-                    <label for="sort_order" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">เรียงโดย</label>
-                    <div class="relative">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <i class="fa fa-sort text-gray-400"></i>
-                        </div>
-                        <select id="sort_order" name="sort_order" onchange="this.form.submit()"
-                            class="pl-10 block w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-amber-500 focus:ring-amber-500 sm:text-sm">
-                            @foreach ( $sortOrders as $sortOrder )
-                            <option value="{{ $sortOrder['var'] }}" {{ $sortOrderSelected == $sortOrder['var'] ? 'selected' : '' }}>{{ $sortOrder['name'] }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
-
-                {{-- Buttons --}}
-                <div class="md:col-span-2 lg:col-span-4 flex justify-end gap-2">
-                    <button type="submit" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white text-sm font-medium rounded-lg transition-colors shadow-sm">
-                        <i class="fa fa-search mr-1"></i> ค้นหา
-                    </button>
-                    <a href="{{ route('worker.operation.in-progress') }}" class="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 text-sm font-medium rounded-lg transition-colors shadow-sm">
-                        <i class="fa fa-refresh mr-1"></i> รีเซ็ต
-                    </a>
-                </div>
-            </form>
+                <x-worker.select-filter 
+                    name="sort_order"
+                    label="เรียงโดย"
+                    :options="collect($sortOrders)->pluck('name', 'var')->toArray()"
+                    :selected="$sortOrderSelected"
+                    :show-all="false"
+                />
+            </x-worker.date-filter>
         </div>
 
         {{-- Table --}}
