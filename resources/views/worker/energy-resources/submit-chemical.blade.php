@@ -1,57 +1,54 @@
 @extends('layouts.worker')
 
 @section('content')
+<x-worker.page 
+    title="บันทึกการใช้เคมี" 
+    subtitle="Chemical Consumption Log" 
+    icon="fa-solid fa-flask"
+    :breadcrumbs="[
+        ['label' => 'Energy Resource', 'route' => route('worker.energy-resource')],
+        ['label' => 'พนักงาน: ' . $energyResourceLog->employee->name, 'route' => route('worker.energy-resource.select-employee', ['energyResourceLogId' => $energyResourceLog->id])],
+        ['label' => 'บันทึกการใช้เคมี']
+    ]"
+>
+    <x-worker.card title="บันทึกการใช้เคมี">
+        <form action="{{ request()->url() }}" method="POST" role="form" enctype="multipart/form-data">
+            @csrf
+            
+            <x-crud.form-group 
+                name="value" 
+                label="ปริมาณเคมีที่ใช้ (Litre)" 
+                type="number" 
+                step="0.01" 
+                placeholder="0.00"
+                :value="old('value')"
+            />
 
-<div class="container">
-    <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ route('worker') }}">Worker</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.energy-resource') }}">{{ __('Energy Resource') }}</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.energy-resource.select-employee', ['energyResourceLogId' => $energyResourceLog->id]) }}">พนักงาน: {{$energyResourceLog->employee->name }}</a></li>
-            <li class="breadcrumb-item active" aria-current="page">บันทึกการใช้เคมี</li>
-        </ol>
-    </nav>
-    <div class="row justify-content-center">
-        <div class="col-md-12 m-2">
-            <div class="card">
-                <div class="card-header">บันทึกการใช้เคมี</div>
-                <div class="card-body">
-                    <form class="row g-3 mb-3" action="{{ request()->url() }}" method="POST" role="form" enctype="multipart/form-data">
-                        
-                        @csrf
+            <x-crud.form-group 
+                name="cost" 
+                label="จำนวนเงิน - Cost (Thai Baht)" 
+                type="number" 
+                step="0.01" 
+                placeholder="0.00"
+                :value="old('cost')"
+            />
 
-                        <div class="col-12">
-                            <label for="value" class="form-label">ปริมาณเคมีที่ใช้ (Litre)</label>
-                            <input type="text" name="value" class="form-control" id="value">
-                            @error('value')
-                                <div class="text-danger">{{ $message }}</div>
-                            @enderror
-                        </div>
+            <x-crud.form-group 
+                name="created_at" 
+                label="วันที่" 
+                type="date" 
+                :value="old('created_at')"
+            />
 
-                        <div class="col-12">
-                            <label for="cost" class="form-label">จำนวนเงิน - Cost (Thai Baht)</label>
-                            <input type="text" name="cost" class="form-control" id="cost">
-                            @error('cost')
-                                <div class="text-danger">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="col-12">
-                            <label for="created_at" class="form-label">วันที่</label>
-                            <input type="date" name="created_at" class="form-control" id="created_at">
-                            @error('created_at')
-                                <div class="text-danger">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="col-12">
-                            <button type="submit" class="btn btn-primary">Submit</button>
-                            <button type="reset" class="btn btn-outline-secondary">Reset</button>
-                        </div>
-                    </form>
-                </div>
+            <div class="flex items-center justify-end gap-3 mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+                <x-ui.button type="submit" variant="primary" icon="fa-solid fa-save">
+                    บันทึกข้อมูล
+                </x-ui.button>
+                <x-ui.button type="reset" variant="secondary" icon="fa-solid fa-rotate-left">
+                    รีเซ็ต
+                </x-ui.button>
             </div>
-        </div>
-    </div>
-</div>
+        </form>
+    </x-worker.card>
+</x-worker.page>
 @endsection

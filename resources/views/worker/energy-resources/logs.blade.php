@@ -1,158 +1,183 @@
 @extends('layouts.worker')
 
 @section('content')
+<x-worker.page 
+    title="ประวัติการใช้พลังงาน" 
+    subtitle="Energy Resource History & Logs" 
+    icon="fa-solid fa-history"
+    :breadcrumbs="[
+        ['label' => 'Energy Resource', 'route' => route('worker.energy-resource')],
+        ['label' => 'History']
+    ]"
+>
+    <!-- Filter Section -->
+    <x-worker.card title="ตัวกรอง (Filter)" icon="fa-solid fa-filter">
+        <form action="{{ request()->url() }}" method="GET" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+            
+            <!-- Energy Resource Select -->
+            <div>
+                <label for="energy_resource" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">พลังงาน</label>
+                <select id="energy_resource" name="energy_resource" onchange="this.form.submit()" 
+                        class="block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm dark:bg-gray-800 dark:border-gray-600 dark:text-white">
+                    <option value="">แสดงทั้งหมด - Show All</option>
+                    @foreach ($energyResources as $key => $energyResource)
+                        <option value="{{ $energyResource['id'] }}" {{ $energyResourceSelected == $energyResource['id'] ? 'selected' : '' }}>
+                            {{ $energyResource['name'] }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
 
-<div class="container">
-    <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ route('worker') }}">Worker</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.energy-resource') }}">{{ __('Energy Resource') }}</a></li>
-            <li class="breadcrumb-item active" aria-current="page">ประวัติ</li>
-        </ol>
-    </nav>
-    <div class="row justify-content-center">
-        <div class="col-md-12 m-2">
-            <div class="card">
-                <div class="card-header">ประวัติ</div>
-                <div class="card-body">
- 
-                    <form class="row row-cols-lg-auto g-3 align-items-center mb-2" action="{{ request()->url() }}" method="GET">
-
-                        <div class="col-12">
-                            <div class="input-group">
-                                <label class="input-group-text" for="energy_resource">พลังงาน</label>
-                                <select class="form-select" id="energy_resource" name="energy_resource" onchange="this.form.submit()">
-                                    <option value="">แสดงทั้งหมด - Show All</option>
-                                    @foreach ( $energyResources as $key => $energyResource )
-                                    <option value="{{ $energyResource['id'] }}" {{ $energyResourceSelected == $energyResource['id'] ? 'selected' : '' }}>{{ $energyResource['name'] }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                        
-                        <div class="col-12">
-                            <div class="input-group">
-                                <input type="date" name="date_start_at" value="{{ $dateStartAt }}" class="form-control" placeholder="วันที่เริ่ม" aria-label="วันที่เริ่ม">
-                                <span class="input-group-text"> ถึง </span>
-                                <input type="date" name="date_end_at" value="{{ $dateEndAt }}" class="form-control" placeholder="วันที่สิ้นสุด" aria-label="วันที่สิ้นสุด">
-                            </div>
-                        </div>
-
-                        <div class="col-12">
-                            <div class="input-group">
-                                <label class="input-group-text" for="sort_order">เรียงโดย</label>
-                                <select class="form-select" id="sort_order" name="sort_order" onchange="this.form.submit()">
-                                    @foreach ( $sortOrders as $sortOrder )
-                                    <option value="{{ $sortOrder['var'] }}" {{ $sortOrderSelected == $sortOrder['var'] ? 'selected' : '' }}>{{ $sortOrder['name'] }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="col-12">
-                            <button type="submit" class="btn btn-primary">Submit</button>
-                            <a href="{{ route('worker.energy-resource.logs') }}" role="button" class="btn btn-outline-secondary">Reset</a>
-                        </div>
-                    </form>
-
-                    @if ($message = Session::get('success'))
-                        <div class="alert alert-success mb-2">
-                            {{ $message }}
-                        </div>
-                    @endif
-
-                    <div class="table-responsive mb-2">
-                        <table class="table table-bordered table-hover">
-                            <thead class="thead">
-                                <tr>
-                                    <th>วันที่</th>
-                                    <th>พลังงาน</th>
-                                    <th>จำนวน</th>
-                                    <th>หน่วย</th>
-                                    <th>ค่าใช้จ่าย</th>
-                                    <th>พนักงาน</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($energyResourceLogs as $energyResourceLog)
-                                    <tr>
-                                        <td class="text-center">{{ $energyResourceLog->created_at->format('Y-m-d') }}</td>
-                                        <td class="text-center">{{ $energyResourceLog->energyResource->name }}</td>
-                                        <td class="text-end">{{ $energyResourceLog->value }}</td>
-                                        <td class="text-start">{{ $energyResourceLog->unit }}</td>
-                                        <td class="text-start">{{ number_format($energyResourceLog->cost) }} Thai Baht</td>
-                                        <td>{{ $energyResourceLog->employee->name ?? "-" }}</td>
-                                        <td>
-                                            <form class="delete-form" action="{{ route('worker.energy-resource.logs.delete', $energyResourceLog->id) }}" method="POST">
-                                                @csrf
-                                                <button type="submit" class="btn btn-danger btn-sm"><i class="fa fa-fw fa-trash"></i> Delete</button>
-                                            </form>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div class="table-responsive mb-2">
-                        <table class="table table-bordered table-hover">
-                            <thead class="thead">
-                                <tr>
-                                    <th>พลังงาน</th>
-                                    <th>จำนวนรวม</th>
-                                    <th>ค่าใช้จ่ายรวม</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($energyResourceSums as $energyResourceSum)
-                                    <tr>
-                                        <td>{{ $energyResourceSum->energyResource->name ?? '-' }}</td>
-                                        <td class="text-center">
-                                            {{ number_format($energyResourceSum->total_value) }}
-                                        </td>
-                                        <td class="text-center">
-                                            {{ number_format($energyResourceSum->total_cost) }}
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-
-                </div>
-                <div class="card-footer">
-                    {!! $energyResourceLogs->withQueryString()->links() !!}
+            <!-- Date Range -->
+            <div class="md:col-span-2">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">ช่วงเวลา</label>
+                <div class="flex items-center space-x-2">
+                    <input type="date" name="date_start_at" value="{{ $dateStartAt }}" 
+                           class="block w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500 sm:text-sm dark:bg-gray-800 dark:border-gray-600 dark:text-white">
+                    <span class="text-gray-500">ถึง</span>
+                    <input type="date" name="date_end_at" value="{{ $dateEndAt }}" 
+                           class="block w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500 sm:text-sm dark:bg-gray-800 dark:border-gray-600 dark:text-white">
                 </div>
             </div>
-        </div>
-        <div class="col-md-12 m-2">
-            <div class="card">
-                <div class="card-header">สถิติ</div>
-                <div class="card-body">
-                    <div id="energy-chart" style="min-width: 400px; height: 400px; margin: 0 auto">
 
-                    </div>
-                </div>
+            <!-- Sort Date -->
+            <div>
+                <label for="sort_order" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">เรียงโดย</label>
+                <select id="sort_order" name="sort_order" onchange="this.form.submit()" 
+                        class="block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm dark:bg-gray-800 dark:border-gray-600 dark:text-white">
+                    @foreach ($sortOrders as $sortOrder)
+                        <option value="{{ $sortOrder['var'] }}" {{ $sortOrderSelected == $sortOrder['var'] ? 'selected' : '' }}>
+                            {{ $sortOrder['name'] }}
+                        </option>
+                    @endforeach
+                </select>
             </div>
+
+            <!-- Actions -->
+            <div class="md:col-span-4 lg:col-span-4 flex justify-end gap-2 mt-2">
+                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors shadow-sm text-sm font-medium">
+                    <i class="fa-solid fa-search mr-1"></i> Search
+                </button>
+                <a href="{{ route('worker.energy-resource.logs') }}" class="px-4 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors shadow-sm text-sm font-medium">
+                    <i class="fa-solid fa-rotate-left mr-1"></i> Reset
+                </a>
+            </div>
+        </form>
+    </x-worker.card>
+
+    @if ($message = Session::get('success'))
+        <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded shadow-sm mb-4" role="alert">
+            <p>{{ $message }}</p>
         </div>
+    @endif
+
+    <!-- Lists Table -->
+    <x-worker.card title="รายการบันทึก (Logs)" icon="fa-solid fa-list">
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                <thead class="bg-gray-50 dark:bg-gray-800">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">วันที่</th>
+                        <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">พลังงาน</th>
+                        <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">จำนวน</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">หน่วย</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">ค่าใช้จ่าย</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">พนักงาน</th>
+                        <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
+                    @foreach ($energyResourceLogs as $energyResourceLog)
+                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 text-center">
+                            {{ $energyResourceLog->created_at->format('Y-m-d') }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 text-center">
+                            <span class="inline-flex px-2 text-xs font-semibold leading-5 text-green-800 bg-green-100 rounded-full dark:bg-green-900 dark:text-green-200">
+                                {{ $energyResourceLog->energyResource->name }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 text-right font-medium">
+                            {{ $energyResourceLog->value }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400 text-left">
+                            {{ $energyResourceLog->unit }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 text-left">
+                            {{ number_format($energyResourceLog->cost) }} <span class="text-xs text-gray-500">THB</span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                            {{ $energyResourceLog->employee->name ?? "-" }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+                            <form class="delete-form inline-block" action="{{ route('worker.energy-resource.logs.delete', $energyResourceLog->id) }}" method="POST">
+                                @csrf
+                                <button type="submit" class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 transition-colors" title="Delete">
+                                    <i class="fa fa-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+        <div class="mt-4">
+            {!! $energyResourceLogs->withQueryString()->links() !!}
+        </div>
+    </x-worker.card>
+
+    <!-- Summary Table -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <x-worker.card title="สรุปตามประเภท (Summary)" icon="fa-solid fa-chart-pie">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                    <thead class="bg-gray-50 dark:bg-gray-800">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">พลังงาน</th>
+                            <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">จำนวนรวม</th>
+                            <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">ค่าใช้จ่ายรวม</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
+                        @foreach ($energyResourceSums as $energyResourceSum)
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
+                                {{ $energyResourceSum->energyResource->name ?? '-' }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 text-center">
+                                {{ number_format($energyResourceSum->total_value) }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 text-center">
+                                {{ number_format($energyResourceSum->total_cost) }}
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </x-worker.card>
+
+        <!-- Chart Section -->
+        <x-worker.card title="สถิติ (Statistics)" icon="fa-solid fa-chart-line">
+            <div id="energy-chart" style="min-width: 100%; height: 400px; margin: 0 auto"></div>
+        </x-worker.card>
     </div>
-</div>
+</x-worker.page>
 
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     if (typeof jQuery === 'undefined') return;
     
-$(function(){
-    $('.delete-form').on('submit', function(e){
-        if (!confirm("Are you sure?")) {
-            return false;
-        }
-        return true
-    })
-});
-
+    $(function(){
+        $('.delete-form').on('submit', function(e){
+            if (!confirm("Are you sure?")) {
+                return false;
+            }
+            return true
+        })
+    });
 });
 </script>
 @endpush

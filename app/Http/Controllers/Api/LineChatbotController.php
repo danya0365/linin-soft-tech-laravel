@@ -30,19 +30,38 @@ class LineChatbotController extends Controller
      */
     public function webhook(Request $request)
     {
-        // ตรวจสอบ Signature
-        $signature = $request->header('X-Line-Signature');
         $body = $request->getContent();
+        $signature = $request->header('X-Line-Signature');
 
+        Log::debug('LINE Webhook received', [
+            'body' => $body,
+            'signature' => $signature
+        ]);
+
+        // ตรวจสอบ Signature
         if (!$signature || !$this->lineService->verifySignature($body, $signature)) {
             Log::warning('LINE Webhook: Invalid signature');
             return response()->json(['error' => 'Invalid signature'], 401);
         }
 
-        $events = $request->input('events', []);
+        $data = json_decode($body, true);
+        $events = $data['events'] ?? [];
+
+        // LINE Verification: Respond 200 even if no events
+        if (empty($events)) {
+            Log::info('LINE Webhook: No events found or empty (Connection test)');
+            return response()->json(['status' => 'ok']);
+        }
 
         foreach ($events as $event) {
-            $this->handleEvent($event);
+            try {
+                $this->handleEvent($event);
+            } catch (\Exception $e) {
+                Log::error('LINE Webhook: Error handling event', [
+                    'error' => $e->getMessage(),
+                    'event' => $event
+                ]);
+            }
         }
 
         return response()->json(['status' => 'ok']);
