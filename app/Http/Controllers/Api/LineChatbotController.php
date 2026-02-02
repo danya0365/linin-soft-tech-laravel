@@ -203,12 +203,21 @@ class LineChatbotController extends Controller
         foreach ($replies as $reply) {
             if (is_string($reply)) {
                 // Simple text reply
-                $items[] = $this->lineService->quickReplyItem($reply, 'message');
+                $label = $reply;
+                if (mb_strlen($label) > 20) {
+                    $label = mb_substr($label, 0, 17) . '...';
+                }
+                $items[] = $this->lineService->quickReplyItem($label, 'message', $reply);
             } else {
                 // Action reply
                 $label = $reply['label'] ?? '';
                 $action = $reply['action'] ?? '';
                 $data = $reply['data'] ?? [];
+
+                // LINE limit: Label must be max 20 characters
+                if (mb_strlen($label) > 20) {
+                    $label = mb_substr($label, 0, 17) . '...';
+                }
 
                 if ($action) {
                     // Build postback data string
