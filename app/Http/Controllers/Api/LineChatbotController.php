@@ -59,8 +59,20 @@ class LineChatbotController extends Controller
             } catch (\Exception $e) {
                 Log::error('LINE Webhook: Error handling event', [
                     'error' => $e->getMessage(),
-                    'event' => $event
+                    'event' => $event,
+                    'trace' => $e->getTraceAsString()
                 ]);
+
+                // ตอบกลับ error ไปยัง User (ถ้ามี replyToken)
+                if (isset($event['replyToken'])) {
+                    try {
+                        $this->lineService->replyMessage($event['replyToken'], [
+                            $this->lineService->textMessage("⚠️ เกิดข้อผิดพลาดชั่วคราวในการประมวลผล\nกรุณาลองใหม่อีกครั้ง หรือพิมพ์ \"เมนู\"")
+                        ]);
+                    } catch (\Exception $inner) {
+                        Log::error('LINE Webhook: Failed to send error reply', ['error' => $inner->getMessage()]);
+                    }
+                }
             }
         }
 
@@ -155,19 +167,30 @@ class LineChatbotController extends Controller
      */
     protected function convertToLineMessages(array $response): array
     {
-        switch ($response['type']) {
+        $type = $response['type'] ?? 'text';
+
+        switch ($type) {
             case 'text':
-                return [$this->lineService->textMessage($response['text'])];
+                $text = $response['text'] ?? 'ไม่มีข้อมูล';
+                return [$this->lineService->textMessage($text)];
 
             case 'menu':
+                $text = $response['text'] ?? 'กรุณาเลือกเมนู';
                 $quickReplyItems = $this->buildQuickReplyItems($response['quickReplies'] ?? []);
-                return [$this->lineService->quickReply($response['text'], $quickReplyItems)];
+                
+                // ถ้าไม่มี Quick Reply ให้ส่งเป็น Text ธรรมดาแทน (LINE Error if quickReply.items is empty)
+                if (empty($quickReplyItems)) {
+                    return [$this->lineService->textMessage($text)];
+                }
+                
+                return [$this->lineService->quickReply($text, $quickReplyItems)];
 
             case 'card':
                 return [$this->buildFlexMessage($response)];
 
             default:
-                return [$this->lineService->textMessage(json_encode($response))];
+                $fallbackText = is_string($response) ? $response : json_encode($response);
+                return [$this->lineService->textMessage($fallbackText)];
         }
     }
 
@@ -229,8 +252,12 @@ class LineChatbotController extends Controller
             }
         }
 
+        if (empty($bodyContents)) {
+            $bodyContents[] = $this->lineService->infoRow('ข้อมูล', 'ไม่พบข้อมูลที่จะแสดงในขณะนี้');
+        }
+
         $bubble = $this->lineService->bubbleContainer(
-            $card['title'] ?? '',
+            $card['title'] ?? 'ข้อมูล',
             $card['subtitle'] ?? '',
             $bodyContents,
             $card['headerColor'] ?? '#1DB446'
