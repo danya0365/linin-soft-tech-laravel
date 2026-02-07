@@ -28,7 +28,7 @@
                 placeholder="Start" 
                 aria-label="Start Date"
             >
-            <span class="px-2 py-2 bg-gray-100 dark:bg-gray-600 border border-l-0 border-gray-300 dark:border-gray-600 text-gray-500 text-xs z-0 relative">-</span>
+            <span class="px-2 py-2 bg-gray-100 dark:bg-gray-600 border border-l-0 border-gray-300 dark:border-gray-600 text-gray-500 text-sm z-0 relative">ถึง</span>
             <input 
                 type="date" 
                 name="date_end_at" 
