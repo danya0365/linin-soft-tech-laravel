@@ -18,6 +18,7 @@
         <div class="grid md:grid-cols-2 gap-6">
             <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Name</p><p class="font-semibold text-gray-900 dark:text-white">{{ $user->name ?? '-' }}</p></div>
             <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Email</p><p class="font-semibold text-gray-900 dark:text-white">{{ $user->email ?? '-' }}</p></div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Line User ID</p><p class="font-semibold text-gray-900 dark:text-white">{{ $user->line_user_id ?? '-' }}</p></div>
             <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Role</p><p class="font-semibold text-gray-900 dark:text-white">{{ $user->role ?? '-' }}</p></div>
             <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Customer Account</p><p class="font-semibold text-gray-900 dark:text-white">{{ $user->customer_account ?? '-' }}</p></div>
             <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Is Can Access Admin</p><p class="font-semibold text-gray-900 dark:text-white">{{ $user->is_can_access_admin ?? '-' }}</p></div>

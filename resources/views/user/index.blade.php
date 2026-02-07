@@ -41,6 +41,10 @@
                                             <span class="ml-2 text-sm text-gray-900 dark:text-gray-100">{{ $user->email ?? '-' }}</span>
                                         </div>
                                         <div class="mb-2">
+                                            <span class="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">Line User ID:</span>
+                                            <span class="ml-2 text-sm text-gray-900 dark:text-gray-100">{{ $user->line_user_id ?? '-' }}</span>
+                                        </div>
+                                        <div class="mb-2">
                                             <span class="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">Role:</span>
                                             <span class="ml-2 text-sm text-gray-900 dark:text-gray-100">{{ $user->role ?? '-' }}</span>
                                         </div>

@@ -1,5 +1,6 @@
 <x-crud.form-group name="name" label="Name" type="text" :value="$user->name ?? old('name')" placeholder="Enter Name" required />
 <x-crud.form-group name="email" label="Email" type="email" :value="$user->email ?? old('email')" placeholder="Enter Email" required />
+<x-crud.form-group name="line_user_id" label="Line User ID" type="text" :value="$user->line_user_id ?? old('line_user_id')" placeholder="Enter Line User ID" />
 {{-- Password field: Leave blank to keep existing password when editing --}}
 <x-crud.form-group name="password" label="Password" type="password" :value="''" placeholder="Enter Password (optional for edit)" />
 
