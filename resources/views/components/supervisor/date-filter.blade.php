@@ -17,23 +17,23 @@
     {{-- Date Range --}}
     <div class="md:col-span-2 lg:col-span-1 w-full">
         <div class="flex items-center gap-0 w-full">
-            <span class="px-3 py-2 bg-gray-100 dark:bg-gray-600 text-gray-700 dark:text-gray-300 text-sm font-medium rounded-l-lg border border-r-0 border-gray-300 dark:border-gray-600 whitespace-nowrap">
+            <span class="px-4 py-2.5 bg-gray-50 dark:bg-gray-600/50 text-gray-500 dark:text-gray-400 text-sm font-medium rounded-l-lg border border-r-0 border-gray-300 dark:border-gray-600 whitespace-nowrap transition-colors duration-200">
                 <i class="fa fa-calendar-alt text-indigo-500 dark:text-indigo-400"></i>
             </span>
             <input 
                 type="date" 
                 name="date_start_at" 
                 value="{{ $dateStartAt }}" 
-                class="px-2 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 flex-1 min-w-0 z-10 relative"
+                class="px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 flex-1 min-w-0 z-10 relative transition-all duration-200"
                 placeholder="Start" 
                 aria-label="Start Date"
             >
-            <span class="px-2 py-2 bg-gray-100 dark:bg-gray-600 border border-l-0 border-gray-300 dark:border-gray-600 text-gray-500 text-sm z-0 relative">ถึง</span>
+            <span class="px-4 py-2.5 bg-gray-50 dark:bg-gray-600/50 border border-l-0 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 text-sm z-0 relative transition-colors duration-200">ถึง</span>
             <input 
                 type="date" 
                 name="date_end_at" 
                 value="{{ $dateEndAt }}" 
-                class="px-2 py-2 bg-white dark:bg-gray-700 border border-left-0 border-gray-300 dark:border-gray-600 rounded-r-lg text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 flex-1 min-w-0 z-10 relative"
+                class="px-4 py-2.5 bg-white dark:bg-gray-700 border border-left-0 border-gray-300 dark:border-gray-600 rounded-r-lg text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 flex-1 min-w-0 z-10 relative transition-all duration-200"
                 placeholder="End" 
                 aria-label="End Date"
             >

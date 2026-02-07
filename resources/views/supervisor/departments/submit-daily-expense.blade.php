@@ -23,69 +23,44 @@
                 @csrf
                 
                 {{-- Department Select --}}
-                <div>
-                    <label for="department_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        แผนก
-                    </label>
-                    <select id="department_id" name="department_id" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                        <option value="">ไม่เลือก</option>
-                        @foreach ( $departments as $department )
-                        <option value="{{ $department->id }}">{{ $department->name }}</option>
-                        @endforeach
-                    </select>
-                    @error('department_id')
-                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
-                    @enderror
-                </div>
+                <x-crud.form-group 
+                    name="department_id" 
+                    label="แผนก" 
+                    type="select" 
+                    :options="$departments" 
+                    placeholder="ไม่เลือก"
+                />
 
                 {{-- Date --}}
-                <div>
-                    <label for="daily_date" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        วันที่
-                    </label>
-                    <input type="date" id="daily_date" name="daily_date" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500" />
-                    @error('daily_date')
-                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
-                    @enderror
-                </div>
+                <x-crud.form-group 
+                    name="daily_date" 
+                    label="วันที่" 
+                    type="date" 
+                />
 
                 {{-- Cost --}}
-                <div>
-                    <label for="cost" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        จำนวนเงิน
-                    </label>
-                    <div class="relative rounded-md shadow-sm">
-                        <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                            <span class="text-gray-500 sm:text-sm">฿</span>
-                        </div>
-                        <input type="number" id="cost" name="cost" class="pl-7 w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500" placeholder="0.00" />
-                    </div>
-                    @error('cost')
-                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
-                    @enderror
-                </div>
+                <x-crud.form-group 
+                    name="cost" 
+                    label="จำนวนเงิน" 
+                    type="number" 
+                    placeholder="0.00" 
+                    prefix="฿"
+                />
 
                 {{-- Note --}}
-                <div>
-                    <label for="message" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        บันทึกข้อความ - Note
-                    </label>
-                    <textarea id="message" name="message" rows="3" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></textarea>
-                    @error('message')
-                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
-                    @enderror
-                </div>
+                <x-crud.form-group 
+                    name="message" 
+                    label="บันทึกข้อความ - Note" 
+                    type="textarea" 
+                    rows="3" 
+                />
 
                 {{-- Image Upload --}}
-                <div>
-                    <label for="image_upload" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        อัพโหลดรูป - Attach Photo
-                    </label>
-                    <input type="file" id="image_upload" name="image_upload" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 dark:file:bg-indigo-900 dark:file:text-indigo-300" />
-                    @error('image_upload')
-                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
-                    @enderror
-                </div>
+                <x-crud.form-group 
+                    name="image_upload" 
+                    label="อัพโหลดรูป - Attach Photo" 
+                    type="file" 
+                />
 
                 {{-- Buttons --}}
                 <div class="flex items-center gap-4 pt-4">

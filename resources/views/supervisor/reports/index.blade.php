@@ -25,22 +25,22 @@
                 <form id="expense-range-days-form" class="mb-6" action="{{ request()->url() }}" method="GET">
                     <div class="flex flex-col md:flex-row items-end gap-4">
                         <div class="w-full md:w-auto flex-grow max-w-lg">
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">ช่วงวันที่</label>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 transition-colors duration-200">ช่วงวันที่</label>
                             <div class="flex items-center gap-0 w-full">
-                                <span class="px-3 py-2 bg-gray-100 dark:bg-gray-600 text-gray-700 dark:text-gray-300 text-sm font-medium rounded-l-lg border border-r-0 border-gray-300 dark:border-gray-600 whitespace-nowrap">
+                                <span class="px-4 py-2.5 bg-gray-50 dark:bg-gray-600/50 text-gray-500 dark:text-gray-400 text-sm font-medium rounded-l-lg border border-r-0 border-gray-300 dark:border-gray-600 whitespace-nowrap transition-colors duration-200">
                                     <i class="fa fa-calendar-alt text-indigo-500"></i>
                                 </span>
                                 <input 
                                     type="date" 
                                     name="expense-range-days-start-at" 
-                                    class="px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 flex-1 min-w-0 z-10 relative"
+                                    class="px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 flex-1 min-w-0 z-10 relative transition-all duration-200 placeholder-gray-400 dark:placeholder-gray-500"
                                     placeholder="Start" 
                                 >
-                                <span class="px-3 py-2 bg-gray-100 dark:bg-gray-600 border border-l-0 border-r-0 border-gray-300 dark:border-gray-600 text-gray-500 text-sm z-0 relative">ถึง</span>
+                                <span class="px-4 py-2.5 bg-gray-50 dark:bg-gray-600/50 border border-l-0 border-r-0 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 text-sm z-0 relative transition-colors duration-200">ถึง</span>
                                 <input 
                                     type="date" 
                                     name="expense-range-days-end-at" 
-                                    class="px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-r-lg text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 flex-1 min-w-0 z-10 relative"
+                                    class="px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-r-lg text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 flex-1 min-w-0 z-10 relative transition-all duration-200 placeholder-gray-400 dark:placeholder-gray-500"
                                     placeholder="End" 
                                 >
                             </div>

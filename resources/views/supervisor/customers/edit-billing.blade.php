@@ -19,55 +19,63 @@
                 
                 {{-- Customer (Disabled) --}}
                 <div class="md:col-span-2">
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        ลูกค้า
-                    </label>
-                    <input type="text" value="{{ $operation->customer->name ?? '-' }}" disabled class="w-full rounded-lg border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 shadow-sm cursor-not-allowed" />
+                    <x-crud.form-group 
+                        name="customer_name" 
+                        label="ลูกค้า" 
+                        type="text" 
+                        :value="$operation->customer->name ?? '-'" 
+                        disabled 
+                    />
                     <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">ไม่สามารถเปลี่ยนลูกค้าได้</p>
                 </div>
 
                 {{-- Billing Weight --}}
                 <div class="md:col-span-2">
-                    <label for="total_billing_weight" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        น้ำหนักลูกค้า (kg.)
-                    </label>
-                    <input type="number" step=".01" name="total_billing_weight" id="total_billing_weight" value="{{ $operation->total_billing_weight }}" oninput="calculateEditWeightPercent()" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500" />
-                    @error('total_billing_weight')
-                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
-                    @enderror
+                    <x-crud.form-group 
+                        name="total_billing_weight" 
+                        label="น้ำหนักลูกค้า (kg.)" 
+                        type="number" 
+                        step=".01" 
+                        :value="$operation->total_billing_weight" 
+                        oninput="calculateEditWeightPercent()" 
+                    />
                 </div>
 
                 {{-- Edit Weight --}}
                 <div class="md:col-span-1">
-                    <label for="total_edit_weight" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        น้ำหนักผ้าแก้ไข (kg.)
-                    </label>
-                    <input type="number" step=".01" name="total_edit_weight" id="total_edit_weight" value="{{ $operation->total_edit_weight }}" oninput="calculateEditWeightPercent()" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500" />
-                    @error('total_edit_weight')
-                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
-                    @enderror
+                    <x-crud.form-group 
+                        name="total_edit_weight" 
+                        label="น้ำหนักผ้าแก้ไข (kg.)" 
+                        type="number" 
+                        step=".01" 
+                        :value="$operation->total_edit_weight" 
+                        oninput="calculateEditWeightPercent()" 
+                    />
                 </div>
 
                 {{-- Edit Percent --}}
                 <div class="md:col-span-1">
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        % ผ้าแก้ไข
-                    </label>
-                    <div class="relative rounded-md shadow-sm">
-                        <input type="text" id="edit_weight_percent" readonly class="w-full rounded-lg border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400 shadow-sm focus:ring-0 focus:border-gray-300 pr-10" />
-                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                            <span class="text-gray-500 sm:text-sm">%</span>
-                        </div>
-                    </div>
-                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">คำนวณจาก (น้ำหนักผ้าแก้ไข / น้ำหนักลูกค้า) × 100</p>
+                    <x-crud.form-group 
+                        name="edit_weight_percent" 
+                        label="% ผ้าแก้ไข" 
+                        type="text" 
+                        readonly 
+                        suffix="%" 
+                        help="คำนวณจาก (น้ำหนักผ้าแก้ไข / น้ำหนักลูกค้า) × 100" 
+                        class="bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400 cursor-not-allowed"
+                    />
                 </div>
 
                 {{-- Payment (Disabled) --}}
                 <div class="md:col-span-2">
-                    <label for="total_billing_payment" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        ยอดเก็บเงิน (Thai Baht)
-                    </label>
-                    <input type="number" step=".01" id="total_billing_payment" value="{{ $operation->total_billing_payment }}" disabled class="w-full rounded-lg border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 shadow-sm cursor-not-allowed" />
+                    <x-crud.form-group 
+                        name="total_billing_payment" 
+                        label="ยอดเก็บเงิน (Thai Baht)" 
+                        type="number" 
+                        step=".01" 
+                        :value="$operation->total_billing_payment" 
+                        disabled 
+                    />
                     <p class="mt-1 text-xs text-amber-600 dark:text-amber-400 flex items-center">
                         <i class="fa fa-lock mr-1"></i> ไม่สามารถแก้ไขได้ เพราะผูกกับรายได้ในระบบ
                     </p>
@@ -75,10 +83,13 @@
 
                 {{-- Payment Date (Disabled) --}}
                 <div class="md:col-span-2">
-                    <label for="billing_payment_date" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        วันที่เก็บเงิน
-                    </label>
-                    <input type="date" id="billing_payment_date" value="{{ $operation->billing_payment_date }}" disabled class="w-full rounded-lg border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 shadow-sm cursor-not-allowed" />
+                    <x-crud.form-group 
+                        name="billing_payment_date" 
+                        label="วันที่เก็บเงิน" 
+                        type="date" 
+                        :value="$operation->billing_payment_date" 
+                        disabled 
+                    />
                     <p class="mt-1 text-xs text-amber-600 dark:text-amber-400 flex items-center">
                         <i class="fa fa-lock mr-1"></i> ไม่สามารถแก้ไขได้ เพราะผูกกับรายงานสรุปรายวัน
                     </p>
