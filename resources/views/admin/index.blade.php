@@ -6,7 +6,6 @@
     subtitle="จัดการข้อมูลหลักของระบบ"
     icon="fa-cog"
     icon-color="text-slate-600"
-    :breadcrumbs="[['label' => 'Admin']]"
 >
     <!-- Section: Users & Customers -->
     <x-menu.section title="ผู้ใช้งาน & ลูกค้า" icon="fa-users" icon-color="text-blue-500">

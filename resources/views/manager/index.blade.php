@@ -6,7 +6,6 @@
     subtitle="ดูรายงานสถิติและวิเคราะห์ข้อมูล"
     icon="fa-briefcase"
     icon-color="text-indigo-600"
-    :breadcrumbs="[['label' => 'Manager']]"
 >
     <x-menu.grid :columns="2">
         <x-menu.card 

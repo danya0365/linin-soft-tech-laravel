@@ -5,7 +5,6 @@
     title="{{ __('Supervisor Menu') }}"
     subtitle="จัดการข้อมูลลูกค้า แผนก และรายงานสถิติ"
     icon="fa-user-tie"
-    :breadcrumbs="[['label' => 'Supervisor']]"
 >
     <x-menu.grid :columns="3">
         <x-menu.card 
