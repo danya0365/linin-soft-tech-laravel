@@ -9,7 +9,7 @@
     'breadcrumbs' => [] // Array of ['label' => '...', 'route' => '...'] or ['label' => '...'] for active item
 ])
 
-<div class="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 min-h-screen">
+<div class="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
     <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {{-- Breadcrumb Navigation --}}
         @if(count($breadcrumbs) > 0)
