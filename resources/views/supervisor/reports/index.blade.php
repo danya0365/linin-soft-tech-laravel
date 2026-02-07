@@ -6,7 +6,6 @@
     subtitle="Report" 
     icon="fa-chart-pie"
     :breadcrumbs="[
-        ['label' => 'Supervisor', 'route' => route('supervisor')],
         ['label' => __('รายงานสถิติ')]
     ]"
 >

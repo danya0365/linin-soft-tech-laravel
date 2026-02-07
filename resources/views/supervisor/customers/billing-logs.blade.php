@@ -6,7 +6,6 @@
     subtitle="Billing Logs" 
     icon="fa-history"
     :breadcrumbs="[
-        ['label' => 'Supervisor', 'route' => route('supervisor')],
         ['label' => __('Customer'), 'route' => route('supervisor.customer')],
         ['label' => __('ประวัติบิลรายรับ')]
     ]"

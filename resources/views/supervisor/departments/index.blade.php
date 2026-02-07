@@ -6,7 +6,6 @@
     subtitle="จัดการค่าใช้จ่ายรายวันของแผนก"
     icon="fa-users-rectangle"
     :breadcrumbs="[
-        ['label' => 'Supervisor', 'route' => route('supervisor')],
         ['label' => 'Department']
     ]"
 >

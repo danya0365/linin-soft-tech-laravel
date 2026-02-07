@@ -6,7 +6,6 @@
     subtitle="New Income Billing" 
     icon="fa-file-invoice-dollar"
     :breadcrumbs="[
-        ['label' => 'Supervisor', 'route' => route('supervisor')],
         ['label' => __('Customer'), 'route' => route('supervisor.customer')],
         ['label' => __('เพิ่มบิลรายรับ')]
     ]"

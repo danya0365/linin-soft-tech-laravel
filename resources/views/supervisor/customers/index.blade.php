@@ -6,7 +6,6 @@
     subtitle="จัดการข้อมูลบิลและประวัติรายรับของลูกค้า"
     icon="fa-hospital"
     :breadcrumbs="[
-        ['label' => 'Supervisor', 'route' => route('supervisor')],
         ['label' => __('Customer')]
     ]"
 >

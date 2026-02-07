@@ -6,7 +6,6 @@
     subtitle="Daily Expense Logs" 
     icon="fa-history"
     :breadcrumbs="[
-        ['label' => 'Supervisor', 'route' => route('supervisor')],
         ['label' => __('Department'), 'route' => route('supervisor.department')],
         ['label' => 'ประวัติค่าใช้จ่ายรายวัน']
     ]"

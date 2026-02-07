@@ -6,7 +6,6 @@
     subtitle="Edit Billing" 
     icon="fa-file-invoice-dollar"
     :breadcrumbs="[
-        ['label' => 'Supervisor', 'route' => route('supervisor')],
         ['label' => __('Customer'), 'route' => route('supervisor.customer')],
         ['label' => __('Billing Logs'), 'route' => route('supervisor.customer.billing-logs')],
         ['label' => __('แก้ไขบิลรายรับ')]
