@@ -1,195 +1,130 @@
 @extends('layouts.manager')
 
 @section('content')
-
-<div class="container">
-    <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ route('manager') }}">Manager</a></li>
-            <li class="breadcrumb-item active" aria-current="page">{{ __('รายงานสถิติ - Report') }}</li>
-        </ol>
-    </nav>
-
-    <div class="row justify-content-center">
-
-        {{-- Operation Statistics Summary Card --}}
+<x-manager.page 
+    title="{{ __('รายงานสถิติ - Report') }}"
+    :breadcrumbs="[
+        ['label' => 'Manager', 'route' => route('manager')],
+        ['label' => 'รายงานสถิติ']
+    ]"
+>
+    <div class="space-y-6">
+        {{-- Operation Statistics Summary --}}
         @php
             $operationStats = App\Managers\HighChartManager::getOperationStatsSummary();
         @endphp
-        <div class="col-md-12 m-2">
-            <div class="card border-info">
-                <div class="card-header bg-info text-white">
-                    🧺 สรุป Operation (7 วันล่าสุด)
-                </div>
-                <div class="card-body">
-                    <div class="row text-center">
-                        <div class="col-md-2 col-6 mb-3">
-                            <div class="border rounded p-3 h-100">
-                                <h5 class="text-muted mb-1">📋 จำนวนงาน</h5>
-                                <h3 class="text-primary mb-0">{{ number_format($operationStats['operationCount']) }}</h3>
-                                <small class="text-muted">รายการ</small>
-                            </div>
-                        </div>
-                        <div class="col-md-2 col-6 mb-3">
-                            <div class="border rounded p-3 h-100">
-                                <h5 class="text-muted mb-1">💧 ผ้าเปียก</h5>
-                                <h3 class="text-info mb-0">{{ number_format($operationStats['totalWetWeight'], 2) }}</h3>
-                                <small class="text-muted">กก.</small>
-                            </div>
-                        </div>
-                        <div class="col-md-2 col-6 mb-3">
-                            <div class="border rounded p-3 h-100">
-                                <h5 class="text-muted mb-1">☀️ ผ้าแห้ง</h5>
-                                <h3 class="text-warning mb-0">{{ number_format($operationStats['totalDryWeight'], 2) }}</h3>
-                                <small class="text-muted">กก.</small>
-                            </div>
-                        </div>
-                        <div class="col-md-2 col-6 mb-3">
-                            <div class="border rounded p-3 h-100">
-                                <h5 class="text-muted mb-1">📉 % หักลบ</h5>
-                                @php
-                                    $diffPercent = $operationStats['weightDiffPercent'];
-                                    $diffColor = $diffPercent > 20 ? 'danger' : ($diffPercent > 15 ? 'warning' : 'success');
-                                @endphp
-                                <h3 class="text-{{ $diffColor }} mb-0">{{ $diffPercent }}%</h3>
-                                <small class="text-muted">เปียก-แห้ง</small>
-                            </div>
-                        </div>
-                        <div class="col-md-2 col-6 mb-3">
-                            <div class="border rounded p-3 h-100" style="background-color: #FFF3CD;">
-                                <h5 class="text-muted mb-1">🔧 ผ้าแก้ไข (ระบบ)</h5>
-                                <h3 class="text-warning mb-0">{{ number_format($operationStats['totalEditCollectWeight'] ?? 0, 2) }}</h3>
-                                <small class="text-muted">กก. | {{ $operationStats['editCollectWeightPercent'] ?? 0 }}%</small>
-                            </div>
-                        </div>
-                        <div class="col-md-2 col-6 mb-3">
-                            <div class="border rounded p-3 h-100" style="background-color: #D1ECF1;">
-                                <h5 class="text-muted mb-1">✏️ ผ้าแก้ไข (กรอกมือ)</h5>
-                                <h3 class="text-info mb-0">{{ number_format($operationStats['totalEditWeight'], 2) }}</h3>
-                                <small class="text-muted">กก. | {{ $operationStats['editWeightPercent'] }}%</small>
-                            </div>
-                        </div>
-                        <div class="col-md-2 col-6 mb-3">
-                            <div class="border rounded p-3 h-100">
-                                <h5 class="text-muted mb-1">⚖️ น้ำหนักบิล</h5>
-                                <h3 class="text-secondary mb-0">{{ number_format($operationStats['totalBillingWeight'], 2) }}</h3>
-                                <small class="text-muted">กก.</small>
-                            </div>
-                        </div>
-                        <div class="col-md-2 col-6 mb-3">
-                            <div class="border rounded p-3 h-100">
-                                <h5 class="text-muted mb-1">💵 ยอดบิล</h5>
-                                <h3 class="text-success mb-0">{{ number_format($operationStats['totalBillingPayment'], 2) }}</h3>
-                                <small class="text-muted">บาท</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        <x-manager.card 
+            title="🧺 สรุป Operation (7 วันล่าสุด)" 
+            header-class="bg-cyan-600 text-white"
+        >
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                <x-manager.stat-card 
+                    title="จำนวนงาน" 
+                    value="{{ number_format($operationStats['operationCount']) }}" 
+                    unit="รายการ" 
+                    color="indigo" 
+                />
+                <x-manager.stat-card 
+                    title="ผ้าเปียก" 
+                    value="{{ number_format($operationStats['totalWetWeight'], 2) }}" 
+                    unit="กก." 
+                    color="cyan" 
+                />
+                <x-manager.stat-card 
+                    title="ผ้าแห้ง" 
+                    value="{{ number_format($operationStats['totalDryWeight'], 2) }}" 
+                    unit="กก." 
+                    color="amber" 
+                />
+                @php
+                    $diffPercent = $operationStats['weightDiffPercent'];
+                    $diffColor = $diffPercent > 20 ? 'danger' : ($diffPercent > 15 ? 'warning' : 'success');
+                    $twDiffColor = match($diffColor) {
+                        'danger' => 'red',
+                        'warning' => 'amber',
+                        default => 'emerald'
+                    };
+                @endphp
+                <x-manager.stat-card 
+                    title="% หักลบ" 
+                    value="{{ $diffPercent }}%" 
+                    unit="เปียก-แห้ง" 
+                    color="{{ $twDiffColor }}" 
+                />
+                <x-manager.stat-card 
+                    title="ผ้าแก้ไข (ระบบ)" 
+                    value="{{ number_format($operationStats['totalEditCollectWeight'] ?? 0, 2) }}" 
+                    unit="กก. | {{ $operationStats['editCollectWeightPercent'] ?? 0 }}%" 
+                    color="amber" 
+                    bg-class="bg-amber-50 dark:bg-amber-900/20"
+                />
+                <x-manager.stat-card 
+                    title="ผ้าแก้ไข (กรอกมือ)" 
+                    value="{{ number_format($operationStats['totalEditWeight'], 2) }}" 
+                    unit="กก. | {{ $operationStats['editWeightPercent'] }}%" 
+                    color="cyan" 
+                    bg-class="bg-cyan-50 dark:bg-cyan-900/20"
+                />
+                <x-manager.stat-card 
+                    title="น้ำหนักบิล" 
+                    value="{{ number_format($operationStats['totalBillingWeight'], 2) }}" 
+                    unit="กก." 
+                    color="gray" 
+                />
+                <x-manager.stat-card 
+                    title="ยอดบิล" 
+                    value="{{ number_format($operationStats['totalBillingPayment'], 2) }}" 
+                    unit="บาท" 
+                    color="emerald" 
+                />
             </div>
-        </div>
+        </x-manager.card>
 
-        <div class="col-md-12 m-2">
-            <div class="card">
-                <div class="card-header">ต้นทุน, ยอดขาย, ตามวันที่เลือก</div>
-                <div class="card-body text-center">
-                    <form id="sales-range-days-form" class="row row-cols-lg-auto g-3 align-items-center mb-2" action="{{ request()->url() }}" method="GET">
+        {{-- Sales Range Days Chart --}}
+        <x-manager.card title="ต้นทุน, ยอดขาย, ตามวันที่เลือก">
+            <x-manager.date-filter 
+                action="{{ request()->url() }}" 
+                id="sales-range-days-form"
+                start-name="sales-range-days-start-at"
+                end-name="sales-range-days-end-at"
+            />
+            <div id="sales-range-days-chart" class="w-full h-[400px]"></div>
+        </x-manager.card>
 
-                        <div class="col-12">
-                            <div class="input-group">
-                                <input type="text" name="sales-range-days-start-at" value="" class="form-control" placeholder="วันที่เริ่ม" aria-label="วันที่เริ่ม">
-                                <span class="input-group-text"> ถึง </span>
-                                <input type="text" name="sales-range-days-end-at" value="" class="form-control" placeholder="วันที่สิ้นสุด" aria-label="วันที่สิ้นสุด">
-                            </div>
-                        </div>
+        {{-- Energy Range Days Chart --}}
+        <x-manager.card title="พลังงานตามวันที่เลือก">
+            <x-manager.date-filter 
+                action="{{ request()->url() }}" 
+                id="energy-range-days-form"
+                start-name="energy-range-days-start-at"
+                end-name="energy-range-days-end-at"
+            />
+            <div id="energy-range-days-chart" class="w-full h-[400px]"></div>
+        </x-manager.card>
 
-                        <div class="col-12">
-                            <button type="submit" class="btn btn-primary">Submit</button>
-                            <button type="reset" class="btn btn-outline-secondary">Reset</button>
-                        </div>
-                    </form>
-                    <div id="sales-range-days-chart" style="min-width: 400px; height: 400px; margin: 0 auto">
+        {{-- Expense Range Days --}}
+        <x-manager.card title="ต้นทุนตามวันที่เลือก">
+            <x-manager.date-filter 
+                 action="{{ request()->url() }}" 
+                id="expense-range-days-form"
+                start-name="expense-range-days-start-at"
+                end-name="expense-range-days-end-at"
+            />
+            <div id="expense-range-days-chart" class="w-full h-[400px]"></div>
+        </x-manager.card>
 
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-12 m-2">
-            <div class="card">
-                <div class="card-header">พลังงานตามวันที่เลือก</div>
-                <div class="card-body text-center">
-                    <form id="energy-range-days-form" class="row row-cols-lg-auto g-3 align-items-center mb-2" action="{{ request()->url() }}" method="GET">
-
-                        <div class="col-12">
-                            <div class="input-group">
-                                <input type="text" name="energy-range-days-start-at" value="" class="form-control" placeholder="วันที่เริ่ม" aria-label="วันที่เริ่ม">
-                                <span class="input-group-text"> ถึง </span>
-                                <input type="text" name="energy-range-days-end-at" value="" class="form-control" placeholder="วันที่สิ้นสุด" aria-label="วันที่สิ้นสุด">
-                            </div>
-                        </div>
-
-                        <div class="col-12">
-                            <button type="submit" class="btn btn-primary">Submit</button>
-                            <button type="reset" class="btn btn-outline-secondary">Reset</button>
-                        </div>
-                    </form>
-                    <div id="energy-range-days-chart" style="min-width: 400px; height: 400px; margin: 0 auto">
-
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-12 m-2">
-            <div class="card">
-                <div class="card-header">ต้นทุนตามวันที่เลือก</div>
-                <div class="card-body text-center">
-                    <form id="expense-range-days-form" class="row row-cols-lg-auto g-3 align-items-center mb-2" action="{{ request()->url() }}" method="GET">
-
-                        <div class="col-12">
-                            <div class="input-group">
-                                <input type="text" name="expense-range-days-start-at" value="" class="form-control" placeholder="วันที่เริ่ม" aria-label="วันที่เริ่ม">
-                                <span class="input-group-text"> ถึง </span>
-                                <input type="text" name="expense-range-days-end-at" value="" class="form-control" placeholder="วันที่สิ้นสุด" aria-label="วันที่สิ้นสุด">
-                            </div>
-                        </div>
-
-                        <div class="col-12">
-                            <button type="submit" class="btn btn-primary">Submit</button>
-                            <button type="reset" class="btn btn-outline-secondary">Reset</button>
-                        </div>
-                    </form>
-                    <div id="expense-range-days-chart" style="min-width: 400px; height: 400px; margin: 0 auto">
-
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-12 m-2">
-            <div class="card">
-                <div class="card-header">ยอดขายตามวันที่เลือก</div>
-                <div class="card-body text-center">
-                    <form id="income-range-days-form" class="row row-cols-lg-auto g-3 align-items-center mb-2" action="{{ request()->url() }}" method="GET">
-
-                        <div class="col-12">
-                            <div class="input-group">
-                                <input type="text" name="income-range-days-start-at" value="" class="date form-control" placeholder="วันที่เริ่ม" aria-label="วันที่เริ่ม">
-                                <span class="input-group-text"> ถึง </span>
-                                <input type="text" name="income-range-days-end-at" value="" class="date form-control" placeholder="วันที่สิ้นสุด" aria-label="วันที่สิ้นสุด">
-                            </div>
-                        </div>
-
-                        <div class="col-12">
-                            <button type="submit" class="btn btn-primary">Submit</button>
-                            <button type="reset" class="btn btn-outline-secondary">Reset</button>
-                        </div>
-                    </form>
-                    <div id="income-range-days-chart" style="min-width: 400px; height: 400px; margin: 0 auto">
-
-                    </div>
+        {{-- Income Range Days --}}
+        <x-manager.card title="ยอดขายตามวันที่เลือก">
+             <x-manager.date-filter 
+                action="{{ request()->url() }}" 
+                id="income-range-days-form"
+                start-name="income-range-days-start-at"
+                end-name="income-range-days-end-at"
+            />
+            <div id="income-range-days-chart" class="w-full h-[400px]"></div>
+        </x-manager.card>
     </div>
-</div>
+</x-manager.page>
 
 @push('scripts')
 <script>
@@ -197,9 +132,10 @@ document.addEventListener('DOMContentLoaded', function() {
     if (typeof jQuery === 'undefined') return;
 
     $(function(){
+
         // Datepicker สำหรับกราฟเปรียบเทียบ
-        $('[name=compare-start]').datepicker({ format: 'yyyy-mm-dd' });
-        $('[name=compare-end]').datepicker({ format: 'yyyy-mm-dd' });
+        //$('[name=compare-start]').datepicker({ format: 'yyyy-mm-dd' });
+        //$('[name=compare-end]').datepicker({ format: 'yyyy-mm-dd' });
 
         $(function(){
             var startAt = '{{ request()->get('sales-range-days-start-at') }}'
@@ -254,6 +190,7 @@ document.addEventListener('DOMContentLoaded', function() {
             $.incomeDaysChart({ 'renderTo': 'income-range-days-chart', 'data': incomeDaysSummary, 'title': title});
         })
 
+        /*
         $('[name=energy-range-days-start-at]').datepicker({ format: 'yyyy-mm-dd' });
         $('[name=energy-range-days-end-at]').datepicker({ format: 'yyyy-mm-dd' });
 
@@ -265,6 +202,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         $('[name=income-range-days-start-at]').datepicker({ format: 'yyyy-mm-dd' });
         $('[name=income-range-days-end-at]').datepicker({ format: 'yyyy-mm-dd' });
+        */
 
     })
 });

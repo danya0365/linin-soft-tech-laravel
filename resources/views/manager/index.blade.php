@@ -1,11 +1,10 @@
 @extends('layouts.manager')
 
 @section('content')
-<x-menu.page-layout 
+<x-manager.page 
     title="{{ __('Manager Menu') }}"
     subtitle="ดูรายงานสถิติและวิเคราะห์ข้อมูล"
     icon="fa-briefcase"
-    icon-color="text-indigo-600"
 >
     <x-menu.grid :columns="2">
         <x-menu.card 
@@ -38,5 +37,5 @@
             </x-slot:badge>
         </x-menu.card>
     </x-menu.grid>
-</x-menu.page-layout>
+</x-manager.page>
 @endsection
