@@ -31,14 +31,14 @@ class ChatService
     /**
      * Main menu commands
      */
-    protected array $mainMenuCommands = [
+    protected array $mainMenuCommands = [   
+        '📈 รายงาน',
         '📊 สรุปวันนี้',
         '👥 ลูกค้า',
         '📦 สต๊อก',
         '⚡ พลังงาน',
         '👷 พนักงาน',
         '⚙️ เครื่องจักร',
-        '📈 รายงาน',
     ];
 
     /**
