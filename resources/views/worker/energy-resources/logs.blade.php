@@ -10,60 +10,30 @@
         ['label' => 'History']
     ]"
 >
-    <!-- Filter Section -->
-    <x-worker.card title="ตัวกรอง (Filter)" icon="fa-solid fa-filter">
-        <form action="{{ request()->url() }}" method="GET" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
-            
-            <!-- Energy Resource Select -->
-            <div>
-                <label for="energy_resource" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">พลังงาน</label>
-                <select id="energy_resource" name="energy_resource" onchange="this.form.submit()" 
-                        class="block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm dark:bg-gray-800 dark:border-gray-600 dark:text-white">
-                    <option value="">แสดงทั้งหมด - Show All</option>
-                    @foreach ($energyResources as $key => $energyResource)
-                        <option value="{{ $energyResource['id'] }}" {{ $energyResourceSelected == $energyResource['id'] ? 'selected' : '' }}>
-                            {{ $energyResource['name'] }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
+    {{-- Filter Form --}}
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 sm:p-6 mb-6 border border-gray-200 dark:border-gray-700">
+        <x-worker.date-filter 
+            :action="route('worker.energy-resource.logs')"
+            :date-start-at="$dateStartAt"
+            :date-end-at="$dateEndAt"
+            :reset-url="route('worker.energy-resource.logs')"
+        >
+            <x-worker.select-filter 
+                name="energy_resource"
+                label="พลังงาน"
+                :options="collect($energyResources)->pluck('name', 'id')->toArray()"
+                :selected="$energyResourceSelected"
+            />
 
-            <!-- Date Range -->
-            <div class="md:col-span-2">
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">ช่วงเวลา</label>
-                <div class="flex items-center space-x-2">
-                    <input type="date" name="date_start_at" value="{{ $dateStartAt }}" 
-                           class="block w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500 sm:text-sm dark:bg-gray-800 dark:border-gray-600 dark:text-white">
-                    <span class="text-gray-500">ถึง</span>
-                    <input type="date" name="date_end_at" value="{{ $dateEndAt }}" 
-                           class="block w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500 sm:text-sm dark:bg-gray-800 dark:border-gray-600 dark:text-white">
-                </div>
-            </div>
-
-            <!-- Sort Date -->
-            <div>
-                <label for="sort_order" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">เรียงโดย</label>
-                <select id="sort_order" name="sort_order" onchange="this.form.submit()" 
-                        class="block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm dark:bg-gray-800 dark:border-gray-600 dark:text-white">
-                    @foreach ($sortOrders as $sortOrder)
-                        <option value="{{ $sortOrder['var'] }}" {{ $sortOrderSelected == $sortOrder['var'] ? 'selected' : '' }}>
-                            {{ $sortOrder['name'] }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-
-            <!-- Actions -->
-            <div class="md:col-span-4 lg:col-span-4 flex justify-end gap-2 mt-2">
-                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors shadow-sm text-sm font-medium">
-                    <i class="fa-solid fa-search mr-1"></i> Search
-                </button>
-                <a href="{{ route('worker.energy-resource.logs') }}" class="px-4 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors shadow-sm text-sm font-medium">
-                    <i class="fa-solid fa-rotate-left mr-1"></i> Reset
-                </a>
-            </div>
-        </form>
-    </x-worker.card>
+            <x-worker.select-filter 
+                name="sort_order"
+                label="เรียงโดย"
+                :options="collect($sortOrders)->pluck('name', 'var')->toArray()"
+                :selected="$sortOrderSelected"
+                :show-all="false"
+            />
+        </x-worker.date-filter>
+    </div>
 
     @if ($message = Session::get('success'))
         <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded shadow-sm mb-4" role="alert">
