@@ -72,16 +72,7 @@ document.addEventListener('DOMContentLoaded', function() {
     $(function(){
 
         var expenseDaysSummary = @json(App\Managers\HighChartManager::getExpenseDaysSummary());
-        // Check if Highcharts is available before initializing
-        if(typeof $.fn.expenseDaysChart === 'function') {
-             $.expenseDaysChart({ 'renderTo': 'expense-latest-day-chart', 'data': expenseDaysSummary});
-        } elseif(typeof Highcharts !== 'undefined') {
-            // Fallback simplistic rendering if custom plugin missing (assumption)
-             Highcharts.chart('expense-latest-day-chart', {
-                title: { text: null },
-                series: [{ data: expenseDaysSummary }]
-             });
-        }
+        $.expenseDaysChart({ 'renderTo': 'expense-latest-day-chart', 'data': expenseDaysSummary});
 
         var expenseRangeDaysSummary = () => {
             var startAt = $('[name=expense-range-days-start-at]').val();
@@ -109,9 +100,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
 
             $.get(url, function(response){
-                if(typeof $.fn.expenseDaysChart === 'function') {
-                    $.expenseDaysChart({ 'renderTo': 'expense-range-days-chart', 'data': response, 'title': `ยอดต้นทุน วันที่ ${startAt} ถึง ${endAt}`});
-                }
+                $.expenseDaysChart({ 'renderTo': 'expense-range-days-chart', 'data': response, 'title': `ยอดต้นทุน วันที่ ${startAt} ถึง ${endAt}`});
             }).fail(function() {
                 Swal.fire({
                     icon: 'error',
