@@ -15,7 +15,7 @@
         {{-- Breadcrumb Navigation --}}
         @if(count($breadcrumbs) > 0)
         <nav class="flex mb-6 sm:mb-8" aria-label="Breadcrumb">
-            <ol class="inline-flex items-center space-x-1 md:space-x-3">
+            <ol class="inline-flex items-center">
                 <li class="inline-flex items-center">
                     <a href="{{ route('worker') }}" class="inline-flex items-center text-sm font-medium text-gray-500 hover:text-amber-600 dark:text-gray-400 dark:hover:text-amber-400 transition-colors">
                         <i class="fa fa-hard-hat mr-2 text-amber-500"></i>
