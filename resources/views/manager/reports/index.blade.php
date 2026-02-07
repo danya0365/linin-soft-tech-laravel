@@ -4,7 +4,6 @@
 <x-manager.page 
     title="{{ __('รายงานสถิติ - Report') }}"
     :breadcrumbs="[
-        ['label' => 'Manager', 'route' => route('manager')],
         ['label' => 'รายงานสถิติ']
     ]"
 >
