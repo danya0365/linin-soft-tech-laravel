@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @section('content')
-<x-menu.page-layout 
+<x-admin.page 
     title="{{ __('Admin Menu') }}"
     subtitle="จัดการข้อมูลหลักของระบบ"
     icon="fa-cog"
@@ -108,5 +108,5 @@
             subtitle-color="text-slate-300"
         />
     </x-menu.section>
-</x-menu.page-layout>
+</x-admin.page>
 @endsection
