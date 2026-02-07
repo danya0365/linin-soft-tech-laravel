@@ -21,10 +21,6 @@
                        class="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-gray-700 transition-all duration-200">
                         {{ __('Worker') }}
                     </a>
-                    <a href="{{ route('user-customer') }}" 
-                       class="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-gray-700 transition-all duration-200">
-                        {{ __('User Customer') }}
-                    </a>
                     <a href="{{ route('supervisor') }}" 
                        class="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-gray-700 transition-all duration-200">
                         {{ __('Supervisor') }}
@@ -98,7 +94,6 @@
             </div>
 
             <!-- Mobile Menu Button -->
-            <!-- Mobile Menu Button -->
             <div class="md:hidden flex items-center gap-2">
                 <!-- Theme Toggle for Mobile -->
                 <x-theme-toggle></x-theme-toggle>
@@ -128,10 +123,6 @@
                 <a href="{{ route('worker') }}" 
                    class="block px-4 py-3 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-gray-700 transition-all duration-200">
                     {{ __('Worker') }}
-                </a>
-                <a href="{{ route('user-customer') }}" 
-                   class="block px-4 py-3 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-gray-700 transition-all duration-200">
-                    {{ __('User Customer') }}
                 </a>
                 <a href="{{ route('supervisor') }}" 
                    class="block px-4 py-3 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-gray-700 transition-all duration-200">
