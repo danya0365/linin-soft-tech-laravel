@@ -328,13 +328,41 @@ class LineChatbotController extends Controller
             if (isset($row['type']) && $row['type'] === 'separator') {
                 $bodyContents[] = $this->lineService->separator();
             } elseif (isset($row['bold']) && $row['bold']) {
-                $bodyContents[] = [
-                    'type' => 'text',
-                    'text' => $row['label'],
-                    'size' => 'sm',
-                    'weight' => 'bold',
-                    'margin' => 'md',
-                ];
+                if (empty($row['value'])) {
+                    // Section Header (Bold Label only)
+                    $bodyContents[] = [
+                        'type' => 'text',
+                        'text' => $row['label'],
+                        'size' => 'sm',
+                        'weight' => 'bold',
+                        'margin' => 'md',
+                    ];
+                } else {
+                    // Highlighted Row (Bold Label + Value)
+                    $bodyContents[] = [
+                        'type' => 'box',
+                        'layout' => 'horizontal',
+                        'contents' => [
+                            [
+                                'type' => 'text',
+                                'text' => $row['label'],
+                                'size' => 'sm',
+                                'weight' => 'bold',
+                                'color' => '#111111',
+                                'flex' => 0,
+                            ],
+                            [
+                                'type' => 'text',
+                                'text' => $row['value'],
+                                'size' => 'sm',
+                                'color' => $row['valueColor'] ?? '#111111',
+                                'align' => 'end',
+                                'weight' => 'bold',
+                            ],
+                        ],
+                        'margin' => 'md',
+                    ];
+                }
             } else {
                 $bodyContents[] = $this->lineService->infoRow(
                     $row['label'] ?? '',
