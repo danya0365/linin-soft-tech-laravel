@@ -1,11 +1,10 @@
 @extends('layouts.supervisor')
 
 @section('content')
-<x-menu.page-layout 
+<x-supervisor.page 
     title="{{ __('Supervisor Menu') }}"
     subtitle="จัดการข้อมูลลูกค้า แผนก และรายงานสถิติ"
     icon="fa-user-tie"
-    icon-color="text-indigo-600"
     :breadcrumbs="[['label' => 'Supervisor']]"
 >
     <x-menu.grid :columns="3">
@@ -36,5 +35,5 @@
             subtitle-color="text-amber-100"
         />
     </x-menu.grid>
-</x-menu.page-layout>
+</x-supervisor.page>
 @endsection
