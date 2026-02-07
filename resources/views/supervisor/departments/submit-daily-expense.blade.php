@@ -23,11 +23,17 @@
                 @csrf
                 
                 {{-- Department Select --}}
+                @php
+                    $departmentOptions = [];
+                    foreach ($departments as $department) {
+                        $departmentOptions[$department->id] = $department->name;
+                    }
+                @endphp
                 <x-crud.form-group 
                     name="department_id" 
                     label="แผนก" 
                     type="select" 
-                    :options="$departments" 
+                    :options="$departmentOptions" 
                     placeholder="ไม่เลือก"
                 />
 
