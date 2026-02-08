@@ -1,103 +1,79 @@
 @extends('layouts.app')
 
 @section('content')
-
-<div class="container">
-    <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="/">Home</a></li>
-        </ol>
-    </nav>
-    <div class="row justify-content-center">
-        <div class="col-md-6 align-content-md-center m-2">
-            @if (session('status'))
-            <div class="alert alert-success" role="alert">
-                {{ session('status') }}
-            </div>
-            @endif
-            @if (session('error'))
-                <div class="alert alert-danger" role="alert">
-                    {{ session('error') }}
-                </div>
-            @endif
-            <div class="card">
-                <div class="card-header bg-success text-light bg-opacity-75">{{ __('Home Menu') }}</div>
-                <div class="card-body">
-                    <div class="row g-2">
-                        @if (Auth::user()->isWorker())
-                        <div class="col-sm-12">
-                            <a href="{{ route('worker') }}">
-                                <div class="p-3 border bg-navy" style="min-height: 150px">
-                                    <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 110px">
-                                        <div class="text-center">
-                                            <div class="fa-solid fa-people-line" style="font-size: 3em"></div>
-                                            <div class="text-center mt-3">{{ __('พนักงาน - Worker') }}</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </a>
-                        </div>
-                        @endif
-                        @if (Auth::user()->isUserCustomer())
-                        <div class="col-sm-12">
-                            <a href="{{ route('user-customer') }}">
-                                <div class="p-3 border bg-navy" style="min-height: 150px">
-                                    <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 110px">
-                                        <div class="text-center">
-                                            <div class="fa-solid fa-people-line" style="font-size: 3em"></div>
-                                            <div class="text-center mt-3">{{ __('ลูกค้า - Customer') }}</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </a>
-                        </div>
-                        @endif
-                        @if (Auth::user()->isSupervisor())
-                        <div class="col-sm-12">
-                            <a href="{{ route('supervisor') }}">
-                                <div class="p-3 border bg-navy" style="min-height: 150px">
-                                    <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 110px">
-                                        <div class="text-center">
-                                            <div class="fa-solid fa-people-roof" style="font-size: 3em"></div>
-                                            <div class="text-center mt-3">{{ __('ผู้คุม - Supervisor') }}</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </a>
-                        </div>
-                        @endif
-                        @if (Auth::user()->isManager())
-                        <div class="col-sm-12">
-                            <a href="{{ route('manager') }}">
-                                <div class="p-3 border bg-navy" style="min-height: 150px">
-                                    <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 110px">
-                                        <div class="text-center">
-                                            <div class="fa-solid fa-user-tie" style="font-size: 3em"></div>
-                                            <div class="text-center mt-3">{{ __('ผู้จัดการ - Manager') }}</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </a>
-                        </div>
-                        @endif
-                        @if (Auth::user()->isAdmin())
-                        <div class="col-sm-12">
-                            <a href="{{ route('admin') }}">
-                                <div class="p-3 border bg-navy" style="min-height: 150px">
-                                    <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 110px">
-                                        <div class="text-center">
-                                            <div class="fa-solid fa-gears" style="font-size: 3em"></div>
-                                            <div class="text-center mt-3">{{ __('ผู้ควบคุม - Admin') }}</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </a>
-                        </div>
-                        @endif
-                    </div>
-                </div>
-            </div>
+<x-menu.page-layout 
+    title="{{ __('Home Menu') }}"
+    subtitle="เลือกเมนูตามสิทธิ์การใช้งานของคุณ"
+    icon="fa-home"
+    icon-color="text-emerald-600"
+    :breadcrumbs="[]"
+>
+    @if (session('status'))
+        <div class="mb-6 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg">
+            {{ session('status') }}
         </div>
-    </div>
-</div>
+    @endif
+    @if (session('error'))
+        <div class="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+            {{ session('error') }}
+        </div>
+    @endif
+
+    <x-menu.grid :columns="2">
+        @if (Auth::user()->isWorker())
+        <x-menu.card 
+            href="{{ route('worker') }}"
+            icon="fa-solid fa-people-line"
+            title="{{ __('พนักงาน') }}"
+            subtitle="Worker"
+            gradient="from-blue-500 to-blue-700"
+            subtitle-color="text-blue-100"
+        />
+        @endif
+        
+        @if (Auth::user()->isUserCustomer())
+        <x-menu.card 
+            href="{{ route('user-customer') }}"
+            icon="fa-solid fa-hospital"
+            title="{{ __('ลูกค้า') }}"
+            subtitle="Customer"
+            gradient="from-emerald-500 to-teal-600"
+            subtitle-color="text-emerald-100"
+        />
+        @endif
+        
+        @if (Auth::user()->isSupervisor())
+        <x-menu.card 
+            href="{{ route('supervisor') }}"
+            icon="fa-solid fa-people-roof"
+            title="{{ __('ผู้คุม') }}"
+            subtitle="Supervisor"
+            gradient="from-amber-400 to-orange-500"
+            subtitle-color="text-amber-100"
+        />
+        @endif
+        
+        @if (Auth::user()->isManager())
+        <x-menu.card 
+            href="{{ route('manager') }}"
+            icon="fa-solid fa-user-tie"
+            title="{{ __('ผู้จัดการ') }}"
+            subtitle="Manager"
+            gradient="from-purple-500 to-violet-700"
+            subtitle-color="text-purple-100"
+        />
+        @endif
+        
+        @if (Auth::user()->isAdmin())
+        <x-menu.card 
+            href="{{ route('admin') }}"
+            icon="fa-solid fa-gears"
+            title="{{ __('ผู้ควบคุม') }}"
+            subtitle="Admin"
+            gradient="from-slate-600 to-gray-800"
+            subtitle-color="text-slate-300"
+        />
+        @endif
+    </x-menu.grid>
+</x-menu.page-layout>
 @endsection

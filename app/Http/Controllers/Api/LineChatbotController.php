@@ -30,19 +30,50 @@ class LineChatbotController extends Controller
      */
     public function webhook(Request $request)
     {
-        // ตรวจสอบ Signature
-        $signature = $request->header('X-Line-Signature');
         $body = $request->getContent();
+        $signature = $request->header('X-Line-Signature');
 
+        Log::debug('LINE Webhook received', [
+            'body' => $body,
+            'signature' => $signature
+        ]);
+
+        // ตรวจสอบ Signature
         if (!$signature || !$this->lineService->verifySignature($body, $signature)) {
             Log::warning('LINE Webhook: Invalid signature');
             return response()->json(['error' => 'Invalid signature'], 401);
         }
 
-        $events = $request->input('events', []);
+        $data = json_decode($body, true);
+        $events = $data['events'] ?? [];
+
+        // LINE Verification: Respond 200 even if no events
+        if (empty($events)) {
+            Log::info('LINE Webhook: No events found or empty (Connection test)');
+            return response()->json(['status' => 'ok']);
+        }
 
         foreach ($events as $event) {
-            $this->handleEvent($event);
+            try {
+                $this->handleEvent($event);
+            } catch (\Exception $e) {
+                Log::error('LINE Webhook: Error handling event', [
+                    'error' => $e->getMessage(),
+                    'event' => $event,
+                    'trace' => $e->getTraceAsString()
+                ]);
+
+                // ตอบกลับ error ไปยัง User (ถ้ามี replyToken)
+                if (isset($event['replyToken'])) {
+                    try {
+                        $this->lineService->replyMessage($event['replyToken'], [
+                            $this->lineService->textMessage("⚠️ เกิดข้อผิดพลาดชั่วคราวในการประมวลผล\nกรุณาลองใหม่อีกครั้ง หรือพิมพ์ \"เมนู\"")
+                        ]);
+                    } catch (\Exception $inner) {
+                        Log::error('LINE Webhook: Failed to send error reply', ['error' => $inner->getMessage()]);
+                    }
+                }
+            }
         }
 
         return response()->json(['status' => 'ok']);
@@ -54,11 +85,44 @@ class LineChatbotController extends Controller
     protected function handleEvent(array $event): void
     {
         $replyToken = $event['replyToken'] ?? null;
+        $userId = $event['source']['userId'] ?? null;
 
-        if (!$replyToken) {
+        if (!$replyToken || !$userId) {
             return;
         }
 
+        // ตรวจสอบว่า User ผูกบัญชีหรือยัง
+        $user = \App\Models\User::where('line_user_id', $userId)->first();
+
+        // กรณีรับข้อความ (Message Event)
+        if ($event['type'] === 'message' && $event['message']['type'] === 'text') {
+            $text = trim($event['message']['text']);
+
+            // ถ้ายังไม่ได้ผูกบัญชี
+            if (!$user) {
+                // ตรวจสอบคำสั่งลงทะเบียน: "ลงทะเบียน [email]"
+                if (str_starts_with($text, 'ลงทะเบียน')) {
+                    $this->handleRegistration($replyToken, $userId, $text);
+                    return;
+                }
+
+                // แจ้งให้ลงทะเบียน
+                $this->sendResponse($replyToken, [
+                    'type' => 'text',
+                    'text' => "⛔ คุณยังไม่ได้ผูกบัญชีกับระบบ\n\nกรุณาพิมพ์คำสั่งเพื่อยืนยันตัวตน:\n\nลงทะเบียน [อีเมลของคุณ]\n\nตัวอย่าง:\nลงทะเบียน employee@example.com"
+                ]);
+                return;
+            }
+        } elseif (!$user) {
+            // Event อื่นๆ (Postback, etc.) ถ้ายังไม่ผูกบัญชี ให้แจ้งเตือนและจบการทำงาน
+            $this->sendResponse($replyToken, [
+                'type' => 'text',
+                'text' => "⛔ กรุณาพิมพ์ \"ลงทะเบียน [อีเมล]\" เพื่อยืนยันตัวตนก่อนใช้งาน"
+            ]);
+            return;
+        }
+
+        // อนุญาตให้ใช้งานได้ตามปกติ
         switch ($event['type']) {
             case 'message':
                 $this->handleMessage($event);
@@ -70,6 +134,56 @@ class LineChatbotController extends Controller
                 $this->handleFollow($event);
                 break;
         }
+    }
+
+    /**
+     * จัดการการลงทะเบียนผูกบัญชี
+     */
+    protected function handleRegistration(string $replyToken, string $userId, string $text): void
+    {
+        $parts = explode(' ', $text);
+        $email = $parts[1] ?? '';
+
+        if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $this->sendResponse($replyToken, [
+                'type' => 'text',
+                'text' => "❌ รูปแบบอีเมลไม่ถูกต้อง\n\nตัวอย่าง:\nลงทะเบียน employee@example.com"
+            ]);
+            return;
+        }
+
+        // ค้นหา User จาก Email
+        $user = \App\Models\User::where('email', $email)->first();
+
+        if (!$user) {
+            $this->sendResponse($replyToken, [
+                'type' => 'text',
+                'text' => "❌ ไม่พบอีเมลนี้ในระบบ\nกรุณาติดต่อผู้ดูแลระบบ"
+            ]);
+            return;
+        }
+
+        if ($user->line_user_id) {
+            $this->sendResponse($replyToken, [
+                'type' => 'text',
+                'text' => "❌ อีเมลนี้ถูกผูกกับ LINE Account อื่นไปแล้ว"
+            ]);
+            return;
+        }
+
+        // บันทึก line_user_id
+        $user->line_user_id = $userId;
+        $user->line_registered_at = now();
+        $user->save();
+
+        $this->sendResponse($replyToken, [
+            'type' => 'text',
+            'text' => "✅ ลงทะเบียนสำเร็จ!\n\nสวัสดีคุณ {$user->name}\nตอนนี้คุณสามารถใช้งาน Chatbot ได้แล้วครับ\n\n(พิมพ์ \"เมนู\" เพื่อเริ่มใช้งาน)"
+        ]);
+        
+        // ส่งเมนูหลักให้เลย
+        $response = $this->chatService->getMainMenu();
+        $this->sendResponse($replyToken, $response);
     }
 
     /**
@@ -136,19 +250,30 @@ class LineChatbotController extends Controller
      */
     protected function convertToLineMessages(array $response): array
     {
-        switch ($response['type']) {
+        $type = $response['type'] ?? 'text';
+
+        switch ($type) {
             case 'text':
-                return [$this->lineService->textMessage($response['text'])];
+                $text = $response['text'] ?? 'ไม่มีข้อมูล';
+                return [$this->lineService->textMessage($text)];
 
             case 'menu':
+                $text = $response['text'] ?? 'กรุณาเลือกเมนู';
                 $quickReplyItems = $this->buildQuickReplyItems($response['quickReplies'] ?? []);
-                return [$this->lineService->quickReply($response['text'], $quickReplyItems)];
+                
+                // ถ้าไม่มี Quick Reply ให้ส่งเป็น Text ธรรมดาแทน (LINE Error if quickReply.items is empty)
+                if (empty($quickReplyItems)) {
+                    return [$this->lineService->textMessage($text)];
+                }
+                
+                return [$this->lineService->quickReply($text, $quickReplyItems)];
 
             case 'card':
                 return [$this->buildFlexMessage($response)];
 
             default:
-                return [$this->lineService->textMessage(json_encode($response))];
+                $fallbackText = is_string($response) ? $response : json_encode($response);
+                return [$this->lineService->textMessage($fallbackText)];
         }
     }
 
@@ -161,12 +286,21 @@ class LineChatbotController extends Controller
         foreach ($replies as $reply) {
             if (is_string($reply)) {
                 // Simple text reply
-                $items[] = $this->lineService->quickReplyItem($reply, 'message');
+                $label = $reply;
+                if (mb_strlen($label) > 20) {
+                    $label = mb_substr($label, 0, 17) . '...';
+                }
+                $items[] = $this->lineService->quickReplyItem($label, 'message', $reply);
             } else {
                 // Action reply
                 $label = $reply['label'] ?? '';
                 $action = $reply['action'] ?? '';
                 $data = $reply['data'] ?? [];
+
+                // LINE limit: Label must be max 20 characters
+                if (mb_strlen($label) > 20) {
+                    $label = mb_substr($label, 0, 17) . '...';
+                }
 
                 if ($action) {
                     // Build postback data string
@@ -194,13 +328,41 @@ class LineChatbotController extends Controller
             if (isset($row['type']) && $row['type'] === 'separator') {
                 $bodyContents[] = $this->lineService->separator();
             } elseif (isset($row['bold']) && $row['bold']) {
-                $bodyContents[] = [
-                    'type' => 'text',
-                    'text' => $row['label'],
-                    'size' => 'sm',
-                    'weight' => 'bold',
-                    'margin' => 'md',
-                ];
+                if (empty($row['value'])) {
+                    // Section Header (Bold Label only)
+                    $bodyContents[] = [
+                        'type' => 'text',
+                        'text' => $row['label'],
+                        'size' => 'sm',
+                        'weight' => 'bold',
+                        'margin' => 'md',
+                    ];
+                } else {
+                    // Highlighted Row (Bold Label + Value)
+                    $bodyContents[] = [
+                        'type' => 'box',
+                        'layout' => 'horizontal',
+                        'contents' => [
+                            [
+                                'type' => 'text',
+                                'text' => $row['label'],
+                                'size' => 'sm',
+                                'weight' => 'bold',
+                                'color' => '#111111',
+                                'flex' => 0,
+                            ],
+                            [
+                                'type' => 'text',
+                                'text' => $row['value'],
+                                'size' => 'sm',
+                                'color' => $row['valueColor'] ?? '#111111',
+                                'align' => 'end',
+                                'weight' => 'bold',
+                            ],
+                        ],
+                        'margin' => 'md',
+                    ];
+                }
             } else {
                 $bodyContents[] = $this->lineService->infoRow(
                     $row['label'] ?? '',
@@ -210,8 +372,12 @@ class LineChatbotController extends Controller
             }
         }
 
+        if (empty($bodyContents)) {
+            $bodyContents[] = $this->lineService->infoRow('ข้อมูล', 'ไม่พบข้อมูลที่จะแสดงในขณะนี้');
+        }
+
         $bubble = $this->lineService->bubbleContainer(
-            $card['title'] ?? '',
+            $card['title'] ?? 'ข้อมูล',
             $card['subtitle'] ?? '',
             $bodyContents,
             $card['headerColor'] ?? '#1DB446'

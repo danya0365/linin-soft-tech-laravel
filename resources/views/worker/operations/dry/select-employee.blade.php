@@ -1,41 +1,35 @@
 @extends('layouts.worker')
 
 @section('content')
-
-<div class="container">
-    <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="{{ route('worker') }}">Worker</a></li>
-          <li class="breadcrumb-item"><a href="{{ route('worker.operation') }}">ปฏิบัติการ</a></li>
-          <li class="breadcrumb-item active" aria-current="page">อบ - เลือกพนักงาน</li>
-        </ol>
-    </nav>
-    <div class="row justify-content-center">
+<x-worker.page 
+    title="เลือกพนักงาน" 
+    subtitle="Select Employee" 
+    icon="fa-solid fa-users"
+    :breadcrumbs="[
+        ['label' => 'Operation', 'route' => route('worker.operation')],
+        ['label' => 'อบ - เลือกพนักงาน']
+    ]"
+>
+    <div class="space-y-6">
         @foreach ($departments as $department)
-        <div class="col-md-12 m-2">
-            <div class="card">
-                <div class="card-header">{{ $department['name'] }}</div>
-                <div class="card-body">
-                    <div class="row g-2">
-                        @foreach ($department['employees'] as $employee)
-                        <div class="col-sm-4">
-                            <a href="{{ route('worker.operation.dry.set-select-employee', ['employeeId' => $employee['id']]) }}">
-                                <div class="p-3 border bg-light" style="min-height: 150px">
-                                    <div class="rounded-3 d-flex align-items-center justify-content-center">
-                                        <div style="max-width: 150px">
-                                            <x-employee-avatar :photo="$employee['photo']" />
-                                        </div>
-                                    </div>
-                                    <div class="text-center">{{ $employee['name'] }}</div>
-                                </div>
-                            </a>
-                        </div>
-                        @endforeach
+        <x-worker.card :title="$department['name']">
+            <div class="grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+                @foreach ($department['employees'] as $employee)
+                <a href="{{ route('worker.operation.dry.set-select-employee', ['employeeId' => $employee['id']]) }}" 
+                   class="group flex flex-col items-center p-4 rounded-xl border-2 border-transparent bg-gray-50 dark:bg-gray-800 hover:border-amber-400 hover:bg-white dark:hover:bg-gray-700 shadow-sm hover:shadow-md transition-all duration-200">
+                    
+                    <div class="w-24 h-24 mb-3 transform group-hover:scale-105 transition-transform duration-200">
+                        <x-employee-avatar :photo="$employee['photo']" class="w-full h-full rounded-full shadow-sm" />
                     </div>
-                </div>
+                    
+                    <span class="text-center font-medium text-gray-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400">
+                        {{ $employee['name'] }}
+                    </span>
+                </a>
+                @endforeach
             </div>
-        </div>
+        </x-worker.card>
         @endforeach
     </div>
-</div>
+</x-worker.page>
 @endsection

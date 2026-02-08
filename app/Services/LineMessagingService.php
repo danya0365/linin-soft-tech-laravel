@@ -12,14 +12,18 @@ use Illuminate\Support\Facades\Log;
  */
 class LineMessagingService
 {
-    protected string $channelAccessToken;
-    protected string $channelSecret;
+    protected ?string $channelAccessToken;
+    protected ?string $channelSecret;
     protected string $apiBaseUrl = 'https://api.line.me/v2/bot';
 
     public function __construct()
     {
         $this->channelAccessToken = config('services.line.channel_access_token');
         $this->channelSecret = config('services.line.channel_secret');
+
+        if (!$this->channelAccessToken || !$this->channelSecret) {
+            Log::error('LINE Messaging API: Missing configuration. Please set LINE_CHANNEL_ACCESS_TOKEN and LINE_CHANNEL_SECRET in .env');
+        }
     }
 
     /**
@@ -27,6 +31,10 @@ class LineMessagingService
      */
     public function verifySignature(string $body, string $signature): bool
     {
+        if (!$this->channelSecret) {
+            return false;
+        }
+        
         $hash = base64_encode(hash_hmac('sha256', $body, $this->channelSecret, true));
         return hash_equals($hash, $signature);
     }

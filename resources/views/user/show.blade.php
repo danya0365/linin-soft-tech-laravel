@@ -1,48 +1,32 @@
 @extends('layouts.app')
-
 @section('template_title')
-    {{ $user->name ?? 'Show User' }}
+    Show User
 @endsection
-
 @section('content')
-    <section class="content container">
-        <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{{ route('admin') }}">{{ __('Admin') }}</a></li>
-                <li class="breadcrumb-item"><a href="{{ route('users.index') }}">{{ __('User') }}</a></li>
-                <li class="breadcrumb-item active" aria-current="page">{{ __('Show User') }}</li>
-            </ol>
-        </nav>
-        <div class="row">
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="card-header">
-                        <div class="float-left">
-                            <span class="card-title">Show User</span>
-                        </div>
-                        <div class="float-right">
-                            <a class="btn btn-primary" href="{{ route('users.index') }}"> Back</a>
-                        </div>
-                    </div>
-
-                    <div class="card-body">
-                        
-                        <div class="form-group">
-                            <strong>Name:</strong>
-                            {{ $user->name }}
-                        </div>
-                        <div class="form-group">
-                            <strong>Email:</strong>
-                            {{ $user->email }}
-                        </div>
-                        <div class="form-group">
-                            <strong>Role:</strong>
-                            {{ App\Enums\UserRole::getDescription($user->role) }}
-                        </div>
-
-                    </div>
+<div class="container mx-auto px-4 py-6 max-w-4xl">
+    <x-crud.breadcrumb :items="[['label' => 'Admin', 'route' => 'admin'],['label' => 'User', 'route' => 'users.index'],['label' => 'Details']]" />
+    <x-ui.card>
+        <x-slot:header>
+            <div class="flex items-center justify-between">
+                <h2 class="text-xl font-semibold text-gray-900 dark:text-white">User Details</h2>
+                <div class="flex items-center gap-2">
+                    <x-ui.button :href="route('users.edit', $user->id)" variant="success" size="sm" icon="fa fa-edit">Edit</x-ui.button>
+                    <x-ui.button :href="route('users.index')" variant="secondary" size="sm" icon="fa fa-arrow-left">Back</x-ui.button>
                 </div>
             </div>
+        </x-slot:header>
+        <div class="grid md:grid-cols-2 gap-6">
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Name</p><p class="font-semibold text-gray-900 dark:text-white">{{ $user->name ?? '-' }}</p></div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Email</p><p class="font-semibold text-gray-900 dark:text-white">{{ $user->email ?? '-' }}</p></div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Line User ID</p><p class="font-semibold text-gray-900 dark:text-white">{{ $user->line_user_id ?? '-' }}</p></div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Role</p><p class="font-semibold text-gray-900 dark:text-white">{{ $user->role ?? '-' }}</p></div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Customer Account</p><p class="font-semibold text-gray-900 dark:text-white">{{ $user->customer_account ?? '-' }}</p></div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Is Can Access Admin</p><p class="font-semibold text-gray-900 dark:text-white">{{ $user->is_can_access_admin ?? '-' }}</p></div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Is Can Access Manager</p><p class="font-semibold text-gray-900 dark:text-white">{{ $user->is_can_access_manager ?? '-' }}</p></div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Is Can Access Supervisor</p><p class="font-semibold text-gray-900 dark:text-white">{{ $user->is_can_access_supervisor ?? '-' }}</p></div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Is Can Access Customer</p><p class="font-semibold text-gray-900 dark:text-white">{{ $user->is_can_access_customer ?? '-' }}</p></div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Is Can Access Worker</p><p class="font-semibold text-gray-900 dark:text-white">{{ $user->is_can_access_worker ?? '-' }}</p></div>
         </div>
-    </section>
+    </x-ui.card>
+</div>
 @endsection

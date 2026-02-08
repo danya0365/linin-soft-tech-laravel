@@ -1,91 +1,81 @@
 @extends('layouts.app')
-
 @section('template_title')
     Truck
 @endsection
-
 @section('content')
-    <div class="container">
-        <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
-            <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ route('admin') }}">{{ __('Admin') }}</a></li>
-            <li class="breadcrumb-item active" aria-current="page">{{ __('Truck') }}</li>
-            </ol>
-        </nav>
-        <div class="row">
-            <div class="col-sm-12">
-                <div class="card">
-                    <div class="card-header">
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-
-                            <span id="card_title">
-                                {{ __('Truck') }}
-                            </span>
-
-                             <div class="float-right">
-                                <a href="{{ route('trucks.create') }}" class="btn btn-primary btn-sm float-right"  data-placement="left">
-                                  {{ __('Create New') }}
-                                </a>
-                              </div>
-                        </div>
-                    </div>
-                    @if ($message = Session::get('success'))
-                        <div class="alert alert-success">
-                            {{ $message }}
-                        </div>
-                    @endif
-
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-striped table-hover">
-                                <thead class="thead">
-                                    <tr>
-                                        <th>No</th>
-                                        
-										<th>Name</th>
-										<th>Photo</th>
-										<th>Plate Number</th>
-										<th>Operation Id</th>
-										<th>สถานะ</th>
-
-                                        <th></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($trucks as $truck)
-                                        <tr>
-                                            <td>{{ ++$i }}</td>
-                                            
-											<td>{{ $truck->name }}</td>
-											<td>{{ $truck->photo }}</td>
-											<td>{{ $truck->plate_number }}</td>
-											<td>{{ $truck->operation_id }}</td>
-											<td>
-												@if($truck->service_status === 'available')
-													<span class="badge bg-success">✅ พร้อมใช้งาน</span>
-												@else
-													<span class="badge bg-danger">🔧 เสีย</span>
-												@endif
-											</td>
-
-                                            <td>
-                                                <form action="{{ route('trucks.destroy',$truck->id) }}" method="POST">
-                                                    <a class="btn btn-sm btn-primary " href="{{ route('trucks.show',$truck->id) }}"><i class="fa fa-fw fa-eye"></i> Show</a>
-                                                    <a class="btn btn-sm btn-success" href="{{ route('trucks.edit',$truck->id) }}"><i class="fa fa-fw fa-edit"></i> Edit</a>
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-danger btn-sm"><i class="fa fa-fw fa-trash"></i> Delete</button>
-                                                </form>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-                {!! $trucks->links() !!}
-            </div>
+<div class="container mx-auto px-4 py-6 max-w-7xl">
+    <x-crud.breadcrumb :items="[['label' => 'Admin', 'route' => 'admin'],['label' => 'Truck']]" />
+    <x-ui.card>
+        <x-slot:header>
+            <x-crud.page-header title="Truck" :createRoute="route('trucks.create')" />
+        </x-slot:header>
+        @if ($message = Session::get('success'))
+            <x-ui.alert variant="success" dismissible="true">{{ $message }}</x-ui.alert>
+        @endif
+        
+        <div class="overflow-x-auto rounded-lg shadow">
+            <table class="w-full text-sm text-left border-collapse bg-white dark:bg-gray-800">
+                <thead class="bg-gradient-to-r from-gray-100 to-gray-50 dark:from-gray-700 dark:to-gray-800 border-b-2 border-gray-300 dark:border-gray-600">
+                    <tr>
+                        <th class="px-6 py-4 text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider w-20 text-center">ID</th>
+                        <th class="px-6 py-4 text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Detail</th>
+                        <th class="px-6 py-4 text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider w-64 text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                    @forelse($trucks as $index => $truck)
+                        <tr class="hover:bg-gradient-to-r hover:from-blue-50 hover:to-transparent dark:hover:from-gray-700/50 dark:hover:to-transparent transition-all duration-200">
+                            <td class="px-6 py-4 text-center">
+                                <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 text-sm font-semibold">
+                                    {{ $i + $index + 1 }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="space-y-1">
+                                        <div class="mb-2">
+                                            <span class="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">Name:</span>
+                                            <span class="ml-2 text-sm text-gray-900 dark:text-gray-100">{{ $truck->name ?? '-' }}</span>
+                                        </div>
+                                        <div class="mb-2">
+                                            <span class="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">Photo:</span>
+                                            <span class="ml-2 text-sm text-gray-900 dark:text-gray-100">{{ $truck->photo ?? '-' }}</span>
+                                        </div>
+                                        <div class="mb-2">
+                                            <span class="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">Plate Number:</span>
+                                            <span class="ml-2 text-sm text-gray-900 dark:text-gray-100">{{ $truck->plate_number ?? '-' }}</span>
+                                        </div>
+                                        <div class="mb-2">
+                                            <span class="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">Operation Id:</span>
+                                            <span class="ml-2 text-sm text-gray-900 dark:text-gray-100">{{ $truck->operation_id ?? '-' }}</span>
+                                        </div>
+                                        <div class="mb-2">
+                                            <span class="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">สถานะ:</span>
+                                            @if($truck->service_status === 'available')
+                                                <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">✅ พร้อมใช้งาน</span>
+                                            @else
+                                                <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400">🔧 เสีย</span>
+                                            @endif
+                                        </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <x-crud.action-buttons :model="$truck" resource="trucks" />
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="3" class="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
+                                <div class="flex flex-col items-center gap-2">
+                                    <i class="fa fa-inbox text-4xl text-gray-300 dark:text-gray-600"></i>
+                                    <p>No Truck available</p>
+                                </div>
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
-    </div>
+    </x-ui.card>
+    <div class="mt-6">{{ $trucks->links() }}</div>
+</div>
 @endsection

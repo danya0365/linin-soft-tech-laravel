@@ -1,104 +1,65 @@
 @extends('layouts.worker')
 
 @section('content')
-
-<div class="container">
-    <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="/">Home</a></li>
-          <li class="breadcrumb-item active" aria-current="page">Worker</li>
-        </ol>
-    </nav>
-    <div class="row justify-content-center">
-        <div class="col-md-12 m-2">
-            <div class="card">
-                <div class="card-header">{{ __('Worker Menu') }}</div>
-                <div class="card-body">
-                    <div class="row g-2">
-                        <div class="col-sm-4">
-                            <a href="{{ route('worker.product') }}">
-                                <div class="p-3 border bg-primary" style="min-height: 150px">
-                                    <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 110px">
-                                        <div class="text-center">
-                                            <div class="fa-solid fa-shirt text-light" style="font-size: 3em"></div>
-                                            <div class="text-center mt-3 text-light">{{ __('สินค้า - Product') }}</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </a>
-                        </div>
-                        <div class="col-sm-4">
-                            <a href="{{ route('worker.customer') }}">
-                                <div class="p-3 border bg-warning" style="min-height: 150px">
-                                    <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 110px">
-                                        <div class="text-center">
-                                            <div class="fa-solid fa-hospital" style="font-size: 3em"></div>
-                                            <div class="text-center mt-3">{{ __('ลูกค้า - Customer') }}</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </a>
-                        </div>
-                        <div class="col-sm-4">
-                            <a href="{{ route('worker.operation') }}">
-                                <div class="p-3 border bg-danger" style="min-height: 150px">
-                                    <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 110px">
-                                        <div class="text-center">
-                                            <div class="fa-solid fa-people-carry-box text-light" style="font-size: 3em"></div>
-                                            <div class="text-center mt-3 text-light">{{ __('ปฏิบัติการ - Operations') }}</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </a>
-                        </div>
-                        <div class="col-sm-4">
-                            <a href="{{ route('worker.energy-resource') }}">
-                                <div class="p-3 border bg-success" style="min-height: 150px">
-                                    <div class="rounded-3 d-flex align-items-center justify-content-center">
-                                        <div class="bi bi-battery-charging text-light" style="font-size: 3em"></div>
-                                    </div>
-                                    <div class="text-center text-light">{{ __('พลังงาน - Energy Resource') }}</div>
-                                </div>
-                            </a>
-                        </div>
-                        <div class="col-sm-4">
-                            <a href="{{ route('worker.employee') }}">
-                                <div class="p-3 border bg-info" style="min-height: 150px">
-                                    <div class="rounded-3 d-flex align-items-center justify-content-center">
-                                        <div class="bi bi-people-fill text-light" style="font-size: 3em"></div>
-                                    </div>
-                                    <div class="text-center text-light">{{ __('พนักงาน - Employee') }}</div>
-                                </div>
-                            </a>
-                        </div>
-                        <div class="col-sm-4">
-                            <a href="{{ route('worker.stock') }}">
-                                <div class="p-3 border bg-brown" style="min-height: 150px">
-                                    <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 110px">
-                                        <div class="text-center">
-                                            <div class="fa-solid fa-warehouse" style="font-size: 3em"></div>
-                                            <div class="text-center mt-3">{{ __('สต๊อก - Stock') }}</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </a>
-                        </div>
-                        <div class="col-sm-4 hidden">
-                            <a href="#">
-                                <div class="p-3 border bg-light" style="min-height: 150px">
-                                    <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 110px">
-                                        <div class="text-center">
-                                            <div class="fa-solid fa-ranking-star" style="font-size: 3em"></div>
-                                            <div class="text-center mt-3">{{ __('อันดับ - Ranking') }}</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+<x-worker.page 
+    title="{{ __('Worker Menu') }}"
+    subtitle="เลือกเมนูที่ต้องการเข้าใช้งาน"
+    icon="fa-th-large"
+>
+    <x-menu.grid :columns="3">
+        <x-menu.card 
+            href="{{ route('worker.product') }}"
+            icon="fa-solid fa-shirt"
+            title="{{ __('สินค้า') }}"
+            subtitle="Product"
+            gradient="from-blue-500 to-blue-700"
+            subtitle-color="text-blue-100"
+        />
+        
+        <x-menu.card 
+            href="{{ route('worker.customer') }}"
+            icon="fa-solid fa-hospital"
+            title="{{ __('ลูกค้า') }}"
+            subtitle="Customer"
+            gradient="from-amber-400 to-orange-500"
+            subtitle-color="text-amber-100"
+        />
+        
+        <x-menu.card 
+            href="{{ route('worker.operation') }}"
+            icon="fa-solid fa-people-carry-box"
+            title="{{ __('ปฏิบัติการ') }}"
+            subtitle="Operations"
+            gradient="from-rose-500 to-red-600"
+            subtitle-color="text-rose-100"
+        />
+        
+        <x-menu.card 
+            href="{{ route('worker.energy-resource') }}"
+            icon="fa-solid fa-bolt"
+            title="{{ __('พลังงาน') }}"
+            subtitle="Energy Resource"
+            gradient="from-emerald-500 to-green-600"
+            subtitle-color="text-emerald-100"
+        />
+        
+        <x-menu.card 
+            href="{{ route('worker.employee') }}"
+            icon="fa-solid fa-users"
+            title="{{ __('พนักงาน') }}"
+            subtitle="Employee"
+            gradient="from-cyan-500 to-blue-500"
+            subtitle-color="text-cyan-100"
+        />
+        
+        <x-menu.card 
+            href="{{ route('worker.stock') }}"
+            icon="fa-solid fa-warehouse"
+            title="{{ __('สต๊อก') }}"
+            subtitle="Stock"
+            gradient="from-violet-500 to-purple-600"
+            subtitle-color="text-violet-100"
+        />
+    </x-menu.grid>
+</x-worker.page>
 @endsection

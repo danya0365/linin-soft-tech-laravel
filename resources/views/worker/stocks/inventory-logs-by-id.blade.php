@@ -1,115 +1,88 @@
 @extends('layouts.worker')
 
 @section('content')
-
-<div class="container">
-    <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ route('worker') }}">Worker</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.stock') }}">Stocks</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.stock.show-inventory-by-group', ['inventoryGroupId' => $inventory->inventoryGroup->id]) }}">รายการทั้งหมดของ {{ $inventory->inventoryGroup->name }} - Show Inventory by {{ $inventory->inventoryGroup->name }}</a></li>
-            <li class="breadcrumb-item active" aria-current="page">ประวัติสต๊อกของ {{ $inventory->name }} - Stock history of {{ $inventory->name }}</li>
-        </ol>
-    </nav>
-    <div class="row justify-content-center">
-        @if ($message = Session::get('success'))
-        <div class="alert alert-success mb-2">
+<x-worker.page
+    :breadcrumbs="[
+        ['label' => __('Stocks'), 'route' => route('worker.stock')],
+        ['label' => $inventory->inventoryGroup->name, 'route' => route('worker.stock.show-inventory-by-group', ['inventoryGroupId' => $inventory->inventoryGroup->id])]
+    ]"
+    title="{{ __('Stock History') }}"
+    subtitle="{{ $inventory->name }}"
+    icon="fa-history"
+>
+    {{-- Success/Error Messages --}}
+    @if ($message = Session::get('success'))
+    <div class="w-full mb-4">
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg">
             {{ $message }}
-        </div>
-        @endif
-
-        @if ($message = Session::get('error'))
-        <div class="alert alert-danger mb-2">
-            {{ $message }}
-        </div>
-        @endif
-
-        <div class="col-md-12 m-2">
-            <div class="card">
-                <div class="card-header">
-                    ประวัติสต๊อกของ {{ $inventory->name }} - Stock history of {{ $inventory->name }}
-                </div>
-                <div class="card-body">
-
-                    <form class="row row-cols-lg-auto g-3 align-items-center mb-2" action="{{ request()->url() }}" method="GET">
-
-                        <div class="col-12">
-                            <div class="input-group">
-                                <input type="date" name="date_start_at" value="{{ $dateStartAt }}" class="form-control" placeholder="วันที่เริ่ม" aria-label="วันที่เริ่ม">
-                                <span class="input-group-text"> ถึง </span>
-                                <input type="date" name="date_end_at" value="{{ $dateEndAt }}" class="form-control" placeholder="วันที่สิ้นสุด" aria-label="วันที่สิ้นสุด">
-                            </div>
-                        </div>
-
-                        <div class="col-12">
-                            <div class="input-group">
-                                <label class="input-group-text" for="sort_order">เรียงโดย</label>
-                                <select class="form-select" id="sort_order" name="sort_order" onchange="this.form.submit()">
-                                    @foreach ( $sortOrders as $sortOrder )
-                                    <option value="{{ $sortOrder['var'] }}" {{ $sortOrderSelected == $sortOrder['var'] ? 'selected' : '' }}>{{ $sortOrder['name'] }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="col-12">
-                            <button type="submit" class="btn btn-primary">Submit</button>
-                            <a href="{{ route('worker.energy-resource.logs') }}" role="button" class="btn btn-outline-secondary">Reset</a>
-                        </div>
-                    </form>
-
-                    @if ($message = Session::get('success'))
-                        <div class="alert alert-success mb-2">
-                            {{ $message }}
-                        </div>
-                    @endif
-
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-hover">
-                            <thead class="thead">
-                                <tr>
-                                    <th>วันที่ - Date</th>
-                                    <th>Import/Export</th>
-                                    <th>จำนวน - Count</th>
-                                    <th>ค่าใช้จ่าย - Cost (Thai Baht)</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($inventoryLogs as $inventoryLog)
-                                    <tr>
-                                        <td>{{ $inventoryLog->created_at->format('Y-m-d') }}</td>
-                                        <td class="text-center">{{ $inventoryLog->type }}</td>
-                                        <td class="text-center">{{ $inventoryLog->quantity }}</td>
-                                        <td class="text-center">{{ number_format($inventoryLog->cost) }}</td>
-                                        <td>
-                                            <form class="delete-form" action="{{ route('worker.stock.inventory.logs.delete', $inventoryLog->id) }}" method="POST">
-                                                @csrf
-                                                <button type="submit" class="btn btn-danger btn-sm"><i class="fa fa-fw fa-trash"></i> Delete</button>
-                                            </form>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-
-                </div>
-                <div class="card-footer">
-                    {!! $inventoryLogs->withQueryString()->links() !!}
-                </div>
-            </div>
         </div>
     </div>
-</div>
+    @endif
+
+    @if ($message = Session::get('error'))
+    <div class="w-full mb-4">
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg">
+            {{ $message }}
+        </div>
+    </div>
+    @endif
+
+    <x-worker.card :title="__('ประวัติสต๊อก - Stock History')">
+        <x-worker.date-filter 
+            :action="request()->url()" 
+            :date-start-at="$dateStartAt" 
+            :date-end-at="$dateEndAt"
+            :reset-url="route('worker.stock.inventory.logs', ['inventoryId' => $inventory->id])"
+        >
+            <x-worker.select-filter 
+                name="sort_order"
+                label="เรียงโดย"
+                :options="collect($sortOrders)->pluck('name', 'var')->toArray()"
+                :selected="$sortOrderSelected"
+                :show-all="false"
+            />
+        </x-worker.date-filter>
+
+        <x-worker.data-table 
+            :headers="['วันที่ - Date', 'Import/Export', 'จำนวน - Count', 'ค่าใช้จ่าย - Cost', 'Actions']"
+            :paginator="$inventoryLogs"
+        >
+            @foreach ($inventoryLogs as $inventoryLog)
+            <tr class="hover:bg-gray-50 dark:hover:bg-gray-800">
+                <td class="px-4 py-3 text-sm text-gray-900 dark:text-gray-200">{{ $inventoryLog->created_at->format('Y-m-d') }}</td>
+                <td class="px-4 py-3 text-sm text-center">
+                    <span class="px-2 py-1 rounded-full text-xs font-medium {{ $inventoryLog->type === 'import' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
+                        {{ $inventoryLog->type === 'import' ? 'นำเข้า' : 'เบิก' }}
+                    </span>
+                </td>
+                <td class="px-4 py-3 text-sm text-gray-900 dark:text-gray-200 text-center font-medium">{{ $inventoryLog->quantity }}</td>
+                <td class="px-4 py-3 text-sm text-gray-900 dark:text-gray-200 text-center">{{ number_format($inventoryLog->cost) }} ฿</td>
+                <td class="px-4 py-3 text-sm">
+                    <form class="delete-form" action="{{ route('worker.stock.inventory.logs.delete', $inventoryLog->id) }}" method="POST">
+                        @csrf
+                        <button type="submit" class="px-3 py-1 bg-red-500 hover:bg-red-600 text-white text-xs font-medium rounded-lg transition-colors">
+                            <i class="fa fa-trash mr-1"></i> Delete
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            @endforeach
+        </x-worker.data-table>
+    </x-worker.card>
+</x-worker.page>
+
+@push('scripts')
 <script>
-    $(function(){
-        $('.delete-form').on('submit', function(e){
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.delete-form').forEach(function(form) {
+        form.addEventListener('submit', function(e) {
             if (!confirm("Are you sure?")) {
+                e.preventDefault();
                 return false;
             }
-            return true
-        })
+        });
     });
+});
 </script>
+@endpush
 @endsection

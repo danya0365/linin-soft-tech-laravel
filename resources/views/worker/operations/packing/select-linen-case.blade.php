@@ -1,40 +1,103 @@
 @extends('layouts.worker')
 
 @section('content')
+<x-worker.page 
+    title="เลือกเคสงาน" 
+    subtitle="Select Linen Case" 
+    icon="fa-solid fa-layer-group"
+    :breadcrumbs="[
+        ['label' => 'Operation', 'route' => route('worker.operation')],
+        ['label' => 'พนักงาน: ' . $operation['employee']['name'], 'route' => route('worker.operation.packing.select-employee')],
+        ['label' => 'ลูกค้า: ' . $operation['customer']['name'], 'route' => route('worker.operation.packing.select-customer', ['operationId' => $operation['id']])],
+        ['label' => 'สรุปข้อมูลการพับแพ็ค', 'route' => route('worker.operation.packing.employee-summary', ['operationId' => $operation['id']])],
+        ['label' => 'พับแพ็ค - เลือกเคสงาน']
+    ]"
+>
+    @php
+        $colorMap = [
+            'bg-primary' => [
+                'bg' => 'bg-blue-50 dark:bg-blue-900/20',
+                'border' => 'border-blue-200 dark:border-blue-800',
+                'text' => 'text-blue-600 dark:text-blue-400',
+                'hover_border' => 'hover:border-blue-400',
+                'icon_bg' => 'bg-blue-100 dark:bg-blue-800'
+            ],
+            'bg-success' => [
+                'bg' => 'bg-green-50 dark:bg-green-900/20',
+                'border' => 'border-green-200 dark:border-green-800',
+                'text' => 'text-green-600 dark:text-green-400',
+                'hover_border' => 'hover:border-green-400',
+                'icon_bg' => 'bg-green-100 dark:bg-green-800'
+            ],
+            'bg-warning' => [
+                'bg' => 'bg-yellow-50 dark:bg-yellow-900/20',
+                'border' => 'border-yellow-200 dark:border-yellow-800',
+                'text' => 'text-yellow-600 dark:text-yellow-400',
+                'hover_border' => 'hover:border-yellow-400',
+                'icon_bg' => 'bg-yellow-100 dark:bg-yellow-800'
+            ],
+            'bg-danger' => [
+                'bg' => 'bg-red-50 dark:bg-red-900/20',
+                'border' => 'border-red-200 dark:border-red-800',
+                'text' => 'text-red-600 dark:text-red-400',
+                'hover_border' => 'hover:border-red-400',
+                'icon_bg' => 'bg-red-100 dark:bg-red-800'
+            ],
+            'bg-info' => [
+                'bg' => 'bg-cyan-50 dark:bg-cyan-900/20',
+                'border' => 'border-cyan-200 dark:border-cyan-800',
+                'text' => 'text-cyan-600 dark:text-cyan-400',
+                'hover_border' => 'hover:border-cyan-400',
+                'icon_bg' => 'bg-cyan-100 dark:bg-cyan-800'
+            ],
+            'bg-secondary' => [
+                'bg' => 'bg-gray-50 dark:bg-gray-800',
+                'border' => 'border-gray-200 dark:border-gray-700',
+                'text' => 'text-gray-600 dark:text-gray-400',
+                'hover_border' => 'hover:border-gray-400',
+                'icon_bg' => 'bg-gray-200 dark:bg-gray-700'
+            ],
+            'bg-dark' => [
+                'bg' => 'bg-slate-50 dark:bg-slate-800',
+                'border' => 'border-slate-300 dark:border-slate-700',
+                'text' => 'text-slate-700 dark:text-slate-300',
+                'hover_border' => 'hover:border-slate-500',
+                'icon_bg' => 'bg-slate-200 dark:bg-slate-700'
+            ],
+            'bg-light' => [
+                'bg' => 'bg-white dark:bg-gray-800',
+                'border' => 'border-gray-200 dark:border-gray-700',
+                'text' => 'text-gray-600 dark:text-gray-400',
+                'hover_border' => 'hover:border-gray-400',
+                'icon_bg' => 'bg-gray-100 dark:bg-gray-700'
+            ],
+        ];
+    @endphp
 
-<div class="container">
-    <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ route('worker') }}">Worker</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.operation') }}">ปฏิบัติการ</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.operation.packing.select-employee') }}">พนักงาน: {{ $operation['employee']['name'] }}</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.operation.packing.select-customer', ['operationId' => $operation['id']]) }}">ลูกค้า: {{ $operation['customer']['name'] }}</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.operation.packing.employee-summary', ['operationId' => $operation['id']]) }}">สรุปข้อมูลการพับแพ็ค</a></li>
-            <li class="breadcrumb-item active" aria-current="page">พับแพ็ค - เลือกเคสงาน</li>
-        </ol>
-    </nav>
-    <div class="row justify-content-center">
-        <div class="col-md-12 m-2">
-            <div class="card">
-                <div class="card-header">เคสงาน</div>
-                <div class="card-body">
-                    <div class="row g-2">
-                        @foreach ($operationLinenCases as $operationLinenCase )
-                        <div class="col-sm-6">
-                            <a href="{{ route('worker.operation.packing.set-select-linen-case', ['operationId' => $operation['id'], 'linenCase' => $operationLinenCase['var'], 'operationLinenProductId' => $operationLinenProduct->id]) }}">
-                                <div class="p-3 border {{ $operationLinenCase['bg_css_class'] }}" style="min-height: 150px">
-                                    <div class="rounded-3 d-flex align-items-center justify-content-center">
-                                        <div class="bi {{ $operationLinenCase['icon'] }} {{ $operationLinenCase['text_css_class'] }}" style="font-size: 3em"></div>
-                                    </div>
-                                    <div class="text-center {{ $operationLinenCase['text_css_class'] }}">{{ $operationLinenCase['name'] }}</div>
-                                </div>
-                            </a>
-                        </div>
-                        @endforeach
+    <x-worker.card title="เคสงาน">
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            @foreach ($operationLinenCases as $operationLinenCase)
+            @php
+                $colors = $colorMap[$operationLinenCase['bg_css_class']] ?? $colorMap['bg-secondary'];
+            @endphp
+            <a href="{{ route('worker.operation.packing.set-select-linen-case', ['operationId' => $operation['id'], 'linenCase' => $operationLinenCase['var'], 'operationLinenProductId' => $operationLinenProduct->id]) }}" 
+               class="group relative flex flex-col items-center justify-center p-6 rounded-xl border-2 shadow-sm hover:shadow-md transition-all duration-200 {{ $colors['bg'] }} {{ $colors['border'] }} {{ $colors['hover_border'] }}"
+               style="min-height: 180px">
+                
+                <div class="mb-4 transform group-hover:scale-110 transition-transform duration-200">
+                    <div class="w-20 h-20 flex items-center justify-center rounded-full {{ $colors['icon_bg'] }} {{ $colors['text'] }}">
+                        <i class="bi {{ $operationLinenCase['icon'] }} text-4xl"></i>
                     </div>
                 </div>
-            </div>
+                
+                <div class="text-center">
+                    <h4 class="text-lg font-bold {{ $colors['text'] }}">
+                        {{ $operationLinenCase['name'] }}
+                    </h4>
+                </div>
+            </a>
+            @endforeach
         </div>
-    </div>
-</div>
+    </x-worker.card>
+</x-worker.page>
 @endsection

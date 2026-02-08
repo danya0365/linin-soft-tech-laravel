@@ -1,40 +1,41 @@
 @extends('layouts.worker')
 
 @section('content')
-
-<div class="container">
-    <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="{{ route('worker') }}">Worker</a></li>
-          <li class="breadcrumb-item"><a href="{{ route('worker.operation') }}">ปฏิบัติการ</a></li>
-          <li class="breadcrumb-item"><a href="{{ route('worker.operation.collect.select-employee') }}">พนักงาน: {{ $operation['employee']['name'] }}</a></li>
-          <li class="breadcrumb-item active" aria-current="page">จัดเก็บ - เลือกลูกค้า</li>
-        </ol>
-    </nav>
-    <div class="row justify-content-center">
+<x-worker.page 
+    title="เลือกลูกค้า" 
+    subtitle="Select Customer" 
+    icon="fa-solid fa-building-user"
+    :breadcrumbs="[
+        ['label' => 'Operation', 'route' => route('worker.operation')],
+        ['label' => 'พนักงาน: ' . $operation['employee']['name'], 'route' => route('worker.operation.collect.select-employee')],
+        ['label' => 'จัดเก็บ - เลือกลูกค้า']
+    ]"
+>
+    <div class="space-y-6">
         @foreach ($customerGroups as $customerGroup)
-        <div class="col-md-12 m-2">
-            <div class="card">
-                <div class="card-header">{{ $customerGroup['name'] }}</div>
-                <div class="card-body">
-                    <div class="row g-2">
-                        @foreach ($customerGroup['customers'] as $customer)
-                        <div class="col-sm-4">
-                            <a href="{{ route('worker.operation.collect.set-select-customer', ['operationId' => $operation['id'], 'customerId' => $customer['id']]) }}">
-                                <div class="p-3 border bg-light" style="min-height: 150px">
-                                    <div class="rounded-3 d-flex align-items-center justify-content-center">
-                                        <div class="bi bi-building" style="font-size: 3em"></div>
-                                    </div>
-                                    <div class="text-center">{{ $customer['name'] }}</div>
-                                </div>
-                            </a>
+        <x-worker.card :title="$customerGroup['name']">
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+                @foreach ($customerGroup['customers'] as $customer)
+                <a href="{{ route('worker.operation.collect.set-select-customer', ['operationId' => $operation['id'], 'customerId' => $customer['id']]) }}" 
+                   class="group relative flex flex-col items-center justify-center p-4 bg-gray-50 dark:bg-gray-800 rounded-xl border-2 border-transparent hover:border-amber-500 hover:bg-white dark:hover:bg-gray-700 shadow-sm hover:shadow-md transition-all duration-200"
+                   style="min-height: 150px">
+                    
+                    <div class="mb-3 transform group-hover:scale-110 transition-transform duration-200">
+                        <div class="w-16 h-16 flex items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 group-hover:bg-amber-100 dark:group-hover:bg-amber-900/30 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
+                            <i class="bi bi-building text-3xl"></i>
                         </div>
-                        @endforeach
                     </div>
-                </div>
+                    
+                    <div class="text-center w-full">
+                        <h4 class="text-sm font-semibold text-gray-900 dark:text-white truncate px-2">
+                            {{ $customer['name'] }}
+                        </h4>
+                    </div>
+                </a>
+                @endforeach
             </div>
-        </div>
+        </x-worker.card>
         @endforeach
     </div>
-</div>
+</x-worker.page>
 @endsection

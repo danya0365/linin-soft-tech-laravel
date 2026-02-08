@@ -1,106 +1,107 @@
 @extends('layouts.worker')
 
 @section('content')
-
-<div class="container">
-    <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ route('worker') }}">Worker</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.operation') }}">ปฏิบัติการ</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.operation.iron.select-employee') }}">พนักงาน: {{ $operation['employee']['name'] }}</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.operation.iron.select-customer', ['operationId' => $operation['id']]) }}">ลูกค้า: {{ $operation['customer']['name'] }}</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.operation.iron.employee-summary', ['operationId' => $operation['id']]) }}">สรุปข้อมูลการรีด</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.operation.iron.select-linen-case', ['operationId' => $operation['id'], 'operationLinenProductId' => $operationLinenProduct['id']]) }}">{{ $operationLinenProduct['linen_case']['name'] }}</a></li>
-            <li class="breadcrumb-item active" aria-current="page">รีด - เลือกประเภทผ้า</li>
-        </ol>
-    </nav>
-    <div class="row justify-content-center">
+<x-worker.page 
+    title="เลือกประเภทผ้า" 
+    subtitle="Select Linen Product" 
+    icon="fa-solid fa-shirt"
+    :breadcrumbs="[
+        ['label' => 'Operation', 'route' => route('worker.operation')],
+        ['label' => 'พนักงาน: ' . $operation['employee']['name'], 'route' => route('worker.operation.iron.select-employee')],
+        ['label' => 'ลูกค้า: ' . $operation['customer']['name'], 'route' => route('worker.operation.iron.select-customer', ['operationId' => $operation['id']])],
+        ['label' => 'สรุปข้อมูลการรีด', 'route' => route('worker.operation.iron.employee-summary', ['operationId' => $operation['id']])],
+        ['label' => 'เคสงาน: ' . $operationLinenProduct['linen_case']['name'], 'route' => route('worker.operation.iron.select-linen-case', ['operationId' => $operation['id'], 'operationLinenProductId' => $operationLinenProduct['id']])],
+        ['label' => 'เลือกประเภทผ้า']
+    ]"
+>
+    <div class="space-y-6">
         @foreach ($linenTypes as $linenType)
-        <div class="col-md-12 m-2">
-            <div class="card">
-                <div class="card-header">{{ $linenType['name'] }}</div>
-                <div class="card-body">
-                    <div class="row g-2">
-                        @foreach ($linenType['linen_products'] as $linenProduct)
-                        <div class="col-sm-3 col-6">
-                            <div class="d-grid gap-2">
-                                <input type="checkbox" class="btn-check" value="{{ $linenProduct['id'] }}" id="linen-{{ $linenProduct['id'] }}" autocomplete="off">
-                                <label class="btn btn-outline-secondary" for="linen-{{ $linenProduct['id'] }}">{{ $linenProduct['name'] }}</label>
-                            </div>
-                        </div>
-                        @endforeach
-                    </div>
-                    <div class="row g-2 mt-2" style="display: none">
-                        <div class="col-md-6 offset-md-3">
-                            <div class="row g-2 mt-2">
-                                <div class="col-6">
-                                    <div class="d-grid gap-2">
-                                        <button class="btn btn-primary submit" type="button">ยืนยันที่เลือก</button>
-                                    </div>
-                                </div>
-                                <div class="col-6">
-                                    <div class="d-grid gap-2">
-                                        <button class="btn btn-danger" type="button">ยกเลิกที่เลือก</button>
-                                    </div>
-                                </div>
-                            </div>
-                            
+        <x-worker.card :title="$linenType['name']">
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+                @foreach ($linenType['linen_products'] as $linenProduct)
+                <div class="relative">
+                    <input type="checkbox" class="btn-check hidden peer" value="{{ $linenProduct['id'] }}" id="linen-{{ $linenProduct['id'] }}" autocomplete="off">
+                    <label for="linen-{{ $linenProduct['id'] }}" 
+                           class="flex flex-col items-center justify-center p-4 h-full rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 cursor-pointer transition-all duration-200 hover:border-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 peer-checked:border-amber-500 peer-checked:bg-amber-50 dark:peer-checked:bg-amber-900/30 peer-checked:ring-2 peer-checked:ring-amber-200 dark:peer-checked:ring-amber-900 shadow-sm"
+                           style="min-height: 120px">
+                        
+                        <div class="mb-2 text-gray-400 peer-checked:text-amber-500">
+                            <i class="fa-solid fa-shirt text-2xl"></i>
                         </div>
                         
-                    </div>
+                        <span class="text-center font-medium text-gray-700 dark:text-gray-300 peer-checked:text-amber-700 dark:peer-checked:text-amber-400">
+                            {{ $linenProduct['name'] }}
+                        </span>
+
+                        <div class="absolute top-2 right-2 opacity-0 peer-checked:opacity-100 transition-opacity">
+                            <i class="fa-solid fa-circle-check text-amber-500"></i>
+                        </div>
+                    </label>
                 </div>
+                @endforeach
             </div>
-        </div>
+        </x-worker.card>
         @endforeach
     </div>
-</div>
+</x-worker.page>
+
+@push('scripts')
 <script>
-var linenProducts = {!! $linenProductJson !!};
-var submitUrl = '{{ route('worker.operation.iron.set-select-linen-product', ['operationId' => $operation['id'], 'operationLinenProductId' => $operationLinenProduct['id'], 'linenProductId' => ':linenProductIds']) }}'
-function getLinenProductWithId(id){
-    return linenProducts.find(linenProduct => linenProduct.id == id)
-}
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof jQuery === 'undefined') return;
+    
+    var linenProducts = {!! $linenProductJson !!};
+    var submitUrl = '{{ route('worker.operation.iron.set-select-linen-product', ['operationId' => $operation['id'], 'operationLinenProductId' => $operationLinenProduct['id'], 'linenProductId' => ':linenProductIds']) }}'
 
-$(function(){
+    $(function(){
+        function submit(){
+            var selectCheckbox = $('.btn-check:checkbox:checked').map(function() {
+                return this.value;
+            }).get();
 
-    function submit(){
-        var selectCheckbox = $('.btn-check:checkbox:checked').map(function() {
-            return this.value;
-        }).get();
+            var selectedLinenProducts = selectCheckbox.map(function(element){
+                var product = linenProducts.find(linenProduct => linenProduct.id == element);
+                return product ? product.name : '';
+            }).join(', ');
 
-        var selectedLinenProducts = selectCheckbox.map(function(element){
-            return linenProducts.find(linenProduct => linenProduct.id == element).name
-        })
+            if (!selectCheckbox || selectCheckbox.length === 0) {
+                // Remove required selection alert if user unchecks everything (just return)
+                // But original code alerted "Please select 1".
+                // We'll keep original behavior if that's desired, but clicking to uncheck might be annoying if it alerts.
+                // Original: Swal.fire('กรุณาเลือก 1 อย่าง', '', 'error')
+                return; 
+            }
 
-        if (!selectCheckbox || selectCheckbox.length === 0) {
-            Swal.fire('กรุณาเลือก 1 อย่าง', '', 'error')
-            return
+            Swal.fire({
+                title: `ยืนยันพนักงานเลือก: ${selectedLinenProducts}`,
+                showDenyButton: true,
+                showCancelButton: false,
+                confirmButtonText: 'ยืนยัน',
+                denyButtonText: `ยกเลิก`,
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    submitUrl = submitUrl.replace(':linenProductIds', selectCheckbox);
+                    window.location = submitUrl
+                } else if (result.isDenied) {
+                    // Uncheck if denied? Or just leave it.
+                    // Leaving it allows user to uncheck manually.
+                }
+            })
         }
 
-        Swal.fire({
-            title: `ยืนยันที่จะเลือก ${selectedLinenProducts}`,
-            showDenyButton: true,
-            showCancelButton: false,
-            confirmButtonText: 'ยืนยัน',
-            denyButtonText: `ยกเลิก`,
-            }).then((result) => {
-            if (result.isConfirmed) {
-                //Swal.fire('Saved!', '', 'success')
-                submitUrl = submitUrl.replace(':linenProductIds', selectCheckbox);
-                window.location = submitUrl
-            } else if (result.isDenied) {
-                //Swal.fire('Changes are not saved', '', 'info')
+        // Trigger submit ONLY when a checkbox is CHECKED (not unchecked)?
+        // Original: click -> submit().
+        // If I click to check -> submit() -> confirm -> go.
+        // If I click to uncheck -> submit() -> (if empty) alert error.
+        $(".btn-check").change(function(){
+            // Use change event instead of click for better reliability with hidden inputs
+            if(this.checked) {
+                submit();
             }
-        })
-    }
-
-    $('.submit').click(function(){
-        submit();
+        });
     })
-
-    $(".btn-check").click(function(){
-        submit();
-    })
-})
+});
 </script>
+@endpush
 @endsection

@@ -18,22 +18,15 @@ Route::get('/', function () {
     return redirect('home');
 });
 
-Route::get('/test', function () {
-
-    $inputName = 'weight';
-    $inputValue = 12.45;
-
-    return view('test', ['inputName' => $inputName, 'inputValue' => $inputValue]);
-});
-
-Route::get('/landing', function () {
-    return view('landing');
-});
-
 // LINE OA User Guide - Public page
 Route::get('/line-oa-use-case', function () {
     return view('line-oa-guide');
 })->name('line-oa-guide');
+
+// UI Components Showcase - For testing Tailwind components
+Route::get('/components-showcase', function () {
+    return view('components-showcase');
+})->name('components-showcase')->middleware('auth');
 
 Auth::routes(['register' => false]);
 
@@ -58,12 +51,11 @@ Route::group(['middleware' => ['admin']], function () {
     Route::resource('washing-machines', App\Http\Controllers\WashingMachineController::class);
     Route::match(array('GET', 'POST'), 'dryer-machines/{id}/create-note', [App\Http\Controllers\DryerMachineController::class, 'createNote'])->name('dryer-machines.create-note');
     Route::resource('dryer-machines', App\Http\Controllers\DryerMachineController::class);
-    Route::resource('inventories', App\Http\Controllers\InventoryController::class);
 
     Route::match(array('GET', 'POST'), 'trucks/{id}/create-note', [App\Http\Controllers\TruckController::class, 'createNote'])->name('trucks.create-note');
     Route::resource('trucks', App\Http\Controllers\TruckController::class);
 
-    Route::resource('notes', App\Http\Controllers\NoteController::class);
+
 });
 
 Route::group(['prefix' => 'manager', 'middleware' => ['manager']], function () {
@@ -267,7 +259,7 @@ Route::group(['prefix' => 'worker', 'middleware' => ['worker']], function () {
         Route::match(array('GET', 'POST'), '/log/{energyResourceLogId}/chemical', [App\Http\Controllers\Worker\EnergyResourceLogController::class, 'submitChemicalLog'])->name('worker.energy-resource.log.submit-chemical');
         Route::get('/logs', [App\Http\Controllers\Worker\EnergyResourceLogController::class, 'getLogs'])->name('worker.energy-resource.logs');
         Route::post('/logs/{energyResourceLogId}/delete', [App\Http\Controllers\Worker\EnergyResourceLogController::class, 'deleteLog'])->name('worker.energy-resource.logs.delete');
-        Route::get('/summary/{energyResourceVarName}', [App\Http\Controllers\Worker\EnergyResourceController::class, 'getSummary'])->name('worker.energy-resource.summary');
+
     });
 
     Route::group(['prefix' => 'employee'], function () {

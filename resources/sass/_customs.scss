@@ -58,3 +58,62 @@ a:active {
     top: 6px !important;
     font-size: 24px;
 }
+
+/* Fix Bootstrap's .border class - Remove !important to allow Tailwind override */
+.border {
+    border: 1px solid #dee2e6; /* Remove !important so Tailwind can override */
+}
+
+/* Dark Mode Overrides - Fix Bootstrap !important conflicts */
+.dark {
+    /* Input borders in dark mode */
+    input.border-gray-300,
+    textarea.border-gray-300,
+    select.border-gray-300 {
+        border-color: rgb(75 85 99) !important; /* gray-600 */
+    }
+    
+    /* Card borders in dark mode */
+    .border-white\/20 {
+        border-color: rgba(55, 65, 81, 0.2) !important; /* gray-700/20 */
+    }
+    
+    .border-gray-700\/20 {
+        border-color: rgba(55, 65, 81, 0.2) !important; /* gray-700/20 */
+    }
+    
+    /* Divider borders */
+    .border-gray-300 {
+        border-color: rgb(75 85 99) !important; /* gray-600 */
+    }
+    
+    /* General border color override */
+    [class*="dark:border-gray-600"] {
+        border-color: rgb(75 85 99) !important;
+    }
+    
+    [class*="dark:border-gray-700"] {
+        border-color: rgb(55 65 81) !important;
+    }
+}
+
+/* Global Responsive Container - Mobile-First (Override Bootstrap) */
+.container {
+    width: 100% !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    padding-left: 0 !important;      /* Mobile: no padding */
+    padding-right: 0 !important;
+    max-width: 100% !important;
+    
+    @media (min-width: 640px) {
+        padding-left: 1rem !important;   /* sm: 16px */
+        padding-right: 1rem !important;
+    }
+    
+    @media (min-width: 1024px) {
+        padding-left: 1.5rem !important; /* lg: 24px */
+        padding-right: 1.5rem !important;
+        max-width: 1280px !important;    /* max-w-7xl */
+    }
+}

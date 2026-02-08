@@ -1,37 +1,40 @@
 @extends('layouts.worker')
 
 @section('content')
-
-<div class="container">
-    <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ route('worker') }}">Worker</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.product') }}">สินค้า</a></li>
-            <li class="breadcrumb-item active" aria-current="page">เลือกเคสงาน</li>
-        </ol>
-    </nav>
-    <div class="row justify-content-center">
-        <div class="col-md-12 m-2">
-            <div class="card">
-                <div class="card-header">เคสงาน</div>
-                <div class="card-body">
-                    <div class="row g-2">
-                        @foreach ($operationLinenCases as $operationLinenCase )
-                        <div class="col-sm-6">
-                            <a href="{{ route('worker.product.get-operations-by-linen-case', ['linenCase' => $operationLinenCase['var']]) }}">
-                                <div class="p-3 border {{ $operationLinenCase['bg_css_class'] }}" style="min-height: 150px">
-                                    <div class="rounded-3 d-flex align-items-center justify-content-center">
-                                        <div class="bi {{ $operationLinenCase['icon'] }} {{ $operationLinenCase['text_css_class'] }}" style="font-size: 3em"></div>
-                                    </div>
-                                    <div class="text-center {{ $operationLinenCase['text_css_class'] }}">{{ $operationLinenCase['name'] }}</div>
-                                </div>
-                            </a>
-                        </div>
-                        @endforeach
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+<x-worker.page 
+    title="{{ __('เคสงาน') }}"
+    subtitle="เลือกประเภทเคสงานที่ต้องการดู"
+    icon="fa-layer-group"
+    :breadcrumbs="[
+        ['label' => 'สินค้า', 'route' => route('worker.product')]
+    ]"
+>
+    @php
+        $gradientMap = [
+            'bg-primary' => 'from-blue-500 to-blue-700',
+            'bg-success' => 'from-green-500 to-green-700',
+            'bg-warning' => 'from-yellow-500 to-orange-500',
+            'bg-danger' => 'from-red-500 to-red-700',
+            'bg-info' => 'from-cyan-500 to-cyan-700',
+            'bg-secondary' => 'from-gray-500 to-gray-700',
+            'bg-dark' => 'from-gray-700 to-gray-900',
+            'bg-light' => 'from-slate-400 to-slate-600',
+        ];
+    @endphp
+    
+    <x-menu.grid :columns="2">
+        @foreach ($operationLinenCases as $operationLinenCase)
+        @php
+            $gradient = $gradientMap[$operationLinenCase['bg_css_class']] ?? 'from-blue-500 to-blue-700';
+        @endphp
+        <x-menu.card 
+            href="{{ route('worker.product.get-operations-by-linen-case', ['linenCase' => $operationLinenCase['var']]) }}"
+            icon="bi {{ $operationLinenCase['icon'] }}"
+            title="{{ $operationLinenCase['name'] }}"
+            subtitle="Linen Case"
+            gradient="{{ $gradient }}"
+        />
+        @endforeach
+    </x-menu.grid>
+</x-worker.page>
 @endsection

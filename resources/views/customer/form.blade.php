@@ -1,26 +1,22 @@
-<div class="box box-info padding-1">
-    <div class="box-body">
-        
-        <div class="form-group">
-            {{ Form::label('name') }}
-            {{ Form::text('name', $customer->name, ['class' => 'form-control' . ($errors->has('name') ? ' is-invalid' : ''), 'placeholder' => 'Name']) }}
-            {!! $errors->first('name', '<div class="invalid-feedback">:message</div>') !!}
-        </div>
-        <div class="form-group">
-            {{ Form::label('customer_group_id') }}
-            <select name="customer_group_id" class="form-select">
-                <option value=""></option>
-            @foreach (App\Models\CustomerGroup::get() as $customerGroup)
-                <option value="{{ $customerGroup->id }}" @selected($customer->customer_group_id == $customerGroup->id)>
-                    {{ $customerGroup->name }}
-                </option>
-            @endforeach
-            </select>
-            {!! $errors->first('customer_group_id', '<div class="invalid-feedback">:message</div>') !!}
-        </div>
+<x-crud.form-group name="name" label="Name" type="text" :value="$customer->name ?? old('name')" placeholder="Enter Name" />
+@php
+    $customerGroupOptions = [];
+    foreach (\App\Models\CustomerGroup::get() as $customerGroup) {
+        $customerGroupOptions[$customerGroup->id] = $customerGroup->name;
+    }
+@endphp
+<x-crud.form-group 
+    name="customer_group_id" 
+    label="Customer Group" 
+    type="select" 
+    :value="$customer->customer_group_id ?? old('customer_group_id')" 
+    placeholder="เลือก"
+    :options="$customerGroupOptions" 
+/>
 
-    </div>
-    <div class="box-footer mt-4">
-        <button type="submit" class="btn btn-primary">Submit</button>
-    </div>
+<div class="flex items-center justify-end gap-3 mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+    <x-ui.button type="submit" variant="primary" icon="fa fa-save">
+        {{ isset($customer->id) ? 'Update' : 'Create' }} Customer
+    </x-ui.button>
+    <x-ui.button :href="route('customers.index')" variant="secondary" icon="fa fa-times">Cancel</x-ui.button>
 </div>

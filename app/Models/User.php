@@ -43,7 +43,8 @@ class User extends Authenticatable
     'is_can_access_manager',
     'is_can_access_supervisor',
     'is_can_access_customer',
-    'is_can_access_worker'
+    'is_can_access_worker',
+    'line_user_id'
   ];
 
   static $onCreateRules = [
@@ -51,11 +52,13 @@ class User extends Authenticatable
     'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
     'password' => ['required', 'string', 'min:8'],
     'role' => 'required',
+    'line_user_id' => ['nullable', 'string', 'max:255', 'unique:users'],
   ];
 
   static $onUpdateRules = [
     'name' => ['required', 'string', 'max:255'],
     'role' => 'required',
+    'line_user_id' => ['nullable', 'string', 'max:255'],
   ];
 
   /**

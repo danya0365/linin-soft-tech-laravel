@@ -1,37 +1,24 @@
 @extends('layouts.app')
-
 @section('template_title')
-    {{ $customer->name ?? 'Show Customer' }}
+    Show Customer
 @endsection
-
 @section('content')
-    <section class="content container">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="card-header">
-                        <div class="float-left">
-                            <span class="card-title">Show Customer</span>
-                        </div>
-                        <div class="float-right">
-                            <a class="btn btn-primary" href="{{ route('customers.index') }}"> Back</a>
-                        </div>
-                    </div>
-
-                    <div class="card-body">
-                        
-                        <div class="form-group">
-                            <strong>Name:</strong>
-                            {{ $customer->name }}
-                        </div>
-                        <div class="form-group">
-                            <strong>Customer Group:</strong>
-                            {{ $customer->customerGroup ? $customer->customerGroup->name : '-' }}
-                        </div>
-
-                    </div>
+<div class="container mx-auto px-4 py-6 max-w-4xl">
+    <x-crud.breadcrumb :items="[['label' => 'Admin', 'route' => 'admin'],['label' => 'Customer', 'route' => 'customers.index'],['label' => 'Details']]" />
+    <x-ui.card>
+        <x-slot:header>
+            <div class="flex items-center justify-between">
+                <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Customer Details</h2>
+                <div class="flex items-center gap-2">
+                    <x-ui.button :href="route('customers.edit', $customer->id)" variant="success" size="sm" icon="fa fa-edit">Edit</x-ui.button>
+                    <x-ui.button :href="route('customers.index')" variant="secondary" size="sm" icon="fa fa-arrow-left">Back</x-ui.button>
                 </div>
             </div>
+        </x-slot:header>
+        <div class="grid md:grid-cols-2 gap-6">
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Name</p><p class="font-semibold text-gray-900 dark:text-white">{{ $customer->name ?? '-' }}</p></div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Customer Group</p><p class="font-semibold text-gray-900 dark:text-white">{{ $customer->customerGroup ? $customer->customerGroup->name : '-' }}</p></div>
         </div>
-    </section>
+    </x-ui.card>
+</div>
 @endsection
