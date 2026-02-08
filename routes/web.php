@@ -18,18 +18,6 @@ Route::get('/', function () {
     return redirect('home');
 });
 
-Route::get('/test', function () {
-
-    $inputName = 'weight';
-    $inputValue = 12.45;
-
-    return view('test', ['inputName' => $inputName, 'inputValue' => $inputValue]);
-});
-
-Route::get('/landing', function () {
-    return view('landing');
-});
-
 // LINE OA User Guide - Public page
 Route::get('/line-oa-use-case', function () {
     return view('line-oa-guide');
