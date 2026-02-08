@@ -1,9 +1,6 @@
 @extends('layouts.app')
 
 @section('content')
-@extends('layouts.app')
-
-@section('content')
 <div class="min-h-[80vh] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-md w-full">
         {{-- Logo --}}
@@ -70,5 +67,4 @@
         </div>
     </div>
 </div>
-@endsection
 @endsection
