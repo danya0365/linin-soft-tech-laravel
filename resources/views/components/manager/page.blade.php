@@ -8,7 +8,6 @@
     'breadcrumbs' => [] // Array of ['label' => '...', 'route' => '...'] or ['label' => '...'] for active item
 ])
 
-<div class="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-gray-900 dark:to-gray-800">
     <div class="container">
         {{-- Breadcrumb Navigation --}}
         @if(count($breadcrumbs) > 0)
@@ -61,4 +60,3 @@
         {{-- Page Content --}}
         {{ $slot }}
     </div>
-</div>
