@@ -141,6 +141,10 @@ class LineChatbotController extends Controller
      */
     protected function handleRegistration(string $replyToken, string $userId, string $text): void
     {
+        // Clean format: Normalize whitespace (incl. newlines) to single space
+        // แก้ปัญหา User พิมพ์เว้นบรรทัด หรือมีช่องว่างเกิน
+        $text = preg_replace('/\s+/u', ' ', trim($text));
+        
         $parts = explode(' ', $text);
         $email = $parts[1] ?? '';
 
