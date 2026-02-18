@@ -98,20 +98,6 @@
                             </div>
                         @endif
                     </div>
-                    
-                    <form action="{{ route('notes.destroy', $note->id) }}" method="POST" class="ml-4">
-                        @csrf
-                        @method('DELETE')
-                        <x-ui.button 
-                            type="submit"
-                            variant="danger"
-                            size="sm"
-                            icon="fa fa-trash"
-                            onclick="return confirm('Are you sure you want to delete this note?')"
-                        >
-                            Delete
-                        </x-ui.button>
-                    </form>
                 </div>
                 
                 <p class="text-gray-700 dark:text-gray-300 mb-3">{{ $note->message }}</p>
