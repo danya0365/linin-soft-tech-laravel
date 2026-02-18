@@ -3,7 +3,7 @@
     Show Truck
 @endsection
 @section('content')
-<div class="container mx-auto px-4 py-6 max-w-4xl">
+<div class="container mx-auto px-4 py-6 max-w-4xl space-y-6">
     <x-crud.breadcrumb :items="[['label' => 'Admin', 'route' => route('admin')],['label' => 'Truck', 'route' => route('trucks.index')],['label' => 'Details']]" />
     <x-ui.card>
         <x-slot:header>
