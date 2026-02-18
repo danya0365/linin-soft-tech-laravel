@@ -48,7 +48,21 @@ class DryerMachineController extends Controller
     {
         request()->validate(DryerMachine::$rules);
 
-        $dryerMachine = DryerMachine::create($request->all());
+        $data = $request->all();
+
+        if ($request->hasFile('photo')) {
+            if ($request->file('photo')->isValid()) {
+                $file = $request->file('photo');
+                $extension = $file->extension();
+                $fileName = 'dryer_' . time() . '.' . $extension;
+                $date = \Carbon\Carbon::now()->format('Y-m-d');
+                $storeDir = "$date";
+                $path = $file->storeAs('images/' . $storeDir, $fileName, 'public');
+                $data['photo'] = 'storage/' . $path;
+            }
+        }
+
+        $dryerMachine = DryerMachine::create($data);
 
         return redirect()->route('dryer-machines.index')
             ->with('success', 'DryerMachine created successfully.');
@@ -104,7 +118,21 @@ class DryerMachineController extends Controller
     {
         request()->validate(DryerMachine::$rules);
 
-        $dryerMachine->update($request->all());
+        $data = $request->all();
+
+        if ($request->hasFile('photo')) {
+            if ($request->file('photo')->isValid()) {
+                $file = $request->file('photo');
+                $extension = $file->extension();
+                $fileName = 'dryer_' . time() . '.' . $extension;
+                $date = \Carbon\Carbon::now()->format('Y-m-d');
+                $storeDir = "$date";
+                $path = $file->storeAs('images/' . $storeDir, $fileName, 'public');
+                $data['photo'] = 'storage/' . $path;
+            }
+        }
+
+        $dryerMachine->update($data);
 
         return redirect()->route('dryer-machines.index')
             ->with('success', 'DryerMachine updated successfully');

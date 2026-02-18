@@ -25,7 +25,16 @@
         </x-slot:header>
         <div class="grid md:grid-cols-2 gap-6">
             <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Name</p><p class="font-semibold text-gray-900 dark:text-white">{{ $dryerMachine->name ?? '-' }}</p></div>
-            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Photo</p><p class="font-semibold text-gray-900 dark:text-white">{{ $dryerMachine->photo ?? '-' }}</p></div>
+            <div>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Photo</p>
+                <div class="mt-1">
+                    @if($dryerMachine->photo)
+                        <img src="{{ asset($dryerMachine->photo) }}" alt="{{ $dryerMachine->name }}" class="max-w-xs rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
+                    @else
+                        <span class="text-gray-400 dark:text-gray-500 italic">No photo available</span>
+                    @endif
+                </div>
+            </div>
             <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Maximum Weight</p><p class="font-semibold text-gray-900 dark:text-white">{{ $dryerMachine->maximum_weight ?? '-' }}</p></div>
         </div>
     </x-ui.card>
