@@ -9,9 +9,9 @@
     
     {{-- Breadcrumb --}}
     <x-crud.breadcrumb :items="[
-        ['label' => 'Admin', 'route' => 'admin'],
-        ['label' => 'Washing Machines', 'route' => 'washing-machines.index'],
-        ['label' => $washingMachine->name],
+        ['label' => 'Admin', 'route' => route('admin')],
+        ['label' => 'Washing Machines', 'route' => route('washing-machines.index')],
+        ['label' => $washingMachine->name, 'route' => route('washing-machines.show', $washingMachine->id)],
         ['label' => 'Add Note']
     ]" />
     

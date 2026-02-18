@@ -9,9 +9,9 @@
     
     {{-- Breadcrumb --}}
     <x-crud.breadcrumb :items="[
-        ['label' => 'Admin', 'route' => 'admin'],
-        ['label' => 'Dryer Machines', 'route' => 'dryer-machines.index'],
-        ['label' => $dryerMachine->name ?? '-', 'route' => 'dryer-machines.show', 'params' => $dryerMachine->id],
+        ['label' => 'Admin', 'route' => route('admin')],
+        ['label' => 'Dryer Machines', 'route' => route('dryer-machines.index')],
+        ['label' => $dryerMachine->name ?? '-', 'route' => route('dryer-machines.show', $dryerMachine->id)],
         ['label' => 'Add Note']
     ]" />
     

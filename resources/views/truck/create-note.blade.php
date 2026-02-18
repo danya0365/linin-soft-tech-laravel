@@ -9,9 +9,9 @@
     
     {{-- Breadcrumb --}}
     <x-crud.breadcrumb :items="[
-        ['label' => 'Admin', 'route' => 'admin'],
-        ['label' => 'Trucks', 'route' => 'trucks.index'],
-        ['label' => $truck->name, 'route' => 'trucks.show', 'params' => $truck->id],
+        ['label' => 'Admin', 'route' => route('admin')],
+        ['label' => 'Trucks', 'route' => route('trucks.index')],
+        ['label' => $truck->name, 'route' => route('trucks.show', $truck->id)],
         ['label' => 'Add Note']
     ]" />
     

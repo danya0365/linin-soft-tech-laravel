@@ -4,7 +4,7 @@
 @endsection
 @section('content')
 <div class="container mx-auto px-4 py-6 max-w-4xl">
-    <x-crud.breadcrumb :items="[['label' => 'Admin', 'route' => 'admin'],['label' => 'Truck', 'route' => 'trucks.index'],['label' => 'Details']]" />
+    <x-crud.breadcrumb :items="[['label' => 'Admin', 'route' => route('admin')],['label' => 'Truck', 'route' => route('trucks.index')],['label' => 'Details']]" />
     <x-ui.card>
         <x-slot:header>
             <div class="flex items-center justify-between">
