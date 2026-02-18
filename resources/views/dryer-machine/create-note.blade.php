@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('template_title')
-    Create Note
+    Create Note 1
 @endsection
 
 @section('content')
@@ -11,7 +11,7 @@
     <x-crud.breadcrumb :items="[
         ['label' => 'Admin', 'route' => 'admin'],
         ['label' => 'Dryer Machines', 'route' => 'dryer-machines.index'],
-        ['label' => $dryerMachine->name, 'route' => 'dryer-machines.show', 'params' => $dryerMachine->id],
+        ['label' => $dryerMachine->name ?? '-', 'route' => 'dryer-machines.show', 'params' => $dryerMachine->id],
         ['label' => 'Add Note']
     ]" />
     
