@@ -4,7 +4,7 @@
 @endsection
 @section('content')
 <div class="container mx-auto px-4 py-6 max-w-7xl">
-    <x-crud.breadcrumb :items="[['label' => 'Admin', 'route' => 'admin'],['label' => 'Dryer Machine']]" />
+    <x-crud.breadcrumb :items="[['label' => 'Admin', 'route' => route('admin')],['label' => 'Dryer Machine']]" />
     <x-ui.card>
         <x-slot:header>
             <x-crud.page-header title="Dryer Machine" :createRoute="route('dryer-machines.create')" />
@@ -38,7 +38,13 @@
                                         </div>
                                         <div class="mb-2">
                                             <span class="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">Photo:</span>
-                                            <span class="ml-2 text-sm text-gray-900 dark:text-gray-100">{{ $dryerMachine->photo ?? '-' }}</span>
+                                            <div class="mt-1">
+                                                @if($dryerMachine->photo)
+                                                    <img src="{{ asset($dryerMachine->photo) }}" alt="{{ $dryerMachine->name }}" class="h-16 w-16 object-cover rounded-md border border-gray-200 dark:border-gray-700">
+                                                @else
+                                                    <span class="text-sm text-gray-400 dark:text-gray-500 italic">No photo</span>
+                                                @endif
+                                            </div>
                                         </div>
                                         <div class="mb-2">
                                             <span class="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">Maximum Weight:</span>

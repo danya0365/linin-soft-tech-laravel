@@ -48,7 +48,21 @@ class WashingMachineController extends Controller
     {
         request()->validate(WashingMachine::$rules);
 
-        $washingMachine = WashingMachine::create($request->all());
+        $data = $request->all();
+
+        if ($request->hasFile('photo')) {
+            if ($request->file('photo')->isValid()) {
+                $file = $request->file('photo');
+                $extension = $file->extension();
+                $fileName = 'washing_' . time() . '.' . $extension;
+                $date = \Carbon\Carbon::now()->format('Y-m-d');
+                $storeDir = "$date";
+                $path = $file->storeAs('images/' . $storeDir, $fileName, 'public');
+                $data['photo'] = 'storage/' . $path;
+            }
+        }
+
+        $washingMachine = WashingMachine::create($data);
 
         return redirect()->route('washing-machines.index')
             ->with('success', 'WashingMachine created successfully.');
@@ -104,7 +118,21 @@ class WashingMachineController extends Controller
     {
         request()->validate(WashingMachine::$rules);
 
-        $washingMachine->update($request->all());
+        $data = $request->all();
+
+        if ($request->hasFile('photo')) {
+            if ($request->file('photo')->isValid()) {
+                $file = $request->file('photo');
+                $extension = $file->extension();
+                $fileName = 'washing_' . time() . '.' . $extension;
+                $date = \Carbon\Carbon::now()->format('Y-m-d');
+                $storeDir = "$date";
+                $path = $file->storeAs('images/' . $storeDir, $fileName, 'public');
+                $data['photo'] = 'storage/' . $path;
+            }
+        }
+
+        $washingMachine->update($data);
 
         return redirect()->route('washing-machines.index')
             ->with('success', 'WashingMachine updated successfully');

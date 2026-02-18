@@ -48,7 +48,21 @@ class TruckController extends Controller
     {
         request()->validate(Truck::$rules);
 
-        $truck = Truck::create($request->all());
+        $data = $request->all();
+
+        if ($request->hasFile('photo')) {
+            if ($request->file('photo')->isValid()) {
+                $file = $request->file('photo');
+                $extension = $file->extension();
+                $fileName = 'truck_' . time() . '.' . $extension;
+                $date = \Carbon\Carbon::now()->format('Y-m-d');
+                $storeDir = "$date";
+                $path = $file->storeAs('images/' . $storeDir, $fileName, 'public');
+                $data['photo'] = 'storage/' . $path;
+            }
+        }
+
+        $truck = Truck::create($data);
 
         return redirect()->route('trucks.index')
             ->with('success', 'Truck created successfully.');
@@ -104,7 +118,21 @@ class TruckController extends Controller
     {
         request()->validate(Truck::$rules);
 
-        $truck->update($request->all());
+        $data = $request->all();
+
+        if ($request->hasFile('photo')) {
+            if ($request->file('photo')->isValid()) {
+                $file = $request->file('photo');
+                $extension = $file->extension();
+                $fileName = 'truck_' . time() . '.' . $extension;
+                $date = \Carbon\Carbon::now()->format('Y-m-d');
+                $storeDir = "$date";
+                $path = $file->storeAs('images/' . $storeDir, $fileName, 'public');
+                $data['photo'] = 'storage/' . $path;
+            }
+        }
+
+        $truck->update($data);
 
         return redirect()->route('trucks.index')
             ->with('success', 'Truck updated successfully');

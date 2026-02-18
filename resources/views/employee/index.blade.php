@@ -4,7 +4,7 @@
 @endsection
 @section('content')
 <div class="container mx-auto px-4 py-6 max-w-7xl">
-    <x-crud.breadcrumb :items="[['label' => 'Admin', 'route' => 'admin'],['label' => 'Employee']]" />
+    <x-crud.breadcrumb :items="[['label' => 'Admin', 'route' => route('admin')],['label' => 'Employee']]" />
     <x-ui.card>
         <x-slot:header>
             <x-crud.page-header title="Employee" :createRoute="route('employees.create')" />
