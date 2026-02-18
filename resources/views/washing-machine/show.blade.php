@@ -10,6 +10,14 @@
             <div class="flex items-center justify-between">
                 <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Washing Machine Details</h2>
                 <div class="flex items-center gap-2">
+                    <x-ui.button 
+                        :href="route('washing-machines.create-note', ['id' => $washingMachine->id])"
+                        variant="primary"
+                        size="sm"
+                        icon="fa fa-plus"
+                    >
+                        Add Note
+                    </x-ui.button>
                     <x-ui.button :href="route('washing-machines.edit', $washingMachine->id)" variant="success" size="sm" icon="fa fa-edit">Edit</x-ui.button>
                     <x-ui.button :href="route('washing-machines.index')" variant="secondary" size="sm" icon="fa fa-arrow-left">Back</x-ui.button>
                 </div>
@@ -22,5 +30,13 @@
             <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Operation Id</p><p class="font-semibold text-gray-900 dark:text-white">{{ $washingMachine->operation_id ?? '-' }}</p></div>
         </div>
     </x-ui.card>
+    {{-- Notes Section --}}
+    <x-crud.notes-section 
+        :notes="$notes"
+        :tags="$machineTags"
+        :selectedTag="$selectedTag"
+        :model="$washingMachine"
+        resource="washing-machines"
+    />
 </div>
 @endsection
