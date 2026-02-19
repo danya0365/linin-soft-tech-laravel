@@ -3,7 +3,7 @@
 @section('content')
 <x-supervisor.page 
     title="{{ __('ประวัติบิลรายรับ') }}"
-    subtitle="Billing Logs" 
+    subtitle="Billing Logs 1" 
     icon="fa-history"
     :breadcrumbs="[
         ['label' => __('Customer'), 'route' => route('supervisor.customer')],
@@ -26,11 +26,15 @@
         :reset-url="request()->url()"
     >
         <div class="md:col-span-1">
-            <x-supervisor.select-filter 
+            <x-supervisor.select-group-filter 
                 name="customer_id" 
                 label="ลูกค้า" 
                 :options="$customerGroups" 
                 :selected="$customerIdSelected" 
+                group-label-key="name"
+                group-options-key="customers"
+                option-value-key="id"
+                option-label-key="name"
             />
         </div>
         <div class="md:col-span-1">
