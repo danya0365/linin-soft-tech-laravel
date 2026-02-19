@@ -46,7 +46,7 @@
 
         {{-- Table --}}
         <x-worker.data-table 
-            :headers="['วันที่', 'ประเภทงาน', 'สินค้า', 'สี', 'ลูกค้า', 'พนักงาน', 'ซัก (kg)', 'อบ (kg)', 'รีด (pc)', 'แพ็ค (pc)', 'เก็บ (kg)', 'เก็บ (pk)', 'ส่ง (pk)', 'เวลา']"
+            :headers="['วันที่', 'ประเภทงาน', 'สินค้า', 'สี', 'ลูกค้า', 'พนักงาน', 'รายละเอียด', 'เวลา']"
             :paginator="$operations"
         >
             @foreach ($operations as $operation)
@@ -58,34 +58,35 @@
                         </a>
                     </td>
                     <td class="px-4 py-3 text-sm text-gray-900 dark:text-gray-200">{{ $operation->linenProduct ? $operation->linenProduct->name : '-' }}</td>
-                    <td class="px-4 py-3 text-sm">
+                    <td class="px-4 py-3 text-sm text-gray-900 dark:text-gray-200">
                         <div class="flex items-center gap-2">
-                            <span class="w-4 h-4 rounded-full border border-gray-200 dark:border-gray-600 shadow-sm" style="background-color: {{ $operation->color }}"></span>
-                            <span class="text-gray-600 dark:text-gray-400">{{ $operation->color }}</span>
+                            <span class="w-4 h-4 rounded-full border border-gray-200 dark:border-gray-600 ring-1 ring-gray-100 dark:ring-gray-700 shadow-sm" style="background-color: {{ $operation->color }}"></span>
+                            <span class="font-medium">{{ $operation->color }}</span>
                         </div>
                     </td>
                     <td class="px-4 py-3 text-sm text-gray-900 dark:text-gray-200">{{ $operation->operation->customer ? $operation->operation->customer->name : '-' }}</td>
                     <td class="px-4 py-3 text-sm text-gray-900 dark:text-gray-200">{{ $operation->operation->employee ? $operation->operation->employee->name : '-' }}</td>
-                    <td class="px-4 py-3 text-sm text-center text-gray-900 dark:text-gray-200">
-                        <div>{{ $operation->wet_weight }}</div>
-                        @if($operation->operation->washing_machine_id)
-                        <div class="text-xs text-gray-500">#{{ $operation->operation->washing_machine_id }}</div>
+                    <td class="px-4 py-3 text-sm text-gray-900 dark:text-gray-200 text-left">
+                        @if ($operation->wet_weight)
+                            <div>ซัก: {{ number_format($operation->wet_weight, 2) }} kg (#{{ $operation->operation->washing_machine_id }})</div>
                         @endif
-                    </td>
-                    <td class="px-4 py-3 text-sm text-center text-gray-900 dark:text-gray-200">
-                        <div>{{ $operation->dry_weight }}</div>
-                        @if($operation->operation->dryer_machine_id)
-                        <div class="text-xs text-gray-500">#{{ $operation->operation->dryer_machine_id }}</div>
+                        @if ($operation->dry_weight)
+                            <div>อบ: {{ number_format($operation->dry_weight, 2) }} kg (#{{ $operation->operation->dryer_machine_id }})</div>
                         @endif
-                    </td>
-                    <td class="px-4 py-3 text-sm text-center text-gray-900 dark:text-gray-200">{{ $operation->iron_piece }}</td>
-                    <td class="px-4 py-3 text-sm text-center text-gray-900 dark:text-gray-200">{{ $operation->packing_piece }}</td>
-                    <td class="px-4 py-3 text-sm text-center text-gray-900 dark:text-gray-200">{{ $operation->collect_weight }}</td>
-                    <td class="px-4 py-3 text-sm text-center text-gray-900 dark:text-gray-200">{{ $operation->collect_pack }}</td>
-                    <td class="px-4 py-3 text-sm text-center text-gray-900 dark:text-gray-200">
-                        <div>{{ $operation->deliver_pack }}</div>
-                        @if($operation->operation->truck_id)
-                        <div class="text-xs text-gray-500">#{{ $operation->operation->truck_id }}</div>
+                        @if ($operation->iron_piece)
+                            <div>รีด: {{ number_format($operation->iron_piece) }} ชิ้น</div>
+                        @endif
+                        @if ($operation->packing_piece)
+                            <div>พับแพ็ค: {{ number_format($operation->packing_piece) }} ชิ้น</div>
+                        @endif
+                        @if ($operation->collect_weight)
+                            <div>จัดเก็บ: {{ number_format($operation->collect_weight, 2) }} kg</div>
+                        @endif
+                        @if ($operation->collect_pack)
+                            <div>จัดเก็บ: {{ number_format($operation->collect_pack) }} pack</div>
+                        @endif
+                        @if ($operation->deliver_pack)
+                            <div>ขนส่ง: {{ number_format($operation->deliver_pack) }} pack (#{{ $operation->operation->truck_id }})</div>
                         @endif
                     </td>
                     <td class="px-4 py-3 text-sm text-gray-900 dark:text-gray-200 whitespace-nowrap">{{ $operation->created_at->format('H:i') }}</td>
