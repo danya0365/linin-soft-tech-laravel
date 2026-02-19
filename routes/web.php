@@ -121,7 +121,7 @@ Route::group(['prefix' => 'worker', 'middleware' => ['worker']], function () {
     Route::group(['prefix' => 'customer'], function () {
         Route::get('/', [App\Http\Controllers\Worker\CustomerController::class, 'index'])->name('worker.customer');
         Route::get('/operation-summary', [App\Http\Controllers\Worker\CustomerController::class, 'getOperationSummary'])->name('worker.customer.operation-summary');
-        Route::get('/operations-group-by-customer', [App\Http\Controllers\Worker\CustomerController::class, 'getOperationsGroupByCustomer'])->name('worker.customer.get-operations-group-by-customer');
+
         Route::get('/operations-by-customer/{customerId}', [App\Http\Controllers\Worker\CustomerController::class, 'getOperationsByCustomer'])->name('worker.customer.get-operations-by-customer');
         Route::get('/new-billing/{customerId}', [App\Http\Controllers\Worker\CustomerController::class, 'getNewBilling'])->name('worker.customer.new-billing');
         Route::post('/submit-billing/{customerId}', [App\Http\Controllers\Worker\CustomerController::class, 'submitBilling'])->name('worker.customer.submit-billing');

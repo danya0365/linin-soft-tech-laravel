@@ -89,63 +89,7 @@ class CustomerController extends Controller
             ->with('i', (request()->input('page', 1) - 1) * $operations->perPage());
     }
 
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function getOperationsGroupByCustomer()
-    {
-        $sortOrders = [
-            ['var' => 'total_wet_weight-desc', 'name' => 'ผ้าเปียกเยอะที่สุด'],
-            ['var' => 'total_wet_weight-asc', 'name' => 'ผ้าเปียกน้อยที่สุด'],
-        ];
-        $sortOrderSelected = request()->get('sort_order', $sortOrders[0]['var']);
 
-        $query = OperationLinenProduct::with('operationCustomer')->select(
-            DB::raw('sum(wet_weight) as total_wet_weight'),
-            DB::raw('(SELECT sum(collect_weight) as total_collect_weight
-                        FROM operations_linen_products as op 
-                        JOIN operations as o ON o.id = op.operation_id 
-                        JOIN customers as c ON c.id = o.customer_id 
-                        WHERE o.customer_id = operations.customer_id AND op.linen_case = \'edit\' ) as total_edit_collect_weight'),
-            DB::raw('sum(collect_weight) as total_collect_weight'),
-            DB::raw('sum(operations.total_billing_weight) as total_billing_weight'),
-            'operations.customer_id'
-        )
-            ->join('operations', 'operations.id', '=', 'operation_id')
-            ->join('customers', 'customers.id', '=', 'operations.customer_id')
-            ->groupBy('operations.customer_id');
-
-        $query->where(function ($query) {
-            $query->whereHas('operation', function ($query) {
-                $query->where('status', OperationStatus::Close());
-            });
-        });
-
-        $dateStartAt = request()->get('date_start_at');
-        $dateEndAt = request()->get('date_end_at');
-        if ($dateStartAt && $dateEndAt) {
-            $query->whereBetween('operations_linen_products.created_at', [$dateStartAt . ' 00:00:00', $dateEndAt . ' 23:59:59']);
-        }
-        if ($sortOrderSelected) {
-            list($sort, $order) = explode('-', $sortOrderSelected);
-            $query->orderBy($sort, $order);
-        }
-
-        $operations = $query->paginate();
-        return view(
-            'worker.customers.get-operations-group-by-customer',
-            [
-                'operations' => $operations,
-                'dateStartAt' => $dateStartAt,
-                'dateEndAt' => $dateEndAt,
-                'sortOrders' => $sortOrders,
-                'sortOrderSelected' => $sortOrderSelected
-            ]
-        )
-            ->with('i', (request()->input('page', 1) - 1) * $operations->perPage());
-    }
 
     /**
      * Display a listing of the resource.

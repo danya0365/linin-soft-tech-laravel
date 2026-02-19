@@ -33,7 +33,7 @@ class AppServiceProvider extends ServiceProvider
      */
     private function setDefaultPaginationView()
     {
-        Paginator::defaultView('vendor/pagination/bootstrap-5');
-        Paginator::defaultSimpleView('vendor/pagination/simple-bootstrap-5');
+        Paginator::defaultView('vendor.pagination.tailwind');
+        Paginator::defaultSimpleView('vendor.pagination.simple-tailwind');
     }
 }

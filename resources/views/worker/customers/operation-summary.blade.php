@@ -15,7 +15,7 @@
             :action="route('worker.customer.operation-summary')"
             :date-start-at="$dateStartAt"
             :date-end-at="$dateEndAt"
-            :reset-url="route('worker.customer.get-operations-group-by-customer')"
+            :reset-url="route('worker.customer.operation-summary')"
         >
             <x-worker.select-filter 
                 name="sort_order"
