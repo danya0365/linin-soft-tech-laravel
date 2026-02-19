@@ -3,7 +3,7 @@
 @section('content')
 <x-supervisor.page 
     title="{{ __('ประวัติบิลรายรับ') }}"
-    subtitle="Billing Logs 1" 
+    subtitle="Billing Logs" 
     icon="fa-history"
     :breadcrumbs="[
         ['label' => __('Customer'), 'route' => route('supervisor.customer')],
@@ -48,16 +48,7 @@
         </div>
     </x-supervisor.date-filter>
 
-    {{-- Helper function for percent color --}}
-    @php
-        function getPercentColor($percent) {
-            if ($percent === '-') return '';
-            $val = floatval($percent);
-            if ($val > 20) return 'text-red-600 dark:text-red-400 font-bold';
-            if ($val > 15) return 'text-amber-600 dark:text-amber-400 font-bold';
-            return 'text-green-600 dark:text-green-400 font-bold';
-        }
-    @endphp
+
 
     {{-- Main Logs Table --}}
     <div class="mb-8">
@@ -68,12 +59,10 @@
                         <tr>
                             <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">วันที่บันทึก</th>
                             <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">ลูกค้า</th>
-                            <th scope="col" class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">น้ำหนัก (kg.)</th>
-                            <th scope="col" class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">เปียก (kg.)</th>
-                            <th scope="col" class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">แห้ง (kg.)</th>
-                            <th scope="col" class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">% หักลบ</th>
+                            <th scope="col" class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">น้ำหนัก</th>
+
                             <th scope="col" class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                แก้ไข (kg.) 
+                                แก้ไข (กรอกมือ) 
                                 <i class="fa fa-info-circle text-gray-400" title="ข้อมูลกรอกโดย Supervisor อาจไม่ตรงกับข้อมูล Operation จริง"></i>
                             </th>
                             <th scope="col" class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">% แก้ไข</th>
@@ -85,13 +74,8 @@
                     <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                         @foreach ($billingLogs as $billingLog)
                             @php
-                                $wetWeight = $billingLog->total_wet_weight ?? 0;
-                                $dryWeight = $billingLog->total_dry_weight ?? 0;
                                 $editWeight = $billingLog->total_edit_weight ?? 0;
-                                $billingWeight = $billingLog->total_billing_weight ?? 0;
-                                $diffPercent = ($wetWeight > 0 && $dryWeight > 0) 
-                                    ? round(($wetWeight - $dryWeight) / $wetWeight * 100, 2) 
-                                    : '-';
+                                $billingWeight = $billingLog->total_billing_weight ?? 0; 
                                 $editPercent = ($billingWeight > 0 && $editWeight > 0)
                                     ? round(($editWeight / $billingWeight) * 100, 2)
                                     : '-';
@@ -100,11 +84,7 @@
                                 <td class="px-4 py-4 text-sm text-gray-900 dark:text-gray-100">{{ $billingLog->created_at->format('Y-m-d') }}</td>
                                 <td class="px-4 py-4 text-sm text-gray-900 dark:text-gray-100">{{ $billingLog->customer->name ?? '-' }}</td>
                                 <td class="px-4 py-4 text-sm text-right text-gray-900 dark:text-gray-100 font-medium">{{ number_format($billingLog->total_billing_weight) }}</td>
-                                <td class="px-4 py-4 text-sm text-right text-gray-500 dark:text-gray-400">{{ $wetWeight ? number_format($wetWeight, 2) : '-' }}</td>
-                                <td class="px-4 py-4 text-sm text-right text-gray-500 dark:text-gray-400">{{ $dryWeight ? number_format($dryWeight, 2) : '-' }}</td>
-                                <td class="px-4 py-4 text-sm text-right {{ getPercentColor($diffPercent) }}">
-                                    {{ $diffPercent !== '-' ? $diffPercent . '%' : '-' }}
-                                </td>
+
                                 <td class="px-4 py-4 text-sm text-right text-gray-900 dark:text-gray-100">{{ $editWeight ? number_format($editWeight, 2) : '-' }}</td>
                                 <td class="px-4 py-4 text-sm text-right text-blue-500 dark:text-blue-400 font-medium">
                                     {{ $editPercent !== '-' ? $editPercent . '%' : '-' }}
