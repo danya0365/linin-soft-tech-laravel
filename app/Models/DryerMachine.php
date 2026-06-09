@@ -21,42 +21,46 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class DryerMachine extends Model
 {
-  use SoftDeletes;
-  use HasFactory;
+    use SoftDeletes;
+    use HasFactory;
 
-  static $rules = [
-    'name' => 'required',
-    'photo' => 'required',
-    'maximum_weight' => 'required',
-  ];
+    public static $rules = [
+      'name' => 'required',
+      'photo' => 'required',
+      'maximum_weight' => 'required',
+    ];
 
-  protected $perPage = 20;
+    protected $perPage = 20;
 
-  /**
-   * Attributes that should be mass-assignable.
-   *
-   * @var array
-   */
-  protected $fillable = ['name', 'photo', 'maximum_weight', 'service_status'];
+    /**
+     * Attributes that should be mass-assignable.
+     *
+     * @var array
+     */
+    protected $fillable = ['name', 'photo', 'maximum_weight', 'service_status'];
 
-  public function operation()
-  {
-    return $this->belongsTo(Operation::class);
-  }
+    public function operation()
+    {
+        return $this->belongsTo(Operation::class);
+    }
 
-  /**
-   * Convert the model instance to an array.
-   *
-   * @return array
-   */
-  public function toArray()
-  {
-    $array = parent::toArray();
+    /**
+     * Convert the model instance to an array.
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        $array = parent::toArray();
 
-    $array['status_text'] = (function ($jobId) {
-      return $jobId ? 'ไม่ว่าง' : 'พร้อมใช้งาน';
-    })($array['operation_id']);
+        if ($this->service_status === 'broken') {
+            $array['status_text'] = 'เสีย/ซ่อม';
+        } elseif ($this->operation_id) {
+            $array['status_text'] = 'กำลังใช้งาน';
+        } else {
+            $array['status_text'] = 'พร้อมใช้งาน';
+        }
 
-    return $array;
-  }
+        return $array;
+    }
 }

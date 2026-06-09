@@ -54,15 +54,14 @@ class DeliverController extends Controller
     {
         $operation = Operation::find($operationId);
         $truck = Truck::find($truckId);
-        if ($truck->operation_id && $truck->operation_id != $operation->id) {
-            return back()->with('error', 'กรุณาเลือกรถคันอื่น - Please select another truck.')->with('operation_id', $truck->operation_id);
-        }
 
         $prevTruckId = $operation->truck_id;
         $operation->truck_id = $truckId;
         $operation->save();
 
-        if ($prevTruckId) Truck::where('id', $prevTruckId)->update(['operation_id' => null]);
+        if ($prevTruckId) {
+            Truck::where('id', $prevTruckId)->update(['operation_id' => null]);
+        }
         Truck::where('id', $truckId)->update(['operation_id' => $operation->id]);
 
         return redirect(route('worker.operation.deliver.employee-summary', ['operationId' => $operation->id]));
@@ -86,7 +85,9 @@ class DeliverController extends Controller
         $operation->status = OperationStatus::Close();
         $operation->save();
 
-        if ($operation->truck_id) Truck::where('id', $operation->truck_id)->update(['operation_id' => null]);
+        if ($operation->truck_id) {
+            Truck::where('id', $operation->truck_id)->update(['operation_id' => null]);
+        }
         OperationManager::createCustomerOperationDailySummary($operation);
 
         EmployeeManager::createEmployeeOperationLog($operation->deliver_employee_id, WorkerOperationStatus::Deliver(), EmployeeOperationActionType::Stop());
@@ -99,7 +100,9 @@ class DeliverController extends Controller
         $operation->status = OperationStatus::InProgress();
         $operation->save();
 
-        if ($operation->truck_id) Truck::where('id', $operation->truck_id)->update(['operation_id' => null]);
+        if ($operation->truck_id) {
+            Truck::where('id', $operation->truck_id)->update(['operation_id' => null]);
+        }
         OperationManager::createCustomerOperationDailySummary($operation);
 
         EmployeeManager::createEmployeeOperationLog($operation->deliver_employee_id, WorkerOperationStatus::Deliver(), EmployeeOperationActionType::Progress());
@@ -120,7 +123,9 @@ class DeliverController extends Controller
 
             $operationLinenProducts = request()->get('operationLinenProducts');
             foreach ($operationLinenProducts as $operationLinenProductId => $value) {
-                if (!$value) continue;
+                if (!$value) {
+                    continue;
+                }
                 OperationLinenProduct::where('id', $operationLinenProductId)->update(
                     [
                         'deliver_pack' => $value,
