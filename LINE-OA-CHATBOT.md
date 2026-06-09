@@ -25,7 +25,7 @@
 
 ### 1. สร้าง LINE Official Account
 
-1. ไปที่ [LINE Business Center](https://account.line.biz/)
+1. ไปที่ [LINE Business Center](https://manager.line.biz/)
 2. คลิก **"สร้างบัญชี"** หรือ **"Create Account"**
 3. กรอกข้อมูล:
    - ชื่อบัญชี: `LinenSoftTech`

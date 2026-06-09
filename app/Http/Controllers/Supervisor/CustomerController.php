@@ -88,6 +88,7 @@ class CustomerController extends Controller
         $billingSums = (function () {
             $query = Operation::with('customer')->select(
                 DB::raw('sum(total_billing_weight) as total_billing_weight'),
+                DB::raw('sum(total_edit_weight) as total_edit_weight'),
                 DB::raw('sum(total_billing_payment) as total_billing_payment'),
                 'customer_id'
             )
