@@ -48,7 +48,21 @@ class WashingMachineController extends Controller
     {
         request()->validate(WashingMachine::$rules);
 
-        $washingMachine = WashingMachine::create($request->all());
+        $data = $request->all();
+
+        if ($request->hasFile('photo')) {
+            if ($request->file('photo')->isValid()) {
+                $file = $request->file('photo');
+                $extension = $file->extension();
+                $fileName = 'washing_' . time() . '.' . $extension;
+                $date = \Carbon\Carbon::now()->format('Y-m-d');
+                $storeDir = "$date";
+                $path = $file->storeAs('images/' . $storeDir, $fileName, 'public');
+                $data['photo'] = 'storage/' . $path;
+            }
+        }
+
+        $washingMachine = WashingMachine::create($data);
 
         return redirect()->route('washing-machines.index')
             ->with('success', 'WashingMachine created successfully.');
@@ -64,9 +78,20 @@ class WashingMachineController extends Controller
     {
         $washingMachine = WashingMachine::find($id);
 
-        $notes = Note::where('washing_machine_id', $id)->paginate();
+        $query = Note::where('washing_machine_id', $id);
+        
+        // Filter by tag if provided (search in JSON array)
+        $selectedTag = request('tag');
+        if ($selectedTag) {
+            $query->whereJsonContains('tags', $selectedTag);
+        }
+        
+        $notes = $query->orderBy('created_at', 'desc')->paginate();
+        
+        // Get tags specific to this washing machine (cached)
+        $machineTags = Note::getTagsForMachine('washing_machine', $id);
 
-        return view('washing-machine.show', compact('washingMachine', 'notes'));
+        return view('washing-machine.show', compact('washingMachine', 'notes', 'machineTags', 'selectedTag'));
     }
 
     /**
@@ -93,7 +118,21 @@ class WashingMachineController extends Controller
     {
         request()->validate(WashingMachine::$rules);
 
-        $washingMachine->update($request->all());
+        $data = $request->all();
+
+        if ($request->hasFile('photo')) {
+            if ($request->file('photo')->isValid()) {
+                $file = $request->file('photo');
+                $extension = $file->extension();
+                $fileName = 'washing_' . time() . '.' . $extension;
+                $date = \Carbon\Carbon::now()->format('Y-m-d');
+                $storeDir = "$date";
+                $path = $file->storeAs('images/' . $storeDir, $fileName, 'public');
+                $data['photo'] = 'storage/' . $path;
+            }
+        }
+
+        $washingMachine->update($data);
 
         return redirect()->route('washing-machines.index')
             ->with('success', 'WashingMachine updated successfully');
@@ -149,6 +188,15 @@ class WashingMachineController extends Controller
             $note->message = $post['message'];
             $note->image_url = $post['image_url'] ?? '';
             $note->cost = $post['cost'];
+            
+            // Process tags - convert comma-separated string to array
+            $tagsInput = $post['tags'] ?? '';
+            if (!empty($tagsInput)) {
+                $tagsArray = array_map('trim', explode(',', $tagsInput));
+                $tagsArray = array_filter($tagsArray); // Remove empty values
+                $note->tags = array_values(array_unique($tagsArray));
+            }
+            
             $note->washing_machine_id = $post['washing_machine_id'];
             if ($post['note_date']) {
                 $note->timestamps = false;
@@ -164,7 +212,8 @@ class WashingMachineController extends Controller
             return redirect()->route('washing-machines.show', $washingMachine)
                 ->with('success', 'Note created successfully');
         }
+        $existingTags = Note::getExistingTags();
 
-        return view('washing-machine.create-note', compact('washingMachine', 'note'));
+        return view('washing-machine.create-note', compact('washingMachine', 'note', 'existingTags'));
     }
 }

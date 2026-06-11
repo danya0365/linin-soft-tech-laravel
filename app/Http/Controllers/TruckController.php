@@ -48,7 +48,21 @@ class TruckController extends Controller
     {
         request()->validate(Truck::$rules);
 
-        $truck = Truck::create($request->all());
+        $data = $request->all();
+
+        if ($request->hasFile('photo')) {
+            if ($request->file('photo')->isValid()) {
+                $file = $request->file('photo');
+                $extension = $file->extension();
+                $fileName = 'truck_' . time() . '.' . $extension;
+                $date = \Carbon\Carbon::now()->format('Y-m-d');
+                $storeDir = "$date";
+                $path = $file->storeAs('images/' . $storeDir, $fileName, 'public');
+                $data['photo'] = 'storage/' . $path;
+            }
+        }
+
+        $truck = Truck::create($data);
 
         return redirect()->route('trucks.index')
             ->with('success', 'Truck created successfully.');
@@ -64,9 +78,20 @@ class TruckController extends Controller
     {
         $truck = Truck::find($id);
 
-        $notes = Note::where('truck_id', $id)->paginate();
+        $query = Note::where('truck_id', $id);
+        
+        // Filter by tag if provided (search in JSON array)
+        $selectedTag = request('tag');
+        if ($selectedTag) {
+            $query->whereJsonContains('tags', $selectedTag);
+        }
+        
+        $notes = $query->orderBy('created_at', 'desc')->paginate();
+        
+        // Get tags specific to this truck (cached)
+        $machineTags = Note::getTagsForMachine('truck', $id);
 
-        return view('truck.show', compact('truck', 'notes'));
+        return view('truck.show', compact('truck', 'notes', 'machineTags', 'selectedTag'));
     }
 
     /**
@@ -93,7 +118,21 @@ class TruckController extends Controller
     {
         request()->validate(Truck::$rules);
 
-        $truck->update($request->all());
+        $data = $request->all();
+
+        if ($request->hasFile('photo')) {
+            if ($request->file('photo')->isValid()) {
+                $file = $request->file('photo');
+                $extension = $file->extension();
+                $fileName = 'truck_' . time() . '.' . $extension;
+                $date = \Carbon\Carbon::now()->format('Y-m-d');
+                $storeDir = "$date";
+                $path = $file->storeAs('images/' . $storeDir, $fileName, 'public');
+                $data['photo'] = 'storage/' . $path;
+            }
+        }
+
+        $truck->update($data);
 
         return redirect()->route('trucks.index')
             ->with('success', 'Truck updated successfully');
@@ -149,6 +188,15 @@ class TruckController extends Controller
             $note->message = $post['message'];
             $note->image_url = $post['image_url'] ?? '';
             $note->cost = $post['cost'];
+            
+            // Process tags - convert comma-separated string to array
+            $tagsInput = $post['tags'] ?? '';
+            if (!empty($tagsInput)) {
+                $tagsArray = array_map('trim', explode(',', $tagsInput));
+                $tagsArray = array_filter($tagsArray);
+                $note->tags = array_values(array_unique($tagsArray));
+            }
+            
             $note->truck_id = $post['truck_id'];
             if ($post['note_date']) {
                 $note->timestamps = false;
@@ -164,7 +212,8 @@ class TruckController extends Controller
             return redirect()->route('trucks.show', $truck)
                 ->with('success', 'Note created successfully');
         }
+        $existingTags = Note::getExistingTags();
 
-        return view('truck.create-note', compact('truck', 'note'));
+        return view('truck.create-note', compact('truck', 'note', 'existingTags'));
     }
 }

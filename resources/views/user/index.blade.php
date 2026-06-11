@@ -1,95 +1,97 @@
 @extends('layouts.app')
-
 @section('template_title')
     User
 @endsection
-
 @section('content')
-    <div class="container">
-        <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
-            <ol class="breadcrumb">
-              <li class="breadcrumb-item"><a href="{{ route('admin') }}">{{ __('Admin') }}</a></li>
-              <li class="breadcrumb-item active" aria-current="page">{{ __('User') }}</li>
-            </ol>
-        </nav>
-        <div class="row">
-            <div class="col-sm-12">
-                <div class="card">
-                    <div class="card-header">
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-
-                            <span id="card_title">
-                                {{ __('User') }}
-                            </span>
-
-                             <div class="float-right">
-                                <a href="{{ route('users.create') }}" class="btn btn-primary btn-sm float-right"  data-placement="left">
-                                  {{ __('Create New') }}
-                                </a>
-                              </div>
-                        </div>
-                    </div>
-                    @if ($message = Session::get('success'))
-                        <div class="alert alert-success">
-                            {{ $message }}
-                        </div>
-                    @endif
-
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-striped table-hover">
-                                <thead class="thead">
-                                    <tr>
-                                        <th>No</th>
-                                        
-										<th>Name</th>
-										<th>Email</th>
-										<th>Role</th>
-
-                                        <th></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($users as $user)
-                                        <tr>
-                                            <td>{{ ++$i }}</td>
-                                            
-											<td>{{ $user->name }}</td>
-											<td>{{ $user->email }}</td>
-											<td>{{ $user->role }}</td>
-
-                                            <td>
-                                                @if ( (config('auth.super_admin_user_id') == $user->id && Auth::user()->id == $user->id) || config('auth.super_admin_user_id') != $user->id )
-                                                <form class="delete-form" action="{{ route('users.destroy', $user->id) }}" method="POST">
-                                                    <a class="btn btn-sm btn-primary " href="{{ route('users.show',$user->id) }}"><i class="fa fa-fw fa-eye"></i> Show</a>
-                                                    <a class="btn btn-sm btn-success" href="{{ route('users.edit',$user->id) }}"><i class="fa fa-fw fa-edit"></i> Edit</a>
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-danger btn-sm"><i class="fa fa-fw fa-trash"></i> Delete</button>
-                                                </form>
-                                                @else 
-                                                <i>ไม่สามารถแก้ไขได้</i>
-                                                @endif
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-                {!! $users->links() !!}
-            </div>
+<div class="container mx-auto px-4 py-6 max-w-7xl">
+    <x-crud.breadcrumb :items="[['label' => 'Admin', 'route' => route('admin')],['label' => 'User']]" />
+    <x-ui.card>
+        <x-slot:header>
+            <x-crud.page-header title="User" :createRoute="route('users.create')" />
+        </x-slot:header>
+        @if ($message = Session::get('success'))
+            <x-ui.alert variant="success" dismissible="true">{{ $message }}</x-ui.alert>
+        @endif
+        
+        <div class="overflow-x-auto rounded-lg shadow">
+            <table class="w-full text-sm text-left border-collapse bg-white dark:bg-gray-800">
+                <thead class="bg-gradient-to-r from-gray-100 to-gray-50 dark:from-gray-700 dark:to-gray-800 border-b-2 border-gray-300 dark:border-gray-600">
+                    <tr>
+                        <th class="px-6 py-4 text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider w-20 text-center">ID</th>
+                        <th class="px-6 py-4 text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Detail</th>
+                        <th class="px-6 py-4 text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider w-64 text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                    @forelse($users as $index => $user)
+                        <tr class="hover:bg-gradient-to-r hover:from-blue-50 hover:to-transparent dark:hover:from-gray-700/50 dark:hover:to-transparent transition-all duration-200">
+                            <td class="px-6 py-4 text-center">
+                                <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 text-sm font-semibold">
+                                    {{ $i + $index + 1 }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="space-y-1">
+                                        <div class="mb-2">
+                                            <span class="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">Name:</span>
+                                            <span class="ml-2 text-sm text-gray-900 dark:text-gray-100">{{ $user->name ?? '-' }}</span>
+                                        </div>
+                                        <div class="mb-2">
+                                            <span class="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">Email:</span>
+                                            <span class="ml-2 text-sm text-gray-900 dark:text-gray-100">{{ $user->email ?? '-' }}</span>
+                                        </div>
+                                        <div class="mb-2">
+                                            <span class="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">Line User ID:</span>
+                                            <span class="ml-2 text-sm text-gray-900 dark:text-gray-100">{{ $user->line_user_id ?? '-' }}</span>
+                                        </div>
+                                        <div class="mb-2">
+                                            <span class="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">Role:</span>
+                                            <span class="ml-2 text-sm text-gray-900 dark:text-gray-100">{{ $user->role ?? '-' }}</span>
+                                        </div>
+                                        <div class="mb-2">
+                                            <span class="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">Customer Account:</span>
+                                            <span class="ml-2 text-sm text-gray-900 dark:text-gray-100">{{ $user->customer_account ?? '-' }}</span>
+                                        </div>
+                                        <div class="mb-2">
+                                            <span class="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">Is Can Access Admin:</span>
+                                            <span class="ml-2 text-sm text-gray-900 dark:text-gray-100">{{ $user->is_can_access_admin ?? '-' }}</span>
+                                        </div>
+                                        <div class="mb-2">
+                                            <span class="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">Is Can Access Manager:</span>
+                                            <span class="ml-2 text-sm text-gray-900 dark:text-gray-100">{{ $user->is_can_access_manager ?? '-' }}</span>
+                                        </div>
+                                        <div class="mb-2">
+                                            <span class="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">Is Can Access Supervisor:</span>
+                                            <span class="ml-2 text-sm text-gray-900 dark:text-gray-100">{{ $user->is_can_access_supervisor ?? '-' }}</span>
+                                        </div>
+                                        <div class="mb-2">
+                                            <span class="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">Is Can Access Customer:</span>
+                                            <span class="ml-2 text-sm text-gray-900 dark:text-gray-100">{{ $user->is_can_access_customer ?? '-' }}</span>
+                                        </div>
+                                        <div class="mb-2">
+                                            <span class="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">Is Can Access Worker:</span>
+                                            <span class="ml-2 text-sm text-gray-900 dark:text-gray-100">{{ $user->is_can_access_worker ?? '-' }}</span>
+                                        </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <x-crud.action-buttons :model="$user" resource="users" />
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="3" class="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
+                                <div class="flex flex-col items-center gap-2">
+                                    <i class="fa fa-inbox text-4xl text-gray-300 dark:text-gray-600"></i>
+                                    <p>No User available</p>
+                                </div>
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
-    </div>
-<script>
-    $(function(){
-        $('.delete-form').on('submit', function(e){
-            if (!confirm("Are you sure?")) {
-                return false;
-            }
-            return true
-        })
-    });
-</script>
+    </x-ui.card>
+    <div class="mt-6">{{ $users->links() }}</div>
+</div>
 @endsection

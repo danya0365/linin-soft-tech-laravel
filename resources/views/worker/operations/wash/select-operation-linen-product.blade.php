@@ -1,50 +1,73 @@
 @extends('layouts.worker')
 
 @section('content')
-
-<div class="container">
-    <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ route('worker') }}">Worker</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.operation') }}">ปฏิบัติการ</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.operation.wash.select-employee') }}">พนักงาน: {{ $operation['employee']['name'] }}</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.operation.wash.select-customer', ['operationId' => $operation['id']]) }}">ลูกค้า: {{ $operation['customer']['name'] }}</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.operation.wash.select-washing-machine', ['operationId' => $operation['id']]) }}">{{ $operation['washing_machine']['name'] }}</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.operation.wash.employee-summary', ['operationId' => $operation['id']]) }}">สรุปข้อมูลการซัก</a></li>
-            <li class="breadcrumb-item active" aria-current="page">ซัก - เลือกที่จะแก้ไขหรือลบ</li>
-        </ol>
-    </nav>
-    <div class="row justify-content-center">
+<x-worker.page 
+    title="เลือกที่จะแก้ไขหรือลบ" 
+    subtitle="Manage Operation Items" 
+    icon="fa-solid fa-pen-to-square"
+    :breadcrumbs="[
+        ['label' => 'Operation', 'route' => route('worker.operation')],
+        ['label' => 'พนักงาน: ' . $operation['employee']['name'], 'route' => route('worker.operation.wash.select-employee')],
+        ['label' => 'ลูกค้า: ' . $operation['customer']['name'], 'route' => route('worker.operation.wash.select-customer', ['operationId' => $operation['id']])],
+        ['label' => 'เครื่องซักผ้า: ' . $operation['washing_machine']['name'], 'route' => route('worker.operation.wash.select-washing-machine', ['operationId' => $operation['id']])],
+        ['label' => 'สรุปข้อมูลการซัก', 'route' => route('worker.operation.wash.employee-summary', ['operationId' => $operation['id']])],
+        ['label' => 'แก้ไขรายการ']
+    ]"
+>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         @foreach ($operationLinenProducts as $operationLinenProduct)
-        <div class="col-12 m-2">
-            <div class="card" style="width: 100%">
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item">{{ $operationLinenProduct['linen_case'] ? $operationLinenProduct['linen_case']['name'] : 'ยังไม่ได้เลือก' }}</li>
-                    <li class="list-group-item">ชนิดผ้า: {{ $operationLinenProduct['linen_product'] ? $operationLinenProduct['linen_product']['name'] : 'ยังไม่ได้เลือก' }}</li>
-                    <li class="list-group-item">น้ำหนักเปียก: {{ $operationLinenProduct['wet_weight'] ? $operationLinenProduct['wet_weight'] : 'ยังไม่ได้เลือก' }} kg.</li>
-                    <li class="list-group-item" style="color: {{ $operationLinenProduct['color'] ? $operationLinenProduct['color'] : '' }}">สี: {{ $operationLinenProduct['color'] ? $operationLinenProduct['color'] : 'ยังไม่ได้เลือก' }}</li>
-                    <li class="list-group-item">
-                        <div class="row g-2">
-                            <div class="col-md-6 offset-md-3">
-                                <div class="row g-2">
-                                    <div class="col-6">
-                                        <div class="d-grid gap-2">
-                                            <a class="btn btn-primary" role="button" href="{{ route('worker.operation.wash.select-linen-case', ['operationId' => $operation['id'], 'operationLinenProductId' => $operationLinenProduct['id']]) }}">แก้ไข</a>
-                                        </div>
-                                    </div>
-                                    <div class="col-6">
-                                        <div class="d-grid gap-2">
-                                            <a class="btn btn-danger" role="button" href="{{ route('worker.operation.wash.delete-operation-linen-product', ['operationId' => $operation['id'], 'operationLinenProductId' => $operationLinenProduct['id']]) }}">ลบเลย</a>
-                                        </div>
-                                    </div>
-                                </div> 
-                            </div>
+        <x-worker.card>
+            <div class="space-y-4">
+                {{-- Header / Title (Linen Case) --}}
+                <div class="flex items-center justify-between border-b border-gray-100 dark:border-gray-700 pb-3">
+                    <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider">เคสงาน</span>
+                    <span class="font-medium text-gray-900 dark:text-white">
+                        {{ $operationLinenProduct['linen_case'] ? $operationLinenProduct['linen_case']['name'] : 'ยังไม่ได้เลือก' }}
+                    </span>
+                </div>
+
+                {{-- Details List --}}
+                <div class="space-y-3 text-sm">
+                    <div class="flex justify-between">
+                        <span class="text-gray-500">ชนิดผ้า</span>
+                        <span class="font-medium text-gray-900 dark:text-gray-200">
+                            {{ $operationLinenProduct['linen_product'] ? $operationLinenProduct['linen_product']['name'] : 'ยังไม่ได้เลือก' }}
+                        </span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-500">น้ำหนักเปียก</span>
+                        <span class="font-medium text-gray-900 dark:text-gray-200">
+                            {{ $operationLinenProduct['wet_weight'] ? $operationLinenProduct['wet_weight'] . ' kg.' : 'ยังไม่ได้เลือก' }}
+                        </span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-500">สี</span>
+                        <div class="flex items-center gap-2">
+                            @if($operationLinenProduct['color'])
+                                <div class="w-4 h-4 rounded-full border border-gray-200 shadow-sm" style="background-color: {{ $operationLinenProduct['color'] }}"></div>
+                                <span class="font-medium text-gray-900 dark:text-gray-200">{{ $operationLinenProduct['color'] }}</span>
+                            @else
+                                <span class="text-gray-400">ยังไม่ได้เลือก</span>
+                            @endif
                         </div>
-                    </li>
-                </ul>
+                    </div>
+                </div>
+
+                {{-- Actions --}}
+                <div class="grid grid-cols-2 gap-3 pt-4 mt-auto">
+                    <a href="{{ route('worker.operation.wash.select-linen-case', ['operationId' => $operation['id'], 'operationLinenProductId' => $operationLinenProduct['id']]) }}" 
+                       class="flex items-center justify-center px-4 py-2 border border-transparent rounded-lg text-sm font-medium text-amber-700 bg-amber-100 hover:bg-amber-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 transition-colors">
+                        <i class="fa fa-pen mr-2"></i> แก้ไข
+                    </a>
+                    
+                    <a href="{{ route('worker.operation.wash.delete-operation-linen-product', ['operationId' => $operation['id'], 'operationLinenProductId' => $operationLinenProduct['id']]) }}" 
+                       class="flex items-center justify-center px-4 py-2 border border-transparent rounded-lg text-sm font-medium text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors">
+                        <i class="fa fa-trash mr-2"></i> ลบเลย
+                    </a>
+                </div>
             </div>
-        </div>
+        </x-worker.card>
         @endforeach
     </div>
-</div>
+</x-worker.page>
 @endsection

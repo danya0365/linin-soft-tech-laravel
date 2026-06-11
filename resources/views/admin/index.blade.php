@@ -1,144 +1,112 @@
 @extends('layouts.admin')
 
 @section('content')
+<x-admin.page 
+    title="{{ __('Admin Menu') }}"
+    subtitle="จัดการข้อมูลหลักของระบบ"
+    icon="fa-cog"
+    icon-color="text-slate-600"
+>
+    <!-- Section: Users & Customers -->
+    <x-menu.section title="ผู้ใช้งาน & ลูกค้า" icon="fa-users" icon-color="text-blue-500">
+        <x-menu.card 
+            href="{{ route('users.index') }}"
+            icon="fa-solid fa-people-group"
+            title="{{ __('ไอดีล็อกอิน') }}"
+            subtitle="Users"
+            gradient="from-blue-500 to-blue-700"
+            subtitle-color="text-blue-200"
+        />
+        
+        <x-menu.card 
+            href="{{ route('customer-groups.index') }}"
+            icon="fa-solid fa-building-user"
+            title="{{ __('กลุ่มลูกค้า') }}"
+            subtitle="Customer Groups"
+            gradient="from-emerald-500 to-teal-600"
+            subtitle-color="text-emerald-200"
+        />
+        
+        <x-menu.card 
+            href="{{ route('customers.index') }}"
+            icon="fa-solid fa-hospital"
+            title="{{ __('ลูกค้า') }}"
+            subtitle="Customers"
+            gradient="from-cyan-500 to-blue-600"
+            subtitle-color="text-cyan-200"
+        />
+    </x-menu.section>
 
-<div class="container">
-    <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/">Home</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Admin</li>
-        </ol>
-    </nav>
-    <div class="row justify-content-center">
-        <div class="col-md-12 m-2">
-            <div class="card">
-                <div class="card-header">{{ __('Admin Menu') }}</div>
-                <div class="card-body">
-                    <div class="row g-2">
-                        <div class="col-sm-4">
-                            <a href="{{ route('users.index') }}">
-                                <div class="p-3 border bg-navy" style="min-height: 150px">
-                                    <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 110px">
-                                        <div class="text-center">
-                                            <div class="fa-solid fa-people-group text-light" style="font-size: 3em"></div>
-                                            <div class="text-center mt-3 text-light">{{ __('ไอดีล็อกอิน') }}</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </a>
-                        </div>
-                        <div class="col-sm-4">
-                            <a href="{{ route('customer-groups.index') }}">
-                                <div class="p-3 border bg-navy" style="min-height: 150px">
-                                    <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 110px">
-                                        <div class="text-center">
-                                            <div class="fa-solid fa-building-user text-light" style="font-size: 3em"></div>
-                                            <div class="text-center mt-3 text-light">{{ __('กลุ่มลูกค้า') }}</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </a>
-                        </div>
-                        <div class="col-sm-4">
-                            <a href="{{ route('customers.index') }}">
-                                <div class="p-3 border bg-navy" style="min-height: 150px">
-                                    <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 110px">
-                                        <div class="text-center">
-                                            <div class="fa-solid fa-building-user text-light" style="font-size: 3em"></div>
-                                            <div class="text-center mt-3 text-light">{{ __('ลูกค้า') }}</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </a>
-                        </div>
-                        <div class="col-sm-4">
-                            <a href="{{ route('departments.index') }}">
-                                <div class="p-3 border bg-navy" style="min-height: 150px">
-                                    <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 110px">
-                                        <div class="text-center">
-                                            <div class="fa-solid fa-people-roof text-light" style="font-size: 3em"></div>
-                                            <div class="text-center mt-3 text-light">{{ __('แผนกพนักงาน') }}</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </a>
-                        </div>
-                        <div class="col-sm-4">
-                            <a href="{{ route('employees.index') }}">
-                                <div class="p-3 border bg-navy" style="min-height: 150px">
-                                    <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 110px">
-                                        <div class="text-center">
-                                            <div class="fa-solid fa-person-digging text-light" style="font-size: 3em"></div>
-                                            <div class="text-center mt-3 text-light">{{ __('พนักงาน') }}</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </a>
-                        </div>
-                        <div class="col-sm-4">
-                            <a href="{{ route('linen-types.index') }}">
-                                <div class="p-3 border bg-navy" style="min-height: 150px">
-                                    <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 110px">
-                                        <div class="text-center">
-                                            <div class="fa-solid fa-shirt text-light" style="font-size: 3em"></div>
-                                            <div class="text-center mt-3 text-light">{{ __('ชนิดผ้า') }}</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </a>
-                        </div>
-                        <div class="col-sm-4">
-                            <a href="{{ route('linen-products.index') }}">
-                                <div class="p-3 border bg-navy" style="min-height: 150px">
-                                    <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 110px">
-                                        <div class="text-center">
-                                            <div class="fa-solid fa-shirt text-light" style="font-size: 3em"></div>
-                                            <div class="text-center mt-3 text-light">{{ __('ผ้า') }}</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </a>
-                        </div>
-                        <div class="col-sm-4">
-                            <a href="{{ route('washing-machines.index') }}">
-                                <div class="p-3 border bg-navy" style="min-height: 150px">
-                                    <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 110px">
-                                        <div class="text-center">
-                                            <div class="fa-solid fa-shirt text-light" style="font-size: 3em"></div>
-                                            <div class="text-center mt-3 text-light">{{ __('เครื่องซักผ้า') }}</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </a>
-                        </div>
-                        <div class="col-sm-4">
-                            <a href="{{ route('dryer-machines.index') }}">
-                                <div class="p-3 border bg-navy" style="min-height: 150px">
-                                    <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 110px">
-                                        <div class="text-center">
-                                            <div class="fa-solid fa-fire text-light" style="font-size: 3em"></div>
-                                            <div class="text-center mt-3 text-light">{{ __('เครื่องอบผ้า') }}</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </a>
-                        </div>
-                        <div class="col-sm-4">
-                            <a href="{{ route('trucks.index') }}">
-                                <div class="p-3 border bg-navy" style="min-height: 150px">
-                                    <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 110px">
-                                        <div class="text-center">
-                                            <div class="fa-solid fa-truck text-light" style="font-size: 3em"></div>
-                                            <div class="text-center mt-3 text-light">{{ __('รถบรรทุก') }}</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+    <!-- Section: Employees -->
+    <x-menu.section title="พนักงาน" icon="fa-id-badge" icon-color="text-orange-500">
+        <x-menu.card 
+            href="{{ route('departments.index') }}"
+            icon="fa-solid fa-people-roof"
+            title="{{ __('แผนกพนักงาน') }}"
+            subtitle="Departments"
+            gradient="from-amber-400 to-orange-500"
+            subtitle-color="text-amber-100"
+        />
+        
+        <x-menu.card 
+            href="{{ route('employees.index') }}"
+            icon="fa-solid fa-person-digging"
+            title="{{ __('พนักงาน') }}"
+            subtitle="Employees"
+            gradient="from-orange-500 to-red-500"
+            subtitle-color="text-orange-200"
+        />
+    </x-menu.section>
+
+    <!-- Section: Products -->
+    <x-menu.section title="สินค้า" icon="fa-shirt" icon-color="text-violet-500">
+        <x-menu.card 
+            href="{{ route('linen-types.index') }}"
+            icon="fa-solid fa-layer-group"
+            title="{{ __('ชนิดผ้า') }}"
+            subtitle="Linen Types"
+            gradient="from-violet-500 to-purple-600"
+            subtitle-color="text-violet-200"
+        />
+        
+        <x-menu.card 
+            href="{{ route('linen-products.index') }}"
+            icon="fa-solid fa-shirt"
+            title="{{ __('ผ้า') }}"
+            subtitle="Linen Products"
+            gradient="from-purple-500 to-pink-600"
+            subtitle-color="text-purple-200"
+        />
+    </x-menu.section>
+
+    <!-- Section: Machines & Vehicles -->
+    <x-menu.section title="เครื่องจักร & ยานพาหนะ" icon="fa-cogs" icon-color="text-slate-500">
+        <x-menu.card 
+            href="{{ route('washing-machines.index') }}"
+            icon="fa-solid fa-soap"
+            title="{{ __('เครื่องซักผ้า') }}"
+            subtitle="Washing Machines"
+            gradient="from-sky-500 to-blue-600"
+            subtitle-color="text-sky-200"
+        />
+        
+        <x-menu.card 
+            href="{{ route('dryer-machines.index') }}"
+            icon="fa-solid fa-fire"
+            title="{{ __('เครื่องอบผ้า') }}"
+            subtitle="Dryer Machines"
+            gradient="from-rose-500 to-red-600"
+            subtitle-color="text-rose-200"
+        />
+        
+        <x-menu.card 
+            href="{{ route('trucks.index') }}"
+            icon="fa-solid fa-truck"
+            title="{{ __('รถบรรทุก') }}"
+            subtitle="Trucks"
+            gradient="from-slate-500 to-gray-700"
+            subtitle-color="text-slate-300"
+        />
+    </x-menu.section>
+</x-admin.page>
 @endsection

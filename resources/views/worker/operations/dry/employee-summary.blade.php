@@ -1,95 +1,145 @@
 @extends('layouts.worker')
 
 @section('content')
+<x-worker.page 
+    title="สรุปข้อมูลการอบ" 
+    subtitle="Dry Operation Summary" 
+    icon="fa-solid fa-clipboard-check"
+    :breadcrumbs="[
+        ['label' => 'Operation', 'route' => route('worker.operation')],
+        ['label' => 'พนักงาน: ' . $operation['employee']['name'], 'route' => route('worker.operation.dry.select-employee')],
+        ['label' => 'ลูกค้า: ' . $operation['customer']['name'], 'route' => route('worker.operation.dry.select-customer', ['operationId' => $operation['id']])],
+        ['label' => 'เครื่องอบผ้า: ' . $operation['dryer_machine']['name'], 'route' => route('worker.operation.dry.select-dryer-machine', ['operationId' => $operation['id']])],
+        ['label' => 'สรุปข้อมูล']
+    ]"
+>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        {{-- Left Column: Status & Actions --}}
+        <x-worker.card title="สถานะการอบ">
+            <div class="space-y-6">
+                {{-- Action Buttons --}}
+                <div class="grid grid-cols-3 gap-3">
+                    <button type="button" 
+                            onclick="window.location='{{ route('worker.operation.dry.select-linen-case', ['operationId' => $operation['id'], 'operationLinenProductId' => 0]) }}'"
+                            class="flex flex-col items-center justify-center p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors border border-blue-200 dark:border-blue-800">
+                        <i class="fa fa-plus mb-1 text-lg"></i>
+                        <span class="text-xs font-semibold">เพิ่ม</span>
+                    </button>
 
-<div class="container">
-    <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ route('worker') }}">Worker</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.operation') }}">ปฏิบัติการ</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.operation.dry.select-employee') }}">พนักงาน: {{ $operation['employee']['name'] }}</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.operation.dry.select-customer', ['operationId' => $operation['id']]) }}">ลูกค้า: {{ $operation['customer']['name'] }}</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.operation.dry.select-dryer-machine', ['operationId' => $operation['id']]) }}">{{ $operation['dryer_machine']['name'] }}</a></li>
-            <li class="breadcrumb-item active" aria-current="page">อบ - สรุปข้อมูลการอบ</li>
-        </ol>
-    </nav>
-    <div class="row justify-content-center">
-        <div class="col-md-12 m-2">
-            <div class="card">
-                <div class="card-header text-center">สถานะการอบ</div>
-                <div class="card-body">
-                    <div class="row g-2">
-                        <div class="col-4">
-                            <div class="d-grid gap-2" style="min-height: 60px">
-                                <button class="btn btn-primary" type="button" onclick="window.location='{{ route('worker.operation.dry.select-linen-case', ['operationId' => $operation['id'], 'operationLinenProductId' => 0]) }}'">เพิ่ม</button>
+                    <button type="button" 
+                            onclick="window.location='{{ route('worker.operation.dry.select-operation-linen-product', ['operationId' => $operation['id']]) }}'"
+                            class="flex flex-col items-center justify-center p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-900/40 transition-colors border border-amber-200 dark:border-amber-800">
+                        <i class="fa fa-pen-to-square mb-1 text-lg"></i>
+                        <span class="text-xs font-semibold text-center">แก้ไข/ลบ</span>
+                    </button>
+
+                    @if ( $operation['status'] != "close")
+                    <button type="button" 
+                            id="close-operation"
+                            class="flex flex-col items-center justify-center p-3 rounded-lg bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 hover:bg-green-100 dark:hover:bg-green-900/40 transition-colors border border-green-200 dark:border-green-800">
+                        <i class="fa fa-check-circle mb-1 text-lg"></i>
+                        <span class="text-xs font-semibold">ปิดงาน</span>
+                    </button>
+                    @else 
+                    <button type="button" 
+                            id="reopen-operation"
+                            class="flex flex-col items-center justify-center p-3 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors border border-gray-200 dark:border-gray-600">
+                        <i class="fa fa-rotate-left mb-1 text-lg"></i>
+                        <span class="text-xs font-semibold">เปิดใหม่</span>
+                    </button>
+                    @endif
+                </div>
+
+                {{-- Status Details --}}
+                <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 space-y-3">
+                    <div class="flex justify-between items-center border-b border-gray-200 dark:border-gray-700 pb-2">
+                        <span class="text-gray-500 text-sm">สถานะ</span>
+                        <span class="font-semibold {{ $operation['status'] == 'close' ? 'text-green-600' : 'text-amber-600' }} uppercase">
+                            {{ $operation['status'] }}
+                        </span>
+                    </div>
+                    <div class="flex justify-between items-center border-b border-gray-200 dark:border-gray-700 pb-2">
+                        <span class="text-gray-500 text-sm">น้ำหนักอบทั้งหมด</span>
+                        <span class="font-semibold text-gray-900 dark:text-white">{{ $operation['total_dry_weight'] ? $operation['total_dry_weight'] : '-' }} kg.</span>
+                    </div>
+                    <div class="flex justify-between items-center pb-2">
+                        <span class="text-gray-500 text-sm">เวลาในการอบผ้า</span>
+                        <span class="font-mono text-gray-900 dark:text-white">{{ $operationTimeDuration }}</span>
+                    </div>
+                </div>
+
+                {{-- Items List --}}
+                <div>
+                    <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">รายการที่เลือก</h4>
+                    <div class="space-y-2">
+                        @forelse ($operationLinenProducts as $operationLinenProduct)
+                        <div class="flex items-start p-3 bg-white dark:bg-gray-700 rounded-md border border-gray-100 dark:border-gray-600 shadow-sm">
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm font-medium text-gray-900 dark:text-white">
+                                    {{ $operationLinenProduct['linen_case'] ? $operationLinenProduct['linen_case']['name'] : 'ยังไม่ได้เลือก' }}
+                                </p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                    {{ $operationLinenProduct['linen_product'] ? $operationLinenProduct['linen_product']['name'] : 'ยังไม่ได้เลือก' }}
+                                </p>
                             </div>
-                        </div>
-                        <div class="col-4">
-                            <div class="d-grid gap-2" style="min-height: 60px">
-                                <button class="btn btn-danger" type="button" onclick="window.location='{{ route('worker.operation.dry.select-operation-linen-product', ['operationId' => $operation['id']]) }}'">แก้ไขหรือลบ</button>
-                            </div>
-                        </div>
-                        <div class="col-4">
-                            <div class="d-grid gap-2" style="min-height: 60px">
-                                @if ( $operation['status'] != "close")
-                                <button class="btn btn-outline-secondary" type="button" id="close-operation">ปิดงาน</button>
-                                @else 
-                                <button class="btn btn-outline-secondary" type="button" id="reopen-operation">เปิดใหม่</button>
+                            <div class="text-right ml-4">
+                                <span class="block text-sm font-semibold text-gray-900 dark:text-white">
+                                    {{ $operationLinenProduct['dry_weight'] ? $operationLinenProduct['dry_weight'] : '-' }} kg.
+                                </span>
+                                @if($operationLinenProduct['color'])
+                                <span class="inline-flex items-center text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                    <span class="w-2 h-2 rounded-full mr-1" style="background-color: {{ $operationLinenProduct['color'] }}"></span>
+                                    {{ $operationLinenProduct['color'] }}
+                                </span>
                                 @endif
                             </div>
                         </div>
+                        @empty
+                        <p class="text-sm text-gray-500 text-center py-4 italic">ยังไม่มีรายการ</p>
+                        @endforelse
                     </div>
                 </div>
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item">สถานะ: {{ $operation['status'] }}</li>
-                    <li class="list-group-item">น้ำหนักอบทั้งหมด: {{ $operation['total_dry_weight'] ? $operation['total_dry_weight'] : '-' }} kg.</li>
-                    @foreach ($operationLinenProducts as $operationLinenProduct)
-                    <li class="list-group-item">
-                        {{ $operationLinenProduct['linen_case'] ? $operationLinenProduct['linen_case']['name'] : 'ยังไม่ได้เลือก' }},
-                        ชนิดผ้า: {{ $operationLinenProduct['linen_product'] ? $operationLinenProduct['linen_product']['name'] : 'ยังไม่ได้เลือก' }},
-                        น้ำหนักอบ: {{ $operationLinenProduct['dry_weight'] ? $operationLinenProduct['dry_weight'] : 'ยังไม่ได้เลือก' }} kg.,
-                        สี: <span style="color: {{ $operationLinenProduct['color'] ? $operationLinenProduct['color'] : '' }}">{{ $operationLinenProduct['color'] ? $operationLinenProduct['color'] : 'ยังไม่ได้เลือก' }}</span>
-                    </li>
-                    @endforeach
-                </ul>
-                <div class="card-footer text-muted text-center">
-                    เวลาในการอบผ้า: {{ $operationTimeDuration }}
+            </div>
+        </x-worker.card>
+
+
+        {{-- Right Column: Employee Summary --}}
+        <x-worker.card title="สรุปข้อมูลการอบของพนักงาน">
+            <div class="flex flex-col items-center py-6 border-b border-gray-100 dark:border-gray-700">
+                <div class="w-24 h-24 mb-4">
+                    <x-employee-avatar :photo="$operation['dry_employee']['photo']" class="w-full h-full rounded-full shadow-md" />
                 </div>
-              </div>
-        </div>
-        <div class="col-md-12 m-2">
-            <div class="card">
-                <div class="card-header text-center">สรุปข้อมูลการอบของพนักงาน</div>
-                <div class="card-body">
-                    <div class="row mb-3 text-center">
-                        <div class="col-12">
-                            <div class="rounded-3 d-flex align-items-center justify-content-center p-3 py-6">
-                                <div style="max-width: 150px">
-                                    <x-employee-avatar :photo="$operation['dry_employee']['photo']" />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <h5 class="card-title text-center">{{ $operation['dry_employee']['name'] }}</h5>
-                    <dl class="row">
-                        <dt class="col-sm-3">Employee Code</dt>
-                        <dd class="col-sm-9">{{ $operation['dry_employee']['code'] }}</dd>
-                    </dl>
+                <h3 class="text-lg font-bold text-gray-900 dark:text-white">{{ $operation['dry_employee']['name'] }}</h3>
+                <p class="text-sm text-gray-500 dark:text-gray-400">{{ $operation['dry_employee']['code'] }}</p>
+            </div>
+
+            <div class="py-4 space-y-3">
+                <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">รายงานสรุป</h4>
+                @foreach ($summaryReports as $summaryReport)
+                <div class="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                    <span class="text-sm text-gray-700 dark:text-gray-300">{{ $summaryReport['title'] }}</span>
+                    <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ number_format($summaryReport['value']) }} kg.</span>
                 </div>
-                <ul class="list-group list-group-flush">
-                    @foreach ($summaryReports as $summaryReport)
-                    <li class="list-group-item">{{ $summaryReport['title'] }}: {{ number_format($summaryReport['value']) }} kg.</li>
-                    @endforeach
-                </ul>
-                <div class="card-footer text-muted text-center">
-                    เวลาการทำงานทั้งหมด: {{ $workingDuration }}
-                </div>
-              </div>
-        </div>
+                @endforeach
+            </div>
+
+            <div class="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700 text-center">
+                <p class="text-sm text-gray-500 dark:text-gray-400">
+                    เวลาการทำงานทั้งหมด: <span class="font-mono font-medium text-gray-900 dark:text-white">{{ $workingDuration }}</span>
+                </p>
+            </div>
+        </x-worker.card>
+
     </div>
-</div>
+</x-worker.page>
+
+@push('scripts')
 <script type="text/javascript">
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof jQuery === 'undefined') return;
     $(function(){
+        
         var operationStatus = '{{ $operation['status'] }}';
 
         function askBeforeExit(e) {
@@ -132,6 +182,7 @@
         $("#close-operation").on("click", closeOperation);
         $("#reopen-operation").on("click", reopenOperation);
     })
+});
 </script>
-
+@endpush
 @endsection

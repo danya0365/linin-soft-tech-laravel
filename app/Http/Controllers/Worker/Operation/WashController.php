@@ -72,15 +72,14 @@ class WashController extends Controller
     {
         $operation = Operation::find($operationId);
         $washingMachine = WashingMachine::find($washingMachineId);
-        if ($washingMachine->operation_id && $washingMachine->operation_id != $operation->id) {
-            return back()->with('error', 'กรุณาเลือกเครื่องอื่น - Please select another device.')->with('operation_id', $washingMachine->operation_id);
-        }
 
         $prevWashingMachineId = $operation->washing_machine_id;
         $operation->washing_machine_id = $washingMachineId;
         $operation->save();
 
-        if ($prevWashingMachineId) WashingMachine::where('id', $prevWashingMachineId)->update(['operation_id' => null]);
+        if ($prevWashingMachineId) {
+            WashingMachine::where('id', $prevWashingMachineId)->update(['operation_id' => null]);
+        }
         WashingMachine::where('id', $washingMachineId)->update(['operation_id' => $operation->id]);
         return redirect(route('worker.operation.wash.employee-summary', ['operationId' => $operation->id]));
     }
@@ -103,7 +102,9 @@ class WashController extends Controller
         $operation->status = OperationStatus::Close();
         $operation->save();
 
-        if ($operation->washing_machine_id) WashingMachine::where('id', $operation->washing_machine_id)->update(['operation_id' => null]);
+        if ($operation->washing_machine_id) {
+            WashingMachine::where('id', $operation->washing_machine_id)->update(['operation_id' => null]);
+        }
         OperationManager::createCustomerOperationDailySummary($operation);
 
         EmployeeManager::createEmployeeOperationLog($operation->wash_employee_id, WorkerOperationStatus::Wash(), EmployeeOperationActionType::Stop());
@@ -116,7 +117,9 @@ class WashController extends Controller
         $operation->status = OperationStatus::InProgress();
         $operation->save();
 
-        if ($operation->washing_machine_id) WashingMachine::where('id', $operation->washing_machine_id)->update(['operation_id' => $operation->id]);
+        if ($operation->washing_machine_id) {
+            WashingMachine::where('id', $operation->washing_machine_id)->update(['operation_id' => $operation->id]);
+        }
 
         EmployeeManager::createEmployeeOperationLog($operation->wash_employee_id, WorkerOperationStatus::Wash(), EmployeeOperationActionType::Progress());
         return redirect(route('worker.operation.wash.employee-summary', ['operationId' => $operation->id]));
@@ -133,7 +136,7 @@ class WashController extends Controller
     public function selectLinenCase($operationId, $operationLinenProductId)
     {
         if ($operationLinenProductId == 0) {
-            $operationLinenProduct = new OperationLinenProduct;
+            $operationLinenProduct = new OperationLinenProduct();
             $operationLinenProduct->operation_id = $operationId;
             $operationLinenProduct->save();
             $operationLinenProductId = $operationLinenProduct->id;

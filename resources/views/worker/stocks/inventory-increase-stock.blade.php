@@ -1,95 +1,82 @@
 @extends('layouts.worker')
 
 @section('content')
+<x-worker.page
+    :breadcrumbs="[
+        ['label' => __('Stocks'), 'route' => route('worker.stock')],
+        ['label' => $inventory->inventoryGroup->name, 'route' => route('worker.stock.show-inventory-by-group', ['inventoryGroupId' => $inventory->inventoryGroup->id])]
+    ]"
+    title="{{ __('Increase Stock') }}"
+    subtitle="{{ $inventory->name }}"
+    icon="fa-plus-circle"
+>
+    <x-worker.card :title="__('เพิ่มสต๊อก - Increase Stock')">
+        <form method="POST" action="{{ request()->url() }}" enctype="multipart/form-data">
+            @csrf
 
-<div class="container">
-    <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ route('worker') }}">Worker</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.stock') }}">Stocks</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('worker.stock.show-inventory-by-group', ['inventoryGroupId' => $inventory->inventoryGroup->id]) }}">รายการทั้งหมดของ {{ $inventory->inventoryGroup->name }} - Show Inventory by {{ $inventory->inventoryGroup->name }}</a></li>
-            <li class="breadcrumb-item active" aria-current="page">เพิ่มสต๊อกของ {{ $inventory->name }} - Increase stock of {{ $inventory->name }}</li>
-        </ol>
-    </nav>
-    <div class="row justify-content-center">
-        <div class="col-md-12 m-2">
-            <div class="card">
-            <form method="POST" action="{{ request()->url() }}"  role="form" enctype="multipart/form-data">
-                @csrf
-
-                <div class="card-header">
-                    เพิ่มสต๊อกของ {{ $inventory->name }} - Increase stock of {{ $inventory->name }}
+            {{-- Current Info (Read-only) --}}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <div>
+                    <label class="block text-sm font-medium text-gray-500 dark:text-gray-400">ชื่อ - Name</label>
+                    <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ $inventory->name }}</p>
                 </div>
-                <div class="card-body">
-                    <div class="row row-cols-lg-auto g-3 align-items-center mb-2">
-                        <div class="col-12">
-                            <div class="input-group">
-                                {{ Form::label('name', 'ชื่อ - Name', ['class' => "input-group-text"]) }}
-                                {{ Form::text('name', $inventory->name, ['class' => 'form-control' . ($errors->has('name') ? ' is-invalid' : ''), 'placeholder' => 'Name', 'readonly' => 'true']) }}
-                                {!! $errors->first('name', '<div class="invalid-feedback">:message</div>') !!}
-                            </div>
-                        </div>
-                        <div class="col-12">
-                            <div class="input-group">
-                                {{ Form::label('unit', 'Unit', ['class' => "input-group-text"]) }}
-                                {{ Form::text('unit', $inventory->unit, ['class' => 'form-control' . ($errors->has('unit') ? ' is-invalid' : ''), 'placeholder' => 'Unit', 'readonly' => 'true']) }}
-                                {!! $errors->first('unit', '<div class="invalid-feedback">:message</div>') !!}
-                            </div>
-                        </div>
-                        <div class="col-12">
-                            <div class="input-group">
-                                {{ Form::label('total_quantity', 'จำนวนสต๊อกทั้งหมด - Total Quantity', ['class' => "input-group-text"]) }}
-                                {{ Form::text('total_quantity', $inventory->total_quantity, ['class' => 'form-control' . ($errors->has('total_quantity') ? ' is-invalid' : ''), 'placeholder' => 'Total Quantity', 'readonly' => 'true']) }}
-                                {!! $errors->first('total_quantity', '<div class="invalid-feedback">:message</div>') !!}
-                            </div>
-                        </div>
-                        <div class="col-12">
-                            <div class="input-group">
-                                {{ Form::label('remain_quantity', 'จำนวนสต๊อกคงเหลือ - Remain Quantity', ['class' => "input-group-text"]) }}
-                                {{ Form::text('remain_quantity', $inventory->remain_quantity, ['class' => 'form-control' . ($errors->has('remain_quantity') ? ' is-invalid' : ''), 'placeholder' => 'Remain Quantity', 'readonly' => 'true']) }}
-                                {!! $errors->first('remain_quantity', '<div class="invalid-feedback">:message</div>') !!}
-                            </div>
-                        </div>
-                        <div class="col-12">
-                            <div class="input-group">
-                                {{ Form::label('increase_quantity', 'จำนวนที่ต้องการเพิ่ม - Increase Count', ['class' => "input-group-text"]) }}
-                                {{ Form::text('increase_quantity', 0, ['class' => 'form-control' . ($errors->has('increase_quantity') ? ' is-invalid' : ''), 'placeholder' => 'Increase Count']) }}
-                                {!! $errors->first('increase_quantity', '<div class="invalid-feedback">:message</div>') !!}
-                            </div>
-                        </div>
-                        <div class="col-12">
-                            <div class="input-group">
-                                {{ Form::label('created_at', 'วันที่เพิ่มสต๊อก', ['class' => "input-group-text"]) }}
-                                {{ Form::date('created_at', '', ['class' => 'form-control' . ($errors->has('created_at') ? ' is-invalid' : ''), 'placeholder' => '']) }}
-                                {!! $errors->first('created_at', '<div class="invalid-feedback">:message</div>') !!}
-                            </div>
-                        </div>
-                    </div>
-                    
+                <div>
+                    <label class="block text-sm font-medium text-gray-500 dark:text-gray-400">หน่วย - Unit</label>
+                    <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ $inventory->unit }}</p>
                 </div>
-                <div class="card-footer">
-                    <button type="submit" class="btn btn-primary">Submit</button>
+                <div>
+                    <label class="block text-sm font-medium text-gray-500 dark:text-gray-400">สต๊อกทั้งหมด - Total</label>
+                    <p id="total_quantity_display" class="text-lg font-semibold text-blue-600 dark:text-blue-400">{{ $inventory->total_quantity }}</p>
                 </div>
-            </form>
+                <div>
+                    <label class="block text-sm font-medium text-gray-500 dark:text-gray-400">สต๊อกคงเหลือ - Remain</label>
+                    <p id="remain_quantity_display" class="text-lg font-semibold text-green-600 dark:text-green-400">{{ $inventory->remain_quantity }}</p>
+                </div>
             </div>
-        </div>
-    </div>
-</div>
-<script type="text/javascript">
-    $(function(){
-        var total_quantity = {{ $inventory->total_quantity }};
-        var remain_quantity = {{ $inventory->remain_quantity }};
-        $("#increase_quantity").on("keyup", function(){
-            var increase_quantity = parseInt($(this).val());
-            if (isNaN(increase_quantity)) {
-                $("#total_quantity").val(total_quantity)
-                $("#remain_quantity").val(remain_quantity)
-                return;
-            }
-            $("#total_quantity").val(total_quantity + increase_quantity)
-            $("#remain_quantity").val(remain_quantity + increase_quantity)
-        });
-    })
-</script>
 
+            {{-- Increase Amount --}}
+            <x-crud.form-group 
+                name="increase_quantity" 
+                label="จำนวนที่ต้องการเพิ่ม - Increase Count" 
+                type="number" 
+                :value="old('increase_quantity', 0)" 
+                placeholder="Enter quantity to add"
+            />
+
+            <x-crud.form-group 
+                name="created_at" 
+                label="วันที่เพิ่มสต๊อก" 
+                type="date" 
+                :value="old('created_at')" 
+            />
+
+            <div class="flex items-center justify-end gap-3 mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+                <x-ui.button type="submit" variant="primary" icon="fa fa-plus">
+                    {{ __('Increase Stock') }}
+                </x-ui.button>
+                <x-ui.button :href="route('worker.stock.show-inventory-by-group', ['inventoryGroupId' => $inventory->inventoryGroup->id])" variant="secondary" icon="fa fa-times">
+                    {{ __('Cancel') }}
+                </x-ui.button>
+            </div>
+        </form>
+    </x-worker.card>
+</x-worker.page>
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var totalQuantity = {{ $inventory->total_quantity }};
+    var remainQuantity = {{ $inventory->remain_quantity }};
+    var input = document.querySelector('[name="increase_quantity"]');
+    
+    if (input) {
+        input.addEventListener('input', function() {
+            var increase = parseInt(this.value) || 0;
+            document.getElementById('total_quantity_display').textContent = totalQuantity + increase;
+            document.getElementById('remain_quantity_display').textContent = remainQuantity + increase;
+        });
+    }
+});
+</script>
+@endpush
 @endsection

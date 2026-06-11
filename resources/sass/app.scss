@@ -1,24 +1,34 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 // Fonts
-@import url('https://fonts.googleapis.com/css?family=Nunito');
+@import url("https://fonts.googleapis.com/css?family=Nunito");
 
 // Variables
-@import 'variables';
+@import "variables";
 
-// Bootstrap
-@import '~bootstrap/scss/bootstrap';
+// Bootstrap (imported early so Tailwind can override)
+// @import '~bootstrap/scss/bootstrap';
 
 // Icons
-@import '~bootstrap-icons/font/bootstrap-icons';
+@import "~bootstrap-icons/font/bootstrap-icons";
 
-@import '~@fortawesome/fontawesome-free/css/fontawesome';
-@import '~@fortawesome/fontawesome-free/css/regular';
-@import '~@fortawesome/fontawesome-free/css/solid';
-@import '~@fortawesome/fontawesome-free/css/brands';
+@import "~@fortawesome/fontawesome-free/css/fontawesome";
+@import "~@fortawesome/fontawesome-free/css/regular";
+@import "~@fortawesome/fontawesome-free/css/solid";
+@import "~@fortawesome/fontawesome-free/css/brands";
 
-@import 'css.gg/icons/all.css';
+@import "css.gg/icons/all.css";
 
-@import 'customs';
+// Cropper.js
+@import "~cropperjs/dist/cropper.css";
+
+// Custom overrides (before Tailwind)
+@import "customs";
+
+// Tailwind Base
+@tailwind base;
+
+// Tailwind Components (for CRUD views)
+@import "../css/components";
+@tailwind components;
+
+// Tailwind Utilities (LAST - highest priority)
+@tailwind utilities;

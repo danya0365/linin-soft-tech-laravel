@@ -1,24 +1,15 @@
-<div class="box box-info padding-1">
-    <div class="box-body">
-        
-        <div class="form-group">
-            {{ Form::label('name') }}
-            {{ Form::text('name', $washingMachine->name, ['class' => 'form-control' . ($errors->has('name') ? ' is-invalid' : ''), 'placeholder' => 'Name']) }}
-            {!! $errors->first('name', '<div class="invalid-feedback">:message</div>') !!}
-        </div>
-        <div class="form-group">
-            {{ Form::label('photo') }}
-            {{ Form::text('photo', $washingMachine->photo, ['class' => 'form-control' . ($errors->has('photo') ? ' is-invalid' : ''), 'placeholder' => 'Photo']) }}
-            {!! $errors->first('photo', '<div class="invalid-feedback">:message</div>') !!}
-        </div>
-        <div class="form-group">
-            {{ Form::label('maximum_weight') }}
-            {{ Form::text('maximum_weight', $washingMachine->maximum_weight, ['class' => 'form-control' . ($errors->has('maximum_weight') ? ' is-invalid' : ''), 'placeholder' => 'Maximum Weight']) }}
-            {!! $errors->first('maximum_weight', '<div class="invalid-feedback">:message</div>') !!}
-        </div>
+<x-crud.form-group name="name" label="Name" type="text" :value="$washingMachine->name ?? old('name')" placeholder="Enter Name" />
 
-    </div>
-    <div class="box-footer mt-4">
-        <button type="submit" class="btn btn-primary">Submit</button>
-    </div>
+{{-- Photo Input with Crop --}}
+<x-image-crop-upload name="photo" label="Photo" :current-image="$washingMachine->photo ?? null" />
+
+<x-crud.form-group name="maximum_weight" label="Maximum Weight" type="number" :value="$washingMachine->maximum_weight ?? old('maximum_weight')"
+    placeholder="Enter Maximum Weight" />
+<x-crud.form-group name="service_status" label="สถานะเครื่อง" type="radio" :value="$washingMachine->service_status ?? 'available'" :options="['available' => '✅ พร้อมใช้งาน', 'broken' => '🔧 เสีย/ซ่อม']" />
+
+<div class="flex items-center justify-end gap-3 mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+    <x-ui.button type="submit" variant="primary" icon="fa fa-save">
+        {{ isset($washingMachine->id) ? 'Update' : 'Create' }} Washing Machine
+    </x-ui.button>
+    <x-ui.button :href="route('washing-machines.index')" variant="secondary" icon="fa fa-times">Cancel</x-ui.button>
 </div>

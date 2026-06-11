@@ -490,3 +490,126 @@
         );
     };
 })(jQuery);
+
+// กราฟเปรียบเทียบ Line Chart (กราฟ 1: การเงิน, กราฟ 2: ปริมาณงาน)
+(function ($) {
+    function comparisonLineChart(targetId, titleText, yAxisLabel, unit, categories, seriesData) {
+        var series = seriesData.map(function (item) {
+            var data = item.data.map(function (val) {
+                return parseFloat(val);
+            });
+            return {
+                name: item.name,
+                data: data,
+                marker: { enabled: true, radius: 4 }
+            };
+        });
+
+        Highcharts.chart(targetId, {
+            chart: { type: "line" },
+            credits: { enabled: false },
+            title: { text: titleText },
+            xAxis: {
+                categories: categories,
+                crosshair: true,
+            },
+            yAxis: {
+                title: { text: yAxisLabel },
+                labels: {
+                    formatter: function () {
+                        return this.value.toLocaleString();
+                    },
+                },
+            },
+            tooltip: {
+                headerFormat: '<span style="font-size:12px"><b>{point.key}</b></span><br/>',
+                pointFormat: '<span style="color:{series.color}">\u25CF</span> {series.name}: <b>{point.y:,.0f} ' + unit + '</b><br/>',
+                shared: true,
+            },
+            plotOptions: {
+                line: {
+                    lineWidth: 2,
+                    marker: { radius: 5 },
+                },
+            },
+            series: series,
+        });
+    }
+
+    $.comparisonLineChart = function (options) {
+        var settings = $.extend({
+            data: null, renderTo: null, title: "", yAxisLabel: "", unit: ""
+        }, options);
+
+        comparisonLineChart(
+            settings.renderTo,
+            settings.title,
+            settings.yAxisLabel,
+            settings.unit,
+            settings.data.titles,
+            settings.data.data
+        );
+    };
+})(jQuery);
+
+// กราฟ 3: เปรียบเทียบแนวโน้ม (Normalized %)
+(function ($) {
+    function trendLineChart(targetId, titleText, categories, seriesData) {
+        var colors = ['#2ecc71', '#e74c3c', '#f39c12', '#3498db'];
+        var series = seriesData.map(function (item, i) {
+            var data = item.data.map(function (val) {
+                return parseFloat(val);
+            });
+            return {
+                name: item.name,
+                data: data,
+                color: colors[i % colors.length],
+                marker: { enabled: true, radius: 5, symbol: 'circle' }
+            };
+        });
+
+        Highcharts.chart(targetId, {
+            chart: { type: "line" },
+            credits: { enabled: false },
+            title: { text: titleText },
+            subtitle: { text: "แสดงแนวโน้มขึ้น-ลง (ค่าสูงสุด = 100%)" },
+            xAxis: {
+                categories: categories,
+                crosshair: true,
+            },
+            yAxis: {
+                title: { text: "% ของค่าสูงสุด" },
+                max: 100,
+                min: 0,
+                labels: {
+                    format: '{value}%'
+                },
+            },
+            tooltip: {
+                headerFormat: '<span style="font-size:12px"><b>{point.key}</b></span><br/>',
+                pointFormat: '<span style="color:{series.color}">\u25CF</span> {series.name}: <b>{point.y}%</b><br/>',
+                shared: true,
+            },
+            plotOptions: {
+                line: {
+                    lineWidth: 3,
+                    marker: { radius: 6 },
+                },
+            },
+            series: series,
+        });
+    }
+
+    $.trendLineChart = function (options) {
+        var settings = $.extend({
+            data: null, renderTo: null, title: ""
+        }, options);
+
+        trendLineChart(
+            settings.renderTo,
+            settings.title,
+            settings.data.titles,
+            settings.data.data
+        );
+    };
+})(jQuery);

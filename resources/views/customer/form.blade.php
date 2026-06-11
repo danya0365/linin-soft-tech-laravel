@@ -1,51 +1,22 @@
-<div class="box box-info padding-1">
-    <div class="box-body">
-        
-        <div class="form-group">
-            {{ Form::label('name') }}
-            {{ Form::text('name', $customer->name, ['class' => 'form-control' . ($errors->has('name') ? ' is-invalid' : ''), 'placeholder' => 'Name']) }}
-            {!! $errors->first('name', '<div class="invalid-feedback">:message</div>') !!}
-        </div>
-        <div class="form-group">
-            {{ Form::label('customer_group_id') }}
-            <select name="customer_group_id" class="form-select">
-                <option value=""></option>
-            @foreach (App\Models\CustomerGroup::get() as $customerGroup)
-                <option value="{{ $customerGroup->id }}" @selected($customer->customer_group_id == $customerGroup->id)>
-                    {{ $customerGroup->name }}
-                </option>
-            @endforeach
-            </select>
-            {!! $errors->first('customer_group_id', '<div class="invalid-feedback">:message</div>') !!}
-        </div>
-        <div class="form-group">
-            {{ Form::label('total_wet_weight') }}
-            {{ Form::text('total_wet_weight', $customer->total_wet_weight, ['class' => 'form-control' . ($errors->has('total_wet_weight') ? ' is-invalid' : ''), 'placeholder' => 'Total Wet Weight']) }}
-            {!! $errors->first('total_wet_weight', '<div class="invalid-feedback">:message</div>') !!}
-        </div>
-        <div class="form-group">
-            {{ Form::label('total_dry_weight') }}
-            {{ Form::text('total_dry_weight', $customer->total_dry_weight, ['class' => 'form-control' . ($errors->has('total_dry_weight') ? ' is-invalid' : ''), 'placeholder' => 'Total Dry Weight']) }}
-            {!! $errors->first('total_dry_weight', '<div class="invalid-feedback">:message</div>') !!}
-        </div>
-        <div class="form-group">
-            {{ Form::label('total_billing_weight') }}
-            {{ Form::text('total_billing_weight', $customer->total_billing_weight, ['class' => 'form-control' . ($errors->has('total_billing_weight') ? ' is-invalid' : ''), 'placeholder' => 'Total Billing Weight']) }}
-            {!! $errors->first('total_billing_weight', '<div class="invalid-feedback">:message</div>') !!}
-        </div>
-        <div class="form-group">
-            {{ Form::label('total_edit_weight') }}
-            {{ Form::text('total_edit_weight', $customer->total_edit_weight, ['class' => 'form-control' . ($errors->has('total_edit_weight') ? ' is-invalid' : ''), 'placeholder' => 'Total Edit Weight']) }}
-            {!! $errors->first('total_edit_weight', '<div class="invalid-feedback">:message</div>') !!}
-        </div>
-        <div class="form-group">
-            {{ Form::label('total_billing_payment') }}
-            {{ Form::text('total_billing_payment', $customer->total_billing_payment, ['class' => 'form-control' . ($errors->has('total_billing_payment') ? ' is-invalid' : ''), 'placeholder' => 'Total Billing Payment']) }}
-            {!! $errors->first('total_billing_payment', '<div class="invalid-feedback">:message</div>') !!}
-        </div>
+<x-crud.form-group name="name" label="Name" type="text" :value="$customer->name ?? old('name')" placeholder="Enter Name" />
+@php
+    $customerGroupOptions = [];
+    foreach (\App\Models\CustomerGroup::get() as $customerGroup) {
+        $customerGroupOptions[$customerGroup->id] = $customerGroup->name;
+    }
+@endphp
+<x-crud.form-group 
+    name="customer_group_id" 
+    label="Customer Group" 
+    type="select" 
+    :value="$customer->customer_group_id ?? old('customer_group_id')" 
+    placeholder="เลือก"
+    :options="$customerGroupOptions" 
+/>
 
-    </div>
-    <div class="box-footer mt-4">
-        <button type="submit" class="btn btn-primary">Submit</button>
-    </div>
+<div class="flex items-center justify-end gap-3 mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+    <x-ui.button type="submit" variant="primary" icon="fa fa-save">
+        {{ isset($customer->id) ? 'Update' : 'Create' }} Customer
+    </x-ui.button>
+    <x-ui.button :href="route('customers.index')" variant="secondary" icon="fa fa-times">Cancel</x-ui.button>
 </div>

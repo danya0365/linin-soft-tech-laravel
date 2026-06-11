@@ -43,6 +43,7 @@ class CustomerController extends Controller
             $operation->status = OperationStatus::Close();
             $operation->customer_id = request()->get('customer_id');
             $operation->total_billing_weight = request()->get('total_billing_weight');
+            $operation->total_edit_weight = request()->get('total_edit_weight');
             $operation->total_billing_payment = request()->get('total_billing_payment');
             $operation->billing_payment_date = request()->get('billing_payment_date');
             $operation->save();
@@ -87,6 +88,7 @@ class CustomerController extends Controller
         $billingSums = (function () {
             $query = Operation::with('customer')->select(
                 DB::raw('sum(total_billing_weight) as total_billing_weight'),
+                DB::raw('sum(total_edit_weight) as total_edit_weight'),
                 DB::raw('sum(total_billing_payment) as total_billing_payment'),
                 'customer_id'
             )
@@ -126,11 +128,56 @@ class CustomerController extends Controller
     {
         $billingLog = Operation::find($id);
 
+        // เก็บข้อมูลก่อนลบ เพื่อใช้ recalculate
+        $customerId = $billingLog->customer_id;
+        $operationDate = $billingLog->created_at->format('Y-m-d');
+
         $billingLog->delete();
 
         IncomeManager::delete($billingLog);
 
+        // Recalculate CustomerOperationDailySummary สำหรับวันนั้น
+        if ($customerId && $operationDate) {
+            OperationManager::recalculateCustomerOperationDailySummary($customerId, $operationDate);
+        }
+
         return redirect()->route('supervisor.customer.billing-logs')
             ->with('success', 'BillingLog deleted successfully');
+    }
+
+    public function editBillingLog($id)
+    {
+        $operation = Operation::with('customer')->find($id);
+        
+        if (!$operation) {
+            return redirect()->route('supervisor.customer.billing-logs')
+                ->with('error', 'Billing not found');
+        }
+
+        if (request()->isMethod('post')) {
+            // ตรวจสอบเฉพาะฟิลด์ที่อนุญาตให้แก้ไข
+            request()->validate([
+                'total_billing_weight' => 'required',
+            ]);
+
+            // ⚠️ ห้ามแก้ไข total_billing_payment และ billing_payment_date 
+            // เพราะผูกกับ Income และ Daily Summary
+            // ⚠️ ห้ามใส่ total_wet_weight, total_dry_weight เพราะจะซ้ำกับ non-payment operations
+            $operation->total_billing_weight = request()->get('total_billing_weight');
+            $operation->total_edit_weight = request()->get('total_edit_weight');
+            $operation->save();
+
+            // Recalculate CustomerOperationDailySummary
+            OperationManager::createCustomerOperationDailySummary($operation);
+
+            return redirect()->route('supervisor.customer.billing-logs')
+                ->with('success', 'อัพเดตน้ำหนักเรียบร้อยแล้ว');
+        }
+
+        $customerGroups = CustomerGroup::with('customers')->get();
+        return view('supervisor.customers.edit-billing', [
+            'operation' => $operation,
+            'customerGroups' => $customerGroups
+        ]);
     }
 }

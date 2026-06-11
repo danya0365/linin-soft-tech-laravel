@@ -1,99 +1,51 @@
 @extends('layouts.app')
-
 @section('template_title')
-    {{ $truck->name ?? 'Show Truck' }}
+    Show Truck
 @endsection
-
 @section('content')
-    <div class="container">
-        <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
-            <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ route('admin') }}">{{ __('Admin') }}</a></li>
-            <li class="breadcrumb-item active" aria-current="page">{{ __('Truck') }}</li>
-            </ol>
-        </nav>
-        <div class="row">
-            <div class="col-md-12">
-                @if (session('success'))
-                    <div class="alert alert-success" role="alert">
-                        {{ session('success') }}
-                    </div>
-                @endif
-
-                <div class="card">
-                    <div class="card-header">
-                        <div class="float-left">
-                            <span class="card-title">Show Truck</span>
-                        </div>
-                        <div class="float-right">
-                            <a class="btn btn-primary" href="{{ route('trucks.create-note', ['id' => $truck->id]) }}"> Add Note</a>
-                            <a class="btn btn-primary" href="{{ route('trucks.index') }}"> Back</a>
-                        </div>
-                    </div>
-
-                    <div class="card-body">
-                        
-                        <div class="form-group">
-                            <strong>Name:</strong>
-                            {{ $truck->name }}
-                        </div>
-                        <div class="form-group">
-                            <strong>Photo:</strong>
-                            {{ $truck->photo }}
-                        </div>
-                        <div class="form-group">
-                            <strong>Plate Number:</strong>
-                            {{ $truck->plate_number }}
-                        </div>
-                        <div class="form-group">
-                            <strong>Operation Id:</strong>
-                            {{ $truck->operation_id }}
-                        </div>
-
-                    </div>
+<div class="container mx-auto px-4 py-6 max-w-4xl space-y-6">
+    <x-crud.breadcrumb :items="[['label' => 'Admin', 'route' => route('admin')],['label' => 'Truck', 'route' => route('trucks.index')],['label' => 'Details']]" />
+    <x-ui.card>
+        <x-slot:header>
+            <div class="flex items-center justify-between">
+                <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Truck Details</h2>
+                <div class="flex items-center gap-2">
+                    <x-ui.button 
+                        :href="route('trucks.create-note', ['id' => $truck->id])"
+                        variant="primary"
+                        size="sm"
+                        icon="fa fa-plus"
+                    >
+                        Add Note
+                    </x-ui.button>
+                    <x-ui.button :href="route('trucks.edit', $truck->id)" variant="success" size="sm" icon="fa fa-edit">Edit</x-ui.button>
+                    <x-ui.button :href="route('trucks.index')" variant="secondary" size="sm" icon="fa fa-arrow-left">Back</x-ui.button>
                 </div>
             </div>
-        </div>
-        <div class="row mt-2">
-            <div class="col-sm-12">
-                <div class="card">
-                    <div class="card-header">
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-
-                            <span id="card_title">
-                                {{ __('Note') }}
-                            </span>
-                        </div>
-                    </div>
-
-                    <div class="card-body">
-                    @foreach ($notes as $note)
-                        <div class="card mb-2">
-                            <div class="card-body">
-                                <h5 class="card-title">ค่าใช้จ่าย: {{ $note->cost }}</h5>
-                                <p class="card-text">{{ $note->message }}</p>
-                            </div>
-                            <ul class="list-group list-group-flush">
-                                <li class="list-group-item">
-                                    <small class="text-muted">วันที่: {{ $note->created_at->format('Y-m-d') }}</small>
-                                </li>
-                            </ul>
-                            <div class="card-body">
-                                <form action="{{ route('notes.destroy',$note->id) }}" method="POST">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-danger btn-sm"><i class="fa fa-fw fa-trash"></i> Delete</button>
-                                </form>
-                            </div>
-                            @if ( $note->image_url != '' )
-                            <img src="{{ asset($note->image_url) }}" class="card-img-bottom" alt="{{ asset($note->image_url) }}">
-                            @endif
-                        </div>
-                    @endforeach
-                    </div>
+        </x-slot:header>
+        <div class="grid md:grid-cols-2 gap-6">
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Name</p><p class="font-semibold text-gray-900 dark:text-white">{{ $truck->name ?? '-' }}</p></div>
+            <div>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Photo</p>
+                <div class="mt-1">
+                    @if($truck->photo)
+                        <img src="{{ asset($truck->photo) }}" alt="{{ $truck->name }}" class="max-w-xs rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
+                    @else
+                        <span class="text-gray-400 dark:text-gray-500 italic">No photo available</span>
+                    @endif
                 </div>
-                {!! $notes->links() !!}
             </div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Plate Number</p><p class="font-semibold text-gray-900 dark:text-white">{{ $truck->plate_number ?? '-' }}</p></div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Operation Id</p><p class="font-semibold text-gray-900 dark:text-white">{{ $truck->operation_id ?? '-' }}</p></div>
         </div>
-    </div>
+    </x-ui.card>
+    {{-- Notes Section --}}
+    <x-crud.notes-section 
+        :notes="$notes"
+        :tags="$machineTags"
+        :selectedTag="$selectedTag"
+        :model="$truck"
+        resource="trucks"
+    />
+</div>
 @endsection

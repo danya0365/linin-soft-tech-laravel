@@ -218,6 +218,290 @@ class HighChartManager extends Manager
     {
         return SalesYearSummary::getInstance()->getSalesYearSummary();
     }
+
+    /**
+     * กราฟ 1: ภาพรวมการเงิน (รายได้, ต้นทุน, กำไร, ค่าพลังงาน) หน่วย: บาท
+     */
+    public static function getFinancialComparisonSummary($startDateString = '', $endDateString = ''): array
+    {
+        $totalDays = 7;
+        $endDate = $endDateString ? \Carbon\Carbon::parse($endDateString) : \Carbon\Carbon::now();
+        $startDate = $startDateString ? \Carbon\Carbon::parse($startDateString) : \Carbon\Carbon::parse($endDate->format('Y-m-d'))->subDays($totalDays);
+
+        $dates = self::getDates($startDateString, $endDateString);
+        $titles = [];
+        $dataStructure = [];
+        foreach ($dates as $date) {
+            $dateYmd = $date->format('Y-m-d');
+            $titles[] = $date->format('M j');
+            $dataStructure[$dateYmd] = 0;
+        }
+
+        // รายได้
+        $incomeData = $dataStructure;
+        $incomeRows = Income::query()
+            ->select(DB::raw("DATE_FORMAT(created_at, '%Y-%m-%d') as ymd"), DB::raw('SUM(amount) as total'))
+            ->whereBetween('created_at', [$startDate->copy()->startOfDay(), $endDate->copy()->endOfDay()])
+            ->groupBy('ymd')->get();
+        foreach ($incomeRows as $row) {
+            if (isset($incomeData[$row->ymd])) {
+                $incomeData[$row->ymd] = floatval($row->total);
+            }
+        }
+
+        // ต้นทุน
+        $expenseData = $dataStructure;
+        $expenseRows = Expense::query()
+            ->select(DB::raw("DATE_FORMAT(created_at, '%Y-%m-%d') as ymd"), DB::raw('SUM(amount) as total'))
+            ->whereBetween('created_at', [$startDate->copy()->startOfDay(), $endDate->copy()->endOfDay()])
+            ->groupBy('ymd')->get();
+        foreach ($expenseRows as $row) {
+            if (isset($expenseData[$row->ymd])) {
+                $expenseData[$row->ymd] = floatval($row->total);
+            }
+        }
+
+        // กำไร = รายได้ - ต้นทุน
+        $profitData = $dataStructure;
+        foreach ($dataStructure as $ymd => $val) {
+            $profitData[$ymd] = $incomeData[$ymd] - $expenseData[$ymd];
+        }
+
+        // ค่าพลังงานรวม
+        $energyData = $dataStructure;
+        $energyRows = EnergyResourceLog::query()
+            ->select(DB::raw("DATE_FORMAT(created_at, '%Y-%m-%d') as ymd"), DB::raw('SUM(cost) as total'))
+            ->whereBetween('created_at', [$startDate->copy()->startOfDay(), $endDate->copy()->endOfDay()])
+            ->groupBy('ymd')->get();
+        foreach ($energyRows as $row) {
+            if (isset($energyData[$row->ymd])) {
+                $energyData[$row->ymd] = floatval($row->total);
+            }
+        }
+
+        return [
+            'titles' => array_values($titles),
+            'data' => [
+                ['name' => 'รายได้', 'data' => array_values($incomeData)],
+                ['name' => 'ต้นทุน', 'data' => array_values($expenseData)],
+                ['name' => 'กำไร', 'data' => array_values($profitData)],
+                ['name' => 'ค่าพลังงาน', 'data' => array_values($energyData)],
+            ]
+        ];
+    }
+
+    /**
+     * กราฟ 2: ปริมาณงาน (น้ำหนักผ้าเปียก, น้ำหนักผ้าแห้ง) หน่วย: กก.
+     * ดึงข้อมูลจากทั้ง customer_operation_daily_summaries และ operations (status=close)
+     */
+    public static function getOperationComparisonSummary($startDateString = '', $endDateString = ''): array
+    {
+        $totalDays = 7;
+        $endDate = $endDateString ? \Carbon\Carbon::parse($endDateString) : \Carbon\Carbon::now();
+        $startDate = $startDateString ? \Carbon\Carbon::parse($startDateString) : \Carbon\Carbon::parse($endDate->format('Y-m-d'))->subDays($totalDays);
+
+        $dates = self::getDates($startDateString, $endDateString);
+        $titles = [];
+        $dataStructure = [];
+        foreach ($dates as $date) {
+            $dateYmd = $date->format('Y-m-d');
+            $titles[] = $date->format('M j');
+            $dataStructure[$dateYmd] = 0;
+        }
+
+        // น้ำหนักผ้าเปียก - จาก customer_operation_daily_summaries
+        $wetWeightData = $dataStructure;
+        $wetRows = \App\Models\CustomerOperationDailySummary::query()
+            ->select(DB::raw("operation_date as ymd"), DB::raw('SUM(total_wet_weight) as total'))
+            ->whereBetween('operation_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
+            ->groupBy('ymd')->get();
+        foreach ($wetRows as $row) {
+            if (isset($wetWeightData[$row->ymd])) {
+                $wetWeightData[$row->ymd] += floatval($row->total);
+            }
+        }
+
+        // น้ำหนักผ้าเปียก - จาก operations (status=close) ที่กรอกผ่าน new-billing
+        $wetRowsOp = \App\Models\Operation::query()
+            ->select(DB::raw("DATE_FORMAT(billing_payment_date, '%Y-%m-%d') as ymd"), DB::raw('SUM(total_wet_weight) as total'))
+            ->where('status', 'close')
+            ->whereNotNull('total_wet_weight')
+            ->whereBetween('billing_payment_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
+            ->groupBy('ymd')->get();
+        foreach ($wetRowsOp as $row) {
+            if (isset($wetWeightData[$row->ymd])) {
+                $wetWeightData[$row->ymd] += floatval($row->total);
+            }
+        }
+
+        // น้ำหนักผ้าแห้ง - จาก customer_operation_daily_summaries
+        $dryWeightData = $dataStructure;
+        $dryRows = \App\Models\CustomerOperationDailySummary::query()
+            ->select(DB::raw("operation_date as ymd"), DB::raw('SUM(total_dry_weight) as total'))
+            ->whereBetween('operation_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
+            ->groupBy('ymd')->get();
+        foreach ($dryRows as $row) {
+            if (isset($dryWeightData[$row->ymd])) {
+                $dryWeightData[$row->ymd] += floatval($row->total);
+            }
+        }
+
+        // น้ำหนักผ้าแห้ง - จาก operations (status=close)
+        $dryRowsOp = \App\Models\Operation::query()
+            ->select(DB::raw("DATE_FORMAT(billing_payment_date, '%Y-%m-%d') as ymd"), DB::raw('SUM(total_dry_weight) as total'))
+            ->where('status', 'close')
+            ->whereNotNull('total_dry_weight')
+            ->whereBetween('billing_payment_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
+            ->groupBy('ymd')->get();
+        foreach ($dryRowsOp as $row) {
+            if (isset($dryWeightData[$row->ymd])) {
+                $dryWeightData[$row->ymd] += floatval($row->total);
+            }
+        }
+
+        return [
+            'titles' => array_values($titles),
+            'data' => [
+                ['name' => 'น้ำหนักผ้าเปียก (กก.)', 'data' => array_values($wetWeightData)],
+                ['name' => 'น้ำหนักผ้าแห้ง (กก.)', 'data' => array_values($dryWeightData)],
+            ]
+        ];
+    }
+
+    /**
+     * สรุปสถิติ Operation ตามช่วงวันที่
+     * ใช้แสดงในหน้า report แบบ card
+     */
+    public static function getOperationStatsSummary($startDateString = '', $endDateString = ''): array
+    {
+        $totalDays = 7;
+        $endDate = $endDateString ? \Carbon\Carbon::parse($endDateString) : \Carbon\Carbon::now();
+        $startDate = $startDateString ? \Carbon\Carbon::parse($startDateString) : \Carbon\Carbon::parse($endDate->format('Y-m-d'))->subDays($totalDays);
+
+        $startOfDay = $startDate->copy()->startOfDay();
+        $endOfDay = $endDate->copy()->endOfDay();
+
+        // ดึงจาก operations table
+        // === Group 1: Non-payment operations - filter by created_at ===
+        $nonPaymentCount = \App\Models\Operation::where('operation_type', '!=', 'payment')
+            ->whereBetween('created_at', [$startOfDay, $endOfDay])->count();
+        $nonPaymentWetWeight = \App\Models\Operation::where('operation_type', '!=', 'payment')
+            ->whereBetween('created_at', [$startOfDay, $endOfDay])->sum('total_wet_weight') ?? 0;
+        $nonPaymentDryWeight = \App\Models\Operation::where('operation_type', '!=', 'payment')
+            ->whereBetween('created_at', [$startOfDay, $endOfDay])->sum('total_dry_weight') ?? 0;
+        $nonPaymentEditWeight = \App\Models\Operation::where('operation_type', '!=', 'payment')
+            ->whereBetween('created_at', [$startOfDay, $endOfDay])->sum('total_edit_weight') ?? 0;
+        $nonPaymentBillingWeight = \App\Models\Operation::where('operation_type', '!=', 'payment')
+            ->whereBetween('created_at', [$startOfDay, $endOfDay])->sum('total_billing_weight') ?? 0;
+        $nonPaymentBillingPayment = \App\Models\Operation::where('operation_type', '!=', 'payment')
+            ->whereBetween('created_at', [$startOfDay, $endOfDay])->sum('total_billing_payment') ?? 0;
+        
+        // === Group 2: Payment operations - filter by billing_payment_date ===
+        $startDateStr = $startDate->format('Y-m-d');
+        $endDateStr = $endDate->format('Y-m-d');
+        
+        $paymentCount = \App\Models\Operation::where('operation_type', 'payment')
+            ->whereBetween('billing_payment_date', [$startDateStr, $endDateStr])->count();
+        $paymentWetWeight = \App\Models\Operation::where('operation_type', 'payment')
+            ->whereBetween('billing_payment_date', [$startDateStr, $endDateStr])->sum('total_wet_weight') ?? 0;
+        $paymentDryWeight = \App\Models\Operation::where('operation_type', 'payment')
+            ->whereBetween('billing_payment_date', [$startDateStr, $endDateStr])->sum('total_dry_weight') ?? 0;
+        $paymentEditWeight = \App\Models\Operation::where('operation_type', 'payment')
+            ->whereBetween('billing_payment_date', [$startDateStr, $endDateStr])->sum('total_edit_weight') ?? 0;
+        $paymentBillingWeight = \App\Models\Operation::where('operation_type', 'payment')
+            ->whereBetween('billing_payment_date', [$startDateStr, $endDateStr])->sum('total_billing_weight') ?? 0;
+        $paymentBillingPayment = \App\Models\Operation::where('operation_type', 'payment')
+            ->whereBetween('billing_payment_date', [$startDateStr, $endDateStr])->sum('total_billing_payment') ?? 0;
+        
+        // === รวมทั้ง 2 กลุ่ม ===
+        $operationCount = $nonPaymentCount + $paymentCount;
+        $totalWetWeight = $nonPaymentWetWeight + $paymentWetWeight;
+        $totalDryWeight = $nonPaymentDryWeight + $paymentDryWeight;
+        $totalEditWeight = $nonPaymentEditWeight + $paymentEditWeight;
+        $totalBillingWeight = $nonPaymentBillingWeight + $paymentBillingWeight;
+        $totalBillingPayment = $nonPaymentBillingPayment + $paymentBillingPayment;
+
+        // === ผ้าแก้ไข จาก CustomerOperationDailySummary (คำนวณจาก linen_case='edit') ===
+        $totalEditCollectWeight = \App\Models\CustomerOperationDailySummary::whereBetween('operation_date', [$startDateStr, $endDateStr])
+            ->sum('total_edit_collect_weight') ?? 0;
+
+        // คำนวณ % หักลบ (เปียก-แห้ง)
+        $weightDiffPercent = ($totalWetWeight > 0 && $totalDryWeight > 0) 
+            ? round(($totalWetWeight - $totalDryWeight) / $totalWetWeight * 100, 2) 
+            : 0;
+
+        // คำนวณ % ผ้าแก้ไข (จากระบบ)
+        $editCollectWeightPercent = ($totalBillingWeight > 0 && $totalEditCollectWeight > 0) 
+            ? round(($totalEditCollectWeight / $totalBillingWeight) * 100, 2) 
+            : 0;
+
+        // คำนวณ % ผ้าแก้ไข (กรอกมือ)
+        $editWeightPercent = ($totalBillingWeight > 0 && $totalEditWeight > 0) 
+            ? round(($totalEditWeight / $totalBillingWeight) * 100, 2) 
+            : 0;
+
+        return [
+            'startDate' => $startDate->format('Y-m-d'),
+            'endDate' => $endDate->format('Y-m-d'),
+            'operationCount' => $operationCount,
+            'totalWetWeight' => round($totalWetWeight, 2),
+            'totalDryWeight' => round($totalDryWeight, 2),
+            'weightDiffPercent' => $weightDiffPercent,
+            'totalEditCollectWeight' => round($totalEditCollectWeight, 2),
+            'editCollectWeightPercent' => $editCollectWeightPercent,
+            'totalEditWeight' => round($totalEditWeight, 2),
+            'editWeightPercent' => $editWeightPercent,
+            'totalBillingWeight' => round($totalBillingWeight, 2),
+            'totalBillingPayment' => round($totalBillingPayment, 2),
+        ];
+    }
+
+    /**
+     * กราฟ 3: เปรียบเทียบแนวโน้ม (Normalized %) - รวมทุกข้อมูลในกราฟเดียว
+     * แปลงค่าเป็น % ของค่าสูงสุดในช่วงเวลา
+     */
+    public static function getTrendComparisonSummary($startDateString = '', $endDateString = ''): array
+    {
+        // ดึงข้อมูลจากทั้ง 2 กราฟ
+        $financial = self::getFinancialComparisonSummary($startDateString, $endDateString);
+        $operation = self::getOperationComparisonSummary($startDateString, $endDateString);
+
+        $allSeries = [];
+
+        // Normalize ข้อมูลเป็น % ของค่าสูงสุด
+        $normalizeData = function($data) {
+            $max = max($data);
+            if ($max == 0) return array_fill(0, count($data), 0);
+            return array_map(function($val) use ($max) {
+                return round(($val / $max) * 100, 1);
+            }, $data);
+        };
+
+        // เพิ่มข้อมูลการเงิน (เลือกเฉพาะบางตัว)
+        foreach ($financial['data'] as $series) {
+            if (in_array($series['name'], ['รายได้', 'ต้นทุน', 'ค่าพลังงาน'])) {
+                $allSeries[] = [
+                    'name' => $series['name'],
+                    'data' => $normalizeData($series['data'])
+                ];
+            }
+        }
+
+        // เพิ่มข้อมูลปริมาณงาน (รวมเป็น 1 เส้น: ผ้าเปียก)
+        foreach ($operation['data'] as $series) {
+            if ($series['name'] === 'น้ำหนักผ้าเปียก (กก.)') {
+                $allSeries[] = [
+                    'name' => 'น้ำหนักผ้า',
+                    'data' => $normalizeData($series['data'])
+                ];
+            }
+        }
+
+        return [
+            'titles' => $financial['titles'],
+            'data' => $allSeries
+        ];
+    }
 }
 
 class SalesLatestDaysSummary

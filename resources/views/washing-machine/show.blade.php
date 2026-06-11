@@ -1,83 +1,51 @@
 @extends('layouts.app')
-
 @section('template_title')
-    {{ $washingMachine->name ?? 'Show Washing Machine' }}
+    Show Washing Machine
 @endsection
-
 @section('content')
-    <section class="content container">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="card-header">
-                        <div class="float-left">
-                            <span class="card-title">Show Washing Machine</span>
-                        </div>
-                        <div class="float-right">
-                            <a class="btn btn-primary" href="{{ route('washing-machines.create-note', ['id' => $washingMachine->id]) }}"> Add Note</a>
-                            <a class="btn btn-primary" href="{{ route('washing-machines.index') }}"> Back</a>
-                        </div>
-                    </div>
-
-                    <div class="card-body">
-                        
-                        <div class="form-group">
-                            <strong>Name:</strong>
-                            {{ $washingMachine->name }}
-                        </div>
-                        <div class="form-group">
-                            <strong>Photo:</strong>
-                            {{ $washingMachine->photo }}
-                        </div>
-                        <div class="form-group">
-                            <strong>Maximum Weight:</strong>
-                            {{ $washingMachine->maximum_weight }}
-                        </div>
-
-                    </div>
+<div class="container mx-auto px-4 py-6 max-w-4xl space-y-6">
+    <x-crud.breadcrumb :items="[['label' => 'Admin', 'route' => route('admin')],['label' => 'Washing Machine', 'route' => route('washing-machines.index')],['label' => 'Details']]" />
+    <x-ui.card>
+        <x-slot:header>
+            <div class="flex items-center justify-between">
+                <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Washing Machine Details</h2>
+                <div class="flex items-center gap-2">
+                    <x-ui.button 
+                        :href="route('washing-machines.create-note', ['id' => $washingMachine->id])"
+                        variant="primary"
+                        size="sm"
+                        icon="fa fa-plus"
+                    >
+                        Add Note
+                    </x-ui.button>
+                    <x-ui.button :href="route('washing-machines.edit', $washingMachine->id)" variant="success" size="sm" icon="fa fa-edit">Edit</x-ui.button>
+                    <x-ui.button :href="route('washing-machines.index')" variant="secondary" size="sm" icon="fa fa-arrow-left">Back</x-ui.button>
                 </div>
             </div>
-        </div>
-        <div class="row mt-2">
-            <div class="col-sm-12">
-                <div class="card">
-                    <div class="card-header">
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-
-                            <span id="card_title">
-                                {{ __('Note') }}
-                            </span>
-                        </div>
-                    </div>
-
-                    <div class="card-body">
-                    @foreach ($notes as $note)
-                        <div class="card mb-2">
-                            <div class="card-body">
-                                <h5 class="card-title">ค่าใช้จ่าย: {{ $note->cost }}</h5>
-                                <p class="card-text">{{ $note->message }}</p>
-                            </div>
-                            <ul class="list-group list-group-flush">
-                                <li class="list-group-item">
-                                    <small class="text-muted">วันที่: {{ $note->created_at->format('Y-m-d') }}</small>
-                                </li>
-                            </ul>
-                            <div class="card-body">
-                                <form action="{{ route('notes.destroy',$note->id) }}" method="POST">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-danger btn-sm"><i class="fa fa-fw fa-trash"></i> Delete</button>
-                                </form>
-                            </div>
-                            @if ( $note->image_url != '' )
-                            <img src="{{ asset($note->image_url) }}" class="card-img-bottom" alt="{{ asset($note->image_url) }}">
-                            @endif
-                        </div>
-                    @endforeach
-                    </div>
+        </x-slot:header>
+        <div class="grid md:grid-cols-2 gap-6">
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Name</p><p class="font-semibold text-gray-900 dark:text-white">{{ $washingMachine->name ?? '-' }}</p></div>
+            <div>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Photo</p>
+                <div class="mt-1">
+                    @if($washingMachine->photo)
+                        <img src="{{ asset($washingMachine->photo) }}" alt="{{ $washingMachine->name }}" class="max-w-xs rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
+                    @else
+                        <span class="text-gray-400 dark:text-gray-500 italic">No photo available</span>
+                    @endif
                 </div>
-                {!! $notes->links() !!}
             </div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Maximum Weight</p><p class="font-semibold text-gray-900 dark:text-white">{{ $washingMachine->maximum_weight ?? '-' }}</p></div>
+            <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Operation Id</p><p class="font-semibold text-gray-900 dark:text-white">{{ $washingMachine->operation_id ?? '-' }}</p></div>
         </div>
-    </section>
+    </x-ui.card>
+    {{-- Notes Section --}}
+    <x-crud.notes-section 
+        :notes="$notes"
+        :tags="$machineTags"
+        :selectedTag="$selectedTag"
+        :model="$washingMachine"
+        resource="washing-machines"
+    />
+</div>
 @endsection

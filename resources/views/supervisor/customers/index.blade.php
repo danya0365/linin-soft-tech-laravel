@@ -1,48 +1,32 @@
-@extends('layouts.worker')
+@extends('layouts.supervisor')
 
 @section('content')
-
-<div class="container">
-    <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="{{ route('supervisor') }}">Supervisor</a></li>
-          <li class="breadcrumb-item active" aria-current="page">{{ __('Customer') }}</li>
-        </ol>
-    </nav>
-    <div class="row justify-content-center">
-        <div class="col-md-12 m-2">
-            <div class="card">
-                <div class="card-header">Customer</div>
-                <div class="card-body">
-                    <div class="row g-2">
-                        <div class="col-sm-6">
-                            <a href="{{ route('supervisor.customer.new-billing') }}">
-                                <div class="p-3 border bg-navy" style="min-height: 150px">
-                                    <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 150px">
-                                        <div class="text-center">
-                                            <div class="fa-solid fa-money-bill text-light" style="font-size: 3em"></div>
-                                            <div class="text-center mt-3 text-light">{{ __('เพิ่มบิลรายรับ - New Income Billing') }}</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </a>
-                        </div>
-                        <div class="col-sm-6">
-                            <a href="{{ route('supervisor.customer.billing-logs') }}">
-                                <div class="p-3 border bg-navy" style="min-height: 150px">
-                                    <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 150px">
-                                        <div class="text-center">
-                                            <div class="fa-solid fa-history text-light" style="font-size: 3em"></div>
-                                            <div class="text-center mt-3 text-light">{{ __('ประวัติบิลรายรับ - Income Billing Logs') }}</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+<x-supervisor.page 
+    title="{{ __('Customer') }}"
+    subtitle="จัดการข้อมูลบิลและประวัติรายรับของลูกค้า"
+    icon="fa-hospital"
+    :breadcrumbs="[
+        ['label' => __('Customer')]
+    ]"
+>
+    <x-menu.grid :columns="2">
+        <x-menu.card 
+            href="{{ route('supervisor.customer.new-billing') }}"
+            icon="fa-solid fa-money-bill"
+            title="{{ __('เพิ่มบิลรายรับ') }}"
+            subtitle="New Income Billing"
+            gradient="from-emerald-500 to-green-600"
+            subtitle-color="text-emerald-100"
+        />
+        
+        <x-menu.card 
+            href="{{ route('supervisor.customer.billing-logs') }}"
+            icon="fa-solid fa-history"
+            title="{{ __('ประวัติบิลรายรับ') }}"
+            subtitle="Income Billing Logs"
+            gradient="from-teal-500 to-teal-700"
+            subtitle-color="text-teal-100"
+        />
+    </x-menu.grid>
+</x-supervisor.page>
 @endsection

@@ -1,58 +1,38 @@
 @extends('layouts.supervisor')
 
 @section('content')
-
-<div class="container">
-    <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="/">Home</a></li>
-          <li class="breadcrumb-item active" aria-current="page">{{ __('Supervisor') }}</li>
-        </ol>
-    </nav>
-    <div class="row justify-content-center">
-        <div class="col-md-12 m-2">
-            <div class="card">
-                <div class="card-header">{{ __('Supervisor Menu') }}</div>
-                <div class="card-body">
-                    <div class="row g-2">
-                        <div class="col-sm-4">
-                            <a href="{{ route('supervisor.customer') }}">
-                                <div class="p-3 border bg-success" style="min-height: 150px">
-                                    <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 110px">
-                                        <div class="text-center">
-                                            <div class="fa-solid fa-hospital text-light" style="font-size: 3em"></div>
-                                            <div class="text-center mt-3 text-light">{{ __('ลูกค้า - Customer') }}</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </a>
-                        </div>
-                        <div class="col-sm-4">
-                            <a href="{{ route('supervisor.department') }}">
-                                <div class="p-3 border bg-info" style="min-height: 150px">
-                                    <div class="rounded-3 d-flex align-items-center justify-content-center">
-                                        <div class="bi bi-people-fill text-light" style="font-size: 3em"></div>
-                                    </div>
-                                    <div class="text-center text-light">{{ __('แผนก - Department') }}</div>
-                                </div>
-                            </a>
-                        </div>
-                        <div class="col-sm-4">
-                            <a href="{{ route('supervisor.report') }}">
-                                <div class="p-3 border bg-warning" style="min-height: 150px">
-                                    <div class="rounded-3 d-flex align-items-center justify-content-center" style="min-height: 110px">
-                                        <div class="text-center">
-                                            <div class="fa-solid fa-chart-pie text-light" style="font-size: 3em"></div>
-                                            <div class="text-center mt-3 text-light">{{ __('รายงานสถิติ - Report') }}</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+<x-supervisor.page 
+    title="{{ __('Supervisor Menu') }}"
+    subtitle="จัดการข้อมูลลูกค้า แผนก และรายงานสถิติ"
+    icon="fa-user-tie"
+>
+    <x-menu.grid :columns="3">
+        <x-menu.card 
+            href="{{ route('supervisor.customer') }}"
+            icon="fa-solid fa-hospital"
+            title="{{ __('ลูกค้า') }}"
+            subtitle="Customer"
+            gradient="from-emerald-500 to-teal-600"
+            subtitle-color="text-emerald-100"
+        />
+        
+        <x-menu.card 
+            href="{{ route('supervisor.department') }}"
+            icon="fa-solid fa-users-rectangle"
+            title="{{ __('แผนก') }}"
+            subtitle="Department"
+            gradient="from-cyan-500 to-blue-600"
+            subtitle-color="text-cyan-100"
+        />
+        
+        <x-menu.card 
+            href="{{ route('supervisor.report') }}"
+            icon="fa-solid fa-chart-pie"
+            title="{{ __('รายงานสถิติ') }}"
+            subtitle="Report"
+            gradient="from-amber-400 to-orange-500"
+            subtitle-color="text-amber-100"
+        />
+    </x-menu.grid>
+</x-supervisor.page>
 @endsection

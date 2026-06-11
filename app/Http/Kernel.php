@@ -40,11 +40,12 @@ class Kernel extends HttpKernel
         ],
 
         'api' => [
+            \App\Http\Middleware\EncryptCookies::class,
+            \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
+            \Illuminate\Session\Middleware\StartSession::class,
             // \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
             'throttle:api',
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
-            \App\Http\Middleware\EncryptCookies::class,
-            \Illuminate\Session\Middleware\StartSession::class,
         ],
     ];
 
@@ -70,5 +71,6 @@ class Kernel extends HttpKernel
         'supervisor' => \App\Http\Middleware\IsSupervisor::class,
         'user-customer' => \App\Http\Middleware\IsCustomer::class,
         'worker' => \App\Http\Middleware\IsWorker::class,
+        'logged-in'=> \App\Http\Middleware\IsLoggedIn::class,
     ];
 }

@@ -1,41 +1,23 @@
-<div class="box box-info padding-1">
-    <div class="box-body">
-        
-        <div class="form-group">
-            {{ Form::label('code') }}
-            {{ Form::text('code', $employee->code, ['class' => 'form-control' . ($errors->has('code') ? ' is-invalid' : ''), 'placeholder' => 'Code']) }}
-            {!! $errors->first('code', '<div class="invalid-feedback">:message</div>') !!}
-        </div>
-        <div class="form-group">
-            {{ Form::label('name') }}
-            {{ Form::text('name', $employee->name, ['class' => 'form-control' . ($errors->has('name') ? ' is-invalid' : ''), 'placeholder' => 'Name']) }}
-            {!! $errors->first('name', '<div class="invalid-feedback">:message</div>') !!}
-        </div>
-        <div class="form-group">
-            {{ Form::label('photo') }}
-            {{ Form::text('photo', $employee->photo, ['class' => 'form-control' . ($errors->has('photo') ? ' is-invalid' : ''), 'placeholder' => 'Photo']) }}
-            {!! $errors->first('photo', '<div class="invalid-feedback">:message</div>') !!}
-        </div>
-        <div class="col-12">
-            {{ Form::label('image_upload', 'Upload photo', ['class' => "form-label"]) }}
-            {{ Form::file('image_upload', ['class' => 'form-control' . ($errors->has('image_upload') ? ' is-invalid' : ''), 'placeholder' => '']) }}
-            {!! $errors->first('image_upload', '<div class="invalid-feedback">:message</div>') !!}
-        </div>
-        <div class="form-group">
-            {{ Form::label('department_id') }}
-            <select name="department_id" class="form-select">
-                <option value=""></option>
-            @foreach (App\Models\Department::get() as $department)
-                <option value="{{ $department->id }}" @selected($employee->department_id == $department->id)>
-                    {{ $department->name }}
-                </option>
-            @endforeach
-            </select>
-            {!! $errors->first('department_id', '<div class="invalid-feedback">:message</div>') !!}
-        </div>
+<x-crud.form-group name="code" label="Code" type="text" :value="$employee->code ?? old('code')" placeholder="Enter Code" />
+<x-crud.form-group name="name" label="Name" type="text" :value="$employee->name ?? old('name')" placeholder="Enter Name" />
+<x-crud.form-group name="photo" label="Photo" type="text" :value="$employee->photo ?? old('photo')" placeholder="Enter Photo" />
 
-    </div>
-    <div class="box-footer mt-4">
-        <button type="submit" class="btn btn-primary">Submit</button>
-    </div>
+{{-- Image Upload with Crop --}}
+<x-image-crop-upload name="image_upload" label="Upload Photo" :current-image="$employee->image_upload ?? null" />
+
+{{-- Department Select --}}
+@php
+    $departmentOptions = [];
+    foreach (\App\Models\Department::get() as $department) {
+        $departmentOptions[$department->id] = $department->name;
+    }
+@endphp
+<x-crud.form-group name="department_id" label="Department" type="select" :value="$employee->department_id ?? old('department_id')" placeholder="เลือก"
+    :options="$departmentOptions" />
+
+<div class="flex items-center justify-end gap-3 mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+    <x-ui.button type="submit" variant="primary" icon="fa fa-save">
+        {{ isset($employee->id) ? 'Update' : 'Create' }} Employee
+    </x-ui.button>
+    <x-ui.button :href="route('employees.index')" variant="secondary" icon="fa fa-times">Cancel</x-ui.button>
 </div>
