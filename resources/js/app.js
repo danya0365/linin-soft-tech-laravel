@@ -3,6 +3,7 @@ require("gijgo");
 require("gijgo/css/gijgo.css");
 require("./worker/employee/employee-summary.js");
 require("./highcharts.js");
+require("./image-crop-upload.js");
 
 $.ajaxSetup({
     headers: {
