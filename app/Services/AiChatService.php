@@ -1,0 +1,485 @@
+<?php
+
+namespace App\Services;
+
+use App\Exceptions\WaveSpeedApiException;
+use App\Models\Customer;
+use App\Models\CustomerGroup;
+use App\Models\Department;
+use App\Models\Employee;
+use App\Models\EnergyResource;
+use App\Models\InventoryGroup;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
+
+/**
+ * AI Chat Service
+ *
+ * Orchestrator สำหรับตอบคำถาม natural language ผ่าน WaveSpeed LLM
+ * ใช้ tool calling ดึงข้อมูลจริงจาก ChatService / Eloquent (read-only)
+ * เป็น fallback path ของ ChatService::processCommand() เมื่อไม่ตรง rule ใดๆ
+ */
+class AiChatService
+{
+    /** จำนวนรอบ tool loop สูงสุด */
+    protected int $maxIterations;
+
+    /** เวลารวมสูงสุดของ loop (วินาที) */
+    protected const OVERALL_DEADLINE_SECONDS = 50;
+
+    /** ตัดข้อความ tool result กัน token บาน */
+    protected const TOOL_RESULT_MAX_CHARS = 2500;
+
+    /** LINE text message limit 5000 — เผื่อ margin */
+    protected const ANSWER_MAX_CHARS = 4500;
+
+    public function __construct(
+        protected WaveSpeedLlmService $llm,
+        protected ChatService $chatService,
+    ) {
+        $this->maxIterations = (int) config('services.wavespeed.max_iterations', 5);
+    }
+
+    public function isAvailable(): bool
+    {
+        return $this->llm->isEnabled();
+    }
+
+    /**
+     * ตอบคำถาม user — ไม่ throw เด็ดขาด
+     * สำเร็จ: {type: text, title, text} / ล้มเหลว: เมนูแจ้งขัดข้อง
+     */
+    public function answer(string $question): array
+    {
+        try {
+            $text = $this->runToolLoop($question);
+
+            if ($text === null || trim($text) === '') {
+                throw new WaveSpeedApiException('LLM returned empty answer');
+            }
+
+            return [
+                'type' => 'text',
+                'title' => '🤖 AI ผู้ช่วย',
+                'text' => mb_substr(trim($text), 0, self::ANSWER_MAX_CHARS),
+            ];
+        } catch (\Throwable $e) {
+            Log::error('AiChatService failed', [
+                'question' => mb_substr($question, 0, 200),
+                'error' => $e->getMessage(),
+            ]);
+
+            return $this->chatService->getMainMenu(
+                "⚠️ ขออภัยครับ ระบบ AI ขัดข้องชั่วคราว\nกรุณาลองใหม่ หรือเลือกเมนูด้านล่าง:"
+            );
+        }
+    }
+
+    /**
+     * Agentic loop: เรียก LLM พร้อม tools → execute tool_calls → วนจนได้คำตอบ
+     */
+    protected function runToolLoop(string $question): ?string
+    {
+        $deadline = microtime(true) + self::OVERALL_DEADLINE_SECONDS;
+
+        $messages = [
+            ['role' => 'system', 'content' => $this->systemPrompt()],
+            ['role' => 'user', 'content' => $question],
+        ];
+
+        $tools = $this->toolDefinitions();
+
+        for ($i = 0; $i < $this->maxIterations; $i++) {
+            if (microtime(true) > $deadline) {
+                break;
+            }
+
+            try {
+                $response = $this->llm->chatCompletion($messages, $tools);
+            } catch (WaveSpeedApiException $e) {
+                // model บางตัวไม่รองรับ tools param → ลอง JSON-intent mode
+                if ($i === 0 && $e->getHttpStatus() === 400) {
+                    return $this->runJsonIntentFallback($question);
+                }
+                throw $e;
+            }
+
+            $message = $response['choices'][0]['message'] ?? [];
+            $toolCalls = $message['tool_calls'] ?? [];
+
+            if (empty($toolCalls)) {
+                return $message['content'] ?? null;
+            }
+
+            $messages[] = [
+                'role' => 'assistant',
+                'content' => $message['content'] ?? null,
+                'tool_calls' => $toolCalls,
+            ];
+
+            foreach ($toolCalls as $toolCall) {
+                $name = $toolCall['function']['name'] ?? '';
+                $args = json_decode($toolCall['function']['arguments'] ?? '{}', true) ?: [];
+
+                Log::info('AiChatService tool call', ['tool' => $name, 'args' => $args]);
+
+                $messages[] = [
+                    'role' => 'tool',
+                    'tool_call_id' => $toolCall['id'] ?? $name,
+                    'content' => $this->executeTool($name, $args),
+                ];
+            }
+        }
+
+        // หมดรอบ/หมดเวลา — เรียกครั้งสุดท้ายแบบไม่มี tools ให้สรุปจากข้อมูลที่มี
+        $messages[] = [
+            'role' => 'user',
+            'content' => 'กรุณาสรุปคำตอบจากข้อมูลที่ได้มาแล้วข้างต้นทันที โดยไม่ต้องเรียกเครื่องมือเพิ่ม',
+        ];
+
+        $response = $this->llm->chatCompletion($messages);
+
+        return $response['choices'][0]['message']['content'] ?? null;
+    }
+
+    /**
+     * Fallback 2-step สำหรับ model ที่ไม่รองรับ tool calling:
+     * (1) ให้ model เลือก tool เป็น JSON → (2) execute แล้วส่งผลกลับให้เรียบเรียง
+     */
+    protected function runJsonIntentFallback(string $question): ?string
+    {
+        Log::info('AiChatService: falling back to JSON-intent mode');
+
+        $toolList = collect($this->toolDefinitions())->map(function ($tool) {
+            $fn = $tool['function'];
+
+            return "- {$fn['name']}: {$fn['description']} | params: " . json_encode($fn['parameters'], JSON_UNESCAPED_UNICODE);
+        })->implode("\n");
+
+        $selectPrompt = $this->systemPrompt()
+            . "\n\nเครื่องมือที่ใช้ได้:\n{$toolList}\n\n"
+            . "ตอบเป็น JSON เท่านั้น ไม่ต้องมีข้อความอื่น รูปแบบ: {\"tool\": \"ชื่อเครื่องมือ\", \"args\": {...}} "
+            . "หรือถ้าตอบได้เลยโดยไม่ต้องใช้ข้อมูล: {\"answer\": \"คำตอบ\"}";
+
+        $response = $this->llm->chatCompletion([
+            ['role' => 'system', 'content' => $selectPrompt],
+            ['role' => 'user', 'content' => $question],
+        ]);
+
+        $content = $response['choices'][0]['message']['content'] ?? '';
+        $intent = $this->extractJson($content);
+
+        if (isset($intent['answer'])) {
+            return (string) $intent['answer'];
+        }
+
+        if (empty($intent['tool'])) {
+            // model ไม่ยอมตอบ JSON — ใช้ content ตรงๆ
+            return $content !== '' ? $content : null;
+        }
+
+        $toolResult = $this->executeTool($intent['tool'], $intent['args'] ?? []);
+
+        $response = $this->llm->chatCompletion([
+            ['role' => 'system', 'content' => $this->systemPrompt()],
+            ['role' => 'user', 'content' => $question],
+            ['role' => 'assistant', 'content' => "ข้อมูลจากระบบ ({$intent['tool']}):\n{$toolResult}"],
+            ['role' => 'user', 'content' => 'กรุณาตอบคำถามข้างต้นจากข้อมูลนี้'],
+        ]);
+
+        return $response['choices'][0]['message']['content'] ?? null;
+    }
+
+    protected function extractJson(string $content): array
+    {
+        $decoded = json_decode(trim($content), true);
+        if (is_array($decoded)) {
+            return $decoded;
+        }
+
+        // เผื่อ model ห่อด้วย ```json ... ``` หรือมีข้อความปน
+        if (preg_match('/\{.*\}/s', $content, $matches)) {
+            $decoded = json_decode($matches[0], true);
+            if (is_array($decoded)) {
+                return $decoded;
+            }
+        }
+
+        return [];
+    }
+
+    protected function systemPrompt(): string
+    {
+        $today = Carbon::now('Asia/Bangkok');
+
+        return "คุณคือผู้ช่วย AI ของระบบจัดการโรงซักรีด LinenSoftTech "
+            . "วันนี้คือวันที่ {$today->format('Y-m-d')} ({$today->locale('th')->isoFormat('dddd D MMMM')}) เวลาประเทศไทย\n\n"
+            . "กฎสำคัญ:\n"
+            . "1. ต้องใช้เครื่องมือ (tools) ดึงข้อมูลจริงจากระบบเสมอ ห้ามแต่งตัวเลขหรือเดาข้อมูลเอง\n"
+            . "2. ถ้าต้องใช้ id (เช่น customer_id, group_id) ให้เรียก list_* หรือ search_* หาก่อน\n"
+            . "3. ตอบเป็นภาษาไทย กระชับ อ่านง่าย เป็น plain text เท่านั้น ห้ามใช้ markdown (เช่น **, #, ตาราง) เพราะแสดงผลใน LINE ไม่ได้\n"
+            . "4. รูปแบบวันที่ใน args ใช้ Y-m-d เช่น {$today->format('Y-m-d')}\n"
+            . "5. ถ้าหาข้อมูลไม่พบ ให้บอกตรงๆ ว่าไม่พบ และแนะนำคำสั่งที่ใกล้เคียง";
+    }
+
+    /**
+     * OpenAI-style tool definitions (read-only ทั้งหมด)
+     */
+    protected function toolDefinitions(): array
+    {
+        $tools = [
+            ['get_today_summary', 'สรุปภาพรวมการดำเนินงานวันนี้ (น้ำหนักผ้า รายรับ-รายจ่าย ลูกค้า)', []],
+            ['get_business_report', 'รายงานธุรกิจตามวันที่/ช่วงเวลา (รายรับ รายจ่าย น้ำหนักผ้า)', [
+                'type' => ['string', 'ประเภทรายงาน: summary หรือ detailed', ['summary', 'detailed']],
+                'date' => ['string', 'วันที่ Y-m-d (ไม่ระบุ = วันนี้)'],
+                'range' => ['string', 'ช่วงเวลา: day, week, month', ['day', 'week', 'month']],
+            ]],
+            ['list_customer_groups', 'รายชื่อกลุ่มลูกค้าทั้งหมด พร้อม id', []],
+            ['search_customers', 'ค้นหาลูกค้าจากชื่อ และ/หรือ กลุ่ม (คืน id, ชื่อ, กลุ่ม)', [
+                'name' => ['string', 'ชื่อลูกค้า (ค้นหาบางส่วนได้)'],
+                'group_id' => ['integer', 'id กลุ่มลูกค้า'],
+            ]],
+            ['get_customer_detail', 'ข้อมูลลูกค้ารายตัว: น้ำหนักผ้า ยอดบิล ตามช่วงวันที่', [
+                'customer_id' => ['integer', 'id ลูกค้า (required)'],
+                'date_from' => ['string', 'วันที่เริ่ม Y-m-d'],
+                'date_to' => ['string', 'วันที่สิ้นสุด Y-m-d'],
+            ]],
+            ['list_inventory_groups', 'รายชื่อกลุ่มสต๊อก/ผ้าทั้งหมด พร้อม id', []],
+            ['get_inventories_by_group', 'รายการสต๊อก/ผ้าในกลุ่ม พร้อมจำนวนคงเหลือ', [
+                'group_id' => ['integer', 'id กลุ่มสต๊อก (required)'],
+            ]],
+            ['list_energy_resources', 'รายชื่อทรัพยากรพลังงานทั้งหมด (น้ำ ไฟ แก๊ส ฯลฯ) พร้อม id', []],
+            ['get_energy_logs', 'ประวัติการใช้พลังงานของทรัพยากร', [
+                'resource_id' => ['integer', 'id ทรัพยากรพลังงาน (required)'],
+            ]],
+            ['list_departments', 'รายชื่อแผนกทั้งหมด พร้อม id', []],
+            ['search_employees', 'ค้นหาพนักงานจากชื่อ และ/หรือ แผนก (คืน id, ชื่อ, แผนก)', [
+                'name' => ['string', 'ชื่อพนักงาน (ค้นหาบางส่วนได้)'],
+                'department_id' => ['integer', 'id แผนก'],
+            ]],
+            ['get_employee_detail', 'ข้อมูลพนักงานรายตัว: ผลงาน เวลาทำงาน', [
+                'employee_id' => ['integer', 'id พนักงาน (required)'],
+            ]],
+            ['get_machine_list', 'รายการเครื่องจักร/รถ พร้อมสถานะ', [
+                'type' => ['string', 'ประเภท: washing (เครื่องซัก), dryer (เครื่องอบ), truck (รถบรรทุก)', ['washing', 'dryer', 'truck']],
+            ]],
+            ['get_machine_notes', 'บันทึก/ประวัติซ่อมบำรุงเครื่องจักร ตามวันที่หรือล่าสุด 7 วัน', [
+                'type' => ['string', 'ประเภท: washing, dryer, truck', ['washing', 'dryer', 'truck']],
+                'date' => ['string', 'วันที่ Y-m-d (ไม่ระบุ = ล่าสุด 7 วัน)'],
+            ]],
+        ];
+
+        return array_map(function ($tool) {
+            [$name, $description, $params] = $tool;
+
+            $properties = [];
+            foreach ($params as $paramName => $def) {
+                $property = ['type' => $def[0], 'description' => $def[1]];
+                if (isset($def[2])) {
+                    $property['enum'] = $def[2];
+                }
+                $properties[$paramName] = $property;
+            }
+
+            return [
+                'type' => 'function',
+                'function' => [
+                    'name' => $name,
+                    'description' => $description,
+                    'parameters' => [
+                        'type' => 'object',
+                        'properties' => (object) $properties,
+                        'required' => [],
+                    ],
+                ],
+            ];
+        }, $tools);
+    }
+
+    /**
+     * Execute tool — คืน string เสมอ (error ก็คืนเป็นข้อความให้ LLM อ่าน ไม่ throw)
+     */
+    protected function executeTool(string $name, array $args): string
+    {
+        try {
+            $result = match ($name) {
+                'get_today_summary' => $this->chatService->getTodaySummary(),
+
+                'get_business_report' => $this->chatService->getReportByDate(
+                    in_array($args['type'] ?? '', ['summary', 'detailed']) ? $args['type'] : 'summary',
+                    $args['date'] ?? null,
+                    in_array($args['range'] ?? '', ['day', 'week', 'month']) ? $args['range'] : 'day',
+                ),
+
+                'list_customer_groups' => $this->listAsText(
+                    CustomerGroup::get(['id', 'name']),
+                    'กลุ่มลูกค้า'
+                ),
+
+                'search_customers' => $this->searchCustomers($args),
+
+                'get_customer_detail' => $this->chatService->getCustomerDetail(
+                    (int) ($args['customer_id'] ?? 0),
+                    $args['date_from'] ?? null,
+                    $args['date_to'] ?? null,
+                ),
+
+                'list_inventory_groups' => $this->listAsText(
+                    InventoryGroup::get(['id', 'name']),
+                    'กลุ่มสต๊อก'
+                ),
+
+                'get_inventories_by_group' => $this->chatService->getInventoriesByGroup(
+                    (int) ($args['group_id'] ?? 0)
+                ),
+
+                'list_energy_resources' => $this->listAsText(
+                    EnergyResource::get(['id', 'name']),
+                    'ทรัพยากรพลังงาน'
+                ),
+
+                'get_energy_logs' => $this->chatService->getEnergyLogs(
+                    (int) ($args['resource_id'] ?? 0)
+                ),
+
+                'list_departments' => $this->listAsText(
+                    Department::get(['id', 'name']),
+                    'แผนก'
+                ),
+
+                'search_employees' => $this->searchEmployees($args),
+
+                'get_employee_detail' => $this->chatService->getEmployeeDetail(
+                    (int) ($args['employee_id'] ?? 0)
+                ),
+
+                'get_machine_list' => $this->chatService->getMachineListByType(
+                    in_array($args['type'] ?? '', ['washing', 'dryer', 'truck']) ? $args['type'] : 'washing'
+                ),
+
+                'get_machine_notes' => $this->getMachineNotes($args),
+
+                default => "ไม่รู้จักเครื่องมือ \"{$name}\" — เครื่องมือที่ใช้ได้: get_today_summary, get_business_report, list_customer_groups, search_customers, get_customer_detail, list_inventory_groups, get_inventories_by_group, list_energy_resources, get_energy_logs, list_departments, search_employees, get_employee_detail, get_machine_list, get_machine_notes",
+            };
+        } catch (\Throwable $e) {
+            Log::warning('AiChatService tool execution failed', [
+                'tool' => $name,
+                'args' => $args,
+                'error' => $e->getMessage(),
+            ]);
+
+            return "เกิดข้อผิดพลาดขณะดึงข้อมูล ({$name}): {$e->getMessage()}";
+        }
+
+        $text = is_array($result) ? $this->serializeResponse($result) : (string) $result;
+
+        if (mb_strlen($text) > self::TOOL_RESULT_MAX_CHARS) {
+            $text = mb_substr($text, 0, self::TOOL_RESULT_MAX_CHARS) . "\n... (ข้อมูลถูกตัดทอน)";
+        }
+
+        return $text;
+    }
+
+    protected function searchCustomers(array $args): string
+    {
+        $query = Customer::query()->with('group:id,name');
+
+        if (!empty($args['name'])) {
+            $query->where('name', 'like', '%' . $args['name'] . '%');
+        }
+        if (!empty($args['group_id'])) {
+            $query->where('customer_group_id', (int) $args['group_id']);
+        }
+
+        $customers = $query->limit(15)->get(['id', 'name', 'customer_group_id']);
+
+        if ($customers->isEmpty()) {
+            return 'ไม่พบลูกค้าตามเงื่อนไขที่ค้นหา';
+        }
+
+        return "ลูกค้าที่พบ (สูงสุด 15 รายการ):\n" . $customers->map(function ($c) {
+            $group = $c->group->name ?? '-';
+
+            return "id: {$c->id} | {$c->name} | กลุ่ม: {$group}";
+        })->implode("\n");
+    }
+
+    protected function searchEmployees(array $args): string
+    {
+        $query = Employee::query()->with('department:id,name');
+
+        if (!empty($args['name'])) {
+            $query->where('name', 'like', '%' . $args['name'] . '%');
+        }
+        if (!empty($args['department_id'])) {
+            $query->where('department_id', (int) $args['department_id']);
+        }
+
+        $employees = $query->limit(15)->get(['id', 'name', 'code', 'department_id']);
+
+        if ($employees->isEmpty()) {
+            return 'ไม่พบพนักงานตามเงื่อนไขที่ค้นหา';
+        }
+
+        return "พนักงานที่พบ (สูงสุด 15 รายการ):\n" . $employees->map(function ($e) {
+            $dept = $e->department->name ?? '-';
+
+            return "id: {$e->id} | {$e->name} (รหัส {$e->code}) | แผนก: {$dept}";
+        })->implode("\n");
+    }
+
+    protected function getMachineNotes(array $args): array
+    {
+        $type = in_array($args['type'] ?? '', ['washing', 'dryer', 'truck']) ? $args['type'] : 'washing';
+
+        if (!empty($args['date'])) {
+            return $this->chatService->getMachineNotesByDateAndType($args['date'], $type);
+        }
+
+        return $this->chatService->getMachineRecentNotesByType($type);
+    }
+
+    /**
+     * แปลง response array ของ ChatService (card/menu/text) เป็น plain text กระชับ
+     */
+    protected function serializeResponse(array $response): string
+    {
+        $lines = [];
+
+        if (!empty($response['title'])) {
+            $lines[] = $response['title'];
+        }
+        if (!empty($response['subtitle'])) {
+            $lines[] = $response['subtitle'];
+        }
+        if (!empty($response['text'])) {
+            $lines[] = $response['text'];
+        }
+
+        foreach ($response['rows'] ?? [] as $row) {
+            $label = $row['label'] ?? '';
+            $value = $row['value'] ?? '';
+            $lines[] = trim("{$label}: {$value}", ': ');
+        }
+
+        if (!empty($response['quickReplies'])) {
+            $labels = array_filter(array_column($response['quickReplies'], 'label'));
+            if ($labels) {
+                $lines[] = 'ตัวเลือกที่เกี่ยวข้อง: ' . implode(', ', $labels);
+            }
+        }
+
+        return implode("\n", array_filter($lines, fn ($l) => trim($l) !== ''));
+    }
+
+    protected function listAsText($items, string $label): string
+    {
+        if ($items->isEmpty()) {
+            return "ไม่พบข้อมูล{$label}";
+        }
+
+        return "{$label}ทั้งหมด:\n" . $items->map(
+            fn ($item) => "id: {$item->id} | {$item->name}"
+        )->implode("\n");
+    }
+}

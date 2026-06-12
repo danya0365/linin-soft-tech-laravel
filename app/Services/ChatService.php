@@ -89,7 +89,12 @@ class ChatService
             return $this->getReportMenu();
         }
 
-        // Unknown command - show menu
+        // Unknown command - try AI assistant, else show menu
+        $ai = app(AiChatService::class); // lazy resolve กัน container cycle
+        if ($ai->isAvailable()) {
+            return $ai->answer($text);
+        }
+
         return $this->getMainMenu("ขอโทษครับ ไม่เข้าใจคำสั่ง \"$text\"\n\nกรุณาเลือกเมนูด้านล่าง:");
     }
 

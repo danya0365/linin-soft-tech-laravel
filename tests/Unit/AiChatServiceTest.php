@@ -1,0 +1,114 @@
+<?php
+
+namespace Tests\Unit;
+
+use App\Services\AiChatService;
+use App\Services\ChatService;
+use Illuminate\Support\Facades\Http;
+use Mockery;
+use Tests\TestCase;
+
+class AiChatServiceTest extends TestCase
+{
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        config([
+            'services.wavespeed.api_key' => 'test-key',
+            'services.wavespeed.base_url' => 'https://llm.wavespeed.ai/v1',
+            'services.wavespeed.model' => 'minimax/minimax-m2.7',
+        ]);
+    }
+
+    public function test_answer_runs_tool_loop_and_returns_text_response(): void
+    {
+        Http::fake([
+            'llm.wavespeed.ai/*' => Http::sequence()
+                ->push([
+                    'choices' => [[
+                        'message' => [
+                            'role' => 'assistant',
+                            'content' => null,
+                            'tool_calls' => [[
+                                'id' => 'call_1',
+                                'type' => 'function',
+                                'function' => [
+                                    'name' => 'get_today_summary',
+                                    'arguments' => '{}',
+                                ],
+                            ]],
+                        ],
+                    ]],
+                ])
+                ->push([
+                    'choices' => [[
+                        'message' => [
+                            'role' => 'assistant',
+                            'content' => 'วันนี้มีลูกค้า 12 ราย น้ำหนักผ้ารวม 350 กก.',
+                        ],
+                    ]],
+                ]),
+        ]);
+
+        // mock ChatService กันไม่ให้ test แตะ database จริง
+        $chatService = Mockery::mock(ChatService::class);
+        $chatService->shouldReceive('getTodaySummary')->once()->andReturn([
+            'type' => 'card',
+            'title' => '📊 สรุปวันนี้',
+            'rows' => [
+                ['label' => 'ลูกค้า', 'value' => '12 ราย'],
+                ['label' => 'น้ำหนักผ้า', 'value' => '350 กก.'],
+            ],
+        ]);
+        $this->app->instance(ChatService::class, $chatService);
+
+        $result = app(AiChatService::class)->answer('วันนี้ยอดเป็นยังไงบ้าง');
+
+        $this->assertSame('text', $result['type']);
+        $this->assertSame('🤖 AI ผู้ช่วย', $result['title']);
+        $this->assertStringContainsString('350 กก.', $result['text']);
+
+        Http::assertSentCount(2);
+        Http::assertSent(function ($request) {
+            return $request->hasHeader('Authorization', 'Bearer test-key')
+                && $request['model'] === 'minimax/minimax-m2.7';
+        });
+    }
+
+    public function test_answer_returns_fallback_menu_when_api_fails(): void
+    {
+        Http::fake([
+            'llm.wavespeed.ai/*' => Http::response(['error' => 'internal'], 500),
+        ]);
+
+        $result = app(AiChatService::class)->answer('คำถามอะไรก็ได้');
+
+        $this->assertSame('menu', $result['type']);
+        $this->assertStringContainsString('ขัดข้อง', $result['text']);
+    }
+
+    public function test_unknown_command_without_api_key_keeps_old_behavior(): void
+    {
+        config(['services.wavespeed.api_key' => null]);
+        Http::fake();
+
+        $result = app(ChatService::class)->processCommand('คำถามมั่วๆ ที่ไม่ตรง rule');
+
+        $this->assertSame('menu', $result['type']);
+        $this->assertStringContainsString('ไม่เข้าใจคำสั่ง', $result['text']);
+
+        Http::assertNothingSent();
+    }
+
+    public function test_rule_command_does_not_call_ai(): void
+    {
+        Http::fake();
+
+        $result = app(ChatService::class)->processCommand('เมนู');
+
+        $this->assertSame('menu', $result['type']);
+
+        Http::assertNothingSent();
+    }
+}
