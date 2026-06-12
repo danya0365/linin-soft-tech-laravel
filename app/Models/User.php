@@ -78,6 +78,7 @@ class User extends Authenticatable
    */
   protected $casts = [
     'email_verified_at' => 'datetime',
+    'ai_credit_balance' => 'decimal:4',
   ];
 
   protected $perPage = 20;
@@ -85,6 +86,11 @@ class User extends Authenticatable
   public function customers()
   {
     return $this->belongsToMany(Customer::class, 'users_customers')->using(UserCustomer::class);
+  }
+
+  public function aiCreditTransactions()
+  {
+    return $this->hasMany(AiCreditTransaction::class);
   }
 
   public function isWorker(): bool

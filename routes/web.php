@@ -32,6 +32,11 @@ Auth::routes(['register' => false]);
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
+// AI Chat - หน้าแชท AI แบบ jarvis (streaming + tool ข้อมูลธุรกิจ) — เฉพาะ supervisor/manager/admin
+Route::get('/ai-chat', [App\Http\Controllers\AiChatController::class, 'index'])
+    ->name('ai-chat')
+    ->middleware('staff');
+
 
 Route::group(['prefix' => 'admin', 'middleware' => ['admin']], function () {
     Route::get('/', [App\Http\Controllers\SettingController::class, 'index'])->name('admin');
@@ -39,6 +44,11 @@ Route::group(['prefix' => 'admin', 'middleware' => ['admin']], function () {
 });
 
 Route::group(['middleware' => ['admin']], function () {
+    // AI Chat credits (หลังบ้าน)
+    Route::get('ai-credits', [App\Http\Controllers\AiCreditController::class, 'index'])->name('ai-credits.index');
+    Route::get('ai-credits/{user}', [App\Http\Controllers\AiCreditController::class, 'show'])->name('ai-credits.show');
+    Route::post('ai-credits/{user}/transactions', [App\Http\Controllers\AiCreditController::class, 'storeTransaction'])->name('ai-credits.transactions.store');
+
     Route::resource('users', App\Http\Controllers\UserController::class);
     Route::resource('customer-groups', App\Http\Controllers\CustomerGroupController::class);
     Route::resource('customers', App\Http\Controllers\CustomerController::class);

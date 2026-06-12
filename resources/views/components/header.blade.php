@@ -29,10 +29,16 @@
                        class="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-gray-700 transition-all duration-200">
                         {{ __('Manager') }}
                     </a>
-                    <a href="{{ route('admin') }}" 
+                    <a href="{{ route('admin') }}"
                        class="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-gray-700 transition-all duration-200">
                         {{ __('Admin') }}
                     </a>
+                    @if (Auth::user()->isSupervisor() || Auth::user()->isManager() || Auth::user()->isAdmin())
+                        <a href="{{ route('ai-chat') }}"
+                           class="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-gray-700 transition-all duration-200">
+                            🤖 {{ __('AI Chat') }}
+                        </a>
+                    @endif
 
                     <!-- User Dropdown -->
                     <div class="relative ml-3" x-data="{ open: false }">
@@ -132,11 +138,17 @@
                    class="block px-4 py-3 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-gray-700 transition-all duration-200">
                     {{ __('Manager') }}
                 </a>
-                <a href="{{ route('admin') }}" 
+                <a href="{{ route('admin') }}"
                    class="block px-4 py-3 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-gray-700 transition-all duration-200">
                     {{ __('Admin') }}
                 </a>
-                
+                @if (Auth::user()->isSupervisor() || Auth::user()->isManager() || Auth::user()->isAdmin())
+                    <a href="{{ route('ai-chat') }}"
+                       class="block px-4 py-3 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-gray-700 transition-all duration-200">
+                        🤖 {{ __('AI Chat') }}
+                    </a>
+                @endif
+
                 <div class="border-t border-gray-200 dark:border-gray-700 my-2"></div>
                 
                 <div class="px-4 py-2 text-sm text-gray-500 dark:text-gray-400">

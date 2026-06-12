@@ -1,0 +1,315 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Exceptions\ClientDisconnectedException;
+use App\Exceptions\WaveSpeedApiException;
+use App\Models\AiChatMessage;
+use App\Models\AiChatSession;
+use App\Services\AiChatStreamService;
+use App\Services\AiCreditService;
+use App\Services\WaveSpeedLlmService;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+
+/**
+ * AI Chat (หน้าแชท AI แบบ jarvis-nextjs + tool ข้อมูลธุรกิจ)
+ *
+ * - index: หน้าแชทเต็มจอ (sidebar รายการแชทจาก DB + streaming + เลือก model)
+ * - stream: บันทึกข้อความ user → streaming tool loop ผ่าน AiChatStreamService
+ *   → บันทึกคำตอบ assistant ลง DB (ประวัติเก็บใน DB แยกตาม user)
+ */
+class AiChatController extends Controller
+{
+    /** จำกัดจำนวนข้อความต่อ session — เกินแล้วให้เปิดแชทใหม่ */
+    protected const SESSION_MESSAGE_CAP = 500;
+
+    /** heuristic ประมาณ token เมื่อ upstream ไม่ส่ง usage (เหมือนฝั่ง client) */
+    protected const CHARS_PER_TOKEN = 3;
+    protected const TOKENS_PER_MESSAGE_OVERHEAD = 4;
+
+    public function __construct(
+        protected WaveSpeedLlmService $llm,
+        protected AiChatStreamService $streamService,
+        protected AiCreditService $credits,
+    ) {
+    }
+
+    /**
+     * GET /ai-chat — หน้าแชท
+     */
+    public function index()
+    {
+        return view('ai-chat.index', [
+            'aiChatConfig' => [
+                'apiBase' => url('/api/ai-chat'),
+                'enabled' => $this->llm->isEnabled(),
+                'defaultModel' => config('ai-chat.default_model'),
+                'models' => config('ai-chat.models'),
+                'credit' => [
+                    'balance' => (float) Auth::user()->ai_credit_balance,
+                    'usdToThb' => (float) config('ai-chat.usd_to_thb'),
+                    'commissionPercent' => (float) config('ai-chat.commission_percent'),
+                    'lowThreshold' => (float) config('ai-chat.low_balance_threshold_thb'),
+                ],
+            ],
+        ]);
+    }
+
+    /**
+     * POST /api/ai-chat/sessions/{id}/stream
+     *
+     * Request: { content, model?, maxTokens?, historyMode?, maxHistoryMessages? }
+     * Response: text/event-stream ตาม protocol:
+     *   meta → content deltas → tool_status → usage → done → [DONE]
+     */
+    public function stream(Request $request, $id)
+    {
+        if (!$this->llm->isEnabled()) {
+            return response()->json([
+                'success' => false,
+                'error' => 'ยังไม่ได้ตั้งค่า WAVESPEED_API_KEY',
+            ], 503);
+        }
+
+        $validated = $request->validate([
+            'content' => ['required', 'string', 'max:16000'],
+            'model' => ['nullable', 'string', 'max:100'],
+            'maxTokens' => ['nullable', 'integer', 'min:1', 'max:32768'],
+            'historyMode' => ['nullable', 'in:recent,all'],
+            'maxHistoryMessages' => ['nullable', 'integer', 'min:1', 'max:100'],
+        ]);
+
+        $session = AiChatSession::forUser(Auth::id())->findOrFail($id);
+
+        // อนุญาตเฉพาะ model ใน catalog
+        $model = $validated['model'] ?? $session->model ?? config('ai-chat.default_model');
+        if (!collect(config('ai-chat.models'))->pluck('id')->contains($model)) {
+            return response()->json([
+                'success' => false,
+                'error' => 'ไม่รู้จัก model: ' . $model,
+            ], 422);
+        }
+
+        // เครดิตหมด → ส่งข้อความใหม่ไม่ได้ (ยอดสุดท้ายรู้หลังตอบจบ จึงเช็คแค่ > 0)
+        if (!$this->credits->hasCredit(Auth::id())) {
+            return response()->json([
+                'success' => false,
+                'error' => 'เครดิตหมดแล้ว กรุณาติดต่อผู้ดูแลระบบเพื่อเติมเครดิตก่อนใช้งาน',
+                'creditBalance' => $this->credits->balance(Auth::id()),
+            ], 402);
+        }
+
+        // คุมค่าใช้จ่ายรายวัน (safety cap เพิ่มจากเครดิต)
+        $dailyLimit = (int) config('ai-chat.daily_message_limit', 200);
+        $todayCount = AiChatMessage::query()
+            ->join('ai_chat_sessions', 'ai_chat_sessions.id', '=', 'ai_chat_messages.ai_chat_session_id')
+            ->where('ai_chat_sessions.user_id', Auth::id())
+            ->where('ai_chat_messages.role', 'assistant')
+            ->where('ai_chat_messages.created_at', '>=', Carbon::today('Asia/Bangkok'))
+            ->count();
+
+        if ($todayCount >= $dailyLimit) {
+            return response()->json([
+                'success' => false,
+                'error' => "ใช้งานครบโควต้าวันนี้แล้ว ({$dailyLimit} ข้อความ/วัน) กรุณาลองใหม่พรุ่งนี้",
+            ], 429);
+        }
+
+        if ($session->messages()->count() >= self::SESSION_MESSAGE_CAP) {
+            return response()->json([
+                'success' => false,
+                'error' => 'แชทนี้ยาวเกินไปแล้ว กรุณาเปิดแชทใหม่',
+            ], 422);
+        }
+
+        $content = trim($validated['content']);
+
+        // บันทึกข้อความ user ก่อน stream — รอดแม้ upstream ล้มเหลว
+        $isFirstUserMessage = !$session->messages()->where('role', 'user')->exists();
+
+        $userMessage = $session->messages()->create([
+            'role' => 'user',
+            'content' => $content,
+        ]);
+
+        $autoTitle = null;
+        if ($isFirstUserMessage) {
+            $autoTitle = mb_strlen($content) > 40 ? mb_substr($content, 0, 40) . '…' : $content;
+            $session->title = $autoTitle;
+        }
+
+        $session->model = $model;
+        $session->last_message_at = now();
+        $session->save();
+
+        // สร้าง context จาก DB (server เป็นเจ้าของ history)
+        $historyMode = $validated['historyMode'] ?? 'recent';
+        $maxHistory = (int) ($validated['maxHistoryMessages'] ?? 10);
+
+        $contextQuery = $session->messages()->orderByDesc('id');
+        if ($historyMode !== 'all') {
+            $contextQuery->limit($maxHistory);
+        } else {
+            $contextQuery->limit(self::SESSION_MESSAGE_CAP);
+        }
+
+        $contextMessages = $contextQuery->get(['role', 'content'])
+            ->reverse()
+            ->values()
+            ->map(static fn ($m) => ['role' => $m->role, 'content' => $m->content])
+            ->all();
+
+        $maxTokens = $validated['maxTokens'] ?? null;
+        $meta = [
+            'type' => 'meta',
+            'sessionId' => $session->id,
+            'userMessageId' => $userMessage->id,
+        ];
+        if ($autoTitle !== null) {
+            $meta['title'] = $autoTitle;
+        }
+
+        return response()->stream(function () use ($session, $contextMessages, $model, $maxTokens, $meta) {
+            // tool loop หลายรอบใช้เวลานานกว่า max_execution_time ปกติ
+            set_time_limit(180);
+
+            $emit = function (array $event) {
+                if (connection_aborted()) {
+                    throw new ClientDisconnectedException('client disconnected');
+                }
+
+                echo 'data: ' . json_encode($event, JSON_UNESCAPED_UNICODE) . "\n\n";
+
+                if (ob_get_level() > 0) {
+                    ob_flush();
+                }
+                flush();
+            };
+
+            $sendDone = static function () {
+                echo "data: [DONE]\n\n";
+                if (ob_get_level() > 0) {
+                    ob_flush();
+                }
+                flush();
+            };
+
+            try {
+                $emit($meta);
+
+                $result = $this->streamService->streamAnswer($contextMessages, $model, $maxTokens, $emit);
+
+                $assistantMessage = $this->persistAssistantMessage($session, $model, $contextMessages, $result);
+
+                // หักเครดิตทุกกรณีที่มีคำตอบ (รวม partial จากการกดหยุด)
+                // ห้ามให้การหักพลาดทำลายคำตอบที่ stream ไปแล้ว — log ไว้ reconcile ทีหลัง
+                $creditTx = null;
+                if ($assistantMessage) {
+                    try {
+                        $creditTx = $this->credits->charge($assistantMessage);
+                    } catch (\Throwable $e) {
+                        Log::error('AI credit charge failed', [
+                            'message_id' => $assistantMessage->id,
+                            'error' => $e->getMessage(),
+                        ]);
+                    }
+                }
+
+                if (!$result['aborted']) {
+                    if ($assistantMessage) {
+                        $emit([
+                            'usage' => [
+                                'prompt_tokens' => $assistantMessage->prompt_tokens,
+                                'completion_tokens' => $assistantMessage->completion_tokens,
+                            ],
+                            'estimated' => $assistantMessage->is_estimated,
+                        ]);
+                        $emit([
+                            'type' => 'done',
+                            'assistantMessageId' => $assistantMessage->id,
+                            'creditCharged' => $creditTx ? abs((float) $creditTx->amount) : null,
+                            'creditBalance' => $creditTx ? (float) $creditTx->balance_after : null,
+                        ]);
+                    }
+                    $sendDone();
+                }
+            } catch (ClientDisconnectedException $e) {
+                // client หลุดระหว่าง emit meta/usage — ไม่มีอะไรต้องส่งต่อ
+            } catch (\Throwable $e) {
+                Log::error('AiChatController stream failed', [
+                    'session_id' => $session->id,
+                    'error' => $e->getMessage(),
+                ]);
+
+                try {
+                    $emit([
+                        'type' => 'error',
+                        'message' => $e instanceof WaveSpeedApiException
+                            ? 'เกิดข้อผิดพลาดจาก AI กรุณาลองใหม่อีกครั้ง'
+                            : 'ระบบขัดข้อง กรุณาลองใหม่อีกครั้ง',
+                    ]);
+                    $sendDone();
+                } catch (ClientDisconnectedException $ignored) {
+                    // client หลุดไปแล้ว
+                }
+            }
+        }, 200, [
+            'Content-Type' => 'text/event-stream; charset=utf-8',
+            'Cache-Control' => 'no-cache, no-transform',
+            'Connection' => 'keep-alive',
+            'X-Accel-Buffering' => 'no',
+        ]);
+    }
+
+    /**
+     * บันทึกคำตอบ assistant ลง DB (รวมกรณี partial จากการกดหยุด)
+     */
+    protected function persistAssistantMessage(AiChatSession $session, string $model, array $contextMessages, array $result): ?AiChatMessage
+    {
+        $content = trim($result['content'] ?? '');
+        if ($content === '') {
+            return null;
+        }
+
+        if ($result['usage'] !== null) {
+            $promptTokens = (int) $result['usage']['prompt_tokens'];
+            $completionTokens = (int) $result['usage']['completion_tokens'];
+        } else {
+            $promptTokens = $this->estimateMessagesTokens($contextMessages);
+            $completionTokens = $this->estimateTokens($content);
+        }
+
+        $message = $session->messages()->create([
+            'role' => 'assistant',
+            'content' => $content,
+            'model' => $model,
+            'prompt_tokens' => $promptTokens,
+            'completion_tokens' => $completionTokens,
+            'is_estimated' => $result['estimated'],
+            'is_partial' => $result['aborted'],
+        ]);
+
+        $session->last_message_at = now();
+        $session->save();
+
+        return $message;
+    }
+
+    protected function estimateTokens(string $text): int
+    {
+        return (int) ceil(mb_strlen($text) / self::CHARS_PER_TOKEN);
+    }
+
+    protected function estimateMessagesTokens(array $messages): int
+    {
+        $total = 0;
+        foreach ($messages as $message) {
+            $total += $this->estimateTokens($message['content'] ?? '') + self::TOKENS_PER_MESSAGE_OVERHEAD;
+        }
+
+        return $total;
+    }
+}

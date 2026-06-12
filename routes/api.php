@@ -29,6 +29,19 @@ Route::group(['middleware' => ['logged-in'], 'prefix' => 'web-chat'], function (
     Route::get('/welcome', [App\Http\Controllers\Api\WebChatController::class, 'welcome']);
 });
 
+// AI Chat (หน้าแชท AI แบบ jarvis) — sessions ใน DB ต่อ user + streaming tool loop
+Route::group(['middleware' => ['staff'], 'prefix' => 'ai-chat'], function () {
+    Route::get('/sessions', [App\Http\Controllers\Api\AiChatSessionController::class, 'index']);
+    Route::post('/sessions', [App\Http\Controllers\Api\AiChatSessionController::class, 'store']);
+    Route::get('/sessions/{id}', [App\Http\Controllers\Api\AiChatSessionController::class, 'show']);
+    Route::patch('/sessions/{id}', [App\Http\Controllers\Api\AiChatSessionController::class, 'update']);
+    Route::delete('/sessions/{id}', [App\Http\Controllers\Api\AiChatSessionController::class, 'destroy']);
+    Route::get('/stats', [App\Http\Controllers\Api\AiChatSessionController::class, 'stats']);
+    Route::post('/sessions/{id}/stream', [App\Http\Controllers\AiChatController::class, 'stream'])
+        ->middleware('throttle:ai-chat')
+        ->name('api.ai-chat.stream');
+});
+
 Route::group(['middleware' => ['manager']], function () {
     Route::get('sales-range-days-chart', [App\Http\Controllers\Manager\ReportController::class, 'getSalesRangeDaysChart'])->name('api.sales-range-days-chart');
     Route::get('energy-range-days-chart', [App\Http\Controllers\Manager\ReportController::class, 'getEnergyRangeDaysChart'])->name('api.energy-range-days-chart');

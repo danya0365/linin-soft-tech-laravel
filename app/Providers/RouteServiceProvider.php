@@ -48,5 +48,11 @@ class RouteServiceProvider extends ServiceProvider
         RateLimiter::for('api', function (Request $request) {
             return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
         });
+
+        // AI Chat streaming — คุมค่าใช้จ่าย LLM ต่อ user
+        RateLimiter::for('ai-chat', function (Request $request) {
+            return Limit::perMinute((int) config('ai-chat.rate_limit_per_minute', 6))
+                ->by($request->user()?->id ?: $request->ip());
+        });
     }
 }

@@ -99,4 +99,67 @@ class WaveSpeedLlmService
 
         return $body;
     }
+
+    /**
+     * เรียก POST /chat/completions แบบ streaming (SSE)
+     *
+     * คืน PSR-7 body stream ของ upstream เพื่อ pass-through ไปยัง client ตรงๆ
+     * (รูปแบบ chunk: data: {"choices":[{"delta":{"content":"..."}}]} ... data: [DONE])
+     *
+     * @param array $messages OpenAI-style messages
+     * @param string|null $model override model (null = ใช้ค่า config)
+     * @param int|null $maxTokens override max_tokens (null = ไม่ส่ง ให้ upstream ใช้ค่า default)
+     * @param array $tools OpenAI-style tool definitions (ว่าง = ไม่ส่ง tools)
+     * @return \Psr\Http\Message\StreamInterface
+     * @throws WaveSpeedApiException เมื่อ non-2xx หรือ connection ล้มเหลว
+     */
+    public function streamChatCompletion(array $messages, ?string $model = null, ?int $maxTokens = null, array $tools = [])
+    {
+        if (!$this->isEnabled()) {
+            throw new WaveSpeedApiException('WaveSpeed API key is not configured');
+        }
+
+        $payload = [
+            'model' => $model ?: $this->model,
+            'messages' => $messages,
+            'stream' => true,
+            // ขอ usage จริง (prompt/completion tokens) มากับ chunk สุดท้ายของ stream
+            'stream_options' => ['include_usage' => true],
+        ];
+
+        if ($maxTokens !== null) {
+            $payload['max_tokens'] = $maxTokens;
+        }
+
+        if (!empty($tools)) {
+            $payload['tools'] = $tools;
+            $payload['tool_choice'] = 'auto';
+        }
+
+        try {
+            $response = Http::withToken($this->apiKey)
+                ->withHeaders(['Accept' => 'text/event-stream'])
+                ->withOptions(['stream' => true])
+                // streaming ใช้เวลานานกว่า request ปกติ — ไม่ใช้ timeout สั้นของ tool loop
+                ->timeout(max($this->timeout, 120))
+                ->connectTimeout(5)
+                ->post($this->baseUrl . '/chat/completions', $payload);
+        } catch (\Exception $e) {
+            Log::error('WaveSpeed API connection failed (stream)', ['error' => $e->getMessage()]);
+            throw new WaveSpeedApiException('Connection failed: ' . $e->getMessage(), null, $e);
+        }
+
+        if (!$response->successful()) {
+            Log::error('WaveSpeed API error (stream)', [
+                'status' => $response->status(),
+                'body' => mb_substr($response->body(), 0, 1000),
+            ]);
+            throw new WaveSpeedApiException(
+                'WaveSpeed API returned HTTP ' . $response->status(),
+                $response->status()
+            );
+        }
+
+        return $response->toPsrResponse()->getBody();
+    }
 }

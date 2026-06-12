@@ -108,5 +108,17 @@
             subtitle-color="text-slate-300"
         />
     </x-menu.section>
+
+    <!-- Section: AI -->
+    <x-menu.section title="AI" icon="fa-robot" icon-color="text-fuchsia-500">
+        <x-menu.card
+            href="{{ route('ai-credits.index') }}"
+            icon="fa-solid fa-coins"
+            title="{{ __('เครดิต AI') }}"
+            subtitle="AI Credits"
+            gradient="from-fuchsia-500 to-purple-700"
+            subtitle-color="text-fuchsia-200"
+        />
+    </x-menu.section>
 </x-admin.page>
 @endsection
