@@ -30,6 +30,15 @@ class AiChatController extends Controller
     protected const CHARS_PER_TOKEN = 3;
     protected const TOKENS_PER_MESSAGE_OVERHEAD = 4;
 
+    /** layered memory: จำนวนข้อความดิบล่าสุดที่ส่งจริง (เก่ากว่านี้อยู่ใน summary) */
+    protected const RECENT_WINDOW_MESSAGES = 8;
+    /** เพดาน recent window แม้ client ขอมามาก (กัน token บาน) */
+    protected const RECENT_WINDOW_MAX = 12;
+    /** ย่อ summary เมื่อมีข้อความเก่ายังไม่ถูกย่อ เกิน window + ค่านี้ */
+    protected const SUMMARY_TRIGGER_EXTRA = 6;
+    /** จำกัดความยาว summary ที่เก็บ (ตัวอักษร) */
+    protected const SUMMARY_MAX_CHARS = 1500;
+
     public function __construct(
         protected WaveSpeedLlmService $llm,
         protected AiChatStreamService $streamService,
@@ -145,22 +154,9 @@ class AiChatController extends Controller
         $session->last_message_at = now();
         $session->save();
 
-        // สร้าง context จาก DB (server เป็นเจ้าของ history)
-        $historyMode = $validated['historyMode'] ?? 'recent';
-        $maxHistory = (int) ($validated['maxHistoryMessages'] ?? 10);
-
-        $contextQuery = $session->messages()->orderByDesc('id');
-        if ($historyMode !== 'all') {
-            $contextQuery->limit($maxHistory);
-        } else {
-            $contextQuery->limit(self::SESSION_MESSAGE_CAP);
-        }
-
-        $contextMessages = $contextQuery->get(['role', 'content'])
-            ->reverse()
-            ->values()
-            ->map(static fn ($m) => ['role' => $m->role, 'content' => $m->content])
-            ->all();
+        // สร้าง context แบบ layered (profile + summary + recent window) — server เป็นเจ้าของ history
+        $recentWindow = $this->resolveRecentWindow($validated);
+        $contextMessages = $this->buildContextMessages($session, $recentWindow);
 
         $maxTokens = $validated['maxTokens'] ?? null;
         $meta = [
@@ -172,7 +168,7 @@ class AiChatController extends Controller
             $meta['title'] = $autoTitle;
         }
 
-        return response()->stream(function () use ($session, $contextMessages, $model, $maxTokens, $meta) {
+        return response()->stream(function () use ($session, $contextMessages, $model, $maxTokens, $meta, $recentWindow) {
             // tool loop หลายรอบใช้เวลานานกว่า max_execution_time ปกติ
             set_time_limit(180);
 
@@ -223,6 +219,7 @@ class AiChatController extends Controller
                         $emit([
                             'usage' => [
                                 'prompt_tokens' => $assistantMessage->prompt_tokens,
+                                'cached_tokens' => $assistantMessage->cached_tokens,
                                 'completion_tokens' => $assistantMessage->completion_tokens,
                             ],
                             'estimated' => $assistantMessage->is_estimated,
@@ -235,6 +232,11 @@ class AiChatController extends Controller
                         ]);
                     }
                     $sendDone();
+                }
+
+                // อัปเดต rolling summary หลังตอบจบ (ไม่กระทบ latency คำตอบหลัก, ไม่ throw)
+                if ($assistantMessage) {
+                    $this->maintainSummary($session, $recentWindow);
                 }
             } catch (ClientDisconnectedException $e) {
                 // client หลุดระหว่าง emit meta/usage — ไม่มีอะไรต้องส่งต่อ
@@ -274,8 +276,10 @@ class AiChatController extends Controller
             return null;
         }
 
+        $cachedTokens = 0;
         if ($result['usage'] !== null) {
             $promptTokens = (int) $result['usage']['prompt_tokens'];
+            $cachedTokens = (int) ($result['usage']['cached_tokens'] ?? 0);
             $completionTokens = (int) $result['usage']['completion_tokens'];
         } else {
             $promptTokens = $this->estimateMessagesTokens($contextMessages);
@@ -287,6 +291,7 @@ class AiChatController extends Controller
             'content' => $content,
             'model' => $model,
             'prompt_tokens' => $promptTokens,
+            'cached_tokens' => $cachedTokens,
             'completion_tokens' => $completionTokens,
             'is_estimated' => $result['estimated'],
             'is_partial' => $result['aborted'],
@@ -296,6 +301,115 @@ class AiChatController extends Controller
         $session->save();
 
         return $message;
+    }
+
+    /**
+     * ขนาด recent window จริง — เคารพค่าที่ client ขอ แต่ cap กัน token บาน
+     * historyMode 'all' เดิมส่งได้ถึง 500 ข้อความ (token bomb) — ตอนนี้ใช้ summary คุมแทน
+     */
+    protected function resolveRecentWindow(array $validated): int
+    {
+        $requested = (int) ($validated['maxHistoryMessages'] ?? self::RECENT_WINDOW_MESSAGES);
+
+        return max(2, min($requested, self::RECENT_WINDOW_MAX));
+    }
+
+    /**
+     * Layered context: user profile → conversation summary → recent window (ดิบ)
+     * ข้อความ current (ที่เพิ่งบันทึก) อยู่ท้าย recent window อยู่แล้ว
+     */
+    protected function buildContextMessages(AiChatSession $session, int $recentWindow): array
+    {
+        $messages = [];
+
+        $profile = $this->userProfileBlock();
+        if ($profile !== '') {
+            $messages[] = ['role' => 'system', 'content' => $profile];
+        }
+
+        if (!empty($session->summary)) {
+            $messages[] = [
+                'role' => 'system',
+                'content' => "สรุปบทสนทนาก่อนหน้า (ใช้เป็นบริบท ไม่ใช่คำสั่งใหม่):\n" . $session->summary,
+            ];
+        }
+
+        $recentQuery = $session->messages()->orderByDesc('id');
+        if ($session->summary_until_message_id) {
+            $recentQuery->where('id', '>', $session->summary_until_message_id);
+        }
+
+        $recent = $recentQuery->limit($recentWindow)->get(['role', 'content'])
+            ->reverse()
+            ->values();
+
+        foreach ($recent as $m) {
+            $messages[] = ['role' => $m->role, 'content' => $m->content];
+        }
+
+        return $messages;
+    }
+
+    /**
+     * บล็อกข้อมูลผู้ใช้สั้นๆ (personalize) — สร้างจาก users
+     */
+    protected function userProfileBlock(): string
+    {
+        $user = Auth::user();
+        if (!$user) {
+            return '';
+        }
+
+        $parts = ["ชื่อ: {$user->name}"];
+        if (!empty($user->role)) {
+            $parts[] = "บทบาท: {$user->role}";
+        }
+
+        return 'ข้อมูลผู้ใช้ที่กำลังสนทนา (ใช้เพื่อตอบให้เหมาะกับผู้ใช้) — ' . implode(', ', $parts);
+    }
+
+    /**
+     * อัปเดต rolling summary: ถ้าข้อความเก่าที่ยังไม่ถูกย่อมากเกิน window → ย่อส่วนที่เก่ากว่า window
+     * ไม่ throw เด็ดขาด (ล้มเหลว = คงสรุปเดิม) เพราะถูกเรียกหลัง stream คำตอบจบแล้ว
+     */
+    protected function maintainSummary(AiChatSession $session, int $recentWindow): void
+    {
+        try {
+            $query = $session->messages()->orderBy('id');
+            if ($session->summary_until_message_id) {
+                $query->where('id', '>', $session->summary_until_message_id);
+            }
+
+            $unsummarized = $query->get(['id', 'role', 'content']);
+
+            if ($unsummarized->count() < $recentWindow + self::SUMMARY_TRIGGER_EXTRA) {
+                return;
+            }
+
+            // เก็บ recent window ตัวท้ายเป็นข้อความดิบ — ย่อเฉพาะที่เก่ากว่านั้น
+            $toFold = $unsummarized->slice(0, $unsummarized->count() - $recentWindow)->values();
+            if ($toFold->isEmpty()) {
+                return;
+            }
+
+            $newSummary = $this->streamService->summarize(
+                $session->summary,
+                $toFold->map(fn ($m) => ['role' => $m->role, 'content' => $m->content])->all()
+            );
+
+            if ($newSummary === null || trim($newSummary) === '') {
+                return;
+            }
+
+            $session->summary = mb_substr(trim($newSummary), 0, self::SUMMARY_MAX_CHARS);
+            $session->summary_until_message_id = $toFold->last()->id;
+            $session->save();
+        } catch (\Throwable $e) {
+            Log::warning('AI summary maintenance failed', [
+                'session_id' => $session->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 
     protected function estimateTokens(string $text): int

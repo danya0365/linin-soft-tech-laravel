@@ -111,4 +111,54 @@ class AiChatServiceTest extends TestCase
 
         Http::assertNothingSent();
     }
+
+    public function test_tool_definitions_consolidate_list_tools(): void
+    {
+        $service = app(AiChatService::class);
+        $method = new \ReflectionMethod($service, 'toolDefinitions');
+        $method->setAccessible(true);
+
+        $names = array_map(fn ($t) => $t['function']['name'], $method->invoke($service));
+
+        // ยุบ list_* 4 ตัว → list_entities ตัวเดียว
+        $this->assertContains('list_entities', $names);
+        $this->assertNotContains('list_customer_groups', $names);
+        $this->assertNotContains('list_inventory_groups', $names);
+        $this->assertNotContains('list_energy_resources', $names);
+        $this->assertNotContains('list_departments', $names);
+    }
+
+    public function test_list_entities_invalid_kind_returns_error_without_db(): void
+    {
+        $service = app(AiChatService::class);
+        $method = new \ReflectionMethod($service, 'executeTool');
+        $method->setAccessible(true);
+
+        // kind ผิด → คืน error ที่บอกค่าที่ใช้ได้ (default branch ไม่ query DB)
+        $result = $method->invoke($service, 'list_entities', ['kind' => 'bogus']);
+
+        $this->assertStringContainsString('kind', $result);
+        $this->assertStringContainsString('customer_groups', $result);
+    }
+
+    public function test_summarize_compacts_messages_via_cheapest_model(): void
+    {
+        Http::fake([
+            'llm.wavespeed.ai/*' => Http::response([
+                'choices' => [['message' => ['content' => 'สรุป: ผู้ใช้ถามยอดขายวันนี้ ตอบ 12,345 บาท']]],
+            ], 200),
+        ]);
+
+        $summary = app(AiChatService::class)->summarize(null, [
+            ['role' => 'user', 'content' => 'ยอดขายวันนี้เท่าไร'],
+            ['role' => 'assistant', 'content' => '12,345 บาท'],
+        ]);
+
+        $this->assertSame('สรุป: ผู้ใช้ถามยอดขายวันนี้ ตอบ 12,345 บาท', $summary);
+        Http::assertSentCount(1);
+        // ย่อด้วย model ตาม config (ถูกสุด) ไม่ส่ง tools
+        Http::assertSent(function ($request) {
+            return $request['model'] === 'minimax/minimax-m2.7' && !isset($request['tools']);
+        });
+    }
 }

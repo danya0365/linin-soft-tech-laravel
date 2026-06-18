@@ -30,23 +30,34 @@ class AiCreditService
     /**
      * ต้นทุนจริงเป็น USD จาก pricing ใน config/ai-chat.php
      * model ที่ไม่รู้จัก → fallback_pricing (กันใช้ฟรี)
+     *
+     * $cachedTokens = ส่วนของ prompt ที่เป็น cache hit คิดที่ราคา cachedInputPerMTok (ถูกกว่า)
+     * ถ้า model ไม่กำหนด cachedInputPerMTok → คิด cache hit ที่ราคา input เต็ม (กัน undercharge)
      */
-    public function costUsd(?string $model, int $promptTokens, int $completionTokens): float
+    public function costUsd(?string $model, int $promptTokens, int $completionTokens, int $cachedTokens = 0): float
     {
         $pricing = collect(config('ai-chat.models'))->firstWhere('id', $model)['pricing']
             ?? config('ai-chat.fallback_pricing');
 
-        return ($promptTokens / 1_000_000) * (float) $pricing['inputPerMTok']
+        $inputRate = (float) $pricing['inputPerMTok'];
+        $cachedRate = (float) ($pricing['cachedInputPerMTok'] ?? $inputRate);
+
+        // กัน cached เกิน prompt (เช่น estimate ไม่ตรง) — fresh ต้องไม่ติดลบ
+        $cachedTokens = max(0, min($cachedTokens, $promptTokens));
+        $freshTokens = $promptTokens - $cachedTokens;
+
+        return ($freshTokens / 1_000_000) * $inputRate
+            + ($cachedTokens / 1_000_000) * $cachedRate
             + ($completionTokens / 1_000_000) * (float) $pricing['outputPerMTok'];
     }
 
     /**
      * ต้นทุนจริงเป็นบาท (ยังไม่รวมค่าคอม)
      */
-    public function costThb(?string $model, int $promptTokens, int $completionTokens): float
+    public function costThb(?string $model, int $promptTokens, int $completionTokens, int $cachedTokens = 0): float
     {
         return round(
-            $this->costUsd($model, $promptTokens, $completionTokens) * (float) config('ai-chat.usd_to_thb'),
+            $this->costUsd($model, $promptTokens, $completionTokens, $cachedTokens) * (float) config('ai-chat.usd_to_thb'),
             4
         );
     }
@@ -54,11 +65,11 @@ class AiCreditService
     /**
      * ยอดที่หักจริง = ต้นทุนบาท × (1 + ค่าคอม%/100)
      */
-    public function chargeThb(?string $model, int $promptTokens, int $completionTokens): float
+    public function chargeThb(?string $model, int $promptTokens, int $completionTokens, int $cachedTokens = 0): float
     {
         $multiplier = 1 + ((float) config('ai-chat.commission_percent')) / 100;
 
-        return round($this->costThb($model, $promptTokens, $completionTokens) * $multiplier, 4);
+        return round($this->costThb($model, $promptTokens, $completionTokens, $cachedTokens) * $multiplier, 4);
     }
 
     /**
@@ -72,8 +83,8 @@ class AiCreditService
             return null;
         }
 
-        $cost = $this->costThb($message->model, (int) $message->prompt_tokens, (int) $message->completion_tokens);
-        $total = $this->chargeThb($message->model, (int) $message->prompt_tokens, (int) $message->completion_tokens);
+        $cost = $this->costThb($message->model, (int) $message->prompt_tokens, (int) $message->completion_tokens, (int) $message->cached_tokens);
+        $total = $this->chargeThb($message->model, (int) $message->prompt_tokens, (int) $message->completion_tokens, (int) $message->cached_tokens);
         $commission = round($total - $cost, 4);
 
         return $this->applyTransaction(

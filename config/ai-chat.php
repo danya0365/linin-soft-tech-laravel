@@ -31,6 +31,7 @@ return [
     'commission_percent' => (float) env('AI_CHAT_COMMISSION_PERCENT', 30),
 
     // model ที่ไม่มีราคาใน catalog ใช้ราคานี้ — กันใช้ฟรี (USD ต่อ 1M tokens)
+    // ไม่กำหนด cachedInputPerMTok → AiCreditService คิด cache hit ที่ราคา input เต็ม (ไม่ undercharge)
     'fallback_pricing' => [
         'inputPerMTok' => (float) env('AI_CHAT_FALLBACK_INPUT_PER_MTOK', 5),
         'outputPerMTok' => (float) env('AI_CHAT_FALLBACK_OUTPUT_PER_MTOK', 25),
@@ -46,14 +47,14 @@ return [
             'label' => 'MiniMax M2.7',
             'description' => 'ค่าเริ่มต้น — เร็ว ราคาถูก context 205K',
             'vendor' => 'MiniMax',
-            'pricing' => ['inputPerMTok' => 0.3, 'outputPerMTok' => 1.2],
+            'pricing' => ['inputPerMTok' => 0.3, 'cachedInputPerMTok' => 0.06, 'outputPerMTok' => 1.2],
         ],
         [
             'id' => 'minimax/minimax-m3',
             'label' => 'MiniMax M3',
             'description' => 'รุ่นใหม่กว่า M2.7 — งาน agent/วิเคราะห์เอกสาร context 1M ราคาประหยัด',
             'vendor' => 'MiniMax',
-            'pricing' => ['inputPerMTok' => 0.6, 'outputPerMTok' => 2.4],
+            'pricing' => ['inputPerMTok' => 0.6, 'cachedInputPerMTok' => 0.12, 'outputPerMTok' => 2.4],
         ],
         // ── Anthropic ──
         [

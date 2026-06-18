@@ -28,7 +28,7 @@ class AiChatService
     protected const OVERALL_DEADLINE_SECONDS = 50;
 
     /** ตัดข้อความ tool result กัน token บาน */
-    protected const TOOL_RESULT_MAX_CHARS = 2500;
+    protected const TOOL_RESULT_MAX_CHARS = 1500;
 
     /** LINE text message limit 5000 — เผื่อ margin */
     protected const ANSWER_MAX_CHARS = 4500;
@@ -72,6 +72,55 @@ class AiChatService
             return $this->chatService->getMainMenu(
                 "⚠️ ขออภัยครับ ระบบ AI ขัดข้องชั่วคราว\nกรุณาลองใหม่ หรือเลือกเมนูด้านล่าง:"
             );
+        }
+    }
+
+    /**
+     * ย่อบทสนทนาเป็น rolling summary — ใช้ model ถูกสุดตาม config เสมอ (chatCompletion ไม่รับ model override)
+     * คืน null เมื่อล้มเหลว เพื่อให้ caller คงสรุปเดิมไว้ (ไม่ทำลายความจำเดิม)
+     *
+     * @param string|null $previousSummary สรุปเดิม (ถ้ามี)
+     * @param array $messages [{role, content}] ข้อความที่จะรวมเข้าสรุป
+     */
+    public function summarize(?string $previousSummary, array $messages): ?string
+    {
+        if (empty($messages)) {
+            return $previousSummary;
+        }
+
+        $transcript = collect($messages)
+            ->map(function ($m) {
+                $who = ($m['role'] ?? '') === 'user' ? 'ผู้ใช้' : 'ผู้ช่วย';
+                $text = mb_substr((string) ($m['content'] ?? ''), 0, 1000);
+
+                return "{$who}: {$text}";
+            })
+            ->implode("\n");
+
+        $instruction = 'ย่อบทสนทนาด้านล่างเป็นบันทึกความจำภาษาไทยแบบกระชับ '
+            . 'เก็บเฉพาะข้อเท็จจริงและบริบทที่จำเป็นต่อการสนทนาต่อ '
+            . '(สิ่งที่ผู้ใช้ต้องการ ชื่อ/ตัวเลข/เงื่อนไข/ข้อสรุปสำคัญ) '
+            . 'ไม่ต้องมีคำนำหรือคำลงท้าย ความยาวไม่เกิน 8-12 บรรทัด';
+
+        if (!empty($previousSummary)) {
+            $instruction .= "\n\nสรุปเดิม (รวมเข้ากับของใหม่):\n" . $previousSummary;
+        }
+
+        $instruction .= "\n\nบทสนทนาที่ต้องย่อ:\n" . $transcript;
+
+        try {
+            $response = $this->llm->chatCompletion([
+                ['role' => 'system', 'content' => 'คุณคือตัวช่วยย่อบทสนทนาให้สั้น กระชับ และคงสาระสำคัญ'],
+                ['role' => 'user', 'content' => $instruction],
+            ]);
+
+            $summary = $response['choices'][0]['message']['content'] ?? null;
+
+            return is_string($summary) && trim($summary) !== '' ? trim($summary) : null;
+        } catch (\Throwable $e) {
+            Log::warning('AiChatService summarize failed', ['error' => $e->getMessage()]);
+
+            return null;
         }
     }
 
@@ -228,44 +277,43 @@ class AiChatService
     protected function toolDefinitions(): array
     {
         $tools = [
-            ['get_today_summary', 'สรุปภาพรวมการดำเนินงานวันนี้ (น้ำหนักผ้า รายรับ-รายจ่าย ลูกค้า)', []],
+            ['get_today_summary', 'สรุปการดำเนินงานวันนี้ (น้ำหนักผ้า รายรับ-จ่าย ลูกค้า)', []],
             ['get_business_report', 'รายงานธุรกิจตามวันที่/ช่วงเวลา (รายรับ รายจ่าย น้ำหนักผ้า)', [
-                'type' => ['string', 'ประเภทรายงาน: summary หรือ detailed', ['summary', 'detailed']],
-                'date' => ['string', 'วันที่ Y-m-d (ไม่ระบุ = วันนี้)'],
-                'range' => ['string', 'ช่วงเวลา: day, week, month', ['day', 'week', 'month']],
+                'type' => ['string', 'summary หรือ detailed', ['summary', 'detailed']],
+                'date' => ['string', 'วันที่ Y-m-d (ไม่ระบุ=วันนี้)'],
+                'range' => ['string', 'day, week หรือ month', ['day', 'week', 'month']],
             ]],
-            ['list_customer_groups', 'รายชื่อกลุ่มลูกค้าทั้งหมด พร้อม id', []],
-            ['search_customers', 'ค้นหาลูกค้าจากชื่อ และ/หรือ กลุ่ม (คืน id, ชื่อ, กลุ่ม)', [
-                'name' => ['string', 'ชื่อลูกค้า (ค้นหาบางส่วนได้)'],
+            ['list_entities', 'รายชื่อ+id ของกลุ่ม/หมวดในระบบ ตามชนิดที่เลือก', [
+                'kind' => ['string', 'customer_groups=กลุ่มลูกค้า, inventory_groups=กลุ่มสต๊อก/ผ้า, energy_resources=ทรัพยากรพลังงาน, departments=แผนก', ['customer_groups', 'inventory_groups', 'energy_resources', 'departments']],
+            ]],
+            ['search_customers', 'ค้นหาลูกค้าจากชื่อและ/หรือกลุ่ม (คืน id, ชื่อ, กลุ่ม)', [
+                'name' => ['string', 'ชื่อลูกค้า (บางส่วนได้)'],
                 'group_id' => ['integer', 'id กลุ่มลูกค้า'],
             ]],
             ['get_customer_detail', 'ข้อมูลลูกค้ารายตัว: น้ำหนักผ้า ยอดบิล ตามช่วงวันที่', [
                 'customer_id' => ['integer', 'id ลูกค้า (required)'],
-                'date_from' => ['string', 'วันที่เริ่ม Y-m-d'],
-                'date_to' => ['string', 'วันที่สิ้นสุด Y-m-d'],
+                'date_from' => ['string', 'เริ่ม Y-m-d'],
+                'date_to' => ['string', 'สิ้นสุด Y-m-d'],
             ]],
-            ['list_inventory_groups', 'รายชื่อกลุ่มสต๊อก/ผ้าทั้งหมด พร้อม id', []],
             ['get_inventories_by_group', 'รายการสต๊อก/ผ้าในกลุ่ม พร้อมจำนวนคงเหลือ', [
                 'group_id' => ['integer', 'id กลุ่มสต๊อก (required)'],
             ]],
-            ['list_energy_resources', 'รายชื่อทรัพยากรพลังงานทั้งหมด (น้ำ ไฟ แก๊ส ฯลฯ) พร้อม id', []],
             ['get_energy_logs', 'ประวัติการใช้พลังงานของทรัพยากร', [
                 'resource_id' => ['integer', 'id ทรัพยากรพลังงาน (required)'],
             ]],
-            ['list_departments', 'รายชื่อแผนกทั้งหมด พร้อม id', []],
-            ['search_employees', 'ค้นหาพนักงานจากชื่อ และ/หรือ แผนก (คืน id, ชื่อ, แผนก)', [
-                'name' => ['string', 'ชื่อพนักงาน (ค้นหาบางส่วนได้)'],
+            ['search_employees', 'ค้นหาพนักงานจากชื่อและ/หรือแผนก (คืน id, ชื่อ, แผนก)', [
+                'name' => ['string', 'ชื่อพนักงาน (บางส่วนได้)'],
                 'department_id' => ['integer', 'id แผนก'],
             ]],
             ['get_employee_detail', 'ข้อมูลพนักงานรายตัว: ผลงาน เวลาทำงาน', [
                 'employee_id' => ['integer', 'id พนักงาน (required)'],
             ]],
             ['get_machine_list', 'รายการเครื่องจักร/รถ พร้อมสถานะ', [
-                'type' => ['string', 'ประเภท: washing (เครื่องซัก), dryer (เครื่องอบ), truck (รถบรรทุก)', ['washing', 'dryer', 'truck']],
+                'type' => ['string', 'washing (เครื่องซัก), dryer (เครื่องอบ) หรือ truck (รถ)', ['washing', 'dryer', 'truck']],
             ]],
             ['get_machine_notes', 'บันทึก/ประวัติซ่อมบำรุงเครื่องจักร ตามวันที่หรือล่าสุด 7 วัน', [
-                'type' => ['string', 'ประเภท: washing, dryer, truck', ['washing', 'dryer', 'truck']],
-                'date' => ['string', 'วันที่ Y-m-d (ไม่ระบุ = ล่าสุด 7 วัน)'],
+                'type' => ['string', 'washing, dryer หรือ truck', ['washing', 'dryer', 'truck']],
+                'date' => ['string', 'วันที่ Y-m-d (ไม่ระบุ=ล่าสุด 7 วัน)'],
             ]],
         ];
 
@@ -311,10 +359,7 @@ class AiChatService
                     in_array($args['range'] ?? '', ['day', 'week', 'month']) ? $args['range'] : 'day',
                 ),
 
-                'list_customer_groups' => $this->listAsText(
-                    CustomerGroup::get(['id', 'name']),
-                    'กลุ่มลูกค้า'
-                ),
+                'list_entities' => $this->listEntities($args),
 
                 'search_customers' => $this->searchCustomers($args),
 
@@ -324,27 +369,12 @@ class AiChatService
                     $args['date_to'] ?? null,
                 ),
 
-                'list_inventory_groups' => $this->listAsText(
-                    InventoryGroup::get(['id', 'name']),
-                    'กลุ่มสต๊อก'
-                ),
-
                 'get_inventories_by_group' => $this->chatService->getInventoriesByGroup(
                     (int) ($args['group_id'] ?? 0)
                 ),
 
-                'list_energy_resources' => $this->listAsText(
-                    EnergyResource::get(['id', 'name']),
-                    'ทรัพยากรพลังงาน'
-                ),
-
                 'get_energy_logs' => $this->chatService->getEnergyLogs(
                     (int) ($args['resource_id'] ?? 0)
-                ),
-
-                'list_departments' => $this->listAsText(
-                    Department::get(['id', 'name']),
-                    'แผนก'
                 ),
 
                 'search_employees' => $this->searchEmployees($args),
@@ -359,7 +389,7 @@ class AiChatService
 
                 'get_machine_notes' => $this->getMachineNotes($args),
 
-                default => "ไม่รู้จักเครื่องมือ \"{$name}\" — เครื่องมือที่ใช้ได้: get_today_summary, get_business_report, list_customer_groups, search_customers, get_customer_detail, list_inventory_groups, get_inventories_by_group, list_energy_resources, get_energy_logs, list_departments, search_employees, get_employee_detail, get_machine_list, get_machine_notes",
+                default => "ไม่รู้จักเครื่องมือ \"{$name}\" — เครื่องมือที่ใช้ได้: get_today_summary, get_business_report, list_entities, search_customers, get_customer_detail, get_inventories_by_group, get_energy_logs, search_employees, get_employee_detail, get_machine_list, get_machine_notes",
             };
         } catch (\Throwable $e) {
             Log::warning('AiChatService tool execution failed', [
@@ -378,6 +408,20 @@ class AiChatService
         }
 
         return $text;
+    }
+
+    /**
+     * รายชื่อกลุ่ม/หมวดตามชนิด (ยุบจาก list_customer_groups/inventory/energy/departments เดิม)
+     */
+    protected function listEntities(array $args): string
+    {
+        return match ($args['kind'] ?? '') {
+            'customer_groups' => $this->listAsText(CustomerGroup::get(['id', 'name']), 'กลุ่มลูกค้า'),
+            'inventory_groups' => $this->listAsText(InventoryGroup::get(['id', 'name']), 'กลุ่มสต๊อก'),
+            'energy_resources' => $this->listAsText(EnergyResource::get(['id', 'name']), 'ทรัพยากรพลังงาน'),
+            'departments' => $this->listAsText(Department::get(['id', 'name']), 'แผนก'),
+            default => 'ระบุ kind ไม่ถูกต้อง — ค่าที่ใช้ได้: customer_groups, inventory_groups, energy_resources, departments',
+        };
     }
 
     protected function searchCustomers(array $args): string

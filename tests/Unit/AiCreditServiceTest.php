@@ -72,4 +72,34 @@ class AiCreditServiceTest extends TestCase
     {
         $this->assertSame(0.0, $this->service->chargeThb('minimax/minimax-m2.7', 0, 0));
     }
+
+    public function test_cached_tokens_billed_at_cache_read_rate(): void
+    {
+        // minimax/minimax-m2.7: input 0.3, cached 0.06 USD/MTok
+        // ทั้งหมด cache hit → 1M × 0.06 = 0.06 (ถูกกว่า 0.3 เต็ม 5 เท่า)
+        $this->assertSame(0.06, $this->service->costUsd('minimax/minimax-m2.7', 1_000_000, 0, 1_000_000));
+
+        $this->assertLessThan(
+            $this->service->costUsd('minimax/minimax-m2.7', 1_000_000, 0, 0),
+            $this->service->costUsd('minimax/minimax-m2.7', 1_000_000, 0, 1_000_000)
+        );
+    }
+
+    public function test_model_without_cache_price_never_undercharges(): void
+    {
+        // fallback (ไม่กำหนด cachedInputPerMTok) → cache hit คิดราคา input เต็ม
+        $this->assertSame(
+            $this->service->costUsd('evil/unknown', 1000, 0, 0),
+            $this->service->costUsd('evil/unknown', 1000, 0, 800)
+        );
+    }
+
+    public function test_cached_tokens_clamped_to_prompt(): void
+    {
+        // cached เกิน prompt (estimate เพี้ยน) ต้องไม่ทำให้ fresh ติดลบ
+        $this->assertSame(
+            $this->service->costUsd('minimax/minimax-m2.7', 1000, 0, 1000),
+            $this->service->costUsd('minimax/minimax-m2.7', 1000, 0, 5000)
+        );
+    }
 }

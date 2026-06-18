@@ -114,6 +114,49 @@ class AiChatStreamServiceTest extends TestCase
         $this->assertCount(2, $contents);
     }
 
+    public function test_cached_tokens_accumulate_and_tool_status_has_thai_label(): void
+    {
+        $iteration1 = $this->sse([
+            ['choices' => [['delta' => ['tool_calls' => [
+                ['index' => 0, 'id' => 'call_1', 'function' => ['name' => 'get_today_summary', 'arguments' => '{}']],
+            ]]]]],
+            ['choices' => [['delta' => [], 'finish_reason' => 'tool_calls']]],
+            ['choices' => [], 'usage' => ['prompt_tokens' => 100, 'completion_tokens' => 20, 'prompt_tokens_details' => ['cached_tokens' => 80]]],
+        ]);
+
+        $iteration2 = $this->sse([
+            ['choices' => [['delta' => ['content' => 'ตอบแล้ว']]]],
+            ['choices' => [], 'usage' => ['prompt_tokens' => 150, 'completion_tokens' => 10, 'prompt_tokens_details' => ['cached_tokens' => 120]]],
+        ]);
+
+        Http::fake([
+            'llm.wavespeed.ai/*' => Http::sequence()
+                ->push($iteration1, 200)
+                ->push($iteration2, 200),
+        ]);
+
+        $chatService = Mockery::mock(ChatService::class);
+        $chatService->shouldReceive('getTodaySummary')->once()->andReturn(['type' => 'text', 'text' => 'ok']);
+
+        $events = [];
+        $result = $this->makeService($chatService)->streamAnswer(
+            [['role' => 'user', 'content' => 'สรุปวันนี้']],
+            'minimax/minimax-m2.7',
+            null,
+            function (array $event) use (&$events) {
+                $events[] = $event;
+            }
+        );
+
+        // cached_tokens บวกสะสมข้าม iteration (80 + 120)
+        $this->assertSame(250, $result['usage']['prompt_tokens']);
+        $this->assertSame(200, $result['usage']['cached_tokens']);
+
+        // tool_status มี label ภาษาไทย
+        $statuses = array_values(array_filter($events, fn ($e) => ($e['type'] ?? '') === 'tool_status'));
+        $this->assertSame('สรุปวันนี้', $statuses[0]['label']);
+    }
+
     public function test_two_parallel_tool_calls_with_fragmented_arguments(): void
     {
         $iteration1 = $this->sse([

@@ -29,14 +29,11 @@
     var TOOL_LABELS = {
         get_today_summary: 'สรุปวันนี้',
         get_business_report: 'รายงานธุรกิจ',
-        list_customer_groups: 'กลุ่มลูกค้า',
+        list_entities: 'รายชื่อกลุ่ม/หมวด',
         search_customers: 'ค้นหาลูกค้า',
         get_customer_detail: 'ข้อมูลลูกค้า',
-        list_inventory_groups: 'กลุ่มสต๊อก',
         get_inventories_by_group: 'รายการสต๊อก',
-        list_energy_resources: 'ทรัพยากรพลังงาน',
         get_energy_logs: 'ประวัติพลังงาน',
-        list_departments: 'แผนก',
         search_employees: 'ค้นหาพนักงาน',
         get_employee_detail: 'ข้อมูลพนักงาน',
         get_machine_list: 'รายการเครื่องจักร',
@@ -495,7 +492,7 @@
 
             if (type === 'tool_status') {
                 if (parsed.status === 'running') {
-                    var label = TOOL_LABELS[parsed.name] || parsed.name;
+                    var label = parsed.label || TOOL_LABELS[parsed.name] || parsed.name;
                     self.toolStatusText = '🔍 กำลังดึงข้อมูล: ' + label + '…';
                 } else {
                     self.toolStatusText = '';
@@ -529,6 +526,7 @@
             if (parsed.usage) {
                 self.serverUsage = {
                     promptTokens: Number(parsed.usage.prompt_tokens) || 0,
+                    cachedTokens: Number(parsed.usage.cached_tokens) || 0,
                     completionTokens: Number(parsed.usage.completion_tokens) || 0,
                     estimated: !!parsed.estimated,
                 };
@@ -720,7 +718,11 @@
         if (!message.usage) return '';
         var u = message.usage;
         var prefix = u.estimated ? '~' : '';
-        var text = prefix + '↓' + u.promptTokens + ' ↑' + u.completionTokens + ' tokens';
+        var text = prefix + '↓' + u.promptTokens;
+        if (u.cachedTokens > 0) {
+            text += ' (cache ' + u.cachedTokens + ')';
+        }
+        text += ' ↑' + u.completionTokens + ' tokens';
 
         // ยอดหักจริงจาก server ถ้ามี ไม่งั้นคำนวณจาก pricing (ข้อความเก่า)
         var thb = (message.creditCharged !== null && message.creditCharged !== undefined)

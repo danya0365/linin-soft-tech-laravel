@@ -12,6 +12,7 @@ class AiChatMessage extends Model
         'content',
         'model',
         'prompt_tokens',
+        'cached_tokens',
         'completion_tokens',
         'is_estimated',
         'is_partial',

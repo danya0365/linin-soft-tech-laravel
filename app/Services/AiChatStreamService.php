@@ -63,8 +63,20 @@ class AiChatStreamService extends AiChatService
     {
         $this->usageTotal = [
             'prompt_tokens' => ($this->usageTotal['prompt_tokens'] ?? 0) + ((int) ($usage['prompt_tokens'] ?? 0)),
+            'cached_tokens' => ($this->usageTotal['cached_tokens'] ?? 0) + $this->extractCachedTokens($usage),
             'completion_tokens' => ($this->usageTotal['completion_tokens'] ?? 0) + ((int) ($usage['completion_tokens'] ?? 0)),
         ];
+    }
+
+    /**
+     * จำนวน prompt token ที่เป็น cache hit จาก usage ของ upstream
+     * รองรับทั้งรูปแบบ OpenAI (prompt_tokens_details.cached_tokens) และ field ตรง (cached_tokens)
+     */
+    protected function extractCachedTokens(array $usage): int
+    {
+        return (int) ($usage['prompt_tokens_details']['cached_tokens']
+            ?? $usage['cached_tokens']
+            ?? 0);
     }
 
     protected function runStreamingToolLoop(array $messages, string $model, ?int $maxTokens, callable $emit): array
@@ -125,9 +137,10 @@ class AiChatStreamService extends AiChatService
             ];
 
             foreach ($result['toolCalls'] as $call) {
-                $emit(['type' => 'tool_status', 'status' => 'running', 'name' => $call['name']]);
-
                 $args = json_decode($call['arguments'], true) ?: [];
+                $label = $this->toolStatusLabel($call['name'], $args);
+
+                $emit(['type' => 'tool_status', 'status' => 'running', 'name' => $call['name'], 'label' => $label]);
 
                 Log::info('AiChatStreamService tool call', ['tool' => $call['name'], 'args' => $args]);
 
@@ -137,7 +150,7 @@ class AiChatStreamService extends AiChatService
                     'content' => $this->executeTool($call['name'], $args),
                 ];
 
-                $emit(['type' => 'tool_status', 'status' => 'done', 'name' => $call['name']]);
+                $emit(['type' => 'tool_status', 'status' => 'done', 'name' => $call['name'], 'label' => $label]);
             }
         }
 
@@ -156,6 +169,37 @@ class AiChatStreamService extends AiChatService
             'estimated' => $this->usageTotal === null,
             'aborted' => false,
         ];
+    }
+
+    /**
+     * label ภาษาไทยสำหรับ tool_status (โชว์ตอนกำลังดึงข้อมูล)
+     * list_entities เป็น tool รวม จึงแยก label ตาม kind ให้ผู้ใช้เห็นชัด
+     */
+    protected function toolStatusLabel(string $name, array $args): string
+    {
+        if ($name === 'list_entities') {
+            return match ($args['kind'] ?? '') {
+                'customer_groups' => 'กลุ่มลูกค้า',
+                'inventory_groups' => 'กลุ่มสต๊อก',
+                'energy_resources' => 'ทรัพยากรพลังงาน',
+                'departments' => 'แผนก',
+                default => 'รายชื่อกลุ่ม/หมวด',
+            };
+        }
+
+        return match ($name) {
+            'get_today_summary' => 'สรุปวันนี้',
+            'get_business_report' => 'รายงานธุรกิจ',
+            'search_customers' => 'ค้นหาลูกค้า',
+            'get_customer_detail' => 'ข้อมูลลูกค้า',
+            'get_inventories_by_group' => 'รายการสต๊อก',
+            'get_energy_logs' => 'ประวัติพลังงาน',
+            'search_employees' => 'ค้นหาพนักงาน',
+            'get_employee_detail' => 'ข้อมูลพนักงาน',
+            'get_machine_list' => 'รายการเครื่องจักร',
+            'get_machine_notes' => 'บันทึกซ่อมบำรุง',
+            default => $name,
+        };
     }
 
     /**
