@@ -183,8 +183,20 @@ class AiChatStreamService extends AiChatService
                 'inventory_groups' => 'กลุ่มสต๊อก',
                 'energy_resources' => 'ทรัพยากรพลังงาน',
                 'departments' => 'แผนก',
+                'linen_types' => 'ประเภทผ้า',
                 default => 'รายชื่อกลุ่ม/หมวด',
             };
+        }
+
+        if (str_starts_with($name, 'prepare_create_')) {
+            $key = substr($name, strlen('prepare_create_'));
+            $label = \App\Services\EntityWriteRegistry::get($key)['label'] ?? $key;
+
+            return "เตรียมสร้าง{$label}";
+        }
+
+        if ($name === 'confirm_create_entity') {
+            return 'ยืนยันบันทึกข้อมูล';
         }
 
         return match ($name) {
@@ -373,6 +385,14 @@ class AiChatStreamService extends AiChatService
             . "จัดโครงสร้างด้วยบรรทัดว่างและลิสต์ขีดหน้า (-) ได้\n"
             . "4. รูปแบบวันที่ใน args ใช้ Y-m-d เช่น {$today->format('Y-m-d')}\n"
             . "5. ถ้าหาข้อมูลไม่พบ ให้บอกตรงๆ ว่าไม่พบ และแนะนำคำถามที่ใกล้เคียง\n"
-            . "6. คำถามทั่วไปที่ไม่เกี่ยวกับข้อมูลในระบบ ตอบได้เลยโดยไม่ต้องเรียกเครื่องมือ";
+            . "6. คำถามทั่วไปที่ไม่เกี่ยวกับข้อมูลในระบบ ตอบได้เลยโดยไม่ต้องเรียกเครื่องมือ\n\n"
+            . "การสร้างข้อมูลใหม่ (insert):\n"
+            . "7. ต้องทำ 2 ขั้นเสมอ — (ก) เรียก prepare_create_* เพื่อเตรียมข้อมูล แล้วแสดง preview ที่ได้ให้ผู้ใช้พร้อมถามยืนยัน "
+            . "(ข) เมื่อผู้ใช้ตอบยืนยันในข้อความถัดไป จึงเรียก confirm_create_entity ด้วย draft_id เดิม\n"
+            . "8. ห้ามเรียก confirm_create_entity ในรอบเดียวกับ prepare_create_* เด็ดขาด ต้องรอให้ผู้ใช้ยืนยันจริงก่อน\n"
+            . "9. ก่อนสร้างข้อมูลที่ต้องอ้างอิง id (เช่น customer_group_id, department_id, linen_type_id) "
+            . "ต้องเรียก list_entities หรือ search_* หา id จริงก่อน ห้ามเดา id เอง\n"
+            . "10. ห้ามแต่งค่าที่ผู้ใช้ไม่ได้ระบุ ถ้าข้อมูลที่จำเป็นไม่ครบให้ถามผู้ใช้ก่อน อย่ากรอกเอง\n"
+            . "11. ระบบไม่รองรับการแนบรูปภาพผ่านแชท ฟิลด์รูป (photo) จะถูกเว้นว่างให้เอง ไม่ต้องถามหา";
     }
 }

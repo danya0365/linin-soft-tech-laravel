@@ -158,6 +158,9 @@ class AiChatController extends Controller
         $recentWindow = $this->resolveRecentWindow($validated);
         $contextMessages = $this->buildContextMessages($session, $recentWindow);
 
+        // เปิด write tool (insert ข้อมูล) ให้เฉพาะ path เว็บ พร้อมส่ง user/session ไปเช็คสิทธิ์ + audit
+        $this->streamService->setWriteContext(Auth::user(), $session);
+
         $maxTokens = $validated['maxTokens'] ?? null;
         $meta = [
             'type' => 'meta',

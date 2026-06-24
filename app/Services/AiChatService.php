@@ -3,12 +3,15 @@
 namespace App\Services;
 
 use App\Exceptions\WaveSpeedApiException;
+use App\Models\AiChatSession;
 use App\Models\Customer;
 use App\Models\CustomerGroup;
 use App\Models\Department;
 use App\Models\Employee;
 use App\Models\EnergyResource;
 use App\Models\InventoryGroup;
+use App\Models\LinenType;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
@@ -33,11 +36,28 @@ class AiChatService
     /** LINE text message limit 5000 — เผื่อ margin */
     protected const ANSWER_MAX_CHARS = 4500;
 
+    /** ผู้ใช้ที่กำลังสั่งงาน — จำเป็นต่อ write tool (เช็คสิทธิ์ + audit) */
+    protected ?User $actingUser = null;
+
+    /** เซสชันแชทปัจจุบัน — ใช้ผูก draft + กลไกกัน auto-confirm */
+    protected ?AiChatSession $actingSession = null;
+
     public function __construct(
         protected WaveSpeedLlmService $llm,
         protected ChatService $chatService,
+        protected EntityWriteService $entityWriter,
     ) {
         $this->maxIterations = (int) config('services.wavespeed.max_iterations', 5);
+    }
+
+    /**
+     * ตั้ง context การเขียนข้อมูล — ต้องเรียกก่อน streamAnswer ถึงจะเปิด write tool
+     * (LINE path ไม่เรียก จึงไม่มี write tool — web-only ในเฟส 1)
+     */
+    public function setWriteContext(User $actor, AiChatSession $session): void
+    {
+        $this->actingUser = $actor;
+        $this->actingSession = $session;
     }
 
     public function isAvailable(): bool
@@ -284,7 +304,7 @@ class AiChatService
                 'range' => ['string', 'day, week หรือ month', ['day', 'week', 'month']],
             ]],
             ['list_entities', 'รายชื่อ+id ของกลุ่ม/หมวดในระบบ ตามชนิดที่เลือก', [
-                'kind' => ['string', 'customer_groups=กลุ่มลูกค้า, inventory_groups=กลุ่มสต๊อก/ผ้า, energy_resources=ทรัพยากรพลังงาน, departments=แผนก', ['customer_groups', 'inventory_groups', 'energy_resources', 'departments']],
+                'kind' => ['string', 'customer_groups=กลุ่มลูกค้า, inventory_groups=กลุ่มสต๊อก/ผ้า, energy_resources=ทรัพยากรพลังงาน, departments=แผนก, linen_types=ประเภทผ้า', ['customer_groups', 'inventory_groups', 'energy_resources', 'departments', 'linen_types']],
             ]],
             ['search_customers', 'ค้นหาลูกค้าจากชื่อและ/หรือกลุ่ม (คืน id, ชื่อ, กลุ่ม)', [
                 'name' => ['string', 'ชื่อลูกค้า (บางส่วนได้)'],
@@ -317,14 +337,23 @@ class AiChatService
             ]],
         ];
 
+        // write tool — เปิดเฉพาะเมื่อมี context ผู้ใช้+เซสชัน (web เท่านั้น)
+        if ($this->actingUser && $this->actingSession) {
+            $tools = array_merge($tools, $this->writeToolDefinitions());
+        }
+
         return array_map(function ($tool) {
             [$name, $description, $params] = $tool;
 
             $properties = [];
+            $required = [];
             foreach ($params as $paramName => $def) {
                 $property = ['type' => $def[0], 'description' => $def[1]];
-                if (isset($def[2])) {
+                if (isset($def[2]) && is_array($def[2])) {
                     $property['enum'] = $def[2];
+                }
+                if (!empty($def[3])) { // element ที่ 4 = required flag
+                    $required[] = $paramName;
                 }
                 $properties[$paramName] = $property;
             }
@@ -337,11 +366,34 @@ class AiChatService
                     'parameters' => [
                         'type' => 'object',
                         'properties' => (object) $properties,
-                        'required' => [],
+                        'required' => $required,
                     ],
                 ],
             ];
         }, $tools);
+    }
+
+    /**
+     * Tool สำหรับสร้างข้อมูล (insert) — สร้างจาก EntityWriteRegistry
+     * 1 prepare tool ต่อ 1 เอนทิตี + confirm_create_entity กลาง 1 ตัว
+     */
+    protected function writeToolDefinitions(): array
+    {
+        $tools = [];
+
+        foreach (EntityWriteRegistry::all() as $key => $cfg) {
+            $tools[] = [
+                "prepare_create_{$key}",
+                "เตรียมสร้าง{$cfg['label']} (ขั้นที่ 1/2 — แสดง preview ให้ผู้ใช้ยืนยันก่อน ห้ามบันทึกเองทันที)",
+                $cfg['fields'],
+            ];
+        }
+
+        $tools[] = ['confirm_create_entity', 'ยืนยันบันทึกข้อมูลที่เตรียมไว้ (ขั้นที่ 2/2) — เรียกเฉพาะเมื่อผู้ใช้ตอบยืนยันในข้อความถัดไปแล้วเท่านั้น', [
+            'draft_id' => ['integer', 'id ของรายการที่ได้จาก prepare_create_*', null, true],
+        ]];
+
+        return $tools;
     }
 
     /**
@@ -350,6 +402,12 @@ class AiChatService
     protected function executeTool(string $name, array $args): string
     {
         try {
+            // write tool (prepare_create_* / confirm_create_entity) — มี context เท่านั้น
+            $writeResult = $this->executeWriteTool($name, $args);
+            if ($writeResult !== null) {
+                return $writeResult;
+            }
+
             $result = match ($name) {
                 'get_today_summary' => $this->chatService->getTodaySummary(),
 
@@ -420,8 +478,35 @@ class AiChatService
             'inventory_groups' => $this->listAsText(InventoryGroup::get(['id', 'name']), 'กลุ่มสต๊อก'),
             'energy_resources' => $this->listAsText(EnergyResource::get(['id', 'name']), 'ทรัพยากรพลังงาน'),
             'departments' => $this->listAsText(Department::get(['id', 'name']), 'แผนก'),
-            default => 'ระบุ kind ไม่ถูกต้อง — ค่าที่ใช้ได้: customer_groups, inventory_groups, energy_resources, departments',
+            'linen_types' => $this->listAsText(LinenType::get(['id', 'name']), 'ประเภทผ้า'),
+            default => 'ระบุ kind ไม่ถูกต้อง — ค่าที่ใช้ได้: customer_groups, inventory_groups, energy_resources, departments, linen_types',
         };
+    }
+
+    /**
+     * จัดการ write tool — คืน null ถ้าไม่ใช่ write tool หรือไม่มี context (ให้ตกไป read match)
+     */
+    protected function executeWriteTool(string $name, array $args): ?string
+    {
+        if (!$this->actingUser || !$this->actingSession) {
+            return null;
+        }
+
+        if ($name === 'confirm_create_entity') {
+            return $this->entityWriter->confirm(
+                $this->actingUser,
+                $this->actingSession,
+                (int) ($args['draft_id'] ?? 0)
+            );
+        }
+
+        if (str_starts_with($name, 'prepare_create_')) {
+            $entityKey = substr($name, strlen('prepare_create_'));
+
+            return $this->entityWriter->prepare($this->actingUser, $this->actingSession, $entityKey, $args);
+        }
+
+        return null;
     }
 
     protected function searchCustomers(array $args): string
