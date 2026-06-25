@@ -9,7 +9,9 @@ use App\Models\CustomerGroup;
 use App\Models\Department;
 use App\Models\Employee;
 use App\Models\EnergyResource;
+use App\Models\Inventory;
 use App\Models\InventoryGroup;
+use App\Models\LinenProduct;
 use App\Models\LinenType;
 use App\Models\User;
 use Carbon\Carbon;
@@ -46,6 +48,7 @@ class AiChatService
         protected WaveSpeedLlmService $llm,
         protected ChatService $chatService,
         protected EntityWriteService $entityWriter,
+        protected OperationActionService $operationActions,
     ) {
         $this->maxIterations = (int) config('services.wavespeed.max_iterations', 5);
     }
@@ -335,11 +338,17 @@ class AiChatService
                 'type' => ['string', 'washing, dryer หรือ truck', ['washing', 'dryer', 'truck']],
                 'date' => ['string', 'วันที่ Y-m-d (ไม่ระบุ=ล่าสุด 7 วัน)'],
             ]],
+            ['search_inventories', 'ค้นหาสต๊อก/วัสดุจากชื่อ (คืน id, ชื่อ, หน่วย, คงเหลือ)', [
+                'name' => ['string', 'ชื่อสต๊อก (บางส่วนได้)'],
+            ]],
+            ['list_linen_products', 'รายชื่อ+id ผลิตภัณฑ์ผ้า (กรองตามประเภทผ้าได้)', [
+                'linen_type_id' => ['integer', 'id ประเภทผ้า (ไม่ระบุ=ทั้งหมด)'],
+            ]],
         ];
 
-        // write tool — เปิดเฉพาะเมื่อมี context ผู้ใช้+เซสชัน (web เท่านั้น)
+        // write tool + operational action — เปิดเฉพาะเมื่อมี context ผู้ใช้+เซสชัน (web เท่านั้น)
         if ($this->actingUser && $this->actingSession) {
-            $tools = array_merge($tools, $this->writeToolDefinitions());
+            $tools = array_merge($tools, $this->writeToolDefinitions(), $this->operationActionToolDefinitions());
         }
 
         return array_map(function ($tool) {
@@ -348,6 +357,35 @@ class AiChatService
             $properties = [];
             $required = [];
             foreach ($params as $paramName => $def) {
+                // array param: $def[4] = schema ของ object ในแต่ละ item (รองรับ 1 ระดับ)
+                if ($def[0] === 'array' && isset($def[4]) && is_array($def[4])) {
+                    $itemProps = [];
+                    $itemRequired = [];
+                    foreach ($def[4] as $itemName => $itemDef) {
+                        $ip = ['type' => $itemDef[0], 'description' => $itemDef[1]];
+                        if (isset($itemDef[2]) && is_array($itemDef[2])) {
+                            $ip['enum'] = $itemDef[2];
+                        }
+                        if (!empty($itemDef[3])) {
+                            $itemRequired[] = $itemName;
+                        }
+                        $itemProps[$itemName] = $ip;
+                    }
+                    $properties[$paramName] = [
+                        'type' => 'array',
+                        'description' => $def[1],
+                        'items' => [
+                            'type' => 'object',
+                            'properties' => (object) $itemProps,
+                            'required' => $itemRequired,
+                        ],
+                    ];
+                    if (!empty($def[3])) {
+                        $required[] = $paramName;
+                    }
+                    continue;
+                }
+
                 $property = ['type' => $def[0], 'description' => $def[1]];
                 if (isset($def[2]) && is_array($def[2])) {
                     $property['enum'] = $def[2];
@@ -406,9 +444,28 @@ class AiChatService
             'id' => ['integer', 'id ของรายการที่จะลบ (หาด้วย search_*/list_entities ก่อน)', null, true],
         ]];
 
-        $tools[] = ['confirm_write', 'ยืนยันทำรายการที่เตรียมไว้ (สร้าง/แก้ไข/ลบ) ขั้นที่ 2/2 — เรียกเฉพาะเมื่อผู้ใช้ตอบยืนยันในข้อความถัดไปแล้วเท่านั้น', [
+        $tools[] = ['confirm_write', 'ยืนยันทำรายการที่เตรียมไว้ (สร้าง/แก้ไข/ลบ/งานประจำวัน) ขั้นที่ 2/2 — เรียกเฉพาะเมื่อผู้ใช้ตอบยืนยันในข้อความถัดไปแล้วเท่านั้น', [
             'draft_id' => ['integer', 'id ของรายการที่ได้จาก prepare_*', null, true],
         ]];
+
+        return $tools;
+    }
+
+    /**
+     * Tool สำหรับงานเดินเอกสาร/ธุรกรรม (operational) — สร้างจาก OperationActionRegistry
+     * 1 prepare ต่อ 1 action (prepare_log_energy ฯลฯ) ใช้ confirm_write ร่วมกัน
+     */
+    protected function operationActionToolDefinitions(): array
+    {
+        $tools = [];
+
+        foreach (OperationActionRegistry::all() as $key => $cfg) {
+            $tools[] = [
+                "prepare_{$key}",
+                "เตรียม{$cfg['label']} (ขั้นที่ 1/2 — แสดง preview ให้ผู้ใช้ยืนยันก่อน ห้ามทำเองทันที)",
+                $cfg['params'],
+            ];
+        }
 
         return $tools;
     }
@@ -447,6 +504,10 @@ class AiChatService
                 'get_inventories_by_group' => $this->chatService->getInventoriesByGroup(
                     (int) ($args['group_id'] ?? 0)
                 ),
+
+                'search_inventories' => $this->searchInventories($args),
+
+                'list_linen_products' => $this->listLinenProducts($args),
 
                 'get_energy_logs' => $this->chatService->getEnergyLogs(
                     (int) ($args['resource_id'] ?? 0)
@@ -526,6 +587,16 @@ class AiChatService
             );
         }
 
+        // operational action (prepare_log_energy/stock_in/.../operation) — guard ด้วย registry ไม่ให้ชน entity tool
+        if (str_starts_with($name, 'prepare_') && OperationActionRegistry::get(substr($name, strlen('prepare_')))) {
+            return $this->operationActions->prepare(
+                $this->actingUser,
+                $this->actingSession,
+                substr($name, strlen('prepare_')),
+                $args
+            );
+        }
+
         if (str_starts_with($name, 'prepare_create_')) {
             $entityKey = substr($name, strlen('prepare_create_'));
 
@@ -592,6 +663,48 @@ class AiChatService
             $dept = $e->department->name ?? '-';
 
             return "id: {$e->id} | {$e->name} (รหัส {$e->code}) | แผนก: {$dept}";
+        })->implode("\n");
+    }
+
+    protected function searchInventories(array $args): string
+    {
+        $query = Inventory::query()->with('inventoryGroup:id,name');
+
+        if (!empty($args['name'])) {
+            $query->where('name', 'like', '%' . $args['name'] . '%');
+        }
+
+        $inventories = $query->limit(15)->get(['id', 'name', 'unit', 'remain_quantity', 'inventory_group_id']);
+
+        if ($inventories->isEmpty()) {
+            return 'ไม่พบสต๊อกตามเงื่อนไขที่ค้นหา';
+        }
+
+        return "สต๊อกที่พบ (สูงสุด 15 รายการ):\n" . $inventories->map(function ($i) {
+            $group = $i->inventoryGroup->name ?? '-';
+
+            return "id: {$i->id} | {$i->name} | คงเหลือ {$i->remain_quantity} {$i->unit} | กลุ่ม: {$group}";
+        })->implode("\n");
+    }
+
+    protected function listLinenProducts(array $args): string
+    {
+        $query = LinenProduct::query()->with('linenType:id,name');
+
+        if (!empty($args['linen_type_id'])) {
+            $query->where('linen_type_id', (int) $args['linen_type_id']);
+        }
+
+        $products = $query->limit(50)->get(['id', 'name', 'linen_type_id']);
+
+        if ($products->isEmpty()) {
+            return 'ไม่พบผลิตภัณฑ์ผ้าตามเงื่อนไขที่ค้นหา';
+        }
+
+        return "ผลิตภัณฑ์ผ้า (สูงสุด 50 รายการ):\n" . $products->map(function ($p) {
+            $type = $p->linenType->name ?? '-';
+
+            return "id: {$p->id} | {$p->name} | ประเภท: {$type}";
         })->implode("\n");
     }
 

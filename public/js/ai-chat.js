@@ -70,6 +70,21 @@
         'ลบประเภทผ้า id 7',
     ];
 
+    // งานประจำวัน (operational) — ทำได้ตามสิทธิ์ (ระบบเช็คให้ตอนสั่งจริง)
+    var OPERATIONAL_CAPABILITIES = [
+        'บันทึกการใช้พลังงาน (น้ำ/ไฟ/แก๊ส/ชีวมวล/น้ำมัน/เคมี)',
+        'รับสต๊อกเข้า และเบิกสต๊อกออก',
+        'ออกบิลเก็บเงินลูกค้า',
+        'บันทึกค่าใช้จ่ายแผนก',
+        'สร้างงานผ้า: ซัก/อบ/รีด/แพ็ค/เก็บ (พร้อมรายการผ้า)',
+    ];
+    var OPERATIONAL_EXAMPLE_PROMPTS = [
+        'บันทึกค่าน้ำ 1200 หน่วย 850 บาท',
+        'เบิกผงซักฟอก 30 ออกจากสต๊อก ต้นทุน 600',
+        'ออกบิลลูกค้าโรงแรม A น้ำหนัก 500 ยอด 25000',
+        'สร้างงานซักให้ลูกค้า A พนักงาน สมชาย ผ้าปูที่นอน 12 กก.',
+    ];
+
     // ── Helpers ─────────────────────────────────────────────────
 
     function loadJson(key, fallback) {
@@ -394,6 +409,9 @@
             body.appendChild(this.buildHelpChecklist('✏️ สร้าง / แก้ไข / ลบข้อมูลได้ (ตามสิทธิ์ของคุณ)', labels));
         }
 
+        // 3) งานประจำวัน (operational) — ทำได้ตามสิทธิ์
+        body.appendChild(this.buildHelpChecklist('🧾 ทำงานประจำวันได้ (ตามสิทธิ์)', OPERATIONAL_CAPABILITIES));
+
         // 3) วิธีใช้
         var how = document.createElement('div');
         how.className = 'ai-chat-help-section';
@@ -435,6 +453,7 @@
         if (canWrite) {
             prompts = prompts.concat(WRITE_EXAMPLE_PROMPTS);
         }
+        prompts = prompts.concat(OPERATIONAL_EXAMPLE_PROMPTS);
         prompts.forEach(function (text) {
             chipRow.appendChild(self.buildChip(text, true));
         });

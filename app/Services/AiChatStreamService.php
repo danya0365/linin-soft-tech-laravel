@@ -188,6 +188,10 @@ class AiChatStreamService extends AiChatService
             };
         }
 
+        if (str_starts_with($name, 'prepare_') && ($actionCfg = \App\Services\OperationActionRegistry::get(substr($name, strlen('prepare_'))))) {
+            return "เตรียม{$actionCfg['label']}";
+        }
+
         if (str_starts_with($name, 'prepare_create_')) {
             $key = substr($name, strlen('prepare_create_'));
             $label = \App\Services\EntityWriteRegistry::get($key)['label'] ?? $key;
@@ -221,6 +225,8 @@ class AiChatStreamService extends AiChatService
             'get_employee_detail' => 'ข้อมูลพนักงาน',
             'get_machine_list' => 'รายการเครื่องจักร',
             'get_machine_notes' => 'บันทึกซ่อมบำรุง',
+            'search_inventories' => 'ค้นหาสต๊อก',
+            'list_linen_products' => 'รายการผลิตภัณฑ์ผ้า',
             default => $name,
         };
     }
@@ -406,6 +412,11 @@ class AiChatStreamService extends AiChatService
             . "ต้องเรียก list_entities หรือ search_* หา id จริงก่อน ห้ามเดา id เอง\n"
             . "10. การแก้ไข (update) ส่งเฉพาะฟิลด์ที่ต้องการเปลี่ยนเท่านั้น ห้ามแต่งค่าที่ผู้ใช้ไม่ได้ระบุ ถ้าข้อมูลจำเป็นไม่ครบให้ถามผู้ใช้ก่อน\n"
             . "11. การลบจะถูกระบบบล็อกถ้ามีข้อมูลอื่นผูกอยู่ (เช่น กลุ่มที่มีลูกค้า) ให้แจ้งผู้ใช้ตามข้อความที่ระบบคืนมา\n"
-            . "12. ระบบไม่รองรับการแนบรูปภาพผ่านแชท ฟิลด์รูป (photo) จะถูกเว้นว่างให้เอง ไม่ต้องถามหา";
+            . "12. ระบบไม่รองรับการแนบรูปภาพผ่านแชท ฟิลด์รูป (photo) จะถูกเว้นว่างให้เอง ไม่ต้องถามหา\n\n"
+            . "งานประจำวัน (operational): บันทึกพลังงาน, รับ/เบิกสต๊อก, ออกบิล, ค่าใช้จ่ายแผนก, สร้างงานผ้า (ซัก/อบ/รีด/แพ็ค/เก็บ)\n"
+            . "13. ใช้ขั้นตอน 2 ชั้นเหมือนกัน — prepare_* (log_energy/stock_in/stock_out/billing/department_expense/operation) แสดง preview แล้ว confirm_write เมื่อผู้ใช้ยืนยัน\n"
+            . "14. ก่อนทำต้องหา id จริงก่อน: พลังงาน/แผนก→list_entities, สต๊อก→search_inventories, ลูกค้า→search_customers, พนักงาน→search_employees, ผลิตภัณฑ์ผ้า→list_linen_products, เครื่องจักร→get_machine_list\n"
+            . "15. สร้างงานผ้า (prepare_operation) ให้รวบรวมรายการผ้าทั้งหมดก่อน แล้วส่ง items เป็น array ครั้งเดียว (แต่ละ item: linen_product_id, linen_case, color, amount; collect ใส่ collect_pack)\n"
+            . "16. วันที่ทุก action ไม่ระบุ = วันนี้ ลงย้อนหลังได้โดยใส่วันที่ Y-m-d";
     }
 }

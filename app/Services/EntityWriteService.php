@@ -25,6 +25,11 @@ class EntityWriteService
     /** อายุ draft ก่อนหมดอายุ (นาที) */
     protected const DRAFT_TTL_MINUTES = 30;
 
+    public function __construct(
+        protected OperationActionService $operationActions,
+    ) {
+    }
+
     /**
      * ขั้นที่ 1: เตรียมสร้างข้อมูล + แสดง preview ให้ผู้ใช้ยืนยัน (ไม่ insert จริง)
      */
@@ -35,7 +40,7 @@ class EntityWriteService
             return "ไม่รู้จักชนิดข้อมูล \"{$entityKey}\" — ชนิดที่สร้างได้: " . implode(', ', EntityWriteRegistry::keys());
         }
 
-        if (!$this->can($actor, $cfg['role'])) {
+        if (!self::can($actor, $cfg['role'])) {
             return $this->denyMessage($cfg);
         }
 
@@ -65,7 +70,7 @@ class EntityWriteService
         // เติมค่า default ของคอลัมน์ที่ skip แต่ NOT NULL (เช่น photo) — ไม่โชว์ใน preview
         $payload = array_merge($cfg['defaults'] ?? [], $payload);
 
-        $draft = $this->createDraft($actor, $session, $entityKey, 'create', $payload, $preview, null);
+        $draft = self::createDraft($actor, $session, $entityKey, 'create', $payload, $preview, null);
 
         return "พร้อมสร้าง{$cfg['label']}ตามนี้:\n{$preview}\n\n"
             . $this->confirmInstruction($draft->id);
@@ -81,7 +86,7 @@ class EntityWriteService
             return "ไม่รู้จักชนิดข้อมูล \"{$entityKey}\" — ชนิดที่แก้ไขได้: " . implode(', ', EntityWriteRegistry::keys());
         }
 
-        if (!$this->can($actor, $cfg['role'])) {
+        if (!self::can($actor, $cfg['role'])) {
             return $this->denyMessage($cfg, 'แก้ไข');
         }
 
@@ -120,7 +125,7 @@ class EntityWriteService
 
         $preview = $this->buildUpdatePreview($cfg, $record, $changes);
 
-        $draft = $this->createDraft($actor, $session, $entityKey, 'update', $changes, $preview, $id);
+        $draft = self::createDraft($actor, $session, $entityKey, 'update', $changes, $preview, $id);
 
         return "พร้อมแก้ไข{$cfg['label']} (id {$id}) ตามนี้:\n{$preview}\n\n"
             . $this->confirmInstruction($draft->id);
@@ -136,7 +141,7 @@ class EntityWriteService
             return "ไม่รู้จักชนิดข้อมูล \"{$entityKey}\" — ชนิดที่ลบได้: " . implode(', ', EntityWriteRegistry::keys());
         }
 
-        if (!$this->can($actor, $cfg['role'])) {
+        if (!self::can($actor, $cfg['role'])) {
             return $this->denyMessage($cfg, 'ลบ');
         }
 
@@ -156,14 +161,14 @@ class EntityWriteService
         $snapshot = $record->only(array_keys($cfg['fields']));
         $preview = $this->buildPreview($cfg, $snapshot);
 
-        $draft = $this->createDraft($actor, $session, $entityKey, 'delete', $snapshot, $preview, $id);
+        $draft = self::createDraft($actor, $session, $entityKey, 'delete', $snapshot, $preview, $id);
 
         return "พร้อมลบ{$cfg['label']} (id {$id}) ตามนี้:\n{$preview}\n\n"
             . "เตือนผู้ใช้ว่าการลบจะกู้คืนยาก แล้ว" . $this->confirmInstruction($draft->id);
     }
 
-    /** สร้าง draft (ใช้ร่วมกันทุก action) */
-    protected function createDraft(User $actor, AiChatSession $session, string $entityKey, string $action, array $payload, string $preview, ?int $recordId): AiWriteDraft
+    /** สร้าง draft (ใช้ร่วมกันทุก action — public static ให้ OperationActionService เรียกได้โดยไม่ circular) */
+    public static function createDraft(User $actor, AiChatSession $session, string $entityKey, string $action, array $payload, string $preview, ?int $recordId): AiWriteDraft
     {
         return AiWriteDraft::create([
             'ai_chat_session_id' => $session->id,
@@ -216,13 +221,18 @@ class EntityWriteService
                 . "แล้วค่อยเรียก confirm_write อีกครั้งในข้อความถัดไป";
         }
 
+        // operational action (energy/stock/billing/operation ฯลฯ) — draft แยก namespace
+        if (str_starts_with($draft->entity_key, 'action:')) {
+            return $this->operationActions->run($actor, $session, $draft);
+        }
+
         $cfg = EntityWriteRegistry::get($draft->entity_key);
         if (!$cfg) {
             return "ไม่รู้จักชนิดข้อมูล \"{$draft->entity_key}\" แล้ว ไม่สามารถดำเนินการได้";
         }
 
         // เช็คสิทธิ์ซ้ำ (role อาจเปลี่ยนระหว่างเทิร์น)
-        if (!$this->can($actor, $cfg['role'])) {
+        if (!self::can($actor, $cfg['role'])) {
             return $this->denyMessage($cfg, $this->actionVerb($draft->action));
         }
 
@@ -359,7 +369,7 @@ class EntityWriteService
     {
         $result = [];
         foreach (EntityWriteRegistry::all() as $key => $cfg) {
-            if ($this->can($u, $cfg['role'])) {
+            if (self::can($u, $cfg['role'])) {
                 $result[] = ['key' => $key, 'label' => $cfg['label']];
             }
         }
@@ -370,8 +380,9 @@ class EntityWriteService
     /**
      * เช็คสิทธิ์ตาม role ขั้นต่ำ — ไต่สิทธิ์แบบเดียวกับ middleware Is* (admin ทำได้ทุกอย่าง)
      * อ่าน flag เป็น boolean ตรงๆ กัน null (คอลัมน์อาจเป็น null สำหรับ user ที่ไม่ได้ตั้งค่า)
+     * public static เพื่อให้ OperationActionService reuse ได้ (single source of truth)
      */
-    protected function can(User $u, string $role): bool
+    public static function can(User $u, string $role): bool
     {
         $isAdmin = (bool) $u->is_can_access_admin;
         $isManager = (bool) $u->is_can_access_manager;
