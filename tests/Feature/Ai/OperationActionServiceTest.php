@@ -14,6 +14,7 @@ use App\Models\InventoryGroup;
 use App\Models\LinenProduct;
 use App\Models\LinenType;
 use App\Models\Operation;
+use App\Models\OperationLinenProduct;
 use App\Models\User;
 use App\Services\EntityWriteService;
 use App\Services\OperationActionService;
@@ -267,5 +268,79 @@ class OperationActionServiceTest extends TestCase
 
         $this->assertStringContainsString('ยังไม่ได้รับการยืนยัน', $result);
         $this->assertDatabaseMissing('energy_resource_logs', ['value' => 1200, 'cost' => 850]);
+    }
+
+    // ── Deliver ──────────────────────────────────────────────────
+
+    /** สร้างงานเก็บ (collect) ที่ปิดแล้ว พร้อม pivot 1 รายการ (ไว้เป็นของส่ง) */
+    protected function closedCollectPivot(Customer $customer, Employee $emp, LinenProduct $lp): OperationLinenProduct
+    {
+        $op = new Operation();
+        $op->operation_type = 'collect';
+        $op->status = 'close';
+        $op->customer_id = $customer->id;
+        $op->employee_id = $emp->id;
+        $op->save();
+
+        $pivot = new OperationLinenProduct();
+        $pivot->operation_id = $op->id;
+        $pivot->linen_product_id = $lp->id;
+        $pivot->linen_case = 'new';
+        $pivot->color = 'ขาว';
+        $pivot->collect_weight = 20;
+        $pivot->collect_pack = 5;
+        $pivot->save();
+
+        return $pivot;
+    }
+
+    public function test_deliver_assigns_pack_to_collect_pivot(): void
+    {
+        $admin = $this->admin();
+        $session = $this->makeSession($admin);
+        $cgroup = CustomerGroup::create(['name' => 'โรงแรม']);
+        $customer = Customer::create(['name' => 'โรงแรม A', 'customer_group_id' => $cgroup->id]);
+        $dept = Department::create(['var_name' => 'deliver_dept', 'name' => 'ส่ง', 'input_unit' => 'pack']);
+        $emp = Employee::create(['code' => 'E9', 'name' => 'สมศักดิ์', 'department_id' => $dept->id]);
+        $ltype = LinenType::create(['name' => 'ผ้าเช็ดตัว']);
+        $lp = LinenProduct::create(['linen_type_id' => $ltype->id, 'name' => 'ผ้าเช็ดตัว']);
+        $pivot = $this->closedCollectPivot($customer, $emp, $lp);
+
+        $result = $this->runFlow($admin, $session, 'deliver', [
+            'employee_id' => $emp->id,
+            'deliver_date' => '2026-06-20',
+            'items' => [
+                ['operation_linen_product_id' => $pivot->id, 'deliver_pack' => 5],
+            ],
+        ]);
+
+        $this->assertStringContainsString('เรียบร้อย', $result);
+        $deliverOp = Operation::where('operation_type', 'deliver')->latest('id')->first();
+        $this->assertNotNull($deliverOp);
+        $this->assertSame('close', $deliverOp->status);
+        $this->assertSame($emp->id, $deliverOp->deliver_employee_id);
+
+        $fresh = $pivot->fresh();
+        $this->assertSame(5, (int) $fresh->deliver_pack);
+        $this->assertSame($deliverOp->id, (int) $fresh->deliver_operation_id);
+    }
+
+    public function test_deliver_rejects_non_deliverable_item(): void
+    {
+        $admin = $this->admin();
+        $session = $this->makeSession($admin);
+        $dept = Department::create(['var_name' => 'deliver_dept', 'name' => 'ส่ง', 'input_unit' => 'pack']);
+        $emp = Employee::create(['code' => 'E9', 'name' => 'สมศักดิ์', 'department_id' => $dept->id]);
+
+        // id ที่ไม่มีจริง → ใช้ไม่ได้
+        $result = $this->actions->prepare($admin, $session, 'deliver', [
+            'employee_id' => $emp->id,
+            'items' => [
+                ['operation_linen_product_id' => 999999, 'deliver_pack' => 3],
+            ],
+        ]);
+
+        $this->assertStringContainsString('ใช้ไม่ได้', $result);
+        $this->assertSame(0, AiWriteDraft::count());
     }
 }

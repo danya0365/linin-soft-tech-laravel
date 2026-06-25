@@ -13,6 +13,7 @@ use App\Models\Inventory;
 use App\Models\InventoryGroup;
 use App\Models\LinenProduct;
 use App\Models\LinenType;
+use App\Models\OperationLinenProduct;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
@@ -344,6 +345,9 @@ class AiChatService
             ['list_linen_products', 'รายชื่อ+id ผลิตภัณฑ์ผ้า (กรองตามประเภทผ้าได้)', [
                 'linen_type_id' => ['integer', 'id ประเภทผ้า (ไม่ระบุ=ทั้งหมด)'],
             ]],
+            ['list_deliverable_collect_items', 'รายการผ้าจากงานเก็บ (collect) ที่ปิดแล้วและยังไม่ถูกส่ง — ใช้หา id ก่อนสั่งงานส่ง (prepare_deliver)', [
+                'customer_id' => ['integer', 'กรองตามลูกค้า (ไม่ระบุ=ทั้งหมด)'],
+            ]],
         ];
 
         // write tool + operational action — เปิดเฉพาะเมื่อมี context ผู้ใช้+เซสชัน (web เท่านั้น)
@@ -508,6 +512,8 @@ class AiChatService
                 'search_inventories' => $this->searchInventories($args),
 
                 'list_linen_products' => $this->listLinenProducts($args),
+
+                'list_deliverable_collect_items' => $this->listDeliverableCollectItems($args),
 
                 'get_energy_logs' => $this->chatService->getEnergyLogs(
                     (int) ($args['resource_id'] ?? 0)
@@ -705,6 +711,34 @@ class AiChatService
             $type = $p->linenType->name ?? '-';
 
             return "id: {$p->id} | {$p->name} | ประเภท: {$type}";
+        })->implode("\n");
+    }
+
+    protected function listDeliverableCollectItems(array $args): string
+    {
+        $query = OperationLinenProduct::query()
+            ->with(['linenProduct:id,name', 'operation' => function ($q) {
+                $q->with('customer:id,name');
+            }])
+            ->whereNull('deliver_operation_id')
+            ->whereHas('operation', function ($q) use ($args) {
+                $q->where('operation_type', 'collect')->where('status', 'close');
+                if (!empty($args['customer_id'])) {
+                    $q->where('customer_id', (int) $args['customer_id']);
+                }
+            });
+
+        $rows = $query->limit(30)->get();
+
+        if ($rows->isEmpty()) {
+            return 'ไม่พบรายการผ้าจากงานเก็บที่รอส่ง';
+        }
+
+        return "รายการผ้ารอส่ง (สูงสุด 30 รายการ):\n" . $rows->map(function ($r) {
+            $cust = $r->operation->customer->name ?? '-';
+            $lp = $r->linenProduct->name ?? ('id ' . $r->linen_product_id);
+
+            return "id: {$r->id} | {$lp} | ลูกค้า: {$cust} | เก็บไว้ {$r->collect_pack} แพ็ค";
         })->implode("\n");
     }
 

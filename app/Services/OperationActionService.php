@@ -23,6 +23,7 @@ use App\Models\InventoryStockLog;
 use App\Models\LinenProduct;
 use App\Models\Operation;
 use App\Models\OperationLinenProduct;
+use App\Models\Truck;
 use App\Models\User;
 use App\Models\WashingMachine;
 use Carbon\Carbon;
@@ -152,6 +153,7 @@ class OperationActionService
             'billing' => $this->resolveBilling($args),
             'department_expense' => $this->resolveDepartmentExpense($args),
             'operation' => $this->resolveOperation($args),
+            'deliver' => $this->resolveDeliver($args),
             default => "ไม่รู้จักงาน \"{$key}\"",
         };
     }
@@ -325,6 +327,61 @@ class OperationActionService
         return [$payload, $preview];
     }
 
+    private function resolveDeliver(array $a)
+    {
+        $emp = Employee::find($a['employee_id']);
+        if (!$emp) {
+            return "ไม่พบพนักงาน id={$a['employee_id']} กรุณาเรียก search_employees ก่อน";
+        }
+        if (!empty($a['truck_id']) && !Truck::find($a['truck_id'])) {
+            return "ไม่พบรถ id={$a['truck_id']} กรุณาเรียก get_machine_list type=truck ก่อน";
+        }
+        $date = $a['deliver_date'] ?? $this->today();
+
+        $items = [];
+        $invalid = [];
+        $lines = [];
+        $total = 0;
+        foreach ($a['items'] as $it) {
+            $olp = OperationLinenProduct::with(['linenProduct:id,name', 'operation' => function ($q) {
+                $q->with('customer:id,name');
+            }])->find($it['operation_linen_product_id']);
+
+            // ต้องเป็นรายการผ้าจากงานเก็บ (collect) ที่ปิดแล้ว และยังไม่ถูกส่ง
+            if (!$olp || !$olp->operation
+                || $olp->operation->operation_type !== 'collect'
+                || $olp->operation->status !== 'close'
+                || $olp->deliver_operation_id) {
+                $invalid[] = $it['operation_linen_product_id'];
+                continue;
+            }
+            $items[] = [
+                'operation_linen_product_id' => (int) $it['operation_linen_product_id'],
+                'deliver_pack' => (int) $it['deliver_pack'],
+            ];
+            $total += (int) $it['deliver_pack'];
+            $custName = $olp->operation->customer->name ?? '-';
+            $lpName = $olp->linenProduct->name ?? ('id ' . $olp->linen_product_id);
+            $lines[] = "- {$lpName} (รายการ id {$olp->id}) | ลูกค้า {$custName} | ส่ง {$it['deliver_pack']} แพ็ค";
+        }
+        if (!empty($invalid)) {
+            return "รายการผ้า id: " . implode(', ', $invalid) . " ใช้ไม่ได้ "
+                . "(ต้องเป็นงานเก็บ collect ที่ปิดแล้วและยังไม่ถูกส่ง) กรุณาเรียก list_deliverable_collect_items ก่อน";
+        }
+
+        $payload = [
+            'employee_id' => (int) $a['employee_id'],
+            'truck_id' => !empty($a['truck_id']) ? (int) $a['truck_id'] : null,
+            'deliver_date' => $date,
+            'items' => $items,
+        ];
+        $truckText = !empty($a['truck_id']) ? " | รถ id {$a['truck_id']}" : '';
+        $preview = "สร้างงานส่ง | พนักงาน {$emp->name}{$truckText} | วันที่ {$date}\n"
+            . "รายการ:\n" . implode("\n", $lines) . "\nรวม {$total} แพ็ค";
+
+        return [$payload, $preview];
+    }
+
     // ── execute (side-effect จริง — เรียกใน DB::transaction) ─────────────────
 
     private function execute(string $key, array $p): int
@@ -336,6 +393,7 @@ class OperationActionService
             'billing' => $this->executeBilling($p),
             'department_expense' => $this->executeDepartmentExpense($p),
             'operation' => $this->executeOperation($p),
+            'deliver' => $this->executeDeliver($p),
         };
     }
 
@@ -476,6 +534,38 @@ class OperationActionService
         $op->status = OperationStatus::Close;
         $op->save();
         OperationManager::createCustomerOperationDailySummary($op); // นับเฉพาะ status=close
+
+        return $op->id;
+    }
+
+    private function executeDeliver(array $p): int
+    {
+        // งานส่งไม่มี customer_id (รวมผ้าหลายลูกค้า) — มิเรอร์ DeliverController
+        $op = new Operation();
+        $op->operation_type = OperationType::Deliver;
+        $op->status = OperationStatus::InProgress;
+        $op->employee_id = $p['employee_id'];
+        $op->deliver_employee_id = $p['employee_id']; // ไม่อยู่ใน fillable → property-assign
+        if (!empty($p['truck_id'])) {
+            $op->truck_id = $p['truck_id']; // ไม่อยู่ใน fillable → property-assign
+        }
+        $op->created_at = Carbon::parse($p['deliver_date']);
+        $op->save();
+
+        foreach ($p['items'] as $it) {
+            // ผูก deliver_pack เข้ากับ pivot row ของงานเก็บ (guard กันถูกส่งซ้ำ)
+            OperationLinenProduct::where('id', $it['operation_linen_product_id'])
+                ->whereNull('deliver_operation_id')
+                ->update([
+                    'deliver_pack' => $it['deliver_pack'],
+                    'deliver_operation_id' => $op->id,
+                ]);
+        }
+
+        $op->status = OperationStatus::Close;
+        $op->save();
+        // มิเรอร์ controller: deliver op ไม่มี customer_id → summary ไม่ถูกปรับ (พฤติกรรมเดียวกับหน้าจอ)
+        OperationManager::createCustomerOperationDailySummary($op);
 
         return $op->id;
     }

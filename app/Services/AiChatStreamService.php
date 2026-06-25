@@ -227,6 +227,7 @@ class AiChatStreamService extends AiChatService
             'get_machine_notes' => 'บันทึกซ่อมบำรุง',
             'search_inventories' => 'ค้นหาสต๊อก',
             'list_linen_products' => 'รายการผลิตภัณฑ์ผ้า',
+            'list_deliverable_collect_items' => 'รายการผ้ารอส่ง',
             default => $name,
         };
     }
@@ -417,6 +418,7 @@ class AiChatStreamService extends AiChatService
             . "13. ใช้ขั้นตอน 2 ชั้นเหมือนกัน — prepare_* (log_energy/stock_in/stock_out/billing/department_expense/operation) แสดง preview แล้ว confirm_write เมื่อผู้ใช้ยืนยัน\n"
             . "14. ก่อนทำต้องหา id จริงก่อน: พลังงาน/แผนก→list_entities, สต๊อก→search_inventories, ลูกค้า→search_customers, พนักงาน→search_employees, ผลิตภัณฑ์ผ้า→list_linen_products, เครื่องจักร→get_machine_list\n"
             . "15. สร้างงานผ้า (prepare_operation) ให้รวบรวมรายการผ้าทั้งหมดก่อน แล้วส่ง items เป็น array ครั้งเดียว (แต่ละ item: linen_product_id, linen_case, color, amount; collect ใส่ collect_pack)\n"
-            . "16. วันที่ทุก action ไม่ระบุ = วันนี้ ลงย้อนหลังได้โดยใส่วันที่ Y-m-d";
+            . "16. งานส่ง (prepare_deliver) เลือกจากผ้าของงานเก็บ (collect) ที่ปิดแล้ว — เรียก list_deliverable_collect_items หา id ก่อน แล้วส่ง items (operation_linen_product_id, deliver_pack)\n"
+            . "17. วันที่ทุก action ไม่ระบุ = วันนี้ ลงย้อนหลังได้โดยใส่วันที่ Y-m-d";
     }
 }

@@ -137,6 +137,28 @@ class OperationActionRegistry
                     'items.*.collect_pack' => 'nullable|integer',
                 ],
             ],
+
+            'deliver' => [
+                'label' => 'สร้างงานส่งผ้า',
+                'role' => 'worker',
+                'params' => [
+                    'employee_id' => ['integer', 'id พนักงานผู้ส่ง (เรียก search_employees ก่อน)', null, true],
+                    'truck_id' => ['integer', 'id รถ (เรียก get_machine_list type=truck, ไม่ระบุก็ได้)'],
+                    'deliver_date' => ['string', 'วันที่ส่ง Y-m-d (ไม่ระบุ=วันนี้)'],
+                    'items' => ['array', 'รายการผ้าที่จะส่ง — มาจากงานเก็บ (collect) ที่ปิดแล้วและยังไม่ถูกส่ง', null, true, [
+                        'operation_linen_product_id' => ['integer', 'id รายการผ้าจากงานเก็บ (เรียก list_deliverable_collect_items ก่อน)', null, true],
+                        'deliver_pack' => ['integer', 'จำนวนแพ็คที่ส่ง', null, true],
+                    ]],
+                ],
+                'rules' => [
+                    'employee_id' => 'required|integer',
+                    'truck_id' => 'nullable|integer',
+                    'deliver_date' => 'nullable|date',
+                    'items' => 'required|array|min:1',
+                    'items.*.operation_linen_product_id' => 'required|integer',
+                    'items.*.deliver_pack' => 'required|integer|gt:0',
+                ],
+            ],
         ];
     }
 
