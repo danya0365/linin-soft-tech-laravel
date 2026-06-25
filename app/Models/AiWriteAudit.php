@@ -24,6 +24,7 @@ class AiWriteAudit extends Model
         'user_id',
         'ai_chat_session_id',
         'entity_key',
+        'action',
         'record_id',
         'payload',
     ];

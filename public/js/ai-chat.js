@@ -40,6 +40,36 @@
         get_machine_notes: 'บันทึกซ่อมบำรุง',
     };
 
+    // จำว่าผู้ใช้เคยเห็นคู่มือแล้ว (เปิดอัตโนมัติเฉพาะครั้งแรก)
+    var STORAGE_GUIDE_SEEN = 'linin.ai-chat.guide-seen';
+
+    // หมวดความสามารถ "อ่านข้อมูล" — เปิดให้ staff ทุกคนที่เข้าแชทได้ (presentational)
+    var READ_CAPABILITIES = [
+        'รายงาน/สรุปประจำวัน รายรับ-รายจ่าย น้ำหนักผ้า',
+        'ข้อมูลลูกค้า: ยอดบิล น้ำหนักผ้า ตามช่วงวันที่',
+        'สต๊อก/ผ้า: รายการและจำนวนคงเหลือในแต่ละกลุ่ม',
+        'การใช้พลังงาน: ประวัติการใช้แต่ละทรัพยากร',
+        'พนักงาน: ค้นหา ดูผลงาน และเวลาทำงาน',
+        'เครื่องจักร/รถ: รายการ สถานะ และบันทึกซ่อมบำรุง',
+    ];
+
+    // คำสั่งตัวอย่าง — คลิกแล้วเด้งใส่ช่องพิมพ์
+    var READ_EXAMPLE_PROMPTS = [
+        'สรุปวันนี้',
+        'รายงานธุรกิจเดือนนี้',
+        'ยอดลูกค้าโรงแรม A เดือนนี้',
+        'สต๊อกผ้าเหลือเท่าไหร่',
+        'พนักงานแผนกซักมีใครบ้าง',
+        'เครื่องซักมีกี่เครื่อง สถานะเป็นยังไง',
+    ];
+
+    // คำสั่งตัวอย่างฝั่งจัดการข้อมูล (สร้าง/แก้ไข/ลบ) — แสดงเฉพาะผู้ใช้ที่มีสิทธิ์ (canWrite)
+    var WRITE_EXAMPLE_PROMPTS = [
+        'เพิ่มลูกค้าใหม่ชื่อ โรงแรม XYZ กลุ่มโรงแรม',
+        'แก้ชื่อกลุ่มลูกค้า id 3 เป็น โรงแรม 5 ดาว',
+        'ลบประเภทผ้า id 7',
+    ];
+
     // ── Helpers ─────────────────────────────────────────────────
 
     function loadJson(key, fallback) {
@@ -124,6 +154,9 @@
             send: document.getElementById('ai-chat-send'),
             stop: document.getElementById('ai-chat-stop'),
             credit: document.getElementById('ai-chat-credit'),
+            helpBtn: document.getElementById('ai-chat-help-btn'),
+            helpModal: document.getElementById('ai-chat-help-modal'),
+            helpBody: document.getElementById('ai-chat-help-body'),
             statsBtn: document.getElementById('ai-chat-stats-btn'),
             statsModal: document.getElementById('ai-chat-stats-modal'),
             statsBody: document.getElementById('ai-chat-stats-body'),
@@ -244,6 +277,10 @@
         });
 
         // Modals
+        this.el.helpBtn.addEventListener('click', function () {
+            self.openHelp();
+        });
+
         this.el.statsBtn.addEventListener('click', function () {
             self.el.statsModal.classList.add('open');
             self.renderStats();
@@ -260,7 +297,7 @@
             });
         });
 
-        [this.el.statsModal, this.el.settingsModal].forEach(function (modal) {
+        [this.el.helpModal, this.el.statsModal, this.el.settingsModal].forEach(function (modal) {
             modal.addEventListener('click', function (e) {
                 if (e.target === modal) modal.classList.remove('open');
             });
@@ -276,6 +313,182 @@
         });
 
         this.updateSendState();
+
+        // เปิดคู่มืออัตโนมัติเฉพาะครั้งแรกที่ใช้งาน (จำผ่าน localStorage)
+        if (CONFIG.enabled !== false && !loadJson(STORAGE_GUIDE_SEEN, false)) {
+            this.openHelp();
+        }
+    };
+
+    // ── Help / guide ────────────────────────────────────────────
+
+    AiChat.prototype.openHelp = function () {
+        this.renderHelp();
+        this.el.helpModal.classList.add('open');
+        saveJson(STORAGE_GUIDE_SEEN, true);
+    };
+
+    /** ใส่ข้อความลงช่องพิมพ์ (ใช้ร่วมกันโดย example chips) */
+    AiChat.prototype.fillInput = function (text) {
+        this.el.input.value = text;
+        this.autosizeInput();
+        this.updateSendState();
+        this.updateContextPreview();
+        this.el.input.focus();
+    };
+
+    /** ปุ่มตัวอย่างคำสั่งที่คลิกได้ */
+    AiChat.prototype.buildChip = function (text, closeHelpOnClick) {
+        var self = this;
+        var chip = document.createElement('button');
+        chip.type = 'button';
+        chip.className = 'ai-chat-chip';
+        chip.textContent = text;
+        chip.addEventListener('click', function () {
+            if (closeHelpOnClick && self.el.helpModal) {
+                self.el.helpModal.classList.remove('open');
+            }
+            self.fillInput(text);
+        });
+        return chip;
+    };
+
+    /** section เช็คลิสต์ (หัวข้อ + รายการติ๊กถูก) */
+    AiChat.prototype.buildHelpChecklist = function (title, items) {
+        var section = document.createElement('div');
+        section.className = 'ai-chat-help-section';
+
+        var heading = document.createElement('h4');
+        heading.className = 'ai-chat-help-title';
+        heading.textContent = title;
+        section.appendChild(heading);
+
+        var list = document.createElement('ul');
+        list.className = 'ai-chat-help-list';
+        items.forEach(function (text) {
+            var li = document.createElement('li');
+            li.textContent = text;
+            list.appendChild(li);
+        });
+        section.appendChild(list);
+
+        return section;
+    };
+
+    /** เนื้อหาคู่มือใน modal — เช็คลิสต์ความสามารถตามสิทธิ์ + วิธีใช้ + ตัวอย่าง */
+    AiChat.prototype.renderHelp = function () {
+        var self = this;
+        var body = this.el.helpBody;
+        if (!body) return;
+        body.innerHTML = '';
+
+        var caps = CONFIG.capabilities || {};
+        var canWrite = !!caps.canWrite && (caps.writableEntities || []).length > 0;
+
+        // 1) ถามข้อมูลได้
+        body.appendChild(this.buildHelpChecklist('📊 ถามข้อมูลได้', READ_CAPABILITIES));
+
+        // 2) สร้าง/แก้ไข/ลบข้อมูลได้ (ตามสิทธิ์)
+        if (canWrite) {
+            var labels = caps.writableEntities.map(function (e) { return e.label; });
+            body.appendChild(this.buildHelpChecklist('✏️ สร้าง / แก้ไข / ลบข้อมูลได้ (ตามสิทธิ์ของคุณ)', labels));
+        }
+
+        // 3) วิธีใช้
+        var how = document.createElement('div');
+        how.className = 'ai-chat-help-section';
+        var howTitle = document.createElement('h4');
+        howTitle.className = 'ai-chat-help-title';
+        howTitle.textContent = '🪄 วิธีใช้';
+        how.appendChild(howTitle);
+
+        var steps = document.createElement('ol');
+        steps.className = 'ai-chat-help-steps';
+        var stepTexts = [
+            'พิมพ์เป็นภาษาคนปกติ เช่น “สรุปวันนี้” หรือ “ยอดลูกค้าโรงแรม A เดือนนี้”',
+            'ถ้าต้องอ้างถึงกลุ่ม/แผนก/ประเภท ระบบจะค้นหารหัส (id) ให้เองอัตโนมัติ',
+        ];
+        if (canWrite) {
+            stepTexts.push('เวลาสั่งสร้าง/แก้ไข/ลบข้อมูล AI จะแสดงตัวอย่าง (preview) ให้ตรวจก่อน — พิมพ์ “ยืนยัน” จึงทำจริง');
+            stepTexts.push('การลบจะถูกกันถ้ามีข้อมูลอื่นผูกอยู่ (เช่น กลุ่มที่ยังมีลูกค้า) และลบแล้วยังกู้คืนได้');
+            stepTexts.push('แนบรูปภาพผ่านแชทไม่ได้ ช่องรูปจะเว้นว่างไว้ ไปเพิ่มทีหลังที่หน้าจัดการได้');
+        }
+        stepTexts.forEach(function (text) {
+            var li = document.createElement('li');
+            li.textContent = text;
+            steps.appendChild(li);
+        });
+        how.appendChild(steps);
+        body.appendChild(how);
+
+        // 4) ตัวอย่างคำสั่ง (คลิกได้)
+        var ex = document.createElement('div');
+        ex.className = 'ai-chat-help-section';
+        var exTitle = document.createElement('h4');
+        exTitle.className = 'ai-chat-help-title';
+        exTitle.textContent = '💡 ตัวอย่างคำสั่ง (คลิกเพื่อใช้)';
+        ex.appendChild(exTitle);
+
+        var chipRow = document.createElement('div');
+        chipRow.className = 'ai-chat-chip-row';
+        var prompts = READ_EXAMPLE_PROMPTS.slice();
+        if (canWrite) {
+            prompts = prompts.concat(WRITE_EXAMPLE_PROMPTS);
+        }
+        prompts.forEach(function (text) {
+            chipRow.appendChild(self.buildChip(text, true));
+        });
+        ex.appendChild(chipRow);
+        body.appendChild(ex);
+    };
+
+    /** welcome panel ในแชทใหม่ (empty state) */
+    AiChat.prototype.buildWelcomePanel = function () {
+        var self = this;
+        var caps = CONFIG.capabilities || {};
+        var canWrite = !!caps.canWrite && (caps.writableEntities || []).length > 0;
+
+        var wrap = document.createElement('div');
+        wrap.className = 'ai-chat-welcome';
+
+        var avatar = document.createElement('div');
+        avatar.className = 'ai-chat-welcome-avatar';
+        avatar.textContent = '🤖';
+        wrap.appendChild(avatar);
+
+        var title = document.createElement('div');
+        title.className = 'ai-chat-welcome-title';
+        title.textContent = 'เริ่มคุยกับ AI ได้เลย';
+        wrap.appendChild(title);
+
+        var sub = document.createElement('div');
+        sub.className = 'ai-chat-welcome-sub';
+        sub.textContent = canWrite
+            ? 'ถามข้อมูลธุรกิจ หรือสั่งสร้างข้อมูลใหม่ผ่านแชทได้เลย'
+            : 'ถามข้อมูลธุรกิจได้เลย เช่น ยอดขาย ลูกค้า สต๊อก พลังงาน';
+        wrap.appendChild(sub);
+
+        var chipRow = document.createElement('div');
+        chipRow.className = 'ai-chat-chip-row';
+        var prompts = READ_EXAMPLE_PROMPTS.slice(0, 4);
+        if (canWrite) {
+            prompts.push(WRITE_EXAMPLE_PROMPTS[0]);
+        }
+        prompts.forEach(function (text) {
+            chipRow.appendChild(self.buildChip(text, false));
+        });
+        wrap.appendChild(chipRow);
+
+        var more = document.createElement('button');
+        more.type = 'button';
+        more.className = 'ai-chat-welcome-more';
+        more.textContent = '❓ ดูทั้งหมดว่าแชทนี้ทำอะไรได้บ้าง';
+        more.addEventListener('click', function () {
+            self.openHelp();
+        });
+        wrap.appendChild(more);
+
+        return wrap;
     };
 
     // ── Sessions ────────────────────────────────────────────────
@@ -740,11 +953,7 @@
         container.innerHTML = '';
 
         if (!this.messages.length && !this.isStreaming) {
-            var empty = document.createElement('div');
-            empty.className = 'ai-chat-empty-state';
-            empty.innerHTML = '🤖<br>เริ่มคุยกับ AI ได้เลย — ถามข้อมูลธุรกิจได้ด้วย<br>'
-                + '<small>เช่น "สรุปวันนี้" "ยอดลูกค้าโรงแรม A เดือนนี้" "สต๊อกผ้าเหลือเท่าไหร่"</small>';
-            container.appendChild(empty);
+            container.appendChild(this.buildWelcomePanel());
             return;
         }
 

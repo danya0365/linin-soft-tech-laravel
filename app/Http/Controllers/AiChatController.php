@@ -8,6 +8,7 @@ use App\Models\AiChatMessage;
 use App\Models\AiChatSession;
 use App\Services\AiChatStreamService;
 use App\Services\AiCreditService;
+use App\Services\EntityWriteService;
 use App\Services\WaveSpeedLlmService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -43,6 +44,7 @@ class AiChatController extends Controller
         protected WaveSpeedLlmService $llm,
         protected AiChatStreamService $streamService,
         protected AiCreditService $credits,
+        protected EntityWriteService $entityWriter,
     ) {
     }
 
@@ -51,6 +53,8 @@ class AiChatController extends Controller
      */
     public function index()
     {
+        $writableEntities = $this->entityWriter->writableEntitiesFor(Auth::user());
+
         return view('ai-chat.index', [
             'aiChatConfig' => [
                 'apiBase' => url('/api/ai-chat'),
@@ -62,6 +66,10 @@ class AiChatController extends Controller
                     'usdToThb' => (float) config('ai-chat.usd_to_thb'),
                     'commissionPercent' => (float) config('ai-chat.commission_percent'),
                     'lowThreshold' => (float) config('ai-chat.low_balance_threshold_thb'),
+                ],
+                'capabilities' => [
+                    'canWrite' => count($writableEntities) > 0,
+                    'writableEntities' => $writableEntities, // [{key,label}] ตามสิทธิ์ผู้ใช้
                 ],
             ],
         ]);

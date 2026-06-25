@@ -28,6 +28,7 @@
                 {{-- optgroup rendered by JS --}}
             </select>
             <span id="ai-chat-credit" class="ai-chat-credit" title="เครดิตคงเหลือ"></span>
+            <button id="ai-chat-help-btn" class="ai-chat-icon-btn" title="วิธีใช้ / แชทนี้ทำอะไรได้บ้าง">❓</button>
             <button id="ai-chat-stats-btn" class="ai-chat-icon-btn" title="สถิติการใช้งาน">📊</button>
             <button id="ai-chat-settings-btn" class="ai-chat-icon-btn" title="ตั้งค่า">⚙️</button>
         </header>
@@ -52,6 +53,19 @@
             </div>
         </div>
     </main>
+
+    {{-- Modal: วิธีใช้ / ความสามารถ --}}
+    <div id="ai-chat-help-modal" class="ai-chat-modal">
+        <div class="ai-chat-modal-card">
+            <div class="ai-chat-modal-header">
+                <span>❓ แชทนี้ทำอะไรได้บ้าง</span>
+                <button class="ai-chat-modal-close" data-close="ai-chat-help-modal">✕</button>
+            </div>
+            <div id="ai-chat-help-body" class="ai-chat-modal-body">
+                {{-- เนื้อหาเรนเดอร์ด้วย JS (renderHelp) ตามสิทธิ์ผู้ใช้ --}}
+            </div>
+        </div>
+    </div>
 
     {{-- Modal: สถิติการใช้งาน --}}
     <div id="ai-chat-stats-modal" class="ai-chat-modal">

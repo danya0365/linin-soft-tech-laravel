@@ -218,4 +218,145 @@ class EntityWriteServiceTest extends TestCase
         $this->assertSame('expired', $draft->fresh()->status);
         $this->assertDatabaseMissing('customers', ['name' => 'โรงแรม ABC']);
     }
+
+    // ── Update ───────────────────────────────────────────────────
+
+    public function test_prepare_update_creates_draft_without_changing(): void
+    {
+        $admin = $this->admin();
+        $session = $this->makeSession($admin);
+        $group = CustomerGroup::create(['name' => 'โรงแรม']);
+        $customer = Customer::create(['name' => 'เดิม', 'customer_group_id' => $group->id]);
+
+        $result = $this->writer->prepareUpdate($admin, $session, 'customer', $customer->id, ['name' => 'ใหม่']);
+
+        $this->assertStringContainsString('พร้อมแก้ไขลูกค้า', $result);
+        $this->assertStringContainsString('เดิม → ใหม่', $result);
+        $this->assertSame('เดิม', $customer->fresh()->name, 'ยังไม่ควรเปลี่ยนตอน prepare');
+        $this->assertDatabaseHas('ai_write_drafts', ['action' => 'update', 'status' => 'pending', 'record_id' => $customer->id]);
+    }
+
+    public function test_confirm_update_applies_partial_change_and_audits(): void
+    {
+        $admin = $this->admin();
+        $session = $this->makeSession($admin);
+        $group = CustomerGroup::create(['name' => 'โรงแรม']);
+        $customer = Customer::create(['name' => 'เดิม', 'customer_group_id' => $group->id]);
+
+        // แก้แค่ name (ไม่ส่ง customer_group_id ที่ required) — ต้องผ่านด้วย merge ค่าเดิม
+        $this->writer->prepareUpdate($admin, $session, 'customer', $customer->id, ['name' => 'ใหม่']);
+        $draft = AiWriteDraft::latest('id')->first();
+        $this->userSays($session);
+        $result = $this->writer->confirm($admin, $session, $draft->id);
+
+        $this->assertStringContainsString('แก้ไขลูกค้า', $result);
+        $this->assertSame('ใหม่', $customer->fresh()->name);
+        $this->assertSame($group->id, $customer->fresh()->customer_group_id, 'ฟิลด์ที่ไม่ได้แก้ต้องคงเดิม');
+        $this->assertDatabaseHas('ai_write_audits', ['action' => 'update', 'record_id' => $customer->id]);
+    }
+
+    public function test_update_nonexistent_id_rejected(): void
+    {
+        $admin = $this->admin();
+        $session = $this->makeSession($admin);
+
+        $result = $this->writer->prepareUpdate($admin, $session, 'customer', 999999, ['name' => 'x']);
+
+        $this->assertStringContainsString('ไม่พบ', $result);
+        $this->assertSame(0, AiWriteDraft::count());
+    }
+
+    public function test_update_with_no_changes_rejected(): void
+    {
+        $admin = $this->admin();
+        $session = $this->makeSession($admin);
+        $group = CustomerGroup::create(['name' => 'โรงแรม']);
+        $customer = Customer::create(['name' => 'เดิม', 'customer_group_id' => $group->id]);
+
+        $result = $this->writer->prepareUpdate($admin, $session, 'customer', $customer->id, ['unknown_field' => 'x']);
+
+        $this->assertStringContainsString('ไม่มีฟิลด์ที่จะแก้', $result);
+        $this->assertSame(0, AiWriteDraft::count());
+    }
+
+    public function test_confirm_update_same_turn_is_rejected(): void
+    {
+        $admin = $this->admin();
+        $session = $this->makeSession($admin);
+        $group = CustomerGroup::create(['name' => 'โรงแรม']);
+        $customer = Customer::create(['name' => 'เดิม', 'customer_group_id' => $group->id]);
+
+        $this->writer->prepareUpdate($admin, $session, 'customer', $customer->id, ['name' => 'ใหม่']);
+        $draft = AiWriteDraft::latest('id')->first();
+        $result = $this->writer->confirm($admin, $session, $draft->id);
+
+        $this->assertStringContainsString('ยังไม่ได้รับการยืนยัน', $result);
+        $this->assertSame('เดิม', $customer->fresh()->name);
+    }
+
+    // ── Delete (strict) ──────────────────────────────────────────
+
+    public function test_delete_blocked_when_dependents_exist(): void
+    {
+        $admin = $this->admin();
+        $session = $this->makeSession($admin);
+        $group = CustomerGroup::create(['name' => 'โรงแรม']);
+        Customer::create(['name' => 'ลูกค้า A', 'customer_group_id' => $group->id]);
+
+        $result = $this->writer->prepareDelete($admin, $session, 'customer_group', $group->id);
+
+        $this->assertStringContainsString('ลบ', $result);
+        $this->assertStringContainsString('ลูกค้า: 1 รายการ', $result);
+        $this->assertSame(0, AiWriteDraft::count());
+        $this->assertNotNull(CustomerGroup::find($group->id), 'ต้องไม่ถูกลบ');
+    }
+
+    public function test_delete_succeeds_and_soft_deletes(): void
+    {
+        $admin = $this->admin();
+        $session = $this->makeSession($admin);
+        $group = CustomerGroup::create(['name' => 'กลุ่มว่าง']);
+
+        $this->writer->prepareDelete($admin, $session, 'customer_group', $group->id);
+        $draft = AiWriteDraft::latest('id')->first();
+        $this->assertSame('delete', $draft->action);
+
+        $this->userSays($session);
+        $result = $this->writer->confirm($admin, $session, $draft->id);
+
+        $this->assertStringContainsString('ลบกลุ่มลูกค้า', $result);
+        $this->assertSoftDeleted('customer_groups', ['id' => $group->id]);
+        $this->assertDatabaseHas('ai_write_audits', ['action' => 'delete', 'record_id' => $group->id]);
+    }
+
+    public function test_delete_race_blocked_at_confirm(): void
+    {
+        $admin = $this->admin();
+        $session = $this->makeSession($admin);
+        $group = CustomerGroup::create(['name' => 'กลุ่มว่าง']);
+
+        // prepare ตอนยังว่าง → ผ่าน
+        $this->writer->prepareDelete($admin, $session, 'customer_group', $group->id);
+        $draft = AiWriteDraft::latest('id')->first();
+
+        // มีลูกค้าเพิ่มเข้ามาก่อน confirm
+        Customer::create(['name' => 'แทรกเข้ามา', 'customer_group_id' => $group->id]);
+        $this->userSays($session);
+        $result = $this->writer->confirm($admin, $session, $draft->id);
+
+        $this->assertStringContainsString('ไม่ได้แล้ว', $result);
+        $this->assertNotNull(CustomerGroup::find($group->id), 'ต้องไม่ถูกลบ');
+    }
+
+    public function test_non_admin_cannot_delete(): void
+    {
+        $supervisor = User::factory()->create(['is_can_access_supervisor' => true]);
+        $session = $this->makeSession($supervisor);
+        $group = CustomerGroup::create(['name' => 'กลุ่มว่าง']);
+
+        $result = $this->writer->prepareDelete($supervisor, $session, 'customer_group', $group->id);
+
+        $this->assertStringContainsString('ไม่มีสิทธิ์ลบ', $result);
+        $this->assertSame(0, AiWriteDraft::count());
+    }
 }

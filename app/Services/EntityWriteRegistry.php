@@ -4,14 +4,24 @@ namespace App\Services;
 
 use App\Models\Customer;
 use App\Models\CustomerGroup;
+use App\Models\CustomerOperationDailySummary;
 use App\Models\Department;
+use App\Models\DepartmentDailyCostLog;
 use App\Models\DryerMachine;
 use App\Models\Employee;
+use App\Models\EmployeeOperationLog;
+use App\Models\EmployeeWorkingTime;
 use App\Models\EnergyResource;
+use App\Models\EnergyResourceLog;
+use App\Models\Inventory;
 use App\Models\InventoryGroup;
 use App\Models\LinenProduct;
 use App\Models\LinenType;
+use App\Models\Note;
+use App\Models\Operation;
+use App\Models\OperationLinenProduct;
 use App\Models\Truck;
+use App\Models\UserCustomer;
 use App\Models\WashingMachine;
 
 /**
@@ -22,7 +32,8 @@ use App\Models\WashingMachine;
  *   'role'  => สิทธิ์ขั้นต่ำ (admin|manager|supervisor|worker),
  *   'fields'=> [name => [type, desc, enum|null, required]] — แปลงเป็น tool params,
  *   'fks'   => [field => Fk model class] — เช็คว่า id มีจริง,
- *   'skip'  => [field] — ตัดออกจาก payload + rules (เช่น photo อัปโหลดผ่านแชทไม่ได้)
+ *   'skip'  => [field] — ตัดออกจาก payload + rules (เช่น photo อัปโหลดผ่านแชทไม่ได้),
+ *   'dependents' => [['model'=>Class, 'column'=>string|array, 'label'=>ไทย]] — กันลบถ้ามีลูกผูกอยู่ (strict)
  */
 class EntityWriteRegistry
 {
@@ -38,6 +49,11 @@ class EntityWriteRegistry
                     'customer_group_id' => ['integer', 'id กลุ่มลูกค้า (เรียก list_entities kind=customer_groups หาก่อน)', null, true],
                 ],
                 'fks' => ['customer_group_id' => CustomerGroup::class],
+                'dependents' => [
+                    ['model' => Operation::class, 'column' => 'customer_id', 'label' => 'งาน/operation'],
+                    ['model' => CustomerOperationDailySummary::class, 'column' => 'customer_id', 'label' => 'สรุปงานรายวัน'],
+                    ['model' => UserCustomer::class, 'column' => 'customer_id', 'label' => 'การผูกกับผู้ใช้'],
+                ],
             ],
 
             'customer_group' => [
@@ -46,6 +62,9 @@ class EntityWriteRegistry
                 'role' => 'admin',
                 'fields' => [
                     'name' => ['string', 'ชื่อกลุ่มลูกค้า', null, true],
+                ],
+                'dependents' => [
+                    ['model' => Customer::class, 'column' => 'customer_group_id', 'label' => 'ลูกค้า'],
                 ],
             ],
 
@@ -57,6 +76,10 @@ class EntityWriteRegistry
                     'name' => ['string', 'ชื่อแผนก', null, true],
                     'input_unit' => ['string', 'หน่วยรับเข้า เช่น กก. หรือ ชิ้น', null, true],
                     'var_name' => ['string', 'รหัสตัวแปร (อังกฤษ ไม่มีช่องว่าง) — ไม่ระบุก็ได้'],
+                ],
+                'dependents' => [
+                    ['model' => Employee::class, 'column' => 'department_id', 'label' => 'พนักงาน'],
+                    ['model' => DepartmentDailyCostLog::class, 'column' => 'department_id', 'label' => 'บันทึกค่าใช้จ่ายรายวัน'],
                 ],
             ],
 
@@ -71,6 +94,12 @@ class EntityWriteRegistry
                 ],
                 'fks' => ['department_id' => Department::class],
                 'skip' => ['photo'],
+                'dependents' => [
+                    ['model' => Operation::class, 'column' => ['employee_id', 'wash_employee_id', 'dry_employee_id', 'iron_employee_id', 'packing_employee_id', 'collect_employee_id', 'deliver_employee_id'], 'label' => 'งาน/operation'],
+                    ['model' => EmployeeWorkingTime::class, 'column' => 'employee_id', 'label' => 'เวลาทำงาน'],
+                    ['model' => EmployeeOperationLog::class, 'column' => 'employee_id', 'label' => 'log การทำงาน'],
+                    ['model' => EnergyResourceLog::class, 'column' => 'employee_id', 'label' => 'log พลังงาน'],
+                ],
             ],
 
             'linen_type' => [
@@ -79,6 +108,9 @@ class EntityWriteRegistry
                 'role' => 'admin',
                 'fields' => [
                     'name' => ['string', 'ชื่อประเภทผ้า', null, true],
+                ],
+                'dependents' => [
+                    ['model' => LinenProduct::class, 'column' => 'linen_type_id', 'label' => 'ผลิตภัณฑ์ผ้า'],
                 ],
             ],
 
@@ -91,6 +123,9 @@ class EntityWriteRegistry
                     'name' => ['string', 'ชื่อผลิตภัณฑ์ผ้า', null, true],
                 ],
                 'fks' => ['linen_type_id' => LinenType::class],
+                'dependents' => [
+                    ['model' => OperationLinenProduct::class, 'column' => 'linen_product_id', 'label' => 'งานที่ใช้ผ้านี้'],
+                ],
             ],
 
             'inventory_group' => [
@@ -100,6 +135,9 @@ class EntityWriteRegistry
                 'fields' => [
                     'name' => ['string', 'ชื่อกลุ่มสต๊อก', null, true],
                 ],
+                'dependents' => [
+                    ['model' => Inventory::class, 'column' => 'inventory_group_id', 'label' => 'รายการสต๊อก'],
+                ],
             ],
 
             'energy_resource' => [
@@ -108,6 +146,9 @@ class EntityWriteRegistry
                 'role' => 'admin',
                 'fields' => [
                     'name' => ['string', 'ชื่อทรัพยากรพลังงาน', null, true],
+                ],
+                'dependents' => [
+                    ['model' => EnergyResourceLog::class, 'column' => 'energy_resource_id', 'label' => 'log การใช้พลังงาน'],
                 ],
             ],
 
@@ -121,6 +162,10 @@ class EntityWriteRegistry
                 ],
                 'skip' => ['photo'], // $rules บังคับ photo แต่แชทแนบไฟล์ไม่ได้
                 'defaults' => ['photo' => ''], // คอลัมน์ photo เป็น NOT NULL — เติมค่าว่าง ไปเพิ่มรูปทีหลังผ่านหน้าจอ
+                'dependents' => [
+                    ['model' => Note::class, 'column' => 'washing_machine_id', 'label' => 'บันทึกซ่อมบำรุง'],
+                    ['model' => Operation::class, 'column' => 'washing_machine_id', 'label' => 'งาน/operation'],
+                ],
             ],
 
             'dryer_machine' => [
@@ -133,6 +178,10 @@ class EntityWriteRegistry
                 ],
                 'skip' => ['photo'],
                 'defaults' => ['photo' => ''],
+                'dependents' => [
+                    ['model' => Note::class, 'column' => 'dryer_machine_id', 'label' => 'บันทึกซ่อมบำรุง'],
+                    ['model' => Operation::class, 'column' => 'dryer_machine_id', 'label' => 'งาน/operation'],
+                ],
             ],
 
             'truck' => [
@@ -145,6 +194,10 @@ class EntityWriteRegistry
                 ],
                 'skip' => ['photo'],
                 'defaults' => ['photo' => ''],
+                'dependents' => [
+                    ['model' => Note::class, 'column' => 'truck_id', 'label' => 'บันทึกซ่อมบำรุง'],
+                    ['model' => Operation::class, 'column' => 'truck_id', 'label' => 'งาน/operation'],
+                ],
             ],
         ];
     }

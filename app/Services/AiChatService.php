@@ -374,23 +374,40 @@ class AiChatService
     }
 
     /**
-     * Tool สำหรับสร้างข้อมูล (insert) — สร้างจาก EntityWriteRegistry
-     * 1 prepare tool ต่อ 1 เอนทิตี + confirm_create_entity กลาง 1 ตัว
+     * Tool สำหรับจัดการข้อมูล (CRUD) — สร้างจาก EntityWriteRegistry
+     * ต่อเอนทิตี: prepare_create_* + prepare_update_*  / generic: prepare_delete_entity + confirm_write
      */
     protected function writeToolDefinitions(): array
     {
         $tools = [];
 
         foreach (EntityWriteRegistry::all() as $key => $cfg) {
+            // create — ฟิลด์ตาม required ที่กำหนด
             $tools[] = [
                 "prepare_create_{$key}",
                 "เตรียมสร้าง{$cfg['label']} (ขั้นที่ 1/2 — แสดง preview ให้ผู้ใช้ยืนยันก่อน ห้ามบันทึกเองทันที)",
                 $cfg['fields'],
             ];
+
+            // update — id required + ฟิลด์อื่น optional (ส่งเฉพาะฟิลด์ที่จะแก้)
+            $updateFields = ['id' => ['integer', "id ของ{$cfg['label']}ที่จะแก้ (หาด้วย search_*/list_entities ก่อน)", null, true]];
+            foreach ($cfg['fields'] as $fieldName => $def) {
+                $updateFields[$fieldName] = [$def[0], $def[1] . ' (ส่งเฉพาะถ้าต้องการเปลี่ยน)', $def[2] ?? null]; // ตัด required flag
+            }
+            $tools[] = [
+                "prepare_update_{$key}",
+                "เตรียมแก้ไข{$cfg['label']} เฉพาะฟิลด์ที่ระบุ (ขั้นที่ 1/2 — แสดง preview ให้ผู้ใช้ยืนยันก่อน)",
+                $updateFields,
+            ];
         }
 
-        $tools[] = ['confirm_create_entity', 'ยืนยันบันทึกข้อมูลที่เตรียมไว้ (ขั้นที่ 2/2) — เรียกเฉพาะเมื่อผู้ใช้ตอบยืนยันในข้อความถัดไปแล้วเท่านั้น', [
-            'draft_id' => ['integer', 'id ของรายการที่ได้จาก prepare_create_*', null, true],
+        $tools[] = ['prepare_delete_entity', 'เตรียมลบข้อมูล master data (ขั้นที่ 1/2 — แสดง preview ให้ผู้ใช้ยืนยันก่อน) จะถูกบล็อกถ้ามีข้อมูลอื่นผูกอยู่', [
+            'entity_key' => ['string', 'ชนิดข้อมูลที่จะลบ', EntityWriteRegistry::keys(), true],
+            'id' => ['integer', 'id ของรายการที่จะลบ (หาด้วย search_*/list_entities ก่อน)', null, true],
+        ]];
+
+        $tools[] = ['confirm_write', 'ยืนยันทำรายการที่เตรียมไว้ (สร้าง/แก้ไข/ลบ) ขั้นที่ 2/2 — เรียกเฉพาะเมื่อผู้ใช้ตอบยืนยันในข้อความถัดไปแล้วเท่านั้น', [
+            'draft_id' => ['integer', 'id ของรายการที่ได้จาก prepare_*', null, true],
         ]];
 
         return $tools;
@@ -402,7 +419,7 @@ class AiChatService
     protected function executeTool(string $name, array $args): string
     {
         try {
-            // write tool (prepare_create_* / confirm_create_entity) — มี context เท่านั้น
+            // write tool (prepare_create_*/prepare_update_*/prepare_delete_entity/confirm_write) — มี context เท่านั้น
             $writeResult = $this->executeWriteTool($name, $args);
             if ($writeResult !== null) {
                 return $writeResult;
@@ -492,7 +509,7 @@ class AiChatService
             return null;
         }
 
-        if ($name === 'confirm_create_entity') {
+        if ($name === 'confirm_write') {
             return $this->entityWriter->confirm(
                 $this->actingUser,
                 $this->actingSession,
@@ -500,10 +517,31 @@ class AiChatService
             );
         }
 
+        if ($name === 'prepare_delete_entity') {
+            return $this->entityWriter->prepareDelete(
+                $this->actingUser,
+                $this->actingSession,
+                (string) ($args['entity_key'] ?? ''),
+                (int) ($args['id'] ?? 0)
+            );
+        }
+
         if (str_starts_with($name, 'prepare_create_')) {
             $entityKey = substr($name, strlen('prepare_create_'));
 
             return $this->entityWriter->prepare($this->actingUser, $this->actingSession, $entityKey, $args);
+        }
+
+        if (str_starts_with($name, 'prepare_update_')) {
+            $entityKey = substr($name, strlen('prepare_update_'));
+
+            return $this->entityWriter->prepareUpdate(
+                $this->actingUser,
+                $this->actingSession,
+                $entityKey,
+                (int) ($args['id'] ?? 0),
+                $args
+            );
         }
 
         return null;

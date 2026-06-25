@@ -341,6 +341,157 @@
     line-height: 1.8;
 }
 
+/* ── Welcome panel (empty state ของแชทใหม่) ───────── */
+
+.ai-chat-welcome {
+    margin: auto;
+    max-width: 30rem;
+    padding: 1rem;
+    text-align: center;
+}
+
+.ai-chat-welcome-avatar {
+    font-size: 2.5rem;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+}
+
+.ai-chat-welcome-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #111827;
+}
+
+.dark .ai-chat-welcome-title {
+    color: #f3f4f6;
+}
+
+.ai-chat-welcome-sub {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin-top: 0.25rem;
+}
+
+.dark .ai-chat-welcome-sub {
+    color: #9ca3af;
+}
+
+.ai-chat-welcome-more {
+    margin-top: 1rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font: inherit;
+    font-size: 0.8125rem;
+    color: #6366f1;
+    text-decoration: underline;
+}
+
+.dark .ai-chat-welcome-more {
+    color: #a5b4fc;
+}
+
+/* ── Example chips (คลิกเพื่อใช้คำสั่ง) ─────────────── */
+
+.ai-chat-chip-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+    margin-top: 1rem;
+}
+
+.ai-chat-chip {
+    cursor: pointer;
+    font: inherit;
+    font-size: 0.8125rem;
+    padding: 0.375rem 0.75rem;
+    border-radius: 9999px;
+    border: 1px solid #e0e7ff;
+    background: #eef2ff;
+    color: #4338ca;
+    transition: background 0.15s, border-color 0.15s;
+}
+
+.ai-chat-chip:hover {
+    background: #e0e7ff;
+    border-color: #c7d2fe;
+}
+
+.dark .ai-chat-chip {
+    background: rgba(79, 70, 229, 0.18);
+    border-color: rgba(99, 102, 241, 0.35);
+    color: #c7d2fe;
+}
+
+.dark .ai-chat-chip:hover {
+    background: rgba(79, 70, 229, 0.3);
+}
+
+/* ── Help modal (คู่มือ/เช็คลิสต์) ─────────────────── */
+
+.ai-chat-help-section {
+    margin-bottom: 1.25rem;
+}
+
+.ai-chat-help-section:last-child {
+    margin-bottom: 0;
+}
+
+.ai-chat-help-title {
+    margin: 0 0 0.5rem;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: #4338ca;
+}
+
+.dark .ai-chat-help-title {
+    color: #a5b4fc;
+}
+
+.ai-chat-help-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.ai-chat-help-list li {
+    position: relative;
+    padding-left: 1.5rem;
+    margin-bottom: 0.375rem;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: #374151;
+}
+
+.ai-chat-help-list li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: #059669;
+    font-weight: 700;
+}
+
+.dark .ai-chat-help-list li {
+    color: #d1d5db;
+}
+
+.ai-chat-help-steps {
+    margin: 0;
+    padding-left: 1.25rem;
+}
+
+.ai-chat-help-steps li {
+    margin-bottom: 0.375rem;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: #374151;
+}
+
+.dark .ai-chat-help-steps li {
+    color: #d1d5db;
+}
+
 /* ── Composer ──────────────────────────────────── */
 
 .ai-chat-composer {

@@ -26,6 +26,7 @@ class AiWriteDraft extends Model
         'ai_chat_session_id',
         'user_id',
         'entity_key',
+        'action',
         'payload',
         'preview',
         'created_after_message_id',
