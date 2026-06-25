@@ -18,6 +18,8 @@ use App\Models\Truck;
 use App\Models\Expense;
 use App\Models\Note;
 use App\Models\Income;
+use App\Models\AiChatSession;
+use App\Models\User;
 use Carbon\Carbon;
 
 /**
@@ -44,10 +46,19 @@ class ChatService
     /**
      * ประมวลผลคำสั่ง - จุดเข้าหลัก
      */
-    public function processCommand(string $text): array
+    public function processCommand(string $text, ?User $user = null): array
     {
         $lowerText = mb_strtolower(trim($text));
         $text = trim($text);
+
+        // LINE write: คำสั่งสร้าง/แก้/ลบ/งานประจำวัน (หรือ "ยืนยัน") ต้องถึง AI ก่อน
+        // ไม่งั้นโดน menu keyword (เช่น "ลูกค้า", "สต๊อก") ดักด้วย str_contains ก่อน
+        if ($user && $text !== '') {
+            $ai = app(AiChatService::class);
+            if ($ai->isAvailable() && $this->looksLikeWriteIntent($text)) {
+                return $this->answerWithLineSession($ai, $user, $text);
+            }
+        }
 
         // Menu command
         if (in_array($text, ['เมนู', 'menu', 'help', 'ช่วยเหลือ', 'start'])) {
@@ -92,10 +103,70 @@ class ChatService
         // Unknown command - try AI assistant, else show menu
         $ai = app(AiChatService::class); // lazy resolve กัน container cycle
         if ($ai->isAvailable()) {
+            // LINE ที่ระบุ user → มี session + ประวัติ + เปิด write tool (เหมือน web)
+            if ($user) {
+                return $this->answerWithLineSession($ai, $user, $text);
+            }
+
             return $ai->answer($text);
         }
 
         return $this->getMainMenu("ขอโทษครับ ไม่เข้าใจคำสั่ง \"$text\"\n\nกรุณาเลือกเมนูด้านล่าง:");
+    }
+
+    /** จำนวนข้อความล่าสุดที่ส่งเป็น context ให้ AI บน LINE */
+    protected const LINE_CONTEXT_WINDOW = 10;
+
+    /** คำที่บ่งบอกเจตนาสร้าง/แก้/ลบ/งานประจำวัน หรือยืนยัน — ให้ไปถึง AI ก่อน menu */
+    protected const WRITE_INTENT_KEYWORDS = [
+        'สร้าง', 'เพิ่ม', 'แก้', 'เปลี่ยน', 'ลบ', 'บันทึก', 'ออกบิล', 'เก็บเงิน',
+        'เบิก', 'รับเข้า', 'รับสต๊อก', 'ตัดสต๊อก', 'ส่งผ้า', 'ยืนยัน', 'ยกเลิก',
+    ];
+
+    protected function looksLikeWriteIntent(string $text): bool
+    {
+        foreach (self::WRITE_INTENT_KEYWORDS as $kw) {
+            if (mb_strpos($text, $kw) !== false) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * ตอบผ่าน AI บน LINE โดยมี session + ประวัติ → เปิด write/operational tool ได้
+     * (กลไก preview→ยืนยัน reuse จาก EntityWriteService ผ่าน setWriteContext)
+     */
+    protected function answerWithLineSession(AiChatService $ai, User $user, string $text): array
+    {
+        // 1 session ต่อ LINE user (rolling)
+        $session = AiChatSession::firstOrCreate(
+            ['user_id' => $user->id, 'channel' => 'line'],
+            ['title' => 'LINE']
+        );
+
+        // persist ข้อความ user ก่อนเรียก AI (ให้ draft.created_after_message_id รวมข้อความนี้)
+        $session->messages()->create(['role' => 'user', 'content' => $text]);
+        $session->forceFill(['last_message_at' => now()])->save();
+
+        // context = N ข้อความล่าสุด (เก่า→ใหม่)
+        $history = $session->messages()
+            ->orderByDesc('id')
+            ->limit(self::LINE_CONTEXT_WINDOW)
+            ->get(['role', 'content'])
+            ->reverse()
+            ->map(fn ($m) => ['role' => $m->role, 'content' => $m->content])
+            ->values()
+            ->all();
+
+        $ai->setWriteContext($user, $session);
+        $answer = $ai->answerWithHistory($history);
+
+        // persist คำตอบ assistant (ให้ draft_id/preview อยู่ในประวัติเทิร์นถัดไป)
+        $session->messages()->create(['role' => 'assistant', 'content' => $answer['text'] ?? '']);
+
+        return $answer;
     }
 
     /**

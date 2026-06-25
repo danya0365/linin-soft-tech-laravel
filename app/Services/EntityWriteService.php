@@ -195,12 +195,18 @@ class EntityWriteService
      */
     public function confirm(User $actor, AiChatSession $session, int $draftId): string
     {
-        $draft = AiWriteDraft::where('ai_chat_session_id', $session->id)
-            ->where('user_id', $actor->id)
-            ->find($draftId);
+        $base = AiWriteDraft::where('ai_chat_session_id', $session->id)
+            ->where('user_id', $actor->id);
+
+        // ระบุ draft_id → ใช้ตัวนั้น; ไม่ระบุ/หาไม่เจอ → fallback draft pending ล่าสุด
+        // (โมเดลอาจจำ draft_id ข้ามเทิร์นไม่ได้ — รายการรอยืนยันต่อ session มักมีตัวเดียว)
+        $draft = $draftId > 0 ? (clone $base)->find($draftId) : null;
+        if (!$draft) {
+            $draft = (clone $base)->where('status', 'pending')->latest('id')->first();
+        }
 
         if (!$draft) {
-            return "ไม่พบรายการรอยืนยัน (draft_id={$draftId}) กรุณาเริ่มสร้างใหม่";
+            return "ไม่พบรายการรอยืนยัน กรุณาเริ่มทำรายการใหม่";
         }
         if ($draft->status !== 'pending') {
             return "รายการนี้ถูกใช้ไปแล้ว (สถานะ: {$draft->status}) ไม่สามารถยืนยันซ้ำได้";

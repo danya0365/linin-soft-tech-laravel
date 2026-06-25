@@ -125,7 +125,7 @@ class LineChatbotController extends Controller
         // อนุญาตให้ใช้งานได้ตามปกติ
         switch ($event['type']) {
             case 'message':
-                $this->handleMessage($event);
+                $this->handleMessage($event, $user);
                 break;
             case 'postback':
                 $this->handlePostback($event);
@@ -193,7 +193,7 @@ class LineChatbotController extends Controller
     /**
      * จัดการ Message Event
      */
-    protected function handleMessage(array $event): void
+    protected function handleMessage(array $event, ?\App\Models\User $user = null): void
     {
         $replyToken = $event['replyToken'];
         $message = $event['message'];
@@ -206,8 +206,8 @@ class LineChatbotController extends Controller
 
         $text = trim($message['text']);
 
-        // ใช้ ChatService สำหรับ business logic
-        $response = $this->chatService->processCommand($text);
+        // ใช้ ChatService สำหรับ business logic — ส่ง user เพื่อเปิด write tool (มี session + ประวัติ)
+        $response = $this->chatService->processCommand($text, $user);
         $this->sendResponse($replyToken, $response);
     }
 

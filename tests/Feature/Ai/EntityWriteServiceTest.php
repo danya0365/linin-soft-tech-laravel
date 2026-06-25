@@ -89,6 +89,25 @@ class EntityWriteServiceTest extends TestCase
         $this->assertSame('pending', $draft->fresh()->status);
     }
 
+    public function test_confirm_without_draft_id_uses_latest_pending(): void
+    {
+        $admin = $this->admin();
+        $session = $this->makeSession($admin);
+        $group = CustomerGroup::create(['name' => 'โรงแรม']);
+
+        $this->writer->prepare($admin, $session, 'customer', [
+            'name' => 'โรงแรม ABC',
+            'customer_group_id' => $group->id,
+        ]);
+        $this->userSays($session);
+
+        // draft_id=0 → ใช้ draft pending ล่าสุดของ session (โมเดลไม่ต้องจำ id)
+        $result = $this->writer->confirm($admin, $session, 0);
+
+        $this->assertStringContainsString('เรียบร้อย', $result);
+        $this->assertDatabaseHas('customers', ['name' => 'โรงแรม ABC']);
+    }
+
     public function test_confirm_after_user_message_inserts_and_audits(): void
     {
         $admin = $this->admin();

@@ -9,7 +9,7 @@ class AiChatSession extends Model
 {
     use SoftDeletes;
 
-    protected $fillable = ['user_id', 'title', 'model', 'summary', 'summary_until_message_id', 'last_message_at'];
+    protected $fillable = ['user_id', 'channel', 'title', 'model', 'summary', 'summary_until_message_id', 'last_message_at'];
 
     protected $casts = [
         'last_message_at' => 'datetime',

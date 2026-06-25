@@ -75,8 +75,17 @@ class AiChatService
      */
     public function answer(string $question): array
     {
+        return $this->answerWithHistory([['role' => 'user', 'content' => $question]]);
+    }
+
+    /**
+     * ตอบโดยมีประวัติสนทนา (LINE write — ต่อเนื่อง preview→ยืนยันข้ามเทิร์น)
+     * $conversation = [{role: user|assistant, content}] เรียงเก่า→ใหม่ (ไม่รวม system)
+     */
+    public function answerWithHistory(array $conversation): array
+    {
         try {
-            $text = $this->runToolLoop($question);
+            $text = $this->runToolLoop($conversation);
 
             if ($text === null || trim($text) === '') {
                 throw new WaveSpeedApiException('LLM returned empty answer');
@@ -89,7 +98,6 @@ class AiChatService
             ];
         } catch (\Throwable $e) {
             Log::error('AiChatService failed', [
-                'question' => mb_substr($question, 0, 200),
                 'error' => $e->getMessage(),
             ]);
 
@@ -151,14 +159,23 @@ class AiChatService
     /**
      * Agentic loop: เรียก LLM พร้อม tools → execute tool_calls → วนจนได้คำตอบ
      */
-    protected function runToolLoop(string $question): ?string
+    protected function runToolLoop(array $conversation): ?string
     {
         $deadline = microtime(true) + self::OVERALL_DEADLINE_SECONDS;
 
-        $messages = [
-            ['role' => 'system', 'content' => $this->systemPrompt()],
-            ['role' => 'user', 'content' => $question],
-        ];
+        $messages = array_merge(
+            [['role' => 'system', 'content' => $this->systemPrompt()]],
+            $conversation
+        );
+
+        // ข้อความ user ล่าสุด (ไว้ใช้ตอน JSON-intent fallback ของ model ที่ไม่รองรับ tools)
+        $lastUser = '';
+        foreach (array_reverse($conversation) as $m) {
+            if (($m['role'] ?? '') === 'user') {
+                $lastUser = (string) ($m['content'] ?? '');
+                break;
+            }
+        }
 
         $tools = $this->toolDefinitions();
 
@@ -172,7 +189,7 @@ class AiChatService
             } catch (WaveSpeedApiException $e) {
                 // model บางตัวไม่รองรับ tools param → ลอง JSON-intent mode
                 if ($i === 0 && $e->getHttpStatus() === 400) {
-                    return $this->runJsonIntentFallback($question);
+                    return $this->runJsonIntentFallback($lastUser);
                 }
                 throw $e;
             }
@@ -292,7 +309,14 @@ class AiChatService
             . "2. ถ้าต้องใช้ id (เช่น customer_id, group_id) ให้เรียก list_* หรือ search_* หาก่อน\n"
             . "3. ตอบเป็นภาษาไทย กระชับ อ่านง่าย เป็น plain text เท่านั้น ห้ามใช้ markdown (เช่น **, #, ตาราง) เพราะแสดงผลใน LINE ไม่ได้\n"
             . "4. รูปแบบวันที่ใน args ใช้ Y-m-d เช่น {$today->format('Y-m-d')}\n"
-            . "5. ถ้าหาข้อมูลไม่พบ ให้บอกตรงๆ ว่าไม่พบ และแนะนำคำสั่งที่ใกล้เคียง";
+            . "5. ถ้าหาข้อมูลไม่พบ ให้บอกตรงๆ ว่าไม่พบ และแนะนำคำสั่งที่ใกล้เคียง\n\n"
+            . "การสร้าง/แก้ไข/ลบ และงานประจำวัน (ถ้ามีเครื่องมือ prepare_*):\n"
+            . "6. ทุกการเปลี่ยนแปลงข้อมูลทำ 2 ขั้นเสมอ — เรียก prepare_* เพื่อเตรียม แล้วแสดง preview ที่ได้ให้ผู้ใช้ พร้อมบอกให้พิมพ์ \"ยืนยัน\" "
+            . "เมื่อผู้ใช้พิมพ์ยืนยันในข้อความถัดไป จึงเรียก confirm_write (ไม่ต้องระบุ draft_id ก็ได้ ระบบใช้รายการล่าสุดที่รอยืนยัน)\n"
+            . "7. ห้ามเรียก confirm_write ในรอบเดียวกับ prepare_* เด็ดขาด ต้องรอให้ผู้ใช้ยืนยันจริงก่อน\n"
+            . "8. ก่อนอ้างอิง/แก้/ลบ ที่ต้องใช้ id ต้องเรียก list_*/search_* หา id จริงก่อน ห้ามเดา\n"
+            . "9. แก้ไข (update) ส่งเฉพาะฟิลด์ที่จะเปลี่ยน; การลบจะถูกบล็อกถ้ามีข้อมูลอื่นผูกอยู่ ให้แจ้งตามข้อความที่ระบบคืนมา\n"
+            . "10. สร้างงานผ้า (prepare_operation) รวบรวมรายการผ้าทั้งหมดแล้วส่ง items ครั้งเดียว; แนบรูปผ่านแชทไม่ได้";
     }
 
     /**
@@ -449,7 +473,7 @@ class AiChatService
         ]];
 
         $tools[] = ['confirm_write', 'ยืนยันทำรายการที่เตรียมไว้ (สร้าง/แก้ไข/ลบ/งานประจำวัน) ขั้นที่ 2/2 — เรียกเฉพาะเมื่อผู้ใช้ตอบยืนยันในข้อความถัดไปแล้วเท่านั้น', [
-            'draft_id' => ['integer', 'id ของรายการที่ได้จาก prepare_*', null, true],
+            'draft_id' => ['integer', 'id ของรายการที่ได้จาก prepare_* (ไม่ระบุ=รายการล่าสุดที่รอยืนยัน)'],
         ]];
 
         return $tools;
