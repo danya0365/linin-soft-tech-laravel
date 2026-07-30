@@ -102,4 +102,73 @@ class AiCreditServiceTest extends TestCase
             $this->service->costUsd('minimax/minimax-m2.7', 1000, 0, 5000)
         );
     }
+
+    // ── ค่าคอมแบบจำนวนคงที่ต่อข้อความ ────────────────────────────────
+
+    /** model ต้นทุน 0 ต้องไม่ฟรี — คิดค่าคอมคงที่แทน % (ของ 0 คือ 0) */
+    public function test_zero_cost_model_charges_flat_fee(): void
+    {
+        config(['ai-chat.models' => [[
+            'id' => 'local/free',
+            'pricing' => ['inputPerMTok' => 0, 'cachedInputPerMTok' => 0, 'outputPerMTok' => 0],
+            'flat_fee_thb' => 0.25,
+        ]]]);
+
+        $this->assertSame(0.0, $this->service->costThb('local/free', 500_000, 200_000));
+        $this->assertSame(0.25, $this->service->chargeThb('local/free', 500_000, 200_000));
+    }
+
+    /** ค่าคอมคงที่ = ต่อข้อความ ไม่ผันตามจำนวน token */
+    public function test_flat_fee_does_not_scale_with_tokens(): void
+    {
+        config(['ai-chat.models' => [[
+            'id' => 'local/free',
+            'pricing' => ['inputPerMTok' => 0, 'outputPerMTok' => 0],
+            'flat_fee_thb' => 0.25,
+        ]]]);
+
+        $this->assertSame(
+            $this->service->chargeThb('local/free', 1_000, 1_000),
+            $this->service->chargeThb('local/free', 5_000_000, 5_000_000)
+        );
+    }
+
+    /** flat fee ใช้แทนค่าคอม % แม้ model นั้นมีต้นทุนจริง */
+    public function test_flat_fee_replaces_percentage_commission(): void
+    {
+        config(['ai-chat.models' => [[
+            'id' => 'paid/flat',
+            'pricing' => ['inputPerMTok' => 1, 'outputPerMTok' => 1],
+            'flat_fee_thb' => 2,
+        ]]]);
+
+        // 1M + 1M tokens → USD 2 → THB 74 (+ ค่าคอมคงที่ 2 บาท)
+        $this->assertSame(74.0, $this->service->costThb('paid/flat', 1_000_000, 1_000_000));
+        $this->assertSame(76.0, $this->service->chargeThb('paid/flat', 1_000_000, 1_000_000));
+    }
+
+    public function test_flat_fee_is_configurable_to_zero(): void
+    {
+        config(['ai-chat.models' => [[
+            'id' => 'local/free',
+            'pricing' => ['inputPerMTok' => 0, 'outputPerMTok' => 0],
+            'flat_fee_thb' => 0,
+        ]]]);
+
+        $this->assertSame(0.0, $this->service->chargeThb('local/free', 1_000, 1_000));
+    }
+
+    /** model ที่ไม่กำหนด flat fee ต้องคิด % เหมือนเดิม */
+    public function test_models_without_flat_fee_keep_percentage_commission(): void
+    {
+        $this->assertSame(0.0, $this->service->flatFeeThb('minimax/minimax-m2.7'));
+        $this->assertSame(72.15, $this->service->chargeThb('minimax/minimax-m2.7', 1_000_000, 1_000_000));
+    }
+
+    /** model ที่ไม่รู้จักไม่มี flat fee → ยังตกไป fallback_pricing ตามเดิม */
+    public function test_unknown_model_has_no_flat_fee(): void
+    {
+        $this->assertSame(0.0, $this->service->flatFeeThb('evil/unknown'));
+        $this->assertGreaterThan(0, $this->service->chargeThb('evil/unknown', 1_000_000, 0));
+    }
 }

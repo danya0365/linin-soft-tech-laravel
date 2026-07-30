@@ -111,12 +111,23 @@
         return Math.ceil(text.length / CHARS_PER_TOKEN);
     }
 
-    function getModelPricing(modelId) {
+    function getModel(modelId) {
         var models = CONFIG.models || [];
         for (var i = 0; i < models.length; i++) {
-            if (models[i].id === modelId) return models[i].pricing || null;
+            if (models[i].id === modelId) return models[i];
         }
         return null;
+    }
+
+    function getModelPricing(modelId) {
+        var model = getModel(modelId);
+        return model ? (model.pricing || null) : null;
+    }
+
+    // ค่าคอมคงที่ต่อข้อความ (บาท) — model ต้นทุน 0 ใช้แทนค่าคอมแบบ %
+    function getFlatFeeThb(modelId) {
+        var model = getModel(modelId);
+        return model ? (Number(model.flat_fee_thb) || 0) : 0;
     }
 
     function calculateCostUsd(modelId, promptTokens, completionTokens) {
@@ -140,8 +151,15 @@
     function calculateChargeThb(modelId, promptTokens, completionTokens) {
         var usd = calculateCostUsd(modelId, promptTokens, completionTokens);
         if (usd === null) return null;
+
         var credit = CONFIG.credit || {};
-        return usd * (credit.usdToThb || 0) * (1 + (credit.commissionPercent || 0) / 100);
+        var costThb = usd * (credit.usdToThb || 0);
+        var flatFee = getFlatFeeThb(modelId);
+
+        // ต้องตรงกับ AiCreditService::chargeThb()
+        return flatFee > 0
+            ? costThb + flatFee
+            : costThb * (1 + (credit.commissionPercent || 0) / 100);
     }
 
     // ── App ─────────────────────────────────────────────────────

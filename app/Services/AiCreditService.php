@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\DB;
  * AI Credit Service (หน่วยบาท)
  *
  * - หักเครดิตตามใช้จริง: ต้นทุน USD × usd_to_thb × (1 + commission%/100)
+ * - model ที่กำหนด flat_fee_thb ใน catalog คิดค่าคอมเป็นจำนวนคงที่ต่อข้อความแทน %
+ *   (จำเป็นกับ model ต้นทุน 0 เพราะ % ของ 0 คือ 0)
  * - ค่าคอม (commission) คือส่วนต่างที่เป็นรายได้ dev — เก็บแยกใน ledger
  * - ทุกการเปลี่ยนยอดผ่าน applyTransaction (DB transaction + lockForUpdate)
  *   และเขียน ledger (ai_credit_transactions) เสมอเพื่อ audit
@@ -63,13 +65,35 @@ class AiCreditService
     }
 
     /**
-     * ยอดที่หักจริง = ต้นทุนบาท × (1 + ค่าคอม%/100)
+     * ค่าคอมแบบจำนวนคงที่ต่อข้อความ (บาท) ถ้า model นั้นกำหนดไว้
+     *
+     * จำเป็นสำหรับ model ที่ต้นทุนเป็น 0 (เช่น endpoint ในเครื่อง) เพราะคิดค่าคอมเป็น %
+     * ของ 0 แล้วได้ 0 — dev จะไม่ได้ส่วนแบ่งเลย
+     */
+    public function flatFeeThb(?string $model): float
+    {
+        $entry = collect(config('ai-chat.models'))->firstWhere('id', $model);
+
+        return round((float) ($entry['flat_fee_thb'] ?? 0), 4);
+    }
+
+    /**
+     * ยอดที่หักจริง
+     * - model ที่กำหนด flat_fee_thb → ต้นทุนบาท + ค่าคอมคงที่
+     * - นอกนั้น → ต้นทุนบาท × (1 + ค่าคอม%/100)
      */
     public function chargeThb(?string $model, int $promptTokens, int $completionTokens, int $cachedTokens = 0): float
     {
+        $cost = $this->costThb($model, $promptTokens, $completionTokens, $cachedTokens);
+        $flatFee = $this->flatFeeThb($model);
+
+        if ($flatFee > 0) {
+            return round($cost + $flatFee, 4);
+        }
+
         $multiplier = 1 + ((float) config('ai-chat.commission_percent')) / 100;
 
-        return round($this->costThb($model, $promptTokens, $completionTokens, $cachedTokens) * $multiplier, 4);
+        return round($cost * $multiplier, 4);
     }
 
     /**

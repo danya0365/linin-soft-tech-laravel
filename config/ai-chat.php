@@ -173,15 +173,16 @@ return [
             'pricing' => ['inputPerMTok' => 1.84, 'outputPerMTok' => 3.66],
         ],
         // ── Local (dev) ──
-        // ยิง endpoint ในเครื่อง ไม่มีค่าใช้จ่าย — ยังผ่านระบบเครดิตตามปกติ
-        // แต่ pricing 0 ทำให้ยอดหักเป็น 0 บาท
+        // ยิง endpoint ในเครื่อง ต้นทุน token เป็น 0 — ยังผ่านระบบเครดิตตามปกติ
+        // ค่าคอมคิดเป็นจำนวนคงที่ต่อข้อความแทน % (เพราะ % ของ 0 คือ 0)
         [
             'id' => 'oc/deepseek-v4-flash-free',
             'provider' => 'local',
-            'label' => 'DeepSeek V4 Flash (local · free)',
-            'description' => 'endpoint ในเครื่องสำหรับทดสอบ — ไม่มีค่าใช้จ่าย',
+            'label' => 'DeepSeek V4 Flash (local)',
+            'description' => 'endpoint ในเครื่องสำหรับทดสอบ — คิดค่าบริการคงที่ต่อข้อความ',
             'vendor' => 'DeepSeek',
             'pricing' => ['inputPerMTok' => 0, 'cachedInputPerMTok' => 0, 'outputPerMTok' => 0],
+            'flat_fee_thb' => (float) env('AI_CHAT_LOCAL_FLAT_FEE_THB', 0.25),
         ],
     ],
 
