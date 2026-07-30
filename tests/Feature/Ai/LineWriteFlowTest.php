@@ -7,14 +7,16 @@ use App\Models\AiWriteDraft;
 use App\Models\Customer;
 use App\Models\CustomerGroup;
 use App\Models\User;
+use App\Contracts\LlmProvider;
 use App\Services\ChatService;
-use App\Services\WaveSpeedLlmService;
+use App\Services\Llm\LlmProviderManager;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Psr\Http\Message\StreamInterface;
 use Tests\TestCase;
 
 /**
  * ทดสอบ write flow บน LINE (ผ่าน ChatService::processCommand พร้อม User)
- * ใช้ WaveSpeedLlmService ปลอม ขับ tool_call เอง — ไม่ต้องเรียก API จริง
+ * ใช้ LlmProvider ปลอม ขับ tool_call เอง — ไม่ต้องเรียก API จริง
  * พิสูจน์: LINE มี session(channel=line) + persist message + ด่านกัน auto-confirm + confirm ข้ามเทิร์น
  */
 class LineWriteFlowTest extends TestCase
@@ -27,7 +29,7 @@ class LineWriteFlowTest extends TestCase
         $group = CustomerGroup::create(['name' => 'โรงแรม']);
 
         // bind LLM ปลอมที่ขับ prepare_create_customer → (เทิร์น 2) confirm_write
-        $this->app->instance(WaveSpeedLlmService::class, new FakeWaveSpeedLlm($group->id));
+        $this->fakeLlm(new FakeWriteFlowLlm($group->id));
 
         $chat = app(ChatService::class);
 
@@ -56,7 +58,7 @@ class LineWriteFlowTest extends TestCase
         $group = CustomerGroup::create(['name' => 'โรงแรม']);
 
         // LLM ปลอมที่ "โกง" — สั่ง prepare แล้ว confirm ในเทิร์นเดียว
-        $this->app->instance(WaveSpeedLlmService::class, new FakeAutoConfirmLlm($group->id));
+        $this->fakeLlm(new FakeAutoConfirmLlm($group->id));
 
         $chat = app(ChatService::class);
         $chat->processCommand('สร้างลูกค้าใหม่ชื่อ โกง กลุ่มโรงแรม', $admin);
@@ -64,17 +66,60 @@ class LineWriteFlowTest extends TestCase
         // ด่านกัน auto-confirm ต้องบล็อก — ไม่มี customer ถูกสร้าง
         $this->assertDatabaseMissing('customers', ['name' => 'โกง']);
     }
+
+    /** ให้ทุก provider ที่ manager คืนออกมาเป็นตัวปลอมตัวนี้ */
+    protected function fakeLlm(LlmProvider $provider): void
+    {
+        $this->app->instance(LlmProviderManager::class, new FakeLlmProviderManager($provider));
+    }
+}
+
+/** manager ที่ route ทุก model ไปยัง provider ปลอมตัวเดียว */
+class FakeLlmProviderManager extends LlmProviderManager
+{
+    public function __construct(protected LlmProvider $fake)
+    {
+    }
+
+    public function forName(string $name): LlmProvider
+    {
+        return $this->fake;
+    }
+
+    public function forModel(?string $model): LlmProvider
+    {
+        return $this->fake;
+    }
+
+    public function default(): LlmProvider
+    {
+        return $this->fake;
+    }
+
+    public function anyEnabled(): bool
+    {
+        return true;
+    }
 }
 
 /**
  * LLM ปลอม: เทิร์นที่ user ยังไม่พิมพ์ "ยืนยัน" → prepare_create_customer
  * เทิร์นที่พิมพ์ "ยืนยัน" → confirm_write; หลังมี tool result แล้ว → คืนข้อความปิดท้าย
  */
-class FakeWaveSpeedLlm extends WaveSpeedLlmService
+class FakeWriteFlowLlm implements LlmProvider
 {
     public function __construct(public int $customerGroupId)
     {
-        // ไม่เรียก parent ที่อ่าน config — ไม่จำเป็นสำหรับ fake
+    }
+
+    public function name(): string
+    {
+        return 'fake';
+    }
+
+    public function label(): string
+    {
+        return 'Fake';
     }
 
     public function isEnabled(): bool
@@ -82,8 +127,26 @@ class FakeWaveSpeedLlm extends WaveSpeedLlmService
         return true;
     }
 
-    public function chatCompletion(array $messages, array $tools = []): array
+    public function defaultModel(): string
     {
+        return 'fake/model';
+    }
+
+    public function streamChatCompletion(
+        array $messages,
+        ?string $model = null,
+        ?int $maxTokens = null,
+        array $tools = []
+    ): StreamInterface {
+        throw new \LogicException('LINE path ไม่ใช้ streaming');
+    }
+
+    public function chatCompletion(
+        array $messages,
+        array $tools = [],
+        ?string $model = null,
+        ?int $maxTokens = null
+    ): array {
         // ถ้ามี tool result แล้วในรอบนี้ → จบด้วยข้อความ
         foreach ($messages as $m) {
             if (($m['role'] ?? '') === 'tool') {
@@ -129,10 +192,14 @@ class FakeWaveSpeedLlm extends WaveSpeedLlmService
 }
 
 /** LLM ปลอมที่พยายาม auto-confirm ในเทิร์นเดียว (prepare → confirm ทันที) */
-class FakeAutoConfirmLlm extends FakeWaveSpeedLlm
+class FakeAutoConfirmLlm extends FakeWriteFlowLlm
 {
-    public function chatCompletion(array $messages, array $tools = []): array
-    {
+    public function chatCompletion(
+        array $messages,
+        array $tools = [],
+        ?string $model = null,
+        ?int $maxTokens = null
+    ): array {
         // นับ tool result ที่เกิดแล้วในรอบนี้
         $toolResults = 0;
         foreach ($messages as $m) {

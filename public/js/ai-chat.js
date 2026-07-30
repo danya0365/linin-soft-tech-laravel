@@ -228,7 +228,7 @@
         this.renderCredit();
 
         if (CONFIG.enabled === false) {
-            this.showToast('ยังไม่ได้ตั้งค่า WAVESPEED_API_KEY — แชทจะใช้งานไม่ได้', 8000);
+            this.showToast('ยังไม่ได้ตั้งค่า LLM provider — แชทจะใช้งานไม่ได้', 8000);
         }
 
         // โหลดรายการ session จาก server
@@ -865,20 +865,30 @@
         var select = this.el.model;
         select.innerHTML = '';
 
+        // มีหลาย provider → ใส่ชื่อ provider นำหน้ากลุ่ม ให้เห็นชัดว่ากำลังยิงไปเจ้าไหน
+        var providers = CONFIG.providers || [];
+        var providerLabels = {};
+        providers.forEach(function (p) { providerLabels[p.name] = p.label; });
+        var showProvider = providers.length > 1;
+
         var groups = {};
         var order = [];
         (CONFIG.models || []).forEach(function (m) {
-            if (!groups[m.vendor]) {
-                groups[m.vendor] = [];
-                order.push(m.vendor);
+            var label = m.vendor;
+            if (showProvider && providerLabels[m.provider]) {
+                label = providerLabels[m.provider] + ' · ' + m.vendor;
             }
-            groups[m.vendor].push(m);
+            if (!groups[label]) {
+                groups[label] = [];
+                order.push(label);
+            }
+            groups[label].push(m);
         });
 
-        order.forEach(function (vendor) {
+        order.forEach(function (groupLabel) {
             var optgroup = document.createElement('optgroup');
-            optgroup.label = vendor;
-            groups[vendor].forEach(function (m) {
+            optgroup.label = groupLabel;
+            groups[groupLabel].forEach(function (m) {
                 var option = document.createElement('option');
                 option.value = m.id;
                 option.textContent = m.label;
@@ -963,7 +973,7 @@
             ? Number(message.creditCharged)
             : calculateChargeThb(message.model || '', u.promptTokens, u.completionTokens);
         if (thb !== null) {
-            text += ' · ฿' + thb.toFixed(4);
+            text += thb === 0 ? ' · ฟรี' : ' · ฿' + thb.toFixed(4);
         }
         return text;
     };

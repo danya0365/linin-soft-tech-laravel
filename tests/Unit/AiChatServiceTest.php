@@ -15,9 +15,9 @@ class AiChatServiceTest extends TestCase
         parent::setUp();
 
         config([
-            'services.wavespeed.api_key' => 'test-key',
-            'services.wavespeed.base_url' => 'https://llm.wavespeed.ai/v1',
-            'services.wavespeed.model' => 'minimax/minimax-m2.7',
+            'ai-chat.providers.wavespeed.api_key' => 'test-key',
+            'ai-chat.providers.wavespeed.base_url' => 'https://llm.wavespeed.ai/v1',
+            'ai-chat.providers.wavespeed.default_model' => 'minimax/minimax-m2.7',
         ]);
     }
 
@@ -90,7 +90,7 @@ class AiChatServiceTest extends TestCase
 
     public function test_unknown_command_without_api_key_keeps_old_behavior(): void
     {
-        config(['services.wavespeed.api_key' => null]);
+        config(['ai-chat.providers.wavespeed.api_key' => null]);
         Http::fake();
 
         $result = app(ChatService::class)->processCommand('คำถามมั่วๆ ที่ไม่ตรง rule');

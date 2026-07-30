@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\AiChatMessage;
 use App\Models\AiChatSession;
+use App\Services\Llm\LlmProviderManager;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -202,17 +203,16 @@ class AiChatSessionController extends Controller
         ];
     }
 
+    /**
+     * อนุญาตเฉพาะ model ที่ provider ของมันเปิดอยู่ (ดู LlmProviderManager::availableModels)
+     */
     protected function isValidModel(string $model): bool
     {
-        return collect(config('ai-chat.models'))->pluck('id')->contains($model);
+        return app(LlmProviderManager::class)->isModelAvailable($model);
     }
 
     protected function validModelOrDefault(?string $model): string
     {
-        if ($model && $this->isValidModel($model)) {
-            return $model;
-        }
-
-        return config('ai-chat.default_model');
+        return app(LlmProviderManager::class)->resolveModel($model);
     }
 }

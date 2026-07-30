@@ -24,7 +24,7 @@ class AiCreditTest extends TestCase
         parent::setUp();
 
         config([
-            'services.wavespeed.api_key' => 'test-key',
+            'ai-chat.providers.wavespeed.api_key' => 'test-key',
             'ai-chat.usd_to_thb' => 37,
             'ai-chat.commission_percent' => 30,
         ]);

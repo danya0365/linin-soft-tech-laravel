@@ -5,7 +5,9 @@ namespace Tests\Unit;
 use App\Exceptions\ClientDisconnectedException;
 use App\Services\AiChatStreamService;
 use App\Services\ChatService;
-use App\Services\WaveSpeedLlmService;
+use App\Services\EntityWriteService;
+use App\Services\Llm\LlmProviderManager;
+use App\Services\OperationActionService;
 use Illuminate\Support\Facades\Http;
 use Mockery;
 use Tests\TestCase;
@@ -17,9 +19,10 @@ class AiChatStreamServiceTest extends TestCase
         parent::setUp();
 
         config([
-            'services.wavespeed.api_key' => 'test-key',
-            'services.wavespeed.base_url' => 'https://llm.wavespeed.ai/v1',
-            'services.wavespeed.model' => 'minimax/minimax-m2.7',
+            'ai-chat.default_provider' => 'wavespeed',
+            'ai-chat.providers.wavespeed.api_key' => 'test-key',
+            'ai-chat.providers.wavespeed.base_url' => 'https://llm.wavespeed.ai/v1',
+            'ai-chat.providers.wavespeed.default_model' => 'minimax/minimax-m2.7',
         ]);
     }
 
@@ -32,8 +35,10 @@ class AiChatStreamServiceTest extends TestCase
     protected function makeService(?ChatService $chatService = null): AiChatStreamService
     {
         return new AiChatStreamService(
-            new WaveSpeedLlmService(),
-            $chatService ?: Mockery::mock(ChatService::class)
+            new LlmProviderManager(),
+            $chatService ?: Mockery::mock(ChatService::class),
+            app(EntityWriteService::class),
+            app(OperationActionService::class),
         );
     }
 
@@ -285,5 +290,55 @@ class AiChatStreamServiceTest extends TestCase
         $this->assertSame('คำตอบจริง', $result['content']);
         $this->assertCount(1, $events);
         $this->assertSame('คำตอบจริง', $events[0]['choices'][0]['delta']['content']);
+    }
+
+    /**
+     * model ตระกูล reasoning ใช้โควตา max_tokens ไปกับการคิดจนไม่เหลือ content
+     * ต้องแจ้งสาเหตุ ไม่ใช่ปล่อยข้อความว่าง
+     */
+    public function test_answer_starved_by_reasoning_tokens_explains_itself(): void
+    {
+        Http::fake([
+            'llm.wavespeed.ai/*' => Http::response($this->sse([
+                ['choices' => [['delta' => ['reasoning_content' => 'คิดยาวมาก...']]]],
+                ['choices' => [], 'usage' => [
+                    'prompt_tokens' => 100,
+                    'completion_tokens' => 200,
+                    'completion_tokens_details' => ['reasoning_tokens' => 200],
+                ]],
+            ]), 200),
+        ]);
+
+        $events = [];
+        $result = $this->makeService()->streamAnswer(
+            [['role' => 'user', 'content' => 'ถามอะไรก็ได้']],
+            'minimax/minimax-m2.7',
+            200,
+            function (array $event) use (&$events) {
+                $events[] = $event;
+            }
+        );
+
+        $this->assertStringContainsString('reasoning 200 tokens', $result['content']);
+        $this->assertStringContainsString('เพดาน 200', $result['content']);
+        $this->assertSame($result['content'], $events[0]['choices'][0]['delta']['content']);
+    }
+
+    public function test_empty_answer_without_reasoning_gets_generic_notice(): void
+    {
+        Http::fake([
+            'llm.wavespeed.ai/*' => Http::response($this->sse([
+                ['choices' => [['delta' => []]]],
+            ]), 200),
+        ]);
+
+        $result = $this->makeService()->streamAnswer(
+            [['role' => 'user', 'content' => 'ถามอะไรก็ได้']],
+            'minimax/minimax-m2.7',
+            null,
+            fn (array $event) => null
+        );
+
+        $this->assertStringContainsString('ไม่ได้รับคำตอบจาก AI', $result['content']);
     }
 }

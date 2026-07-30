@@ -2,23 +2,10 @@
 
 namespace App\Exceptions;
 
-use Exception;
-
 /**
- * Exception สำหรับความผิดพลาดจากการเรียก WaveSpeed LLM API
+ * @deprecated ใช้ LlmApiException แทน — คงไว้เพื่อ backward compatibility
+ *             หลังแยก AI chat ออกเป็นระบบ provider แบบ pluggable
  */
-class WaveSpeedApiException extends Exception
+class WaveSpeedApiException extends LlmApiException
 {
-    protected ?int $httpStatus;
-
-    public function __construct(string $message, ?int $httpStatus = null, ?\Throwable $previous = null)
-    {
-        parent::__construct($message, 0, $previous);
-        $this->httpStatus = $httpStatus;
-    }
-
-    public function getHttpStatus(): ?int
-    {
-        return $this->httpStatus;
-    }
 }

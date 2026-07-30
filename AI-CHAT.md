@@ -7,8 +7,14 @@
 ## การตั้งค่า
 
 ```env
-WAVESPEED_API_KEY=          # จำเป็น — ถ้าไม่ตั้ง หน้าแชทจะขึ้นเตือนและใช้งานไม่ได้
+AI_CHAT_DEFAULT_PROVIDER=wavespeed         # provider เริ่มต้น (ดู config/ai-chat.php)
+WAVESPEED_API_KEY=          # จำเป็น — ถ้าไม่มี provider ไหนพร้อมเลย หน้าแชทจะขึ้นเตือนและใช้งานไม่ได้
 WAVESPEED_LLM_MODEL=minimax/minimax-m2.7   # model เริ่มต้น
+
+# endpoint OpenAI-compatible ในเครื่อง (dev เท่านั้น — ต้องปิดบน production)
+LLM_LOCAL_ENABLED=false
+LLM_LOCAL_BASE_URL=http://localhost:20128/v1
+LLM_LOCAL_MODEL=oc/deepseek-v4-flash-free
 
 # คุมค่าใช้จ่าย
 AI_CHAT_RATE_LIMIT=6        # ข้อความ/นาที/user (stream endpoint)
@@ -63,7 +69,7 @@ browser ──POST {content,model,settings}──▶ AiChatController::stream
    │ SSE: meta → content deltas →             │ สร้าง context จากประวัติใน DB
    │      tool_status → usage → done → [DONE] ▼
    └────────────────────────── AiChatStreamService (extends AiChatService)
-                                  │ เรียก WaveSpeed stream:true + tools
+                                  │ เรียก provider ของ model นั้น stream:true + tools
                                   │ parse SSE ฝั่ง server, สะสม tool_call deltas
                                   │ executeTool() (14 tools เดิมของ LINE bot)
                                   │ วน loop จนได้คำตอบ → บันทึก assistant msg ลง DB
@@ -74,6 +80,19 @@ browser ──POST {content,model,settings}──▶ AiChatController::stream
 - model ไม่รองรับ tools (HTTP 400) → fallback JSON-intent mode (non-stream) อัตโนมัติ
 - กดหยุดกลางทาง → server บันทึก partial ไว้ (`is_partial`)
 - usage จริงจาก API บวกสะสมข้ามทุก iteration; ถ้าไม่มีใช้สูตร ~3 ตัวอักษร/token (`is_estimated`)
+- model ตระกูล reasoning นับ reasoning token รวมใน `max_tokens` — ถ้าเพดานต่ำจนไม่เหลือคำตอบ
+  ระบบจะแจ้งสาเหตุแทนการส่งข้อความว่าง
+
+## LLM provider (สลับเจ้าได้)
+
+`LlmProvider` (port) + `OpenAiCompatibleProvider` (adapter) + `LlmProviderManager` (registry)
+
+- แต่ละ model ใน `config('ai-chat.models')` ระบุ `provider` → route ไปเจ้านั้นตอน runtime
+- ผู้ใช้เลือก provider เองผ่าน dropdown (จัดกลุ่มตามชื่อ provider)
+- เพิ่มเจ้าใหม่ที่พูดภาษา OpenAI chat completions = เพิ่ม block ใน `config('ai-chat.providers')`
+  **ไม่ต้องเขียนคลาสใหม่**; เจ้าที่ใช้ protocol อื่นให้เขียน adapter ใหม่ที่ implement `LlmProvider`
+- provider ที่ปิดอยู่ (`enabled=false` หรือไม่มี key) จะไม่โผล่ใน dropdown และยิงตรงได้ 422
+- adapter ทน quirk: gateway บางตัวต่อ `data: [DONE]` ท้าย body ของ response ที่ไม่ได้ stream
 
 ## ไฟล์ที่เกี่ยวข้อง
 
@@ -85,12 +104,19 @@ browser ──POST {content,model,settings}──▶ AiChatController::stream
 - `app/Models/AiChatSession.php`, `app/Models/AiChatMessage.php`, `app/Models/AiCreditTransaction.php`
 - `app/Http/Middleware/IsStaff.php` (alias `staff`)
 - `app/Exceptions/ClientDisconnectedException.php`
-- `config/ai-chat.php` — model catalog + ราคา + limits + เครดิต/ค่าคอม
+- `app/Contracts/LlmProvider.php` — port ของผู้ให้บริการ LLM
+- `app/Services/Llm/OpenAiCompatibleProvider.php` — adapter สำหรับ endpoint แบบ OpenAI
+- `app/Services/Llm/LlmProviderManager.php` — registry + route model → provider + allowlist
+- `app/Exceptions/LlmApiException.php` (`WaveSpeedApiException` เป็น alias เก่า deprecated)
+- `config/ai-chat.php` — providers + model catalog + ราคา + limits + เครดิต/ค่าคอม
 - `resources/views/ai-chat/index.blade.php`, `resources/views/ai-credit/*.blade.php`,
   `public/js/ai-chat.js`, `public/css/ai-chat.css`
-- tests: `tests/Unit/AiChatStreamServiceTest.php`, `tests/Unit/WaveSpeedLlmStreamTest.php`,
-  `tests/Unit/AiCreditServiceTest.php`, `tests/Feature/AiChatSessionApiTest.php`,
+- tests: `tests/Unit/AiChatStreamServiceTest.php`, `tests/Unit/Llm/OpenAiCompatibleProviderTest.php`,
+  `tests/Unit/Llm/LlmProviderManagerTest.php`, `tests/Unit/AiCreditServiceTest.php`,
+  `tests/Feature/AiChatSessionApiTest.php`,
   `tests/Feature/AiCreditTest.php` (Feature ใช้ DatabaseTransactions — ห้าม RefreshDatabase)
+- `tests/Feature/Ai/LocalProviderSmokeTest.php` — ยิง endpoint ในเครื่องจริง (`@group live`)
+  ข้ามอัตโนมัติเมื่อ endpoint ไม่พร้อม; รันด้วย `php artisan test tests/Feature/Ai/LocalProviderSmokeTest.php`
 
 ## ข้อแตกต่างจาก mini-chat เดิม
 

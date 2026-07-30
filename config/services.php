@@ -36,13 +36,7 @@ return [
         'channel_secret' => env('LINE_CHANNEL_SECRET'),
     ],
 
-    'wavespeed' => [
-        'api_key' => env('WAVESPEED_API_KEY'),
-        'base_url' => env('WAVESPEED_BASE_URL', 'https://llm.wavespeed.ai/v1'),
-        'model' => env('WAVESPEED_LLM_MODEL', 'minimax/minimax-m2.7'),
-        'max_iterations' => env('WAVESPEED_MAX_ITERATIONS', 5),
-        'timeout' => env('WAVESPEED_TIMEOUT', 25), // วินาทีต่อ HTTP call
-        'max_tokens' => env('WAVESPEED_MAX_TOKENS', 1024),
-    ],
+    // ผู้ให้บริการ LLM ย้ายไปอยู่ใน config/ai-chat.php ('providers')
+    // เพราะตอนนี้เลือกได้หลายเจ้าและผูกกับ model catalog
 
 ];

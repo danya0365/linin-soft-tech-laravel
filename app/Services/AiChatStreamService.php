@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Exceptions\ClientDisconnectedException;
-use App\Exceptions\WaveSpeedApiException;
+use App\Exceptions\LlmApiException;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Psr\Http\Message\StreamInterface;
@@ -11,7 +11,7 @@ use Psr\Http\Message\StreamInterface;
 /**
  * AI Chat Stream Service (หน้าเว็บ /ai-chat)
  *
- * Streaming tool loop: เรียก WaveSpeed แบบ stream + tools,
+ * Streaming tool loop: เรียก provider ของ model ที่เลือกแบบ stream + tools,
  * parse SSE ฝั่ง server, execute tool แล้ววนต่อ, ส่ง content delta
  * ให้ browser แบบ realtime ผ่าน emit callback
  *
@@ -31,12 +31,17 @@ class AiChatStreamService extends AiChatService
      * @param int|null $maxTokens จำกัดความยาวคำตอบ (null = ไม่จำกัด)
      * @param callable $emit fn(array $event): void — ส่ง event ให้ client, โยน ClientDisconnectedException เมื่อ client หลุด
      * @return array{content: string, usage: ?array, estimated: bool, aborted: bool}
-     * @throws WaveSpeedApiException เมื่อ upstream ล้มเหลว (ก่อนได้ content ใดๆ)
+     * @throws LlmApiException เมื่อ upstream ล้มเหลว (ก่อนได้ content ใดๆ)
      */
     public function streamAnswer(array $messages, string $model, ?int $maxTokens, callable $emit): array
     {
+        // ล็อก provider ตาม model ที่เลือก ให้ path ที่สืบทอดมา (fallback แบบ non-stream) ใช้เจ้าเดียวกัน
+        $this->useModel($model);
+
         try {
-            return $this->runStreamingToolLoop($messages, $model, $maxTokens, $emit);
+            $result = $this->runStreamingToolLoop($messages, $model, $maxTokens, $emit);
+
+            return $this->explainEmptyAnswer($result, $maxTokens, $emit);
         } catch (ClientDisconnectedException $e) {
             // client กดหยุด — คืน partial content ที่สะสมไว้ (เก็บใน exception ไม่ได้ ใช้ property)
             return [
@@ -46,6 +51,35 @@ class AiChatStreamService extends AiChatService
                 'aborted' => true,
             ];
         }
+    }
+
+    /**
+     * model ตระกูล reasoning นับ reasoning token รวมใน max_tokens ด้วย
+     * ถ้าเพดานต่ำเกิน โควตาจะหมดไปกับการคิดจนไม่เหลือคำตอบ — ผู้ใช้เห็นข้อความว่างเปล่า
+     * แจ้งสาเหตุแทนที่จะปล่อยว่าง
+     */
+    protected function explainEmptyAnswer(array $result, ?int $maxTokens, callable $emit): array
+    {
+        if (trim($result['content']) !== '' || $result['aborted']) {
+            return $result;
+        }
+
+        $notice = $this->reasoningTokens > 0
+            ? 'ตอบไม่ทันครับ — โควตาความยาวคำตอบหมดไปกับขั้นตอนคิดวิเคราะห์ '
+                . '(reasoning ' . $this->reasoningTokens . ' tokens'
+                . ($maxTokens ? ' จากเพดาน ' . $maxTokens : '') . ') '
+                . 'กรุณาเพิ่มความยาวคำตอบสูงสุด แล้วลองใหม่อีกครั้ง'
+            : 'ไม่ได้รับคำตอบจาก AI กรุณาลองใหม่อีกครั้ง';
+
+        try {
+            $emit(['choices' => [['delta' => ['content' => $notice]]]]);
+        } catch (ClientDisconnectedException $e) {
+            // client หลุดไปแล้ว — ยังคืน content ไว้บันทึกลง DB
+        }
+
+        $result['content'] = $notice;
+
+        return $result;
     }
 
     /** content ที่ emit ให้ client ไปแล้ว (สำหรับ persist partial เมื่อ abort) */
@@ -66,6 +100,18 @@ class AiChatStreamService extends AiChatService
             'cached_tokens' => ($this->usageTotal['cached_tokens'] ?? 0) + $this->extractCachedTokens($usage),
             'completion_tokens' => ($this->usageTotal['completion_tokens'] ?? 0) + ((int) ($usage['completion_tokens'] ?? 0)),
         ];
+
+        $this->reasoningTokens += $this->extractReasoningTokens($usage);
+    }
+
+    /** reasoning token ที่ถูกใช้ไป — นับรวมใน max_tokens ของ model ตระกูล reasoning */
+    protected int $reasoningTokens = 0;
+
+    protected function extractReasoningTokens(array $usage): int
+    {
+        return (int) ($usage['completion_tokens_details']['reasoning_tokens']
+            ?? $usage['reasoning_tokens']
+            ?? 0);
     }
 
     /**
@@ -85,6 +131,7 @@ class AiChatStreamService extends AiChatService
 
         $this->partialContent = '';
         $this->usageTotal = null;
+        $this->reasoningTokens = 0;
 
         $workMessages = array_merge(
             [['role' => 'system', 'content' => $this->systemPrompt()]],
@@ -99,8 +146,8 @@ class AiChatStreamService extends AiChatService
             }
 
             try {
-                $body = $this->llm->streamChatCompletion($workMessages, $model, $maxTokens, $tools);
-            } catch (WaveSpeedApiException $e) {
+                $body = $this->provider($model)->streamChatCompletion($workMessages, $model, $maxTokens, $tools);
+            } catch (LlmApiException $e) {
                 // model บางตัวไม่รองรับ tools param → JSON-intent mode (non-stream) แล้วส่งทั้งก้อน
                 if ($i === 0 && $e->getHttpStatus() === 400) {
                     return $this->runNonStreamingFallback($messages, $emit);
@@ -160,7 +207,7 @@ class AiChatStreamService extends AiChatService
             'content' => 'กรุณาสรุปคำตอบจากข้อมูลที่ได้มาแล้วข้างต้นทันที โดยไม่ต้องเรียกเครื่องมือเพิ่ม',
         ];
 
-        $body = $this->llm->streamChatCompletion($workMessages, $model, $maxTokens);
+        $body = $this->provider($model)->streamChatCompletion($workMessages, $model, $maxTokens);
         $this->consumeIteration($body, $emit);
 
         return [

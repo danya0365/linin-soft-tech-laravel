@@ -3,13 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Exceptions\ClientDisconnectedException;
-use App\Exceptions\WaveSpeedApiException;
+use App\Exceptions\LlmApiException;
 use App\Models\AiChatMessage;
 use App\Models\AiChatSession;
 use App\Services\AiChatStreamService;
 use App\Services\AiCreditService;
 use App\Services\EntityWriteService;
-use App\Services\WaveSpeedLlmService;
+use App\Services\Llm\LlmProviderManager;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -41,11 +41,19 @@ class AiChatController extends Controller
     protected const SUMMARY_MAX_CHARS = 1500;
 
     public function __construct(
-        protected WaveSpeedLlmService $llm,
+        protected LlmProviderManager $llm,
         protected AiChatStreamService $streamService,
         protected AiCreditService $credits,
         protected EntityWriteService $entityWriter,
     ) {
+    }
+
+    /**
+     * model เริ่มต้นที่ใช้ได้จริง (default ของ config อาจผูกกับ provider ที่ปิดอยู่)
+     */
+    protected function defaultModel(): string
+    {
+        return $this->llm->resolveModel();
     }
 
     /**
@@ -58,9 +66,11 @@ class AiChatController extends Controller
         return view('ai-chat.index', [
             'aiChatConfig' => [
                 'apiBase' => url('/api/ai-chat'),
-                'enabled' => $this->llm->isEnabled(),
-                'defaultModel' => config('ai-chat.default_model'),
-                'models' => config('ai-chat.models'),
+                'enabled' => $this->llm->anyEnabled(),
+                'defaultModel' => $this->defaultModel(),
+                // เฉพาะ model ที่ provider ของมันเปิดอยู่ — prod ไม่เห็น model ฝั่ง dev
+                'models' => $this->llm->availableModels(),
+                'providers' => $this->llm->enabledForClient(),
                 'credit' => [
                     'balance' => (float) Auth::user()->ai_credit_balance,
                     'usdToThb' => (float) config('ai-chat.usd_to_thb'),
@@ -84,10 +94,10 @@ class AiChatController extends Controller
      */
     public function stream(Request $request, $id)
     {
-        if (!$this->llm->isEnabled()) {
+        if (!$this->llm->anyEnabled()) {
             return response()->json([
                 'success' => false,
-                'error' => 'ยังไม่ได้ตั้งค่า WAVESPEED_API_KEY',
+                'error' => 'ยังไม่ได้ตั้งค่า LLM provider — ตรวจสอบ config/ai-chat.php',
             ], 503);
         }
 
@@ -101,9 +111,9 @@ class AiChatController extends Controller
 
         $session = AiChatSession::forUser(Auth::id())->findOrFail($id);
 
-        // อนุญาตเฉพาะ model ใน catalog
-        $model = $validated['model'] ?? $session->model ?? config('ai-chat.default_model');
-        if (!collect(config('ai-chat.models'))->pluck('id')->contains($model)) {
+        // อนุญาตเฉพาะ model ใน catalog ที่ provider ของมันเปิดอยู่
+        $model = $validated['model'] ?? $session->model ?? $this->defaultModel();
+        if (!in_array($model, $this->llm->availableModelIds(), true)) {
             return response()->json([
                 'success' => false,
                 'error' => 'ไม่รู้จัก model: ' . $model,
@@ -260,7 +270,7 @@ class AiChatController extends Controller
                 try {
                     $emit([
                         'type' => 'error',
-                        'message' => $e instanceof WaveSpeedApiException
+                        'message' => $e instanceof LlmApiException
                             ? 'เกิดข้อผิดพลาดจาก AI กรุณาลองใหม่อีกครั้ง'
                             : 'ระบบขัดข้อง กรุณาลองใหม่อีกครั้ง',
                     ]);
@@ -405,7 +415,8 @@ class AiChatController extends Controller
 
             $newSummary = $this->streamService->summarize(
                 $session->summary,
-                $toFold->map(fn ($m) => ['role' => $m->role, 'content' => $m->content])->all()
+                $toFold->map(fn ($m) => ['role' => $m->role, 'content' => $m->content])->all(),
+                $session->model,
             );
 
             if ($newSummary === null || trim($newSummary) === '') {

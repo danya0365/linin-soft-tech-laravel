@@ -2,7 +2,8 @@
 
 namespace App\Services;
 
-use App\Exceptions\WaveSpeedApiException;
+use App\Contracts\LlmProvider;
+use App\Exceptions\LlmApiException;
 use App\Models\AiChatSession;
 use App\Models\Customer;
 use App\Models\CustomerGroup;
@@ -15,13 +16,14 @@ use App\Models\LinenProduct;
 use App\Models\LinenType;
 use App\Models\OperationLinenProduct;
 use App\Models\User;
+use App\Services\Llm\LlmProviderManager;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
 /**
  * AI Chat Service
  *
- * Orchestrator สำหรับตอบคำถาม natural language ผ่าน WaveSpeed LLM
+ * Orchestrator สำหรับตอบคำถาม natural language ผ่าน LLM provider ที่เลือกไว้
  * ใช้ tool calling ดึงข้อมูลจริงจาก ChatService / Eloquent (read-only)
  * เป็น fallback path ของ ChatService::processCommand() เมื่อไม่ตรง rule ใดๆ
  */
@@ -45,13 +47,32 @@ class AiChatService
     /** เซสชันแชทปัจจุบัน — ใช้ผูก draft + กลไกกัน auto-confirm */
     protected ?AiChatSession $actingSession = null;
 
+    /** model ที่ user เลือกไว้ — ตัวกำหนดว่าจะยิงไป provider ไหน (null = provider เริ่มต้น) */
+    protected ?string $activeModel = null;
+
     public function __construct(
-        protected WaveSpeedLlmService $llm,
+        protected LlmProviderManager $llm,
         protected ChatService $chatService,
         protected EntityWriteService $entityWriter,
         protected OperationActionService $operationActions,
     ) {
-        $this->maxIterations = (int) config('services.wavespeed.max_iterations', 5);
+        $this->maxIterations = (int) config('ai-chat.max_iterations', 5);
+    }
+
+    /**
+     * ล็อก model (และ provider ที่ผูกอยู่) สำหรับคำขอนี้
+     */
+    public function useModel(?string $model): void
+    {
+        $this->activeModel = $model;
+    }
+
+    /**
+     * provider ที่รับผิดชอบ model ที่ระบุ — ไม่ระบุ = model ที่ล็อกไว้ = provider เริ่มต้น
+     */
+    protected function provider(?string $model = null): LlmProvider
+    {
+        return $this->llm->forModel($model ?? $this->activeModel);
     }
 
     /**
@@ -66,7 +87,7 @@ class AiChatService
 
     public function isAvailable(): bool
     {
-        return $this->llm->isEnabled();
+        return $this->llm->anyEnabled();
     }
 
     /**
@@ -88,7 +109,7 @@ class AiChatService
             $text = $this->runToolLoop($conversation);
 
             if ($text === null || trim($text) === '') {
-                throw new WaveSpeedApiException('LLM returned empty answer');
+                throw new LlmApiException('LLM returned empty answer');
             }
 
             return [
@@ -108,13 +129,14 @@ class AiChatService
     }
 
     /**
-     * ย่อบทสนทนาเป็น rolling summary — ใช้ model ถูกสุดตาม config เสมอ (chatCompletion ไม่รับ model override)
+     * ย่อบทสนทนาเป็น rolling summary — ใช้ model เริ่มต้นของ provider นั้น (งานย่อไม่ต้องใช้ตัวแพง)
      * คืน null เมื่อล้มเหลว เพื่อให้ caller คงสรุปเดิมไว้ (ไม่ทำลายความจำเดิม)
      *
      * @param string|null $previousSummary สรุปเดิม (ถ้ามี)
      * @param array $messages [{role, content}] ข้อความที่จะรวมเข้าสรุป
+     * @param string|null $model model ของเซสชัน — ใช้เลือก provider เท่านั้น
      */
-    public function summarize(?string $previousSummary, array $messages): ?string
+    public function summarize(?string $previousSummary, array $messages, ?string $model = null): ?string
     {
         if (empty($messages)) {
             return $previousSummary;
@@ -141,7 +163,7 @@ class AiChatService
         $instruction .= "\n\nบทสนทนาที่ต้องย่อ:\n" . $transcript;
 
         try {
-            $response = $this->llm->chatCompletion([
+            $response = $this->provider($model)->chatCompletion([
                 ['role' => 'system', 'content' => 'คุณคือตัวช่วยย่อบทสนทนาให้สั้น กระชับ และคงสาระสำคัญ'],
                 ['role' => 'user', 'content' => $instruction],
             ]);
@@ -185,8 +207,8 @@ class AiChatService
             }
 
             try {
-                $response = $this->llm->chatCompletion($messages, $tools);
-            } catch (WaveSpeedApiException $e) {
+                $response = $this->provider()->chatCompletion($messages, $tools);
+            } catch (LlmApiException $e) {
                 // model บางตัวไม่รองรับ tools param → ลอง JSON-intent mode
                 if ($i === 0 && $e->getHttpStatus() === 400) {
                     return $this->runJsonIntentFallback($lastUser);
@@ -227,7 +249,7 @@ class AiChatService
             'content' => 'กรุณาสรุปคำตอบจากข้อมูลที่ได้มาแล้วข้างต้นทันที โดยไม่ต้องเรียกเครื่องมือเพิ่ม',
         ];
 
-        $response = $this->llm->chatCompletion($messages);
+        $response = $this->provider()->chatCompletion($messages);
 
         return $response['choices'][0]['message']['content'] ?? null;
     }
@@ -251,7 +273,7 @@ class AiChatService
             . "ตอบเป็น JSON เท่านั้น ไม่ต้องมีข้อความอื่น รูปแบบ: {\"tool\": \"ชื่อเครื่องมือ\", \"args\": {...}} "
             . "หรือถ้าตอบได้เลยโดยไม่ต้องใช้ข้อมูล: {\"answer\": \"คำตอบ\"}";
 
-        $response = $this->llm->chatCompletion([
+        $response = $this->provider()->chatCompletion([
             ['role' => 'system', 'content' => $selectPrompt],
             ['role' => 'user', 'content' => $question],
         ]);
@@ -270,7 +292,7 @@ class AiChatService
 
         $toolResult = $this->executeTool($intent['tool'], $intent['args'] ?? []);
 
-        $response = $this->llm->chatCompletion([
+        $response = $this->provider()->chatCompletion([
             ['role' => 'system', 'content' => $this->systemPrompt()],
             ['role' => 'user', 'content' => $question],
             ['role' => 'assistant', 'content' => "ข้อมูลจากระบบ ({$intent['tool']}):\n{$toolResult}"],
