@@ -27,7 +27,7 @@
         <env name="QUEUE_CONNECTION" value="sync"/>
         <env name="SESSION_DRIVER" value="array"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
-        <!-- เทสต้องไม่ยิง endpoint จริงในเครื่อง dev — เปิดเฉพาะ live smoke test -->
-        <env name="LLM_LOCAL_ENABLED" value="false"/>
+        <!-- เทสต้องไม่ยิง provider จริง — base_url ว่าง = ปิด (smoke test override เอง) -->
+        <env name="NINEROUTER_BASE_URL" value=""/>
     </php>
 </phpunit>

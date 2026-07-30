@@ -67,7 +67,7 @@ class AiCreditService
     /**
      * ค่าคอมแบบจำนวนคงที่ต่อข้อความ (บาท) ถ้า model นั้นกำหนดไว้
      *
-     * จำเป็นสำหรับ model ที่ต้นทุนเป็น 0 (เช่น endpoint ในเครื่อง) เพราะคิดค่าคอมเป็น %
+     * จำเป็นสำหรับ model ฟรี (เช่น model ฟรีที่ 9Router ให้ใช้) เพราะคิดค่าคอมเป็น %
      * ของ 0 แล้วได้ 0 — dev จะไม่ได้ส่วนแบ่งเลย
      */
     public function flatFeeThb(?string $model): float

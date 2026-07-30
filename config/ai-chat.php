@@ -38,18 +38,18 @@ return [
             'max_tokens' => (int) env('WAVESPEED_MAX_TOKENS', 1024),
         ],
 
-        // endpoint OpenAI-compatible ในเครื่อง สำหรับ dev/ทดสอบ flow เต็มรูปแบบ
-        // โดยไม่กิน token จริง — ปิดไว้เป็นค่าเริ่มต้น เปิดเฉพาะเครื่อง dev
-        'local' => [
-            'label' => 'Local (dev)',
+        // 9Router — AI router แบบ OpenAI-compatible (รวมหลายเจ้าไว้หลัง endpoint เดียว
+        // มีทั้ง model ฟรีและ model เสียเงิน) โฮสต์ที่ไหนก็ได้: เครื่อง dev, server ในองค์กร, cloud
+        // ที่อยู่เป็นแค่ค่า config — ตั้ง NINEROUTER_BASE_URL เมื่อไหร่ = เปิดใช้งานเมื่อนั้น (ว่าง = ปิด)
+        '9router' => [
+            'label' => '9Router',
             'driver' => 'openai-compatible',
-            'api_key' => env('LLM_LOCAL_API_KEY'),
-            'base_url' => env('LLM_LOCAL_BASE_URL', 'http://localhost:20128/v1'),
-            'default_model' => env('LLM_LOCAL_MODEL', 'oc/deepseek-v4-flash-free'),
-            'requires_key' => false,
-            'enabled' => filter_var(env('LLM_LOCAL_ENABLED', false), FILTER_VALIDATE_BOOLEAN),
-            'timeout' => (int) env('LLM_LOCAL_TIMEOUT', 60),
-            'max_tokens' => (int) env('LLM_LOCAL_MAX_TOKENS', 2048),
+            'api_key' => env('NINEROUTER_API_KEY'),
+            'base_url' => env('NINEROUTER_BASE_URL'), // ไม่มีค่า default โดยตั้งใจ — ว่าง = provider ปิด
+            'default_model' => env('NINEROUTER_MODEL', 'oc/deepseek-v4-flash-free'),
+            'requires_key' => false, // 9Router ไม่บังคับ auth; ถ้าโฮสต์ไว้หลัง auth ค่อยตั้ง API key
+            'timeout' => (int) env('NINEROUTER_TIMEOUT', 60),
+            'max_tokens' => (int) env('NINEROUTER_MAX_TOKENS', 2048),
         ],
 
     ],
@@ -172,17 +172,17 @@ return [
             'vendor' => 'DeepSeek',
             'pricing' => ['inputPerMTok' => 1.84, 'outputPerMTok' => 3.66],
         ],
-        // ── Local (dev) ──
-        // ยิง endpoint ในเครื่อง ต้นทุน token เป็น 0 — ยังผ่านระบบเครดิตตามปกติ
-        // ค่าคอมคิดเป็นจำนวนคงที่ต่อข้อความแทน % (เพราะ % ของ 0 คือ 0)
+        // ── 9Router ──
+        // model ฟรีของ 9Router — ต้นทุน token เป็น 0 จึงคิดค่าคอมคงที่ต่อข้อความแทน % (% ของ 0 คือ 0)
+        // 9Router มี model เสียเงินด้วย ถ้าเพิ่มภายหลังให้ใส่ pricing จริงแทน flat_fee_thb
         [
             'id' => 'oc/deepseek-v4-flash-free',
-            'provider' => 'local',
-            'label' => 'DeepSeek V4 Flash (local)',
-            'description' => 'endpoint ในเครื่องสำหรับทดสอบ — คิดค่าบริการคงที่ต่อข้อความ',
+            'provider' => '9router',
+            'label' => 'DeepSeek V4 Flash (free)',
+            'description' => 'model ฟรีผ่าน 9Router — คิดค่าบริการคงที่ต่อข้อความ',
             'vendor' => 'DeepSeek',
             'pricing' => ['inputPerMTok' => 0, 'cachedInputPerMTok' => 0, 'outputPerMTok' => 0],
-            'flat_fee_thb' => (float) env('AI_CHAT_LOCAL_FLAT_FEE_THB', 0.25),
+            'flat_fee_thb' => (float) env('AI_CHAT_FREE_MODEL_FEE_THB', 0.25),
         ],
     ],
 

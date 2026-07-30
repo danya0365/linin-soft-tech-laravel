@@ -117,15 +117,23 @@ class OpenAiCompatibleProviderTest extends TestCase
         $this->assertFalse($this->provider(['enabled' => false])->isEnabled());
     }
 
+    /** ไม่ได้ตั้ง base_url = ยังไม่ได้ตั้งค่า provider นี้ → ปิด แม้จะไม่ต้องใช้ key */
+    public function test_provider_without_base_url_is_disabled(): void
+    {
+        $provider = $this->provider(['base_url' => null, 'requires_key' => false]);
+
+        $this->assertFalse($provider->isEnabled());
+    }
+
     public function test_authorization_header_is_omitted_without_key(): void
     {
-        Http::fake(['localhost:20128/*' => Http::response("data: [DONE]\n\n", 200)]);
+        Http::fake(['router.example.test/*' => Http::response("data: [DONE]\n\n", 200)]);
 
         $this->provider([
-            'name' => 'local',
+            'name' => '9router',
             'api_key' => null,
             'requires_key' => false,
-            'base_url' => 'http://localhost:20128/v1',
+            'base_url' => 'https://router.example.test/v1',
         ])->streamChatCompletion([['role' => 'user', 'content' => 'hi']]);
 
         Http::assertSent(fn ($request) => !$request->hasHeader('Authorization'));
@@ -156,11 +164,11 @@ class OpenAiCompatibleProviderTest extends TestCase
             'usage' => ['total_tokens' => 42],
         ], JSON_UNESCAPED_UNICODE);
 
-        Http::fake(['localhost:20128/*' => Http::response($json . "data: [DONE]\n\n", 200)]);
+        Http::fake(['router.example.test/*' => Http::response($json . "data: [DONE]\n\n", 200)]);
 
         $body = $this->provider([
-            'name' => 'local',
-            'base_url' => 'http://localhost:20128/v1',
+            'name' => '9router',
+            'base_url' => 'https://router.example.test/v1',
         ])->chatCompletion([['role' => 'user', 'content' => 'ping']]);
 
         $this->assertSame('PONG }" ตัวหลอก', $body['choices'][0]['message']['content']);

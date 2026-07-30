@@ -23,17 +23,16 @@ class LlmProviderManagerTest extends TestCase
                     'default_model' => 'paid/model',
                     'requires_key' => true,
                 ],
-                'local' => [
-                    'label' => 'Local (dev)',
-                    'base_url' => 'http://localhost:20128/v1',
+                '9router' => [
+                    'label' => '9Router',
+                    'base_url' => 'https://router.example.test/v1',
                     'default_model' => 'free/model',
                     'requires_key' => false,
-                    'enabled' => true,
                 ],
             ],
             'ai-chat.models' => [
                 ['id' => 'paid/model', 'provider' => 'wavespeed', 'vendor' => 'X'],
-                ['id' => 'free/model', 'provider' => 'local', 'vendor' => 'Y'],
+                ['id' => 'free/model', 'provider' => '9router', 'vendor' => 'Y'],
             ],
         ]);
     }
@@ -48,7 +47,7 @@ class LlmProviderManagerTest extends TestCase
         $manager = $this->manager();
 
         $this->assertSame('wavespeed', $manager->forModel('paid/model')->name());
-        $this->assertSame('local', $manager->forModel('free/model')->name());
+        $this->assertSame('9router', $manager->forModel('free/model')->name());
     }
 
     public function test_unknown_model_falls_back_to_default_provider(): void
@@ -64,9 +63,10 @@ class LlmProviderManagerTest extends TestCase
         $this->manager()->forName('nope');
     }
 
-    public function test_disabled_provider_models_are_not_available(): void
+    /** provider ที่ยังไม่ได้ตั้ง base_url = ยังไม่ได้ตั้งค่า → ปิด (ไม่ต้องมี flag แยก) */
+    public function test_provider_without_base_url_is_not_available(): void
     {
-        config(['ai-chat.providers.local.enabled' => false]);
+        config(['ai-chat.providers.9router.base_url' => null]);
 
         $manager = $this->manager();
 
@@ -75,13 +75,21 @@ class LlmProviderManagerTest extends TestCase
         $this->assertFalse($manager->isModelAvailable('free/model'));
     }
 
+    /** ปิดชั่วคราวด้วย flag ได้ แม้ตั้งค่าอย่างอื่นครบ */
+    public function test_provider_disabled_by_flag_is_not_available(): void
+    {
+        config(['ai-chat.providers.9router.enabled' => false]);
+
+        $this->assertSame(['wavespeed'], $this->manager()->enabledNames());
+    }
+
     public function test_provider_without_credentials_is_not_available(): void
     {
         config(['ai-chat.providers.wavespeed.api_key' => null]);
 
         $manager = $this->manager();
 
-        $this->assertSame(['local'], $manager->enabledNames());
+        $this->assertSame(['9router'], $manager->enabledNames());
         $this->assertSame(['free/model'], $manager->availableModelIds());
     }
 
@@ -94,19 +102,19 @@ class LlmProviderManagerTest extends TestCase
         $this->assertSame('paid/model', $manager->resolveModel(null));
     }
 
-    /** default model ผูกกับ provider ที่ปิดอยู่ → ต้องตกไป model แรกที่ยังใช้ได้ */
-    public function test_resolve_model_falls_back_when_default_provider_is_disabled(): void
+    /** default model ผูกกับ provider ที่ยังไม่ได้ตั้งค่า → ต้องตกไป model แรกที่ยังใช้ได้ */
+    public function test_resolve_model_falls_back_when_default_provider_is_unavailable(): void
     {
         config(['ai-chat.providers.wavespeed.api_key' => null]);
 
         $this->assertSame('free/model', $this->manager()->resolveModel(null));
     }
 
-    public function test_any_enabled_is_false_when_all_providers_are_off(): void
+    public function test_any_enabled_is_false_when_no_provider_is_configured(): void
     {
         config([
             'ai-chat.providers.wavespeed.api_key' => null,
-            'ai-chat.providers.local.enabled' => false,
+            'ai-chat.providers.9router.base_url' => null,
         ]);
 
         $this->assertFalse($this->manager()->anyEnabled());
@@ -116,7 +124,7 @@ class LlmProviderManagerTest extends TestCase
     {
         $this->assertSame([
             ['name' => 'wavespeed', 'label' => 'WaveSpeed'],
-            ['name' => 'local', 'label' => 'Local (dev)'],
+            ['name' => '9router', 'label' => '9Router'],
         ], $this->manager()->enabledForClient());
     }
 }

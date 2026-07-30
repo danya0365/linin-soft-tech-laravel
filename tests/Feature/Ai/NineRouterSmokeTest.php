@@ -2,58 +2,69 @@
 
 namespace Tests\Feature\Ai;
 
+use App\Contracts\LlmProvider;
 use App\Services\Llm\LlmProviderManager;
-use App\Services\Llm\OpenAiCompatibleProvider;
+use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
 /**
- * ยิง endpoint OpenAI-compatible ในเครื่องจริง (ไม่ mock)
+ * ยิง 9Router ตัวจริง (ไม่ mock) — โฮสต์ที่ไหนก็ได้ตาม NINEROUTER_BASE_URL
  *
- * ข้ามอัตโนมัติเมื่อ endpoint ไม่พร้อม — CI และเครื่องที่ไม่ได้รัน gateway จะไม่พัง
- * รันเฉพาะกลุ่มนี้: php artisan test --group=live
+ * ข้ามอัตโนมัติเมื่อไม่ได้ตั้ง base_url หรือต่อไม่ติด
+ * (phpunit.xml บังคับ base_url ว่างไว้ เทสนี้จึงต้องอ่านจาก .env เอง)
  *
  * @group live
  */
-class LocalProviderSmokeTest extends TestCase
+class NineRouterSmokeTest extends TestCase
 {
-    protected OpenAiCompatibleProvider $provider;
+    protected LlmProvider $provider;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $baseUrl = env('LLM_LOCAL_BASE_URL', 'http://localhost:20128/v1');
+        // phpunit.xml เคลียร์ค่านี้ไว้กันเทสอื่นยิงของจริง — smoke test อ่านค่าจริงจาก .env
+        $baseUrl = trim((string) ($_SERVER['NINEROUTER_BASE_URL'] ?? '')) ?: $this->baseUrlFromEnvFile();
 
-        config([
-            'ai-chat.providers.local.enabled' => true,
-            'ai-chat.providers.local.base_url' => $baseUrl,
-        ]);
+        if ($baseUrl === '') {
+            $this->markTestSkipped('ยังไม่ได้ตั้ง NINEROUTER_BASE_URL');
+        }
+
+        config(['ai-chat.providers.9router.base_url' => $baseUrl]);
 
         if (!$this->endpointReachable($baseUrl)) {
-            $this->markTestSkipped("LLM endpoint ในเครื่องไม่พร้อม ({$baseUrl})");
+            $this->markTestSkipped("ต่อ 9Router ไม่ติด ({$baseUrl})");
         }
 
-        $this->provider = (new LlmProviderManager())->forName('local');
+        $this->provider = (new LlmProviderManager())->forName('9router');
     }
 
-    protected function endpointReachable(string $baseUrl): bool
+    /** อ่านตรงจาก .env เพราะ phpunit.xml override ค่าใน environment ไปแล้ว */
+    protected function baseUrlFromEnvFile(): string
     {
-        $parts = parse_url($baseUrl);
-        $handle = @fsockopen(
-            $parts['host'] ?? 'localhost',
-            $parts['port'] ?? 80,
-            $errno,
-            $errstr,
-            1.0
-        );
-
-        if ($handle === false) {
-            return false;
+        $path = base_path('.env');
+        if (!is_readable($path)) {
+            return '';
         }
 
-        fclose($handle);
+        preg_match('/^NINEROUTER_BASE_URL=(.*)$/m', (string) file_get_contents($path), $m);
 
-        return true;
+        return trim($m[1] ?? '', " \t\"'");
+    }
+
+    /**
+     * ต้องเป็น HTTP จริง ไม่ใช่ socket ไป localhost — 9Router อยู่คนละ server หรือหลัง HTTPS ก็ได้
+     */
+    protected function endpointReachable(string $baseUrl): bool
+    {
+        try {
+            return Http::timeout(5)
+                ->connectTimeout(3)
+                ->get(rtrim($baseUrl, '/') . '/models')
+                ->successful();
+        } catch (\Throwable $e) {
+            return false;
+        }
     }
 
     protected function model(): string

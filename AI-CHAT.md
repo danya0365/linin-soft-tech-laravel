@@ -11,10 +11,11 @@ AI_CHAT_DEFAULT_PROVIDER=wavespeed         # provider เริ่มต้น (
 WAVESPEED_API_KEY=          # จำเป็น — ถ้าไม่มี provider ไหนพร้อมเลย หน้าแชทจะขึ้นเตือนและใช้งานไม่ได้
 WAVESPEED_LLM_MODEL=minimax/minimax-m2.7   # model เริ่มต้น
 
-# endpoint OpenAI-compatible ในเครื่อง (dev เท่านั้น — ต้องปิดบน production)
-LLM_LOCAL_ENABLED=false
-LLM_LOCAL_BASE_URL=http://localhost:20128/v1
-LLM_LOCAL_MODEL=oc/deepseek-v4-flash-free
+# 9Router — AI router แบบ OpenAI-compatible (โฮสต์ที่ไหนก็ได้ ใช้บน production ได้)
+# ตั้ง BASE_URL = เปิดใช้งาน / เว้นว่าง = ปิด
+NINEROUTER_BASE_URL=
+NINEROUTER_API_KEY=
+NINEROUTER_MODEL=oc/deepseek-v4-flash-free
 
 # คุมค่าใช้จ่าย
 AI_CHAT_RATE_LIMIT=6        # ข้อความ/นาที/user (stream endpoint)
@@ -30,8 +31,8 @@ AI_CHAT_COMMISSION_PERCENT=30  # ค่าคอม % บวกบนต้น�
 - หักเครดิตหลังได้คำตอบแต่ละครั้ง (รวมกรณีกดหยุดกลางทาง):
   `หัก (บาท) = ต้นทุน USD × usd_to_thb × (1 + commission%/100)`
 - model ที่กำหนด `flat_fee_thb` ใน catalog → `หัก = ต้นทุนบาท + ค่าคอมคงที่ต่อข้อความ`
-  (ใช้กับ model ต้นทุน 0 เช่น endpoint ในเครื่อง เพราะค่าคอม % ของ 0 คือ 0 → dev ไม่ได้ส่วนแบ่ง)
-  ค่าคอมคงที่ไม่ผันตามจำนวน token; ปรับที่ `AI_CHAT_LOCAL_FLAT_FEE_THB` (ค่าเริ่มต้น 0.25 บาท)
+  (ใช้กับ model ฟรี เพราะค่าคอม % ของ 0 คือ 0 → dev ไม่ได้ส่วนแบ่ง)
+  ค่าคอมคงที่ไม่ผันตามจำนวน token; ปรับที่ `AI_CHAT_FREE_MODEL_FEE_THB` (ค่าเริ่มต้น 0.25 บาท)
 - model ที่ไม่มีราคาใน catalog ใช้ `fallback_pricing` — ไม่มีทางใช้ฟรี
 - เครดิต ≤ 0 → ส่งข้อความใหม่ไม่ได้ (HTTP 402) — ยอดสุดท้ายรู้หลังตอบจบ จึงติดลบเล็กน้อยได้
 - ledger ทุกรายการอยู่ใน `ai_credit_transactions` (เก็บแยก `cost_thb` / `commission_thb` ต่อแถว
@@ -90,11 +91,23 @@ browser ──POST {content,model,settings}──▶ AiChatController::stream
 
 `LlmProvider` (port) + `OpenAiCompatibleProvider` (adapter) + `LlmProviderManager` (registry)
 
+เจ้าที่ตั้งค่าไว้แล้ว:
+
+| provider | คืออะไร | model ฟรี |
+|---|---|---|
+| `wavespeed` | ผู้ให้บริการ LLM โดยตรง | ไม่มี |
+| `9router` | AI router รวมหลายเจ้าไว้หลัง endpoint เดียว โฮสต์ที่ไหนก็ได้ | มี |
+
+- **"ฟรีหรือไม่" เป็นคุณสมบัติของ model ไม่ใช่ของ provider** — เจ้าเดียวกันมีได้ทั้ง model ฟรี
+  และ model เสียเงิน คิดเงินตาม `pricing` / `flat_fee_thb` ของ model นั้น
+- **ที่อยู่ของ provider เป็นแค่ค่า config** — `9router` จะรันบนเครื่อง dev, server ในองค์กร
+  หรือ cloud ก็ได้ ไม่มีอะไรผูกกับ localhost และใช้บน production ได้ตามปกติ
 - แต่ละ model ใน `config('ai-chat.models')` ระบุ `provider` → route ไปเจ้านั้นตอน runtime
 - ผู้ใช้เลือก provider เองผ่าน dropdown (จัดกลุ่มตามชื่อ provider)
 - เพิ่มเจ้าใหม่ที่พูดภาษา OpenAI chat completions = เพิ่ม block ใน `config('ai-chat.providers')`
   **ไม่ต้องเขียนคลาสใหม่**; เจ้าที่ใช้ protocol อื่นให้เขียน adapter ใหม่ที่ implement `LlmProvider`
-- provider ที่ปิดอยู่ (`enabled=false` หรือไม่มี key) จะไม่โผล่ใน dropdown และยิงตรงได้ 422
+- provider ถือว่า**พร้อมใช้งาน**เมื่อมี `base_url` (และมี key ถ้า `requires_key`) และไม่ได้ตั้ง
+  `enabled => false` — เจ้าที่ยังไม่ได้ตั้งค่าจะไม่โผล่ใน dropdown และยิง model ของมันตรงๆ ได้ 422
 - adapter ทน quirk: gateway บางตัวต่อ `data: [DONE]` ท้าย body ของ response ที่ไม่ได้ stream
 
 ## ไฟล์ที่เกี่ยวข้อง
@@ -118,8 +131,9 @@ browser ──POST {content,model,settings}──▶ AiChatController::stream
   `tests/Unit/Llm/LlmProviderManagerTest.php`, `tests/Unit/AiCreditServiceTest.php`,
   `tests/Feature/AiChatSessionApiTest.php`,
   `tests/Feature/AiCreditTest.php` (Feature ใช้ DatabaseTransactions — ห้าม RefreshDatabase)
-- `tests/Feature/Ai/LocalProviderSmokeTest.php` — ยิง endpoint ในเครื่องจริง (`@group live`)
-  ข้ามอัตโนมัติเมื่อ endpoint ไม่พร้อม; รันด้วย `php artisan test tests/Feature/Ai/LocalProviderSmokeTest.php`
+- `tests/Feature/Ai/NineRouterSmokeTest.php` — ยิง 9Router ตัวจริง (`@group live`)
+  ข้ามอัตโนมัติเมื่อไม่ได้ตั้ง `NINEROUTER_BASE_URL` หรือต่อไม่ติด
+  รันด้วย `php artisan test tests/Feature/Ai/NineRouterSmokeTest.php`
 
 ## ข้อแตกต่างจาก mini-chat เดิม
 

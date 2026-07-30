@@ -68,7 +68,7 @@ class AiChatController extends Controller
                 'apiBase' => url('/api/ai-chat'),
                 'enabled' => $this->llm->anyEnabled(),
                 'defaultModel' => $this->defaultModel(),
-                // เฉพาะ model ที่ provider ของมันเปิดอยู่ — prod ไม่เห็น model ฝั่ง dev
+                // เฉพาะ model ที่ provider ของมันตั้งค่าไว้แล้ว — เจ้าที่ยังไม่ได้ตั้งค่าจะไม่โผล่
                 'models' => $this->llm->availableModels(),
                 'providers' => $this->llm->enabledForClient(),
                 'credit' => [

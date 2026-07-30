@@ -109,27 +109,27 @@ class AiCreditServiceTest extends TestCase
     public function test_zero_cost_model_charges_flat_fee(): void
     {
         config(['ai-chat.models' => [[
-            'id' => 'local/free',
+            'id' => 'free/model',
             'pricing' => ['inputPerMTok' => 0, 'cachedInputPerMTok' => 0, 'outputPerMTok' => 0],
             'flat_fee_thb' => 0.25,
         ]]]);
 
-        $this->assertSame(0.0, $this->service->costThb('local/free', 500_000, 200_000));
-        $this->assertSame(0.25, $this->service->chargeThb('local/free', 500_000, 200_000));
+        $this->assertSame(0.0, $this->service->costThb('free/model', 500_000, 200_000));
+        $this->assertSame(0.25, $this->service->chargeThb('free/model', 500_000, 200_000));
     }
 
     /** ค่าคอมคงที่ = ต่อข้อความ ไม่ผันตามจำนวน token */
     public function test_flat_fee_does_not_scale_with_tokens(): void
     {
         config(['ai-chat.models' => [[
-            'id' => 'local/free',
+            'id' => 'free/model',
             'pricing' => ['inputPerMTok' => 0, 'outputPerMTok' => 0],
             'flat_fee_thb' => 0.25,
         ]]]);
 
         $this->assertSame(
-            $this->service->chargeThb('local/free', 1_000, 1_000),
-            $this->service->chargeThb('local/free', 5_000_000, 5_000_000)
+            $this->service->chargeThb('free/model', 1_000, 1_000),
+            $this->service->chargeThb('free/model', 5_000_000, 5_000_000)
         );
     }
 
@@ -150,12 +150,12 @@ class AiCreditServiceTest extends TestCase
     public function test_flat_fee_is_configurable_to_zero(): void
     {
         config(['ai-chat.models' => [[
-            'id' => 'local/free',
+            'id' => 'free/model',
             'pricing' => ['inputPerMTok' => 0, 'outputPerMTok' => 0],
             'flat_fee_thb' => 0,
         ]]]);
 
-        $this->assertSame(0.0, $this->service->chargeThb('local/free', 1_000, 1_000));
+        $this->assertSame(0.0, $this->service->chargeThb('free/model', 1_000, 1_000));
     }
 
     /** model ที่ไม่กำหนด flat fee ต้องคิด % เหมือนเดิม */

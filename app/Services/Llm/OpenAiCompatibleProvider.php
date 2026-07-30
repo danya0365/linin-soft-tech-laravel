@@ -12,7 +12,7 @@ use Psr\Http\Message\StreamInterface;
 /**
  * Adapter สำหรับ LLM endpoint ที่พูดภาษา OpenAI chat completions
  *
- * ครอบคลุมทั้ง WaveSpeed, gateway ในเครื่อง และเจ้าอื่นที่ compatible กัน
+ * ครอบคลุมทั้ง WaveSpeed, 9Router และเจ้าอื่นที่ compatible กัน — ไม่ว่าจะโฮสต์ที่ไหน
  * ต่างกันแค่ config array ที่ฉีดเข้ามา — เพิ่ม provider ใหม่ไม่ต้องเขียนคลาสใหม่
  * ดู config('ai-chat.providers')
  */
@@ -38,8 +38,11 @@ class OpenAiCompatibleProvider implements LlmProvider
     }
 
     /**
-     * ปิดด้วย flag ได้ (prod ปิด provider ที่ใช้เฉพาะ dev)
-     * provider ที่ requires_key = false เช่น endpoint ในเครื่อง ไม่ต้องมี key ก็ถือว่าพร้อม
+     * พร้อมใช้งาน = ตั้งค่าครบและไม่ได้ถูกปิดไว้
+     *
+     * - ไม่มี base_url → ยังไม่ได้ตั้งค่า provider นี้ ถือว่าปิด
+     * - requires_key = false → provider ที่ไม่บังคับ auth (เช่น 9Router) ไม่ต้องมี key ก็พร้อม
+     * - ตั้ง enabled = false ใน config เพื่อปิดชั่วคราวได้ แม้ตั้งค่าอย่างอื่นครบแล้ว
      */
     public function isEnabled(): bool
     {
@@ -169,7 +172,7 @@ class OpenAiCompatibleProvider implements LlmProvider
     }
 
     /**
-     * ส่ง Authorization เฉพาะเมื่อมี key — gateway ในเครื่องบางตัวปฏิเสธ bearer ว่าง
+     * ส่ง Authorization เฉพาะเมื่อมี key — gateway ที่ไม่บังคับ auth บางตัวปฏิเสธ bearer ว่าง
      */
     protected function request(): \Illuminate\Http\Client\PendingRequest
     {
@@ -205,7 +208,7 @@ class OpenAiCompatibleProvider implements LlmProvider
     /**
      * Decode body แบบทนต่อขยะท้าย response
      *
-     * บาง gateway (เช่น endpoint OpenAI-compatible ในเครื่อง) ต่อ SSE sentinel
+     * บาง gateway (เช่น 9Router) ต่อ SSE sentinel
      * `data: [DONE]` ท้าย body ของ response ที่ไม่ได้ stream ทำให้ JSON ไม่ valid
      * และ $response->json() คืน null — ตัดส่วนเกินทิ้งก่อนแล้วค่อย decode ใหม่
      */

@@ -94,8 +94,8 @@ class LlmProviderManager
     /**
      * model จาก catalog ที่ provider ของมันเปิดใช้งานอยู่
      *
-     * ใช้ทั้ง render dropdown และ validate ฝั่ง server — prod ที่ปิด provider dev
-     * จะไม่เห็นและยิง model ของเจ้านั้นไม่ได้
+     * ใช้ทั้ง render dropdown และ validate ฝั่ง server — environment ที่ยังไม่ได้ตั้งค่า
+     * provider เจ้าไหน จะไม่เห็นและยิง model ของเจ้านั้นไม่ได้
      *
      * @return array<int, array>
      */
