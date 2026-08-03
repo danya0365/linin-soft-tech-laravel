@@ -4,6 +4,7 @@ namespace App\Services\Llm;
 
 use App\Contracts\LlmProvider;
 use App\Exceptions\LlmApiException;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Registry ของ LLM provider
@@ -77,14 +78,24 @@ class LlmProviderManager
 
     /**
      * @return array<int, string> ชื่อ provider ที่พร้อมใช้งาน
+     *
+     * ไม่ throw — provider ที่ config พัง (driver ไม่รู้จัก) ถือว่า "ไม่พร้อมใช้"
+     * ไม่ใช่พังทั้งระบบ เพราะ LLM เป็น optional
      */
     public function enabledNames(): array
     {
         $names = [];
 
         foreach (array_keys((array) config('ai-chat.providers', [])) as $name) {
-            if ($this->forName($name)->isEnabled()) {
-                $names[] = $name;
+            try {
+                if ($this->forName($name)->isEnabled()) {
+                    $names[] = $name;
+                }
+            } catch (LlmApiException $e) {
+                Log::warning('LLM provider skipped: misconfigured', [
+                    'provider' => $name,
+                    'error' => $e->getMessage(),
+                ]);
             }
         }
 

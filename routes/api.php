@@ -21,7 +21,11 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 // LINE Messaging API Webhook
-Route::post('/line/webhook', [App\Http\Controllers\Api\LineChatbotController::class, 'webhook']);
+// ถอด throttle:api ออก — throttle นับตาม IP แต่ LINE ยิงมาจาก IP ชุดจำกัด
+// พอ OA คุยกันเยอะจะได้ 429 ซึ่ง LINE นับเป็น error และปิด webhook ให้อัตโนมัติ
+// (gate จริงคือ signature verification ในตัว controller อยู่แล้ว)
+Route::post('/line/webhook', [App\Http\Controllers\Api\LineChatbotController::class, 'webhook'])
+    ->withoutMiddleware(['throttle:api']);
 
 Route::group(['middleware' => ['logged-in'], 'prefix' => 'web-chat'], function () {
     Route::post('/message', [App\Http\Controllers\Api\WebChatController::class, 'message']);

@@ -120,6 +120,34 @@ class LlmProviderManagerTest extends TestCase
         $this->assertFalse($this->manager()->anyEnabled());
     }
 
+    /**
+     * provider ที่ config พัง (driver ไม่รู้จัก) ต้องถูกข้าม ไม่ใช่พังทั้ง registry
+     * — LLM เป็น optional: การถาม "มี LLM ไหม" ห้าม throw
+     */
+    public function test_misconfigured_provider_is_skipped_instead_of_throwing(): void
+    {
+        config(['ai-chat.providers.broken' => [
+            'label' => 'Broken',
+            'driver' => 'no-such-driver',
+            'base_url' => 'https://broken.example.test/v1',
+        ]]);
+
+        $manager = $this->manager();
+
+        $this->assertSame(['wavespeed', '9router'], $manager->enabledNames());
+        $this->assertTrue($manager->anyEnabled());
+    }
+
+    /** provider พังเป็นเจ้าเดียวที่มี → anyEnabled() คืน false ไม่ใช่ throw */
+    public function test_any_enabled_is_false_when_only_provider_is_misconfigured(): void
+    {
+        config(['ai-chat.providers' => [
+            'broken' => ['label' => 'Broken', 'driver' => 'no-such-driver', 'base_url' => 'https://x.test'],
+        ]]);
+
+        $this->assertFalse($this->manager()->anyEnabled());
+    }
+
     public function test_enabled_for_client_exposes_labels(): void
     {
         $this->assertSame([

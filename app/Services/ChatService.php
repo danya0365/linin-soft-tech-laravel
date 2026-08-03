@@ -21,6 +21,7 @@ use App\Models\Income;
 use App\Models\AiChatSession;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Chat Service - Single Source of Truth
@@ -54,9 +55,9 @@ class ChatService
         // LINE write: คำสั่งสร้าง/แก้/ลบ/งานประจำวัน (หรือ "ยืนยัน") ต้องถึง AI ก่อน
         // ไม่งั้นโดน menu keyword (เช่น "ลูกค้า", "สต๊อก") ดักด้วย str_contains ก่อน
         if ($user && $text !== '') {
-            $ai = app(AiChatService::class);
-            if ($ai->isAvailable() && $this->looksLikeWriteIntent($text)) {
-                return $this->answerWithLineSession($ai, $user, $text);
+            $aiAnswer = $this->attemptAi($user, $text, writeIntentOnly: true);
+            if ($aiAnswer !== null) {
+                return $aiAnswer;
             }
         }
 
@@ -101,17 +102,45 @@ class ChatService
         }
 
         // Unknown command - try AI assistant, else show menu
-        $ai = app(AiChatService::class); // lazy resolve กัน container cycle
-        if ($ai->isAvailable()) {
-            // LINE ที่ระบุ user → มี session + ประวัติ + เปิด write tool (เหมือน web)
-            if ($user) {
-                return $this->answerWithLineSession($ai, $user, $text);
-            }
-
-            return $ai->answer($text);
+        $aiAnswer = $this->attemptAi($user, $text);
+        if ($aiAnswer !== null) {
+            return $aiAnswer;
         }
 
         return $this->getMainMenu("ขอโทษครับ ไม่เข้าใจคำสั่ง \"$text\"\n\nกรุณาเลือกเมนูด้านล่าง:");
+    }
+
+    /**
+     * พยายามตอบด้วย AI — คืน null เมื่อไม่มี LLM หรือ AI path ล้มเหลว
+     * เพื่อให้ caller ตกไปที่เมนูตามปกติ
+     *
+     * LLM เป็น optional: ไม่ว่าจะไม่ได้ตั้งค่า, config พัง หรือ DB ของ session มีปัญหา
+     * ก็ต้องไม่กลายเป็น error ที่หลุดออกไปถึง webhook
+     */
+    protected function attemptAi(?User $user, string $text, bool $writeIntentOnly = false): ?array
+    {
+        try {
+            $ai = app(AiChatService::class); // lazy resolve กัน container cycle
+
+            if (!$ai->isAvailable()) {
+                return null;
+            }
+
+            if ($writeIntentOnly && !$this->looksLikeWriteIntent($text)) {
+                return null;
+            }
+
+            // LINE ที่ระบุ user → มี session + ประวัติ + เปิด write tool (เหมือน web)
+            return $user
+                ? $this->answerWithLineSession($ai, $user, $text)
+                : $ai->answer($text);
+        } catch (\Throwable $e) {
+            Log::warning('ChatService: AI path unavailable, falling back to menu', [
+                'error' => $e->getMessage(),
+            ]);
+
+            return null;
+        }
     }
 
     /** จำนวนข้อความล่าสุดที่ส่งเป็น context ให้ AI บน LINE */

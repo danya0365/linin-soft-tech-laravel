@@ -16,6 +16,9 @@ use Illuminate\Support\Facades\Log;
  */
 class LineChatbotController extends Controller
 {
+    /** จำกัดความยาว body ใน debug log — กัน log บวมและลด PII ที่เก็บไว้ */
+    protected const LOG_BODY_MAX_CHARS = 500;
+
     protected LineMessagingService $lineService;
     protected ChatService $chatService;
 
@@ -33,19 +36,37 @@ class LineChatbotController extends Controller
         $body = $request->getContent();
         $signature = $request->header('X-Line-Signature');
 
+        // ตัด body กัน log บวม + ลด PII (มี LINE userId และข้อความลูกค้าอยู่ในนั้น)
         Log::debug('LINE Webhook received', [
-            'body' => $body,
-            'signature' => $signature
+            'body' => mb_substr($body, 0, self::LOG_BODY_MAX_CHARS),
+            'body_bytes' => strlen($body),
         ]);
 
-        // ตรวจสอบ Signature
-        if (!$signature || !$this->lineService->verifySignature($body, $signature)) {
-            Log::warning('LINE Webhook: Invalid signature');
+        // ตรวจสอบ Signature — ทุกเคสตอบ 401 เหมือนกัน แต่แยก log ให้รู้ว่าต้องแก้ตรงไหน
+        // (ห้าม log secret หรือ hash ที่คำนวณได้ = แจก signature ที่ถูกต้องให้ผู้โจมตี)
+        if (!$this->lineService->hasChannelSecret()) {
+            Log::error('LINE Webhook: LINE_CHANNEL_SECRET not configured — every webhook will be rejected', [
+                'env' => app()->environment(),
+            ]);
             return response()->json(['error' => 'Invalid signature'], 401);
         }
 
+        if (!$signature) {
+            Log::warning('LINE Webhook: missing X-Line-Signature header');
+            return response()->json(['error' => 'Invalid signature'], 401);
+        }
+
+        if (!$this->lineService->verifySignature($body, $signature)) {
+            Log::warning('LINE Webhook: signature mismatch — channel secret ไม่ตรงกับที่ LINE ใช้ sign', [
+                'signature_len' => strlen($signature),
+                'body_bytes' => strlen($body),
+            ]);
+            return response()->json(['error' => 'Invalid signature'], 401);
+        }
+
+        // body ที่ไม่ใช่ JSON object (หรือ decode ไม่ผ่าน) ถือว่าไม่มี event — ไม่ใช่ error
         $data = json_decode($body, true);
-        $events = $data['events'] ?? [];
+        $events = is_array($data) && is_array($data['events'] ?? null) ? $data['events'] : [];
 
         // LINE Verification: Respond 200 even if no events
         if (empty($events)) {
@@ -54,22 +75,24 @@ class LineChatbotController extends Controller
         }
 
         foreach ($events as $event) {
+            // จับ \Throwable ไม่ใช่แค่ \Exception — \Error (เช่น TypeError จาก payload แปลกๆ)
+            // ต้องไม่หลุดออกไปเป็น 500 เพราะ LINE จะถือว่า webhook ล้มเหลวและปิดให้อัตโนมัติ
             try {
-                $this->handleEvent($event);
-            } catch (\Exception $e) {
+                $this->handleEvent(is_array($event) ? $event : []);
+            } catch (\Throwable $e) {
                 Log::error('LINE Webhook: Error handling event', [
                     'error' => $e->getMessage(),
-                    'event' => $event,
+                    'event_type' => $event['type'] ?? null,
                     'trace' => $e->getTraceAsString()
                 ]);
 
                 // ตอบกลับ error ไปยัง User (ถ้ามี replyToken)
-                if (isset($event['replyToken'])) {
+                if (isset($event['replyToken']) && is_string($event['replyToken'])) {
                     try {
                         $this->lineService->replyMessage($event['replyToken'], [
                             $this->lineService->textMessage("⚠️ เกิดข้อผิดพลาดชั่วคราวในการประมวลผล\nกรุณาลองใหม่อีกครั้ง หรือพิมพ์ \"เมนู\"")
                         ]);
-                    } catch (\Exception $inner) {
+                    } catch (\Throwable $inner) {
                         Log::error('LINE Webhook: Failed to send error reply', ['error' => $inner->getMessage()]);
                     }
                 }
@@ -95,8 +118,8 @@ class LineChatbotController extends Controller
         $user = \App\Models\User::where('line_user_id', $userId)->first();
 
         // กรณีรับข้อความ (Message Event)
-        if ($event['type'] === 'message' && $event['message']['type'] === 'text') {
-            $text = trim($event['message']['text']);
+        if (($event['type'] ?? null) === 'message' && ($event['message']['type'] ?? null) === 'text') {
+            $text = trim((string) ($event['message']['text'] ?? ''));
 
             // ถ้ายังไม่ได้ผูกบัญชี
             if (!$user) {
@@ -123,7 +146,7 @@ class LineChatbotController extends Controller
         }
 
         // อนุญาตให้ใช้งานได้ตามปกติ
-        switch ($event['type']) {
+        switch ($event['type'] ?? null) {
             case 'message':
                 $this->handleMessage($event, $user);
                 break;
@@ -195,16 +218,20 @@ class LineChatbotController extends Controller
      */
     protected function handleMessage(array $event, ?\App\Models\User $user = null): void
     {
-        $replyToken = $event['replyToken'];
-        $message = $event['message'];
+        $replyToken = $event['replyToken'] ?? null;
+        $message = is_array($event['message'] ?? null) ? $event['message'] : [];
 
-        if ($message['type'] !== 'text') {
+        if (!is_string($replyToken) || $replyToken === '') {
+            return;
+        }
+
+        if (($message['type'] ?? null) !== 'text') {
             $response = $this->chatService->getMainMenu('กรุณาเลือกเมนูด้านล่าง หรือพิมพ์ "เมนู"');
             $this->sendResponse($replyToken, $response);
             return;
         }
 
-        $text = trim($message['text']);
+        $text = trim((string) ($message['text'] ?? ''));
 
         // ใช้ ChatService สำหรับ business logic — ส่ง user เพื่อเปิด write tool (มี session + ประวัติ)
         $response = $this->chatService->processCommand($text, $user);
@@ -220,7 +247,7 @@ class LineChatbotController extends Controller
         $data = $event['postback']['data'] ?? '';
 
         // Parse postback data (format: action=value)
-        parse_str($data, $params);
+        parse_str(is_string($data) ? $data : '', $params);
         $action = $params['action'] ?? '';
         unset($params['action']);
 

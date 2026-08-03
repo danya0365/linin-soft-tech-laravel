@@ -27,6 +27,17 @@ class LineMessagingService
     }
 
     /**
+     * ตั้งค่า channel secret ไว้แล้วหรือยัง
+     *
+     * แยกจาก verifySignature() เพื่อให้ caller บอกได้ว่า 401 เกิดจาก
+     * "ยังไม่ได้ตั้งค่า" หรือ "signature ไม่ตรง" — สองเคสนี้แก้คนละทาง
+     */
+    public function hasChannelSecret(): bool
+    {
+        return !empty($this->channelSecret);
+    }
+
+    /**
      * ตรวจสอบ Signature ของ request จาก LINE
      */
     public function verifySignature(string $body, string $signature): bool

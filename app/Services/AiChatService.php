@@ -85,9 +85,20 @@ class AiChatService
         $this->actingSession = $session;
     }
 
+    /**
+     * มี LLM ให้ใช้ไหม — ไม่ throw เด็ดขาด (LLM เป็น optional, ระบบต้องเดินต่อได้เมื่อไม่มี)
+     */
     public function isAvailable(): bool
     {
-        return $this->llm->anyEnabled();
+        try {
+            return $this->llm->anyEnabled();
+        } catch (\Throwable $e) {
+            Log::warning('AiChatService availability check failed', [
+                'error' => $e->getMessage(),
+            ]);
+
+            return false;
+        }
     }
 
     /**
