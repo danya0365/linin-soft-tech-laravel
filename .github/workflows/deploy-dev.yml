@@ -17,15 +17,25 @@ jobs:
           key: ${{ secrets.DEV_LLC_SSH_KEY }}
           port: ${{ secrets.DEV_LLC_SSH_PORT }}
           script: |
-            cd /var/www/html/web-dev
+            # ล้มทันทีเมื่อ step ไหนพัง — ไม่งั้น deploy ที่ fail จะยังรายงานเขียว
+            # (เคยเกิดจริง: git fetch/reset พังจาก dubious ownership แต่ workflow ขึ้นเขียว
+            #  เพราะ echo บรรทัดสุดท้าย exit 0 → โค้ดบน server ค้างเก่าโดยไม่มีใครรู้)
+            set -euo pipefail
 
-            # PHP path configuration
+            APP_DIR="/var/www/html/web-dev"
+            BRANCH="dev.linentechpro.livex.cloud"
             PHP_PATH="/usr/bin/php8.5"
             COMPOSER_PATH="composer.phar"
 
+            cd "$APP_DIR"
+
+            # repo เป็นของ www-data แต่ deploy รันเป็น root → git ปฏิเสธถ้าไม่ whitelist ไว้
+            git config --global --get-all safe.directory | grep -qx "$APP_DIR" \
+              || git config --global --add safe.directory "$APP_DIR"
+
             # Pull latest code
             git fetch origin
-            git reset --hard origin/dev.linentechpro.livex.cloud
+            git reset --hard "origin/$BRANCH"
 
             # Install PHP dependencies
             $PHP_PATH $COMPOSER_PATH install --no-interaction --prefer-dist --optimize-autoloader
@@ -38,4 +48,17 @@ jobs:
             $PHP_PATH artisan route:cache
             $PHP_PATH artisan view:cache
 
-            echo "✅ Dev deployment completed successfully!"
+            # artisan รันเป็น root → ไฟล์ที่มันสร้างเป็นของ root ทำให้ php-fpm (www-data)
+            # เขียน log/cache ไม่ได้ แล้วทุก request กลายเป็น 500
+            chown -R www-data:www-data storage bootstrap/cache
+
+            # ยืนยัน invariant ที่เคยพัง — ถ้ายังไม่ถูกต้องให้ deploy แดง ไม่ใช่ปล่อยผ่าน
+            for d in storage/logs bootstrap/cache; do
+              owner=$(stat -c '%U' "$d")
+              if [ "$owner" != "www-data" ]; then
+                echo "::error::$d is owned by $owner — php-fpm (www-data) cannot write to it"
+                exit 1
+              fi
+            done
+
+            echo "✅ Dev deployment completed successfully! → $(git rev-parse --short HEAD)"
