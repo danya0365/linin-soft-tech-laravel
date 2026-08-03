@@ -1,0 +1,41 @@
+name: Deploy to Linentechpro
+
+on:
+  push:
+    branches:
+      - linentechpro.livex.cloud
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.LLC_SSH_HOST }}
+          username: ${{ secrets.LLC_SSH_USERNAME }}
+          key: ${{ secrets.LLC_SSH_KEY }}
+          port: ${{ secrets.LLC_SSH_PORT }}
+          script: |
+            cd /var/www/html/web
+
+            # PHP path configuration
+            PHP_PATH="/usr/bin/php8.5"
+            COMPOSER_PATH="composer.phar"
+
+            # Pull latest code
+            git fetch origin
+            git reset --hard origin/linentechpro.livex.cloud
+
+            # Install PHP dependencies
+            $PHP_PATH $COMPOSER_PATH install --no-interaction --prefer-dist --optimize-autoloader --no-dev
+
+            # Run database migrations
+            $PHP_PATH artisan migrate --force
+
+            # Clear and optimize Laravel caches
+            $PHP_PATH artisan config:cache
+            $PHP_PATH artisan route:cache
+            $PHP_PATH artisan view:cache
+
+            echo "✅ Linentechpro deployment completed successfully!"
