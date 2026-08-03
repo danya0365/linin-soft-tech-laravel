@@ -990,8 +990,9 @@
         var thb = (message.creditCharged !== null && message.creditCharged !== undefined)
             ? Number(message.creditCharged)
             : calculateChargeThb(message.model || '', u.promptTokens, u.completionTokens);
+        // แสดงยอดเสมอ — ห้ามมีคำว่า "ฟรี" เพราะทุก model คิดค่าบริการ ต่างกันแค่มาก/น้อย
         if (thb !== null) {
-            text += thb === 0 ? ' · ฟรี' : ' · ฿' + thb.toFixed(4);
+            text += ' · ฿' + thb.toFixed(4);
         }
         return text;
     };

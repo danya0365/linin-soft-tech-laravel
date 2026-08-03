@@ -39,7 +39,7 @@ return [
         ],
 
         // 9Router — AI router แบบ OpenAI-compatible (รวมหลายเจ้าไว้หลัง endpoint เดียว
-        // มีทั้ง model ฟรีและ model เสียเงิน) โฮสต์ที่ไหนก็ได้: เครื่อง dev, server ในองค์กร, cloud
+        // ต้นทุนต่อ model ต่างกันมาก) โฮสต์ที่ไหนก็ได้: เครื่อง dev, server ในองค์กร, cloud
         // ที่อยู่เป็นแค่ค่า config — ตั้ง NINEROUTER_BASE_URL เมื่อไหร่ = เปิดใช้งานเมื่อนั้น (ว่าง = ปิด)
         '9router' => [
             'label' => '9Router',
@@ -68,7 +68,7 @@ return [
     // ค่าคอม (%) บวกบนต้นทุนจริง — รายได้ dev เช่น 30 = บวก 30%
     'commission_percent' => (float) env('AI_CHAT_COMMISSION_PERCENT', 30),
 
-    // model ที่ไม่มีราคาใน catalog ใช้ราคานี้ — กันใช้ฟรี (USD ต่อ 1M tokens)
+    // model ที่ไม่มีราคาใน catalog ใช้ราคานี้ — กันหลุดเป็นไม่คิดเงิน (USD ต่อ 1M tokens)
     // ไม่กำหนด cachedInputPerMTok → AiCreditService คิด cache hit ที่ราคา input เต็ม (ไม่ undercharge)
     'fallback_pricing' => [
         'inputPerMTok' => (float) env('AI_CHAT_FALLBACK_INPUT_PER_MTOK', 5),
@@ -173,13 +173,15 @@ return [
             'pricing' => ['inputPerMTok' => 1.84, 'outputPerMTok' => 3.66],
         ],
         // ── 9Router ──
-        // model ฟรีของ 9Router — ต้นทุน token เป็น 0 จึงคิดค่าคอมคงที่ต่อข้อความแทน % (% ของ 0 คือ 0)
-        // 9Router มี model เสียเงินด้วย ถ้าเพิ่มภายหลังให้ใส่ pricing จริงแทน flat_fee_thb
+        // ต้นทุน token เป็น 0 จึงคิดค่าบริการคงที่ต่อข้อความแทนค่าคอมแบบ % (% ของ 0 คือ 0)
+        //
+        // label/description ที่ผู้ใช้เห็น ห้ามบอกว่า model ไหนไม่มีต้นทุน — ทุก model
+        // มีค่าบริการเสมอ ต่างกันแค่มาก/น้อย ถ้าเพิ่ม model ที่มีต้นทุนจริงให้ใส่ pricing แทน flat_fee_thb
         [
             'id' => 'oc/deepseek-v4-flash-free',
             'provider' => '9router',
-            'label' => 'DeepSeek V4 Flash (free)',
-            'description' => 'model ฟรีผ่าน 9Router — คิดค่าบริการคงที่ต่อข้อความ',
+            'label' => 'DeepSeek V4 Flash',
+            'description' => 'ประหยัดที่สุด — ค่าบริการต่อข้อความต่ำมาก',
             'vendor' => 'DeepSeek',
             'pricing' => ['inputPerMTok' => 0, 'cachedInputPerMTok' => 0, 'outputPerMTok' => 0],
             'flat_fee_thb' => (float) env('AI_CHAT_FREE_MODEL_FEE_THB', 0.25),
