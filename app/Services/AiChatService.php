@@ -359,10 +359,12 @@ class AiChatService
     {
         $tools = [
             ['get_today_summary', 'สรุปการดำเนินงานวันนี้ (น้ำหนักผ้า รายรับ-จ่าย ลูกค้า)', []],
-            ['get_business_report', 'รายงานธุรกิจตามวันที่/ช่วงเวลา (รายรับ รายจ่าย น้ำหนักผ้า)', [
+            ['get_business_report', 'รายงานธุรกิจตามวันที่/ช่วงเวลา (รายรับ รายจ่าย น้ำหนักผ้า) — ระบุ date_from/date_to เพื่อดูช่วงตามใจ เช่น เปรียบเทียบรายปี', [
                 'type' => ['string', 'summary หรือ detailed', ['summary', 'detailed']],
                 'date' => ['string', 'วันที่ Y-m-d (ไม่ระบุ=วันนี้)'],
-                'range' => ['string', 'day, week หรือ month', ['day', 'week', 'month']],
+                'range' => ['string', 'day, week, month หรือ year', ['day', 'week', 'month', 'year']],
+                'date_from' => ['string', 'เริ่ม Y-m-d (ระบุคู่กับ date_to เพื่อดูช่วงตามใจ แทน range)'],
+                'date_to' => ['string', 'สิ้นสุด Y-m-d (ระบุคู่กับ date_from)'],
             ]],
             ['list_entities', 'รายชื่อ+id ของกลุ่ม/หมวดในระบบ ตามชนิดที่เลือก', [
                 'kind' => ['string', 'customer_groups=กลุ่มลูกค้า, inventory_groups=กลุ่มสต๊อก/ผ้า, energy_resources=ทรัพยากรพลังงาน, departments=แผนก, linen_types=ประเภทผ้า', ['customer_groups', 'inventory_groups', 'energy_resources', 'departments', 'linen_types']],
@@ -379,22 +381,28 @@ class AiChatService
             ['get_inventories_by_group', 'รายการสต๊อก/ผ้าในกลุ่ม พร้อมจำนวนคงเหลือ', [
                 'group_id' => ['integer', 'id กลุ่มสต๊อก (required)'],
             ]],
-            ['get_energy_logs', 'ประวัติการใช้พลังงานของทรัพยากร', [
+            ['get_energy_logs', 'ประวัติการใช้พลังงานของทรัพยากร ตามช่วงวันที่ (ระบุ date_from/date_to เพื่อดูข้ามช่วง เช่น รายปี)', [
                 'resource_id' => ['integer', 'id ทรัพยากรพลังงาน (required)'],
+                'date_from' => ['string', 'เริ่ม Y-m-d (ไม่ระบุ=ล่าสุด 7 รายการ)'],
+                'date_to' => ['string', 'สิ้นสุด Y-m-d (ระบุคู่กับ date_from)'],
             ]],
             ['search_employees', 'ค้นหาพนักงานจากชื่อและ/หรือแผนก (คืน id, ชื่อ, แผนก)', [
                 'name' => ['string', 'ชื่อพนักงาน (บางส่วนได้)'],
                 'department_id' => ['integer', 'id แผนก'],
             ]],
-            ['get_employee_detail', 'ข้อมูลพนักงานรายตัว: ผลงาน เวลาทำงาน', [
+            ['get_employee_detail', 'ข้อมูลพนักงานรายตัว: ผลงาน เวลาทำงาน (ระบุ date_from/date_to เพื่อดูสถิติตามช่วง เช่น รายปี)', [
                 'employee_id' => ['integer', 'id พนักงาน (required)'],
+                'date_from' => ['string', 'เริ่ม Y-m-d (ไม่ระบุ=วันนี้/สัปดาห์นี้/เดือนนี้)'],
+                'date_to' => ['string', 'สิ้นสุด Y-m-d (ระบุคู่กับ date_from)'],
             ]],
             ['get_machine_list', 'รายการเครื่องจักร/รถ พร้อมสถานะ', [
                 'type' => ['string', 'washing (เครื่องซัก), dryer (เครื่องอบ) หรือ truck (รถ)', ['washing', 'dryer', 'truck']],
             ]],
-            ['get_machine_notes', 'บันทึก/ประวัติซ่อมบำรุงเครื่องจักร ตามวันที่หรือล่าสุด 7 วัน', [
+            ['get_machine_notes', 'บันทึก/ประวัติซ่อมบำรุงเครื่องจักร ตามวันที่/ช่วงที่เลือก (ไม่ระบุ=ล่าสุด 7 วัน)', [
                 'type' => ['string', 'washing, dryer หรือ truck', ['washing', 'dryer', 'truck']],
                 'date' => ['string', 'วันที่ Y-m-d (ไม่ระบุ=ล่าสุด 7 วัน)'],
+                'date_from' => ['string', 'เริ่ม Y-m-d (ระบุคู่กับ date_to เพื่อดูช่วงตามใจ แทน date)'],
+                'date_to' => ['string', 'สิ้นสุด Y-m-d (ระบุคู่กับ date_from)'],
             ]],
             ['search_inventories', 'ค้นหาสต๊อก/วัสดุจากชื่อ (คืน id, ชื่อ, หน่วย, คงเหลือ)', [
                 'name' => ['string', 'ชื่อสต๊อก (บางส่วนได้)'],
@@ -549,7 +557,9 @@ class AiChatService
                 'get_business_report' => $this->chatService->getReportByDate(
                     in_array($args['type'] ?? '', ['summary', 'detailed']) ? $args['type'] : 'summary',
                     $args['date'] ?? null,
-                    in_array($args['range'] ?? '', ['day', 'week', 'month']) ? $args['range'] : 'day',
+                    in_array($args['range'] ?? '', ['day', 'week', 'month', 'year']) ? $args['range'] : 'day',
+                    $args['date_from'] ?? null,
+                    $args['date_to'] ?? null,
                 ),
 
                 'list_entities' => $this->listEntities($args),
@@ -573,13 +583,17 @@ class AiChatService
                 'list_deliverable_collect_items' => $this->listDeliverableCollectItems($args),
 
                 'get_energy_logs' => $this->chatService->getEnergyLogs(
-                    (int) ($args['resource_id'] ?? 0)
+                    (int) ($args['resource_id'] ?? 0),
+                    $args['date_from'] ?? null,
+                    $args['date_to'] ?? null,
                 ),
 
                 'search_employees' => $this->searchEmployees($args),
 
                 'get_employee_detail' => $this->chatService->getEmployeeDetail(
-                    (int) ($args['employee_id'] ?? 0)
+                    (int) ($args['employee_id'] ?? 0),
+                    $args['date_from'] ?? null,
+                    $args['date_to'] ?? null,
                 ),
 
                 'get_machine_list' => $this->chatService->getMachineListByType(
@@ -805,6 +819,11 @@ class AiChatService
 
         if (!empty($args['date'])) {
             return $this->chatService->getMachineNotesByDateAndType($args['date'], $type);
+        }
+
+        // ระบุช่วงวันที่ตามใจ → ข้าม window 7 วัน
+        if (!empty($args['date_from']) && !empty($args['date_to'])) {
+            return $this->chatService->getMachineRecentNotesByType($type, $args['date_from'], $args['date_to']);
         }
 
         return $this->chatService->getMachineRecentNotesByType($type);

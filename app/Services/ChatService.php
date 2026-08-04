@@ -599,7 +599,7 @@ class ChatService
     /**
      * ดึง Log พลังงาน
      */
-    public function getEnergyLogs($resourceId): array
+    public function getEnergyLogs($resourceId, ?string $dateFrom = null, ?string $dateTo = null): array
     {
         $resource = EnergyResource::find($resourceId);
 
@@ -610,15 +610,21 @@ class ChatService
             ];
         }
 
-        $logs = EnergyResourceLog::where('energy_resource_id', $resourceId)
-            ->orderBy('created_at', 'desc')
-            ->take(7)
+        $query = EnergyResourceLog::where('energy_resource_id', $resourceId);
+
+        $hasRange = $dateFrom && $dateTo;
+        if ($hasRange) {
+            $query->whereBetween('created_at', [$dateFrom . ' 00:00:00', $dateTo . ' 23:59:59']);
+        }
+
+        $logs = $query->orderBy('created_at', 'desc')
+            ->when(!$hasRange, fn ($q) => $q->take(7))
             ->get();
 
         $totalValue = $logs->sum('value');
 
         $rows = [
-            ['label' => '📊 รวม 7 วัน', 'value' => number_format($totalValue, 2), 'valueColor' => '#1DB446'],
+            ['label' => '📊 ' . ($hasRange ? 'รวมช่วงที่เลือก' : 'รวม 7 วัน'), 'value' => number_format($totalValue, 2), 'valueColor' => '#1DB446'],
             ['type' => 'separator'],
         ];
 
@@ -697,7 +703,7 @@ class ChatService
     /**
      * ดึงรายละเอียดพนักงาน
      */
-    public function getEmployeeDetail($employeeId): array
+    public function getEmployeeDetail($employeeId, ?string $dateFrom = null, ?string $dateTo = null): array
     {
         $employee = Employee::with('department')->find($employeeId);
 
@@ -708,45 +714,70 @@ class ChatService
             ];
         }
 
-        $today = Carbon::today();
-        $thisWeek = Carbon::now()->startOfWeek();
-        $thisMonth = Carbon::now()->startOfMonth();
+        $hasRange = $dateFrom && $dateTo;
 
-        // นับจำนวน Operation logs
-        $todayLogs = EmployeeOperationLog::where('employee_id', $employeeId)
-            ->whereDate('created_at', $today)
-            ->count();
+        if ($hasRange) {
+            // สถิติตามช่วงวันที่ที่เลือก
+            $rangeLogs = EmployeeOperationLog::where('employee_id', $employeeId)
+                ->whereBetween('created_at', [$dateFrom . ' 00:00:00', $dateTo . ' 23:59:59'])
+                ->count();
 
-        $weekLogs = EmployeeOperationLog::where('employee_id', $employeeId)
-            ->where('created_at', '>=', $thisWeek)
-            ->count();
+            $operationStats = EmployeeOperationLog::where('employee_id', $employeeId)
+                ->whereBetween('created_at', [$dateFrom . ' 00:00:00', $dateTo . ' 23:59:59'])
+                ->selectRaw('operation_type, COUNT(*) as count')
+                ->groupBy('operation_type')
+                ->pluck('count', 'operation_type')
+                ->toArray();
 
-        $monthLogs = EmployeeOperationLog::where('employee_id', $employeeId)
-            ->where('created_at', '>=', $thisMonth)
-            ->count();
+            $rows = [
+                ['label' => '👤 ชื่อ', 'value' => $employee->name],
+                ['label' => '🏢 แผนก', 'value' => $employee->department->name ?? 'ไม่ระบุ'],
+                ['type' => 'separator'],
+                ['label' => '📊 สถิติการทำงาน', 'value' => '', 'bold' => true],
+                ['label' => '📅 ช่วงเวลา', 'value' => Carbon::parse($dateFrom)->format('d/m/Y') . ' - ' . Carbon::parse($dateTo)->format('d/m/Y')],
+                ['label' => '🔢 จำนวนงานทั้งหมด', 'value' => number_format($rangeLogs) . ' ครั้ง', 'valueColor' => '#1DB446'],
+            ];
+        } else {
+            $today = Carbon::today();
+            $thisWeek = Carbon::now()->startOfWeek();
+            $thisMonth = Carbon::now()->startOfMonth();
 
-        // นับแยกตามประเภทงาน (วันนี้)
-        $operationStats = EmployeeOperationLog::where('employee_id', $employeeId)
-            ->whereDate('created_at', $today)
-            ->selectRaw('operation_type, COUNT(*) as count')
-            ->groupBy('operation_type')
-            ->pluck('count', 'operation_type')
-            ->toArray();
+            // นับจำนวน Operation logs
+            $todayLogs = EmployeeOperationLog::where('employee_id', $employeeId)
+                ->whereDate('created_at', $today)
+                ->count();
 
-        $rows = [
-            ['label' => '👤 ชื่อ', 'value' => $employee->name],
-            ['label' => '🏢 แผนก', 'value' => $employee->department->name ?? 'ไม่ระบุ'],
-            ['type' => 'separator'],
-            ['label' => '📊 สถิติการทำงาน', 'value' => '', 'bold' => true],
-            ['label' => '📅 วันนี้', 'value' => number_format($todayLogs) . ' ครั้ง', 'valueColor' => '#1DB446'],
-            ['label' => '📆 สัปดาห์นี้', 'value' => number_format($weekLogs) . ' ครั้ง'],
-            ['label' => '📅 เดือนนี้', 'value' => number_format($monthLogs) . ' ครั้ง'],
-        ];
+            $weekLogs = EmployeeOperationLog::where('employee_id', $employeeId)
+                ->where('created_at', '>=', $thisWeek)
+                ->count();
+
+            $monthLogs = EmployeeOperationLog::where('employee_id', $employeeId)
+                ->where('created_at', '>=', $thisMonth)
+                ->count();
+
+            // นับแยกตามประเภทงาน (วันนี้)
+            $operationStats = EmployeeOperationLog::where('employee_id', $employeeId)
+                ->whereDate('created_at', $today)
+                ->selectRaw('operation_type, COUNT(*) as count')
+                ->groupBy('operation_type')
+                ->pluck('count', 'operation_type')
+                ->toArray();
+
+            $rows = [
+                ['label' => '👤 ชื่อ', 'value' => $employee->name],
+                ['label' => '🏢 แผนก', 'value' => $employee->department->name ?? 'ไม่ระบุ'],
+                ['type' => 'separator'],
+                ['label' => '📊 สถิติการทำงาน', 'value' => '', 'bold' => true],
+                ['label' => '📅 วันนี้', 'value' => number_format($todayLogs) . ' ครั้ง', 'valueColor' => '#1DB446'],
+                ['label' => '📆 สัปดาห์นี้', 'value' => number_format($weekLogs) . ' ครั้ง'],
+                ['label' => '📅 เดือนนี้', 'value' => number_format($monthLogs) . ' ครั้ง'],
+            ];
+        }
 
         // เพิ่มสถิติแยกตามประเภทงาน
         if (!empty($operationStats)) {
             $rows[] = ['type' => 'separator'];
-            $rows[] = ['label' => '🔧 งานวันนี้ (แยกประเภท)', 'value' => '', 'bold' => true];
+            $rows[] = ['label' => '🔧 ' . ($hasRange ? 'งานในรอบช่วงเวลา' : 'งานวันนี้') . ' (แยกประเภท)', 'value' => '', 'bold' => true];
 
             $operationLabels = [
                 'wash' => '🧺 ซัก',
@@ -1263,10 +1294,14 @@ class ChatService
     /**
      * แสดง Notes ล่าสุดของเครื่องจักรตามประเภท (7 วันล่าสุด, limit 10 รายการ)
      */
-    public function getMachineRecentNotesByType(string $type): array
+    public function getMachineRecentNotesByType(string $type, ?string $dateFrom = null, ?string $dateTo = null): array
     {
-        $startDate = Carbon::now()->subDays(7)->startOfDay();
-        $endDate = Carbon::now()->endOfDay();
+        $startDate = $dateFrom ? Carbon::parse($dateFrom)->startOfDay() : Carbon::now()->subDays(7)->startOfDay();
+        $endDate = $dateTo ? Carbon::parse($dateTo)->endOfDay() : Carbon::now()->endOfDay();
+        $hasRange = $dateFrom && $dateTo;
+        $rangeLabel = $hasRange
+            ? Carbon::parse($dateFrom)->format('d/m/Y') . ' - ' . Carbon::parse($dateTo)->format('d/m/Y')
+            : '7 วันล่าสุด';
 
         $typeLabels = [
             'washing' => '🧺 เครื่องซักผ้า',
@@ -1275,7 +1310,7 @@ class ChatService
         ];
         $label = $typeLabels[$type] ?? 'เครื่องจักร';
 
-        // ดึง Notes ตามประเภท (7 วันล่าสุด, limit 10)
+        // ดึง Notes ตามประเภท (7 วันล่าสุด, limit 10 — ปลด limit เมื่อระบุช่วงวันที่)
         $query = Note::whereBetween('created_at', [$startDate, $endDate]);
 
         switch ($type) {
@@ -1290,16 +1325,18 @@ class ChatService
                 break;
         }
 
-        $notes = $query->orderBy('created_at', 'desc')->take(10)->get();
+        $notes = $query->orderBy('created_at', 'desc')
+            ->when(!$hasRange, fn ($q) => $q->take(10))
+            ->get();
 
         if ($notes->isEmpty()) {
             return [
                 'type' => 'card',
                 'title' => "📜 ประวัติ{$label}",
-                'subtitle' => '7 วันล่าสุด',
+                'subtitle' => $rangeLabel,
                 'headerColor' => '#34495E',
                 'rows' => [
-                    ['label' => '📅 ช่วงเวลา', 'value' => '7 วันล่าสุด'],
+                    ['label' => '📅 ช่วงเวลา', 'value' => $rangeLabel],
                     ['type' => 'separator'],
                     ['label' => 'ℹ️ สถานะ', 'value' => 'ไม่พบประวัติ', 'valueColor' => '#999999'],
                 ],
@@ -1307,8 +1344,8 @@ class ChatService
         }
 
         $rows = [
-            ['label' => '📅 ช่วงเวลา', 'value' => '7 วันล่าสุด'],
-            ['label' => '📝 จำนวนรายการ', 'value' => $notes->count() . ' รายการ (สูงสุด 10)'],
+            ['label' => '📅 ช่วงเวลา', 'value' => $rangeLabel],
+            ['label' => '📝 จำนวนรายการ', 'value' => $notes->count() . ' รายการ' . (!$hasRange ? ' (สูงสุด 10)' : '')],
             ['type' => 'separator'],
         ];
 
@@ -1442,32 +1479,39 @@ class ChatService
     /**
      * แสดงรายงานตามวันที่/ช่วงเวลาที่เลือก
      */
-    public function getReportByDate(string $type, ?string $dateString, string $range = 'day'): array
+    public function getReportByDate(string $type, ?string $dateString, string $range = 'day', ?string $dateFrom = null, ?string $dateTo = null): array
     {
-        // กำหนดช่วงวันที่ตาม range
-        switch ($range) {
-            case 'week':
-                $startDate = Carbon::now()->startOfWeek();
-                $endDate = Carbon::now()->endOfWeek();
-                $rangeLabel = 'สัปดาห์นี้';
-                break;
-            case 'month':
-                $startDate = Carbon::now()->startOfMonth();
-                $endDate = Carbon::now()->endOfMonth();
-                $rangeLabel = 'เดือนนี้';
-                break;
-            case 'year':
-                $startDate = Carbon::now()->startOfYear();
-                $endDate = Carbon::now()->endOfYear();
-                $rangeLabel = 'ปีนี้';
-                break;
-            case 'day':
-            default:
-                $date = $dateString ? Carbon::parse($dateString) : Carbon::today();
-                $startDate = $date->copy()->startOfDay();
-                $endDate = $date->copy()->endOfDay();
-                $rangeLabel = $date->format('d/m/Y');
-                break;
+        // ถ้าระบุช่วงวันที่ตามใจ → override range/date
+        if ($dateFrom && $dateTo) {
+            $startDate = Carbon::parse($dateFrom)->startOfDay();
+            $endDate = Carbon::parse($dateTo)->endOfDay();
+            $rangeLabel = Carbon::parse($dateFrom)->format('d/m/Y') . ' - ' . Carbon::parse($dateTo)->format('d/m/Y');
+        } else {
+            // กำหนดช่วงวันที่ตาม range
+            switch ($range) {
+                case 'week':
+                    $startDate = Carbon::now()->startOfWeek();
+                    $endDate = Carbon::now()->endOfWeek();
+                    $rangeLabel = 'สัปดาห์นี้';
+                    break;
+                case 'month':
+                    $startDate = Carbon::now()->startOfMonth();
+                    $endDate = Carbon::now()->endOfMonth();
+                    $rangeLabel = 'เดือนนี้';
+                    break;
+                case 'year':
+                    $startDate = Carbon::now()->startOfYear();
+                    $endDate = Carbon::now()->endOfYear();
+                    $rangeLabel = 'ปีนี้';
+                    break;
+                case 'day':
+                default:
+                    $date = $dateString ? Carbon::parse($dateString) : Carbon::today();
+                    $startDate = $date->copy()->startOfDay();
+                    $endDate = $date->copy()->endOfDay();
+                    $rangeLabel = $date->format('d/m/Y');
+                    break;
+            }
         }
 
         if ($type === 'detailed') {
