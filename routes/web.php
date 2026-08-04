@@ -44,11 +44,6 @@ Route::group(['prefix' => 'admin', 'middleware' => ['admin']], function () {
 });
 
 Route::group(['middleware' => ['admin']], function () {
-    // AI Chat credits (หลังบ้าน)
-    Route::get('ai-credits', [App\Http\Controllers\AiCreditController::class, 'index'])->name('ai-credits.index');
-    Route::get('ai-credits/{user}', [App\Http\Controllers\AiCreditController::class, 'show'])->name('ai-credits.show');
-    Route::post('ai-credits/{user}/transactions', [App\Http\Controllers\AiCreditController::class, 'storeTransaction'])->name('ai-credits.transactions.store');
-
     Route::resource('users', App\Http\Controllers\UserController::class);
     Route::resource('customer-groups', App\Http\Controllers\CustomerGroupController::class);
     Route::resource('customers', App\Http\Controllers\CustomerController::class);
@@ -66,6 +61,13 @@ Route::group(['middleware' => ['admin']], function () {
     Route::resource('trucks', App\Http\Controllers\TruckController::class);
 
 
+});
+
+Route::group(['middleware' => ['admin', 'super-admin']], function () {
+    // AI Chat credits (หลังบ้าน) — super admin เท่านั้น
+    Route::get('ai-credits', [App\Http\Controllers\AiCreditController::class, 'index'])->name('ai-credits.index');
+    Route::get('ai-credits/{user}', [App\Http\Controllers\AiCreditController::class, 'show'])->name('ai-credits.show');
+    Route::post('ai-credits/{user}/transactions', [App\Http\Controllers\AiCreditController::class, 'storeTransaction'])->name('ai-credits.transactions.store');
 });
 
 Route::group(['prefix' => 'manager', 'middleware' => ['manager']], function () {

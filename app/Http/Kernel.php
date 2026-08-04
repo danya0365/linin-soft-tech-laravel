@@ -73,5 +73,6 @@ class Kernel extends HttpKernel
         'worker' => \App\Http\Middleware\IsWorker::class,
         'logged-in'=> \App\Http\Middleware\IsLoggedIn::class,
         'staff' => \App\Http\Middleware\IsStaff::class,
+        'super-admin' => \App\Http\Middleware\IsSuperAdmin::class,
     ];
 }

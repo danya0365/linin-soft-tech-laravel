@@ -74,7 +74,7 @@ class UserController extends Controller
      */
     public function show($id)
     {
-        if (config('auth.super_admin_user_id') == $id && Auth::user()->id != $id) {
+        if ((config('auth.super_admin_user_id') == $id || $id == 1) && Auth::user()->id != $id) {
             return redirect()->route('users.index')
                 ->with('success', 'Can not show super admin');
         }
@@ -92,7 +92,7 @@ class UserController extends Controller
      */
     public function edit($id)
     {
-        if (config('auth.super_admin_user_id') == $id && Auth::user()->id != $id) {
+        if ((config('auth.super_admin_user_id') == $id || $id == 1) && Auth::user()->id != $id) {
             return redirect()->route('users.index')
                 ->with('success', 'Can not edit super admin');
         }
@@ -114,7 +114,7 @@ class UserController extends Controller
      */
     public function update(Request $request, User $user)
     {
-        if (config('auth.super_admin_user_id') == $user->id && Auth::user()->id != $user->id) {
+        if ((config('auth.super_admin_user_id') == $user->id || $user->id == 1) && Auth::user()->id != $user->id) {
             return redirect()->route('users.index')
                 ->with('success', 'Can not edit super admin');
         }
@@ -141,7 +141,7 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
-        if (config('auth.super_admin_user_id') == $id && Auth::user()->id != $id) {
+        if ((config('auth.super_admin_user_id') == $id || $id == 1) && Auth::user()->id != $id) {
             return redirect()->route('users.index')
                 ->with('success', 'Can not delete super admin');
         }

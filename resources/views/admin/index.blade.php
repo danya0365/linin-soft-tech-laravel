@@ -109,16 +109,18 @@
         />
     </x-menu.section>
 
-    <!-- Section: AI -->
-    <x-menu.section title="AI" icon="fa-robot" icon-color="text-fuchsia-500">
-        <x-menu.card
-            href="{{ route('ai-credits.index') }}"
-            icon="fa-solid fa-coins"
-            title="{{ __('เครดิต AI') }}"
-            subtitle="AI Credits"
-            gradient="from-fuchsia-500 to-purple-700"
-            subtitle-color="text-fuchsia-200"
-        />
-    </x-menu.section>
+    <!-- Section: AI (super admin เท่านั้น) -->
+    @if(Auth::check() && Auth::user()->id == config('auth.super_admin_user_id'))
+        <x-menu.section title="AI" icon="fa-robot" icon-color="text-fuchsia-500">
+            <x-menu.card
+                href="{{ route('ai-credits.index') }}"
+                icon="fa-solid fa-coins"
+                title="{{ __('เครดิต AI') }}"
+                subtitle="AI Credits"
+                gradient="from-fuchsia-500 to-purple-700"
+                subtitle-color="text-fuchsia-200"
+            />
+        </x-menu.section>
+    @endif
 </x-admin.page>
 @endsection
