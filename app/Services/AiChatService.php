@@ -8,6 +8,7 @@ use App\Models\AiChatSession;
 use App\Models\Customer;
 use App\Models\CustomerGroup;
 use App\Models\Department;
+use App\Models\Document;
 use App\Models\Employee;
 use App\Models\EnergyResource;
 use App\Models\Inventory;
@@ -19,6 +20,7 @@ use App\Models\User;
 use App\Services\Llm\LlmProviderManager;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * AI Chat Service
@@ -55,6 +57,7 @@ class AiChatService
         protected ChatService $chatService,
         protected EntityWriteService $entityWriter,
         protected OperationActionService $operationActions,
+        protected DocumentService $documents,
     ) {
         $this->maxIterations = (int) config('ai-chat.max_iterations', 5);
     }
@@ -349,7 +352,10 @@ class AiChatService
             . "7. ห้ามเรียก confirm_write ในรอบเดียวกับ prepare_* เด็ดขาด ต้องรอให้ผู้ใช้ยืนยันจริงก่อน\n"
             . "8. ก่อนอ้างอิง/แก้/ลบ ที่ต้องใช้ id ต้องเรียก list_*/search_* หา id จริงก่อน ห้ามเดา\n"
             . "9. แก้ไข (update) ส่งเฉพาะฟิลด์ที่จะเปลี่ยน; การลบจะถูกบล็อกถ้ามีข้อมูลอื่นผูกอยู่ ให้แจ้งตามข้อความที่ระบบคืนมา\n"
-            . "10. สร้างงานผ้า (prepare_operation) รวบรวมรายการผ้าทั้งหมดแล้วส่ง items ครั้งเดียว; แนบรูปผ่านแชทไม่ได้";
+            . "10. สร้างงานผ้า (prepare_operation) รวบรวมรายการผ้าทั้งหมดแล้วส่ง items ครั้งเดียว; แนบรูปผ่านแชทไม่ได้\n\n"
+            . "เอกสารที่อัปโหลด (documents):\n"
+            . "11. คำถามเกี่ยวกับเอกสารที่ staff อัปโหลด (สัญญา ใบเสร็จ เอกสารซ่อม รูปถ่าย) — เรียก search_documents หาก่อน แล้วอ่านรายละเอียดด้วย get_document_content; ตอบจากเนื้อหาจริงในเอกสารเท่านั้น ห้ามแต่ง\n"
+            . "12. คำถามเกี่ยวกับสิ่งที่เห็นในภาพถ่าย (เช่น รอยชำรุดของเครื่องจักร) — เรียก analyze_document_image; ถ้าใช้โมเดลที่อ่านรูปไม่ได้ (ตอบด้วย OCR text) ให้แจ้งว่าเห็นได้แค่ข้อความที่สกัดจากภาพ";
     }
 
     /**
@@ -412,6 +418,17 @@ class AiChatService
             ]],
             ['list_deliverable_collect_items', 'รายการผ้าจากงานเก็บ (collect) ที่ปิดแล้วและยังไม่ถูกส่ง — ใช้หา id ก่อนสั่งงานส่ง (prepare_deliver)', [
                 'customer_id' => ['integer', 'กรองตามลูกค้า (ไม่ระบุ=ทั้งหมด)'],
+            ]],
+            ['search_documents', 'ค้นหาเอกสารที่ staff อัปโหลด (รูป/PDF/เอกสาร) จากชื่อหรือเนื้อหา — คืนรายการเอกสารพร้อม id ก่อนอ่านฉบับเต็ม', [
+                'query' => ['string', 'คำค้นในชื่อ/เนื้อหาเอกสาร (required)'],
+            ]],
+            ['get_document_content', 'อ่านเนื้อหาของเอกสารที่อัปโหลด (ใช้หลัง search_documents เอาคำตอบจากข้อความจริงในเอกสาร)', [
+                'id' => ['integer', 'id เอกสาร (required)'],
+                'query' => ['string', 'กรองเฉพาะตอนที่มีคำนี้ (ไม่ระบุ=อ่านทั้งหมด)'],
+            ]],
+            ['analyze_document_image', 'วิเคราะห์รูปภาพ/ภาพถ่ายที่อัปโหลดในเอกสาร (เช่น รอยชำรุดของเครื่องจักร) — ส่งภาพให้โมเดล vision; โมเดลที่อ่านรูปไม่ได้จะตอบจากข้อความ OCR ที่สกัดไว้แทน', [
+                'id' => ['integer', 'id เอกสาร (required)'],
+                'question' => ['string', 'คำถาม/สิ่งที่อยากให้ดูในภาพ (required)'],
             ]],
         ];
 
@@ -602,7 +619,19 @@ class AiChatService
 
                 'get_machine_notes' => $this->getMachineNotes($args),
 
-                default => "ไม่รู้จักเครื่องมือ \"{$name}\" — เครื่องมือที่ใช้ได้: get_today_summary, get_business_report, list_entities, search_customers, get_customer_detail, get_inventories_by_group, get_energy_logs, search_employees, get_employee_detail, get_machine_list, get_machine_notes",
+                'search_documents' => $this->searchDocuments($args),
+
+                'get_document_content' => $this->documents->documentContent(
+                    (int) ($args['id'] ?? 0),
+                    !empty($args['query']) ? (string) $args['query'] : null
+                ),
+
+                'analyze_document_image' => $this->analyzeDocumentImage(
+                    (int) ($args['id'] ?? 0),
+                    (string) ($args['question'] ?? '')
+                ),
+
+                default => "ไม่รู้จักเครื่องมือ \"{$name}\" — เครื่องมือที่ใช้ได้: get_today_summary, get_business_report, list_entities, search_customers, get_customer_detail, get_inventories_by_group, get_energy_logs, search_employees, get_employee_detail, get_machine_list, get_machine_notes, search_inventories, list_linen_products, list_deliverable_collect_items, search_documents, get_document_content, analyze_document_image",
             };
         } catch (\Throwable $e) {
             Log::warning('AiChatService tool execution failed', [
@@ -871,5 +900,200 @@ class AiChatService
         return "{$label}ทั้งหมด:\n" . $items->map(
             fn ($item) => "id: {$item->id} | {$item->name}"
         )->implode("\n");
+    }
+
+    // ── documents (เอกสารที่ staff อัปโหลด) ─────────────────────────────
+
+    /**
+     * Tool search_documents — ค้นเอกสารจากชื่อ/เนื้อหา ผ่าน DocumentService
+     */
+    protected function searchDocuments(array $args): array
+    {
+        $query = trim((string) ($args['query'] ?? ''));
+        if ($query === '') {
+            return ['error' => 'ต้องระบุคำค้นหา (query) ก่อนค้นเอกสาร'];
+        }
+
+        $results = $this->documents->searchDocuments($query);
+
+        if (empty($results)) {
+            return ['message' => "ไม่พบเอกสารที่ตรงกับ \"{$query}\" — แนะนำ: ลองคำค้นอื่น, หรือตรวจว่าเอกสารถูกอัปโหลดและสถานะเป็น พร้อมใช้ บนหน้า /documents"];
+        }
+
+        return array_map(function ($r) {
+            return "id: {$r['id']} | {$r['title']} ({$r['filename']}) | {$r['preview']}";
+        }, $results);
+    }
+
+    /**
+     * Tool analyze_document_image — วิเคราะห์รูปจริงด้วยโมเดล vision / ตอบจาก OCR text เมื่อโมเดลอ่านรูปไม่ได้
+     */
+    protected function analyzeDocumentImage(int $id, string $question): string
+    {
+        $doc = Document::ready()->find($id);
+        if (!$doc) {
+            return "ไม่พบเอกสาร id {$id} (หรือยังประมวลผลไม่เสร็จ)";
+        }
+
+        $dataUrl = $this->imageDataUrl($doc);
+        if ($dataUrl === null) {
+            return $this->ocrFallback($doc, $question);
+        }
+
+        $visionModel = $this->visionModelForCurrent();
+
+        try {
+            set_time_limit(120);
+
+            $messages = [[
+                'role' => 'user',
+                'content' => [
+                    ['type' => 'text', 'text' => "{$question}\n\n(ตอบเป็นภาษาไทย กระชับ ปรับตามสิ่งที่เห็นในภาพ)"],
+                    ['type' => 'image_url', 'image_url' => ['url' => $dataUrl]],
+                ],
+            ]];
+
+            $response = $this->provider($visionModel)->chatCompletion($messages, [], $visionModel, 1024);
+
+            $content = trim((string) (
+                $response['choices'][0]['message']['content']
+                ?? $response['choices'][0]['message']['text']
+                ?? ''
+            ));
+
+            if ($content !== '') {
+                return $content;
+            }
+
+            return $this->ocrFallback($doc, $question);
+        } catch (\Throwable $e) {
+            Log::warning('AiChatService analyzeDocumentImage failed', [
+                'document_id' => $id,
+                'error' => $e->getMessage(),
+            ]);
+            return $this->ocrFallback($doc, $question);
+        }
+    }
+
+    /**
+     * สร้าง data URL ของภาพ (document) — รูป: อ่านตรงจาก storage; PDF: แปลงหน้าแรกเป็น JPEG (pdftoppm)
+     * คืน null ถ้าสร้างไม่ได้ (เช่น ไฟล์ชนิดที่เรากลั่นภาพไม่ออก)
+     */
+    protected function imageDataUrl(Document $doc): ?string
+    {
+        $disk = (string) config('ai-chat.documents.storage_disk', 'local');
+        $absPath = Storage::disk($disk)->path($doc->storage_path);
+        if (!is_file($absPath)) {
+            return null;
+        }
+
+        try {
+            if ($doc->kind === Document::KIND_IMAGE) {
+                $mime = $doc->mime_type ?: 'image/jpeg';
+                $bytes = file_get_contents($absPath);
+                if ($bytes === false || strlen($bytes) > 10 * 1024 * 1024) {
+                    return null;
+                }
+                return 'data:' . $mime . ';base64,' . base64_encode($bytes);
+            }
+
+            if ($doc->kind === Document::KIND_PDF) {
+                return $this->pdfFirstPageAsDataUrl($absPath);
+            }
+        } catch (\Throwable $e) {
+            Log::warning('AiChatService imageDataUrl failed', ['error' => $e->getMessage()]);
+        }
+
+        return null;
+    }
+
+    /**
+     * หน้าแรกของ PDF → data URL (กด provider ต้องสามารถส่ง image_url ได้)
+     */
+    protected function pdfFirstPageAsDataUrl(string $absPath): ?string
+    {
+        $bin = $this->shellBinary('pdftoppm');
+        if ($bin === null) {
+            return null;
+        }
+
+        $tmpDir = sys_get_temp_dir() . '/linin_vis_' . uniqid();
+        @mkdir($tmpDir, 0700);
+
+        try {
+            exec(
+                escapeshellarg($bin) . ' -jpeg -r 100 -f 1 -l 1 ' . escapeshellarg($absPath) . ' ' . escapeshellarg($tmpDir . '/p'),
+                $out,
+                $exitCode
+            );
+            if ($exitCode !== 0) {
+                return null;
+            }
+
+            $files = glob($tmpDir . '/p-*.jpg') ?: [];
+            $img = $files[0] ?? null;
+            if ($img === null || !is_file($img)) {
+                return null;
+            }
+
+            return 'data:image/jpeg;base64,' . base64_encode((string) file_get_contents($img));
+        } catch (\Throwable $e) {
+            Log::warning('PDF first-page convert failed', ['error' => $e->getMessage()]);
+            return null;
+        } finally {
+            foreach (glob($tmpDir . '/*') ?: [] as $f) {
+                @unlink($f);
+            }
+            @rmdir($tmpDir);
+        }
+    }
+
+    /**
+     * โมเดลที่จะใช้ดูภาพจริง — โมเดลปัจจุบันถ้ามี vision:true ใน catalog, ไม่งั้น fallback
+     */
+    protected function visionModelForCurrent(): string
+    {
+        $active = $this->activeModel;
+        $catalog = config('ai-chat.models', []);
+        $hasVision = false;
+
+        foreach ($catalog as $m) {
+            if (($m['id'] ?? null) === $active && ($m['vision'] ?? false) === true) {
+                $hasVision = true;
+                break;
+            }
+        }
+
+        if ($hasVision) {
+            return (string) $active;
+        }
+
+        return (string) config('ai-chat.documents.vision_fallback_model', 'google/gemini-3.5-flash');
+    }
+
+    /**
+     * Fallback เมื่อวิเคราะห์ภาพไม่ได้/โมเดลไม่มี vision — ตอบจากข้อความ OCR ที่สกัดไว้ตอนอัปโหลด
+     */
+    protected function ocrFallback(Document $doc, string $question): string
+    {
+        $text = trim((string) $doc->extracted_text);
+        if ($text === '') {
+            return "ดูภาพของเอกสาร \"{$doc->title}\" ไม่ได้ (โมเดลนี้ไม่รองรับรูป และไม่มีข้อความในภาพที่สกัดไว้) — เลือกโมเดลที่รองรับภาพ เช่น Gemini เพื่อถามเรื่องภาพ";
+        }
+
+        return "โมเดลนี้ไม่รองรับการดูภาพจริง จึงตอบจากข้อความที่ OCR ได้จากภาพ (จำกัด 1500 ตัวอักษร):\n" . mb_substr($text, 0, 1500);
+    }
+
+    /**
+     * หา binary ที่ใช้วิเคราะห์/แปลงไฟล์ เพราะ exec() อาจถูกปิดบน shared hosting
+     */
+    protected function shellBinary(string $name): ?string
+    {
+        if (!function_exists('exec')) {
+            return null;
+        }
+
+        exec('command -v ' . escapeshellarg($name) . ' 2>/dev/null', $out, $exitCode);
+        return $exitCode === 0 && !empty($out[0]) ? trim((string) $out[0]) : null;
     }
 }

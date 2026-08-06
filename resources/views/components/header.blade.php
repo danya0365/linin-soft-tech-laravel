@@ -38,6 +38,10 @@
                            class="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-gray-700 transition-all duration-200">
                             🤖 {{ __('AI Chat') }}
                         </a>
+                        <a href="{{ route('documents.index') }}"
+                           class="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-gray-700 transition-all duration-200">
+                            📁 {{ __('เอกสาร') }}
+                        </a>
                     @endif
 
                     <!-- User Dropdown -->
@@ -146,6 +150,10 @@
                     <a href="{{ route('ai-chat') }}"
                        class="block px-4 py-3 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-gray-700 transition-all duration-200">
                         🤖 {{ __('AI Chat') }}
+                    </a>
+                    <a href="{{ route('documents.index') }}"
+                       class="block px-4 py-3 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-gray-700 transition-all duration-200">
+                        📁 {{ __('เอกสาร') }}
                     </a>
                 @endif
 

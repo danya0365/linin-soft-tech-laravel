@@ -37,6 +37,17 @@ Route::get('/ai-chat', [App\Http\Controllers\AiChatController::class, 'index'])
     ->name('ai-chat')
     ->middleware('staff');
 
+// Documents - เอกสารที่ staff อัปโหลด ให้ AI agent ค้น/ตอบจากเนื้อหา (staff = supervisor/manager/admin)
+// auth ไว้ก่อน เพื่อ guest → login (ไม่ใช่ /home); staff อนุญาตเฉพาะ supervisor/manager/admin
+Route::group(['middleware' => ['auth', 'staff']], function () {
+    Route::get('/documents', [App\Http\Controllers\DocumentController::class, 'index'])->name('documents.index');
+    Route::get('/documents/create', [App\Http\Controllers\DocumentController::class, 'create'])->name('documents.create');
+    Route::post('/documents', [App\Http\Controllers\DocumentController::class, 'store'])->name('documents.store');
+    Route::delete('/documents/{id}', [App\Http\Controllers\DocumentController::class, 'destroy'])->name('documents.destroy');
+    Route::get('/documents/{id}/download', [App\Http\Controllers\DocumentController::class, 'download'])->name('documents.download');
+    Route::get('/documents/{id}/preview', [App\Http\Controllers\DocumentController::class, 'preview'])->name('documents.preview');
+});
+
 
 Route::group(['prefix' => 'admin', 'middleware' => ['admin']], function () {
     Route::get('/', [App\Http\Controllers\SettingController::class, 'index'])->name('admin');

@@ -39,6 +39,7 @@ class AiChatStreamServiceTest extends TestCase
             $chatService ?: Mockery::mock(ChatService::class),
             app(EntityWriteService::class),
             app(OperationActionService::class),
+            app(\App\Services\DocumentService::class),
         );
     }
 
