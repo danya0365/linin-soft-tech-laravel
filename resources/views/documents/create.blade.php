@@ -42,8 +42,8 @@
 
                 <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3 text-xs text-blue-800 dark:text-blue-300">
                     <i class="fa fa-info-circle mr-1"></i>
-                    ระบบจะสกัดข้อความจากไฟล์ (OCR รูป / อ่าน PDF) ให้ AI นำไปตอบคำถามได้ —
-                    ไฟล์ .doc/.docx/.xls/.xlsx จะถูกเก็บไว้แต่ยังอ่านเนื้อหาไม่ได้ในเฟสนี้
+                    ระบบจะสกัดข้อความจากไฟล์ (OCR รูป / อ่าน PDF / อ่าน .docx และ .txt) ให้ AI นำไปตอบคำถามได้ —
+                    ไฟล์ .doc/.xls/.xlsx ยังไม่รองรับการอ่าน (เก็บไฟล์ไว้ได้แต่ AI อ่านเนื้อหาไม่ได้)
                 </div>
 
                 <div class="flex gap-2 pt-2">

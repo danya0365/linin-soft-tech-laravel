@@ -102,10 +102,21 @@ class DocumentService
             $document->extracted_text = $text;
             $document->chunks_json = $chunks;
             $document->extracted_chars = mb_strlen($text);
+            $document->status = Document::STATUS_READY;
+            $document->fail_reason = null;
+        } elseif (in_array($document->kind, [Document::KIND_OFFICE], true)) {
+            // office ที่อ่านแล้วไม่ได้ข้อความเลย (เช่น docx ที่มีแต่รูป) — ไม่ใช่ ready
+            if (empty($document->fail_reason)) {
+                $document->fail_reason = 'ไม่พบข้อความที่สกัดได้จากไฟล์นี้';
+            }
+            $document->status = Document::STATUS_FAILED;
+        } else {
+            // รูป/PDF ที่ OCR ไม่ได้ข้อความ (ภาพถ่ายไม่มีตัวอักษร) — ยัง ready เพราะ
+            // ใช้กับ analyze_document_image (vision) ได้ แต่ text ว่าง
+            $document->status = Document::STATUS_READY;
+            $document->fail_reason = null;
         }
 
-        $document->status = Document::STATUS_READY;
-        $document->fail_reason = null;
         $document->save();
     }
 
@@ -205,12 +216,91 @@ class DocumentService
     }
 
     /**
-     * office (docx/xlsx/txt...) — เฟส 1 ไม่รองรับการอ่าน ส่ง fail_reason ชัดเจน
+     * office — docx (ZIP + word/document.xml) / txt
+     * .doc/.xls/.xlsx ยังไม่รองรับ (binary เก่า/ตารางซับซ้อน) → fail_reason ชัดเจน
      */
     protected function extractOffice(Document $document, string $absPath): string
     {
-        $document->fail_reason = 'ยังไม่รองรับการอ่านไฟล์ .' . $document->extension . ' ในเฟสนี้ — ไฟล์ถูกเก็บไว้แล้ว';
+        $ext = $document->extension;
+
+        if ($ext === 'txt') {
+            return $this->extractTxt($absPath);
+        }
+
+        if ($ext === 'docx') {
+            return $this->extractDocx($absPath);
+        }
+
+        $document->fail_reason = 'ยังไม่รองรับการอ่านไฟล์ .' . $ext . ' — สนับสนุนเฉพาะ .docx และ .txt ในเฟสนี้ (ไฟล์ถูกเก็บไว้แล้ว)';
         return '';
+    }
+
+    /**
+     * .txt — อ่านตรงๆ (UTF-8; ถ้าเป็น UTF-16 ให้แปลง)
+     */
+    protected function extractTxt(string $absPath): string
+    {
+        $content = (string) file_get_contents($absPath);
+
+        // UTF-16 BOM → UTF-8 (ไฟล์จาก Windows Notepad)
+        if (str_starts_with($content, "\xFF\xFE") || str_starts_with($content, "\xFE\xFF")) {
+            $converted = mb_convert_encoding($content, 'UTF-8', 'UTF-16');
+            if ($converted !== false) {
+                $content = $converted;
+            }
+        }
+
+        return $content;
+    }
+
+    /**
+     * .docx — ZIP; เนื้อหาอยู่ใน word/document.xml (XML w:t elements)
+     * ไม่ต้อง composer dep — ใช้ ZipArchive ที่มีใน PHP
+     */
+    protected function extractDocx(string $absPath): string
+    {
+        if (!class_exists(\ZipArchive::class)) {
+            return '';
+        }
+
+        $zip = new \ZipArchive();
+        if ($zip->open($absPath) !== true) {
+            return '';
+        }
+
+        try {
+            $xml = $zip->getFromName('word/document.xml');
+        } finally {
+            $zip->close();
+        }
+
+        if ($xml === false) {
+            return '';
+        }
+
+        $dom = new \DOMDocument();
+        libxml_use_internal_errors(true);
+        $loaded = $dom->loadXML($xml);
+        libxml_clear_errors();
+        if (!$loaded) {
+            return '';
+        }
+
+        // สกัดข้อความจากทุก <w:t> — แทรกบรรทัดใหม่ตาม paragraph <w:p>
+        $parts = [];
+        $paragraphs = $dom->getElementsByTagNameNS('*', 'p');
+        foreach ($paragraphs as $p) {
+            $text = '';
+            $runs = $p->getElementsByTagNameNS('*', 't');
+            foreach ($runs as $t) {
+                $text .= $t->textContent;
+            }
+            if (trim($text) !== '') {
+                $parts[] = trim($text);
+            }
+        }
+
+        return implode("\n", $parts);
     }
 
     // ── ช่วยค้นหาของ AI agent ─────────────────────────────────────────────
