@@ -74,5 +74,6 @@ class Kernel extends HttpKernel
         'logged-in'=> \App\Http\Middleware\IsLoggedIn::class,
         'staff' => \App\Http\Middleware\IsStaff::class,
         'super-admin' => \App\Http\Middleware\IsSuperAdmin::class,
+        'ability' => \App\Http\Middleware\EnsureTokenAbility::class,
     ];
 }

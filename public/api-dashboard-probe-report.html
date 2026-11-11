@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>External Dashboard API — Probe Report</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --panel: #1a2332;
+      --panel2: #243044;
+      --text: #e7eef8;
+      --muted: #9aadC2;
+      --accent: #3b82f6;
+      --ok: #10b981;
+      --warn: #f59e0b;
+      --err: #ef4444;
+      --border: #2d3a4f;
+      --code-bg: #0b1020;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "IBM Plex Sans Thai", "Sarabun", ui-sans-serif, system-ui, sans-serif;
+      background: radial-gradient(1200px 600px at 10% -10%, #1e3a5f 0%, transparent 50%),
+                  radial-gradient(900px 500px at 100% 0%, #13233a 0%, transparent 45%),
+                  var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 32px 20px 80px; }
+    h1 { font-size: 1.75rem; margin: 0 0 8px; letter-spacing: -0.02em; }
+    .sub { color: var(--muted); margin: 0 0 24px; }
+    .summary {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px; margin-bottom: 28px;
+    }
+    .stat {
+      background: var(--panel); border: 1px solid var(--border);
+      border-radius: 12px; padding: 14px 16px;
+    }
+    .stat .n { font-size: 1.6rem; font-weight: 700; }
+    .stat .l { color: var(--muted); font-size: 0.85rem; }
+    table {
+      width: 100%; border-collapse: collapse; background: var(--panel);
+      border: 1px solid var(--border); border-radius: 12px; overflow: hidden;
+      margin-bottom: 36px;
+    }
+    th, td { padding: 12px 14px; text-align: left; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { background: var(--panel2); color: var(--muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.04em; }
+    tr:last-child td { border-bottom: 0; }
+    a { color: #93c5fd; }
+    .badge {
+      display: inline-block; padding: 3px 10px; border-radius: 999px;
+      font-weight: 700; font-size: 0.8rem; font-variant-numeric: tabular-nums;
+    }
+    .badge.ok { background: rgba(16,185,129,.15); color: var(--ok); }
+    .badge.warn { background: rgba(245,158,11,.15); color: var(--warn); }
+    .badge.err { background: rgba(239,68,68,.15); color: var(--err); }
+    .card {
+      background: var(--panel); border: 1px solid var(--border);
+      border-radius: 14px; margin-bottom: 18px; overflow: hidden;
+    }
+    .card-head {
+      display: flex; justify-content: space-between; gap: 16px; align-items: flex-start;
+      padding: 16px 18px; border-bottom: 1px solid var(--border); background: var(--panel2);
+    }
+    .card-head h2 { margin: 0 0 6px; font-size: 1.05rem; }
+    .meta { margin: 0; color: var(--muted); font-size: 0.9rem; }
+    .method {
+      display: inline-block; background: rgba(59,130,246,.2); color: #93c5fd;
+      padding: 1px 8px; border-radius: 6px; font-weight: 700; font-size: 0.75rem;
+      margin-right: 6px;
+    }
+    pre {
+      margin: 0; padding: 16px 18px; overflow: auto; max-height: 480px;
+      background: var(--code-bg); font-size: 0.8rem; line-height: 1.45;
+    }
+    code { font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .note {
+      background: rgba(59,130,246,.1); border: 1px solid rgba(59,130,246,.35);
+      border-radius: 12px; padding: 14px 16px; color: var(--muted); margin-bottom: 24px;
+      font-size: 0.92rem;
+    }
+    .toc a { text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>External Dashboard API — Probe Report</h1>
+    <p class="sub">ยิงจริงผ่าน Sail ที่ <code>http://localhost</code> · สร้างเมื่อ 2026-11-11 15:39:57 · Auth: Sanctum personal access token (<code>dashboard:read</code>)</p>
+
+    <div class="note">
+      Token ที่ใช้เทสต์ถูก redact ในรายงานนี้ (ไม่ใส่ plain secret)<br>
+      Header ที่ใช้กับเส้นสำเร็จ: <code>Authorization: Bearer &lt;token&gt;</code> + <code>Accept: application/json</code>
+    </div>
+
+    <div class="summary">
+      <div class="stat"><div class="n">10</div><div class="l">requests</div></div>
+      <div class="stat"><div class="n" style="color:var(--ok)">7</div><div class="l">HTTP 200</div></div>
+      <div class="stat"><div class="n" style="color:var(--warn)">2</div><div class="l">HTTP 401</div></div>
+      <div class="stat"><div class="n" style="color:var(--warn)">1</div><div class="l">HTTP 422</div></div>
+    </div>
+
+    <table class="toc">
+      <thead>
+        <tr><th>Method</th><th>Path</th><th>รายละเอียด</th><th>Status</th><th></th></tr>
+      </thead>
+      <tbody>
+        
+      <tr>
+        <td><code>GET</code></td>
+        <td><code>/api/v1/dashboard</code></td>
+        <td>Guest / ไม่มี token</td>
+        <td><span class="badge ok">401</span></td>
+        <td><a href="#01_guest_no_token">ดู response</a></td>
+      </tr>
+      <tr>
+        <td><code>GET</code></td>
+        <td><code>/api/v1/dashboard</code></td>
+        <td>Bearer ไม่ถูกต้อง</td>
+        <td><span class="badge ok">401</span></td>
+        <td><a href="#02_invalid_bearer">ดู response</a></td>
+      </tr>
+      <tr>
+        <td><code>GET</code></td>
+        <td><code>/api/v1/dashboard</code></td>
+        <td>Overview: overall + operations</td>
+        <td><span class="badge ok">200</span></td>
+        <td><a href="#03_dashboard_overview">ดู response</a></td>
+      </tr>
+      <tr>
+        <td><code>GET</code></td>
+        <td><code>/api/v1/dashboard/operations</code></td>
+        <td>Operation stats (default 7 วัน)</td>
+        <td><span class="badge ok">200</span></td>
+        <td><a href="#04_operations">ดู response</a></td>
+      </tr>
+      <tr>
+        <td><code>GET</code></td>
+        <td><code>/api/v1/dashboard/operations?start_at=2026-11-01&amp;end_at=2026-11-11</code></td>
+        <td>Operation stats (ระบุช่วงวันที่)</td>
+        <td><span class="badge ok">200</span></td>
+        <td><a href="#05_operations_range">ดู response</a></td>
+      </tr>
+      <tr>
+        <td><code>GET</code></td>
+        <td><code>/api/v1/dashboard/sales</code></td>
+        <td>Sales year + latest days</td>
+        <td><span class="badge ok">200</span></td>
+        <td><a href="#06_sales">ดู response</a></td>
+      </tr>
+      <tr>
+        <td><code>GET</code></td>
+        <td><code>/api/v1/dashboard/energy</code></td>
+        <td>Energy summary + days</td>
+        <td><span class="badge ok">200</span></td>
+        <td><a href="#07_energy">ดู response</a></td>
+      </tr>
+      <tr>
+        <td><code>GET</code></td>
+        <td><code>/api/v1/dashboard/income</code></td>
+        <td>Income daily series</td>
+        <td><span class="badge ok">200</span></td>
+        <td><a href="#08_income">ดู response</a></td>
+      </tr>
+      <tr>
+        <td><code>GET</code></td>
+        <td><code>/api/v1/dashboard/expense</code></td>
+        <td>Expense daily series</td>
+        <td><span class="badge ok">200</span></td>
+        <td><a href="#09_expense">ดู response</a></td>
+      </tr>
+      <tr>
+        <td><code>GET</code></td>
+        <td><code>/api/v1/dashboard/operations?start_at=not-a-date</code></td>
+        <td>Validation: วันที่ไม่ถูกต้อง</td>
+        <td><span class="badge ok">422</span></td>
+        <td><a href="#10_invalid_date">ดู response</a></td>
+      </tr>
+      </tbody>
+    </table>
+
+    <h1 style="font-size:1.25rem;margin-bottom:14px;">Response bodies</h1>
+    
+    <section class="card" id="01_guest_no_token">
+      <div class="card-head">
+        <div>
+          <h2>Guest / ไม่มี token</h2>
+          <p class="meta"><span class="method">GET</span> <code>/api/v1/dashboard</code></p>
+          <p class="meta">Auth: ไม่มี Authorization</p>
+        </div>
+        <span class="badge ok">401</span>
+      </div>
+      <pre><code>{
+  &quot;message&quot;: &quot;Unauthenticated.&quot;
+}</code></pre>
+    </section>
+    <section class="card" id="02_invalid_bearer">
+      <div class="card-head">
+        <div>
+          <h2>Bearer ไม่ถูกต้อง</h2>
+          <p class="meta"><span class="method">GET</span> <code>/api/v1/dashboard</code></p>
+          <p class="meta">Auth: Bearer invalid-token</p>
+        </div>
+        <span class="badge ok">401</span>
+      </div>
+      <pre><code>{
+  &quot;message&quot;: &quot;Unauthenticated.&quot;
+}</code></pre>
+    </section>
+    <section class="card" id="03_dashboard_overview">
+      <div class="card-head">
+        <div>
+          <h2>Overview: overall + operations</h2>
+          <p class="meta"><span class="method">GET</span> <code>/api/v1/dashboard</code></p>
+          <p class="meta">Auth: Bearer (dashboard:read)</p>
+        </div>
+        <span class="badge ok">200</span>
+      </div>
+      <pre><code>{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;overall&quot;: {
+      &quot;data&quot;: {
+        &quot;expense&quot;: null,
+        &quot;income&quot;: null,
+        &quot;profit&quot;: 0
+      },
+      &quot;queryParam&quot;: {
+        &quot;dateStartAt&quot;: &quot;&quot;,
+        &quot;dateEndAt&quot;: &quot;&quot;
+      }
+    },
+    &quot;operations&quot;: {
+      &quot;startDate&quot;: &quot;2026-11-04&quot;,
+      &quot;endDate&quot;: &quot;2026-11-11&quot;,
+      &quot;operationCount&quot;: 0,
+      &quot;totalWetWeight&quot;: 0,
+      &quot;totalDryWeight&quot;: 0,
+      &quot;weightDiffPercent&quot;: 0,
+      &quot;totalEditCollectWeight&quot;: 0,
+      &quot;editCollectWeightPercent&quot;: 0,
+      &quot;totalEditWeight&quot;: 0,
+      &quot;editWeightPercent&quot;: 0,
+      &quot;totalBillingWeight&quot;: 0,
+      &quot;totalBillingPayment&quot;: 0
+    }
+  }
+}</code></pre>
+    </section>
+    <section class="card" id="04_operations">
+      <div class="card-head">
+        <div>
+          <h2>Operation stats (default 7 วัน)</h2>
+          <p class="meta"><span class="method">GET</span> <code>/api/v1/dashboard/operations</code></p>
+          <p class="meta">Auth: Bearer (dashboard:read)</p>
+        </div>
+        <span class="badge ok">200</span>
+      </div>
+      <pre><code>{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;startDate&quot;: &quot;2026-11-04&quot;,
+    &quot;endDate&quot;: &quot;2026-11-11&quot;,
+    &quot;operationCount&quot;: 0,
+    &quot;totalWetWeight&quot;: 0,
+    &quot;totalDryWeight&quot;: 0,
+    &quot;weightDiffPercent&quot;: 0,
+    &quot;totalEditCollectWeight&quot;: 0,
+    &quot;editCollectWeightPercent&quot;: 0,
+    &quot;totalEditWeight&quot;: 0,
+    &quot;editWeightPercent&quot;: 0,
+    &quot;totalBillingWeight&quot;: 0,
+    &quot;totalBillingPayment&quot;: 0
+  }
+}</code></pre>
+    </section>
+    <section class="card" id="05_operations_range">
+      <div class="card-head">
+        <div>
+          <h2>Operation stats (ระบุช่วงวันที่)</h2>
+          <p class="meta"><span class="method">GET</span> <code>/api/v1/dashboard/operations?start_at=2026-11-01&amp;end_at=2026-11-11</code></p>
+          <p class="meta">Auth: Bearer (dashboard:read)</p>
+        </div>
+        <span class="badge ok">200</span>
+      </div>
+      <pre><code>{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;startDate&quot;: &quot;2026-11-01&quot;,
+    &quot;endDate&quot;: &quot;2026-11-11&quot;,
+    &quot;operationCount&quot;: 0,
+    &quot;totalWetWeight&quot;: 0,
+    &quot;totalDryWeight&quot;: 0,
+    &quot;weightDiffPercent&quot;: 0,
+    &quot;totalEditCollectWeight&quot;: 0,
+    &quot;editCollectWeightPercent&quot;: 0,
+    &quot;totalEditWeight&quot;: 0,
+    &quot;editWeightPercent&quot;: 0,
+    &quot;totalBillingWeight&quot;: 0,
+    &quot;totalBillingPayment&quot;: 0
+  }
+}</code></pre>
+    </section>
+    <section class="card" id="06_sales">
+      <div class="card-head">
+        <div>
+          <h2>Sales year + latest days</h2>
+          <p class="meta"><span class="method">GET</span> <code>/api/v1/dashboard/sales</code></p>
+          <p class="meta">Auth: Bearer (dashboard:read)</p>
+        </div>
+        <span class="badge ok">200</span>
+      </div>
+      <pre><code>{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;year&quot;: {
+      &quot;incomeYearSummary&quot;: {
+        &quot;2026-01&quot;: {
+          &quot;month_year&quot;: &quot;2026-01&quot;,
+          &quot;total_amount&quot;: 0,
+          &quot;month_year_title&quot;: &quot;January 26&quot;
+        },
+        &quot;2026-02&quot;: {
+          &quot;month_year&quot;: &quot;2026-02&quot;,
+          &quot;total_amount&quot;: 0,
+          &quot;month_year_title&quot;: &quot;February 26&quot;
+        },
+        &quot;2026-03&quot;: {
+          &quot;month_year&quot;: &quot;2026-03&quot;,
+          &quot;total_amount&quot;: 0,
+          &quot;month_year_title&quot;: &quot;March 26&quot;
+        },
+        &quot;2026-04&quot;: {
+          &quot;month_year&quot;: &quot;2026-04&quot;,
+          &quot;total_amount&quot;: 0,
+          &quot;month_year_title&quot;: &quot;April 26&quot;
+        },
+        &quot;2026-05&quot;: {
+          &quot;month_year&quot;: &quot;2026-05&quot;,
+          &quot;total_amount&quot;: 0,
+          &quot;month_year_title&quot;: &quot;May 26&quot;
+        },
+        &quot;2026-06&quot;: {
+          &quot;month_year&quot;: &quot;2026-06&quot;,
+          &quot;total_amount&quot;: 0,
+          &quot;month_year_title&quot;: &quot;June 26&quot;
+        },
+        &quot;2026-07&quot;: {
+          &quot;month_year&quot;: &quot;2026-07&quot;,
+          &quot;total_amount&quot;: 0,
+          &quot;month_year_title&quot;: &quot;July 26&quot;
+        },
+        &quot;2026-08&quot;: {
+          &quot;month_year&quot;: &quot;2026-08&quot;,
+          &quot;total_amount&quot;: 0,
+          &quot;month_year_title&quot;: &quot;August 26&quot;
+        },
+        &quot;2026-09&quot;: {
+          &quot;month_year&quot;: &quot;2026-09&quot;,
+          &quot;total_amount&quot;: 0,
+          &quot;month_year_title&quot;: &quot;September 26&quot;
+        },
+        &quot;2026-10&quot;: {
+          &quot;month_year&quot;: &quot;2026-10&quot;,
+          &quot;total_amount&quot;: 0,
+          &quot;month_year_title&quot;: &quot;October 26&quot;
+        },
+        &quot;2026-11&quot;: {
+          &quot;month_year&quot;: &quot;2026-11&quot;,
+          &quot;total_amount&quot;: 0,
+          &quot;month_year_title&quot;: &quot;November 26&quot;
+        },
+        &quot;2026-12&quot;: {
+          &quot;month_year&quot;: &quot;2026-12&quot;,
+          &quot;total_amount&quot;: 0,
+          &quot;month_year_title&quot;: &quot;December 26&quot;
+        }
+      },
+      &quot;expenseYearSummary&quot;: {
+        &quot;2026-01&quot;: {
+          &quot;month_year&quot;: &quot;2026-01&quot;,
+          &quot;total_amount&quot;: 0,
+          &quot;month_year_title&quot;: &quot;January 26&quot;
+        },
+        &quot;2026-02&quot;: {
+          &quot;month_year&quot;: &quot;2026-02&quot;,
+          &quot;total_amount&quot;: 0,
+          &quot;month_year_title&quot;: &quot;February 26&quot;
+        },
+        &quot;2026-03&quot;: {
+          &quot;month_year&quot;: &quot;2026-03&quot;,
+          &quot;total_amount&quot;: 0,
+          &quot;month_year_title&quot;: &quot;March 26&quot;
+        },
+        &quot;2026-04&quot;: {
+          &quot;month_year&quot;: &quot;2026-04&quot;,
+          &quot;total_amount&quot;: 0,
+          &quot;month_year_title&quot;: &quot;April 26&quot;
+        },
+        &quot;2026-05&quot;: {
+          &quot;month_year&quot;: &quot;2026-05&quot;,
+          &quot;total_amount&quot;: 0,
+          &quot;month_year_title&quot;: &quot;May 26&quot;
+        },
+        &quot;2026-06&quot;: {
+          &quot;month_year&quot;: &quot;2026-06&quot;,
+          &quot;total_amount&quot;: 0,
+          &quot;month_year_title&quot;: &quot;June 26&quot;
+        },
+        &quot;2026-07&quot;: {
+          &quot;month_year&quot;: &quot;2026-07&quot;,
+          &quot;total_amount&quot;: 0,
+          &quot;month_year_title&quot;: &quot;July 26&quot;
+        },
+        &quot;2026-08&quot;: {
+          &quot;month_year&quot;: &quot;2026-08&quot;,
+          &quot;total_amount&quot;: 0,
+          &quot;month_year_title&quot;: &quot;August 26&quot;
+        },
+        &quot;2026-09&quot;: {
+          &quot;month_year&quot;: &quot;2026-09&quot;,
+          &quot;total_amount&quot;: 0,
+          &quot;month_year_title&quot;: &quot;September 26&quot;
+        },
+        &quot;2026-10&quot;: {
+          &quot;month_year&quot;: &quot;2026-10&quot;,
+          &quot;total_amount&quot;: 0,
+          &quot;month_year_title&quot;: &quot;October 26&quot;
+        },
+        &quot;2026-11&quot;: {
+          &quot;month_year&quot;: &quot;2026-11&quot;,
+          &quot;total_amount&quot;: 0,
+          &quot;month_year_title&quot;: &quot;November 26&quot;
+        },
+        &quot;2026-12&quot;: {
+          &quot;month_year&quot;: &quot;2026-12&quot;,
+          &quot;total_amount&quot;: 0,
+          &quot;month_year_title&quot;: &quot;December 26&quot;
+        }
+      },
+      &quot;profitYearSummary&quot;: {
+        &quot;2026-01&quot;: {
+          &quot;month_year&quot;: &quot;2026-01&quot;,
+          &quot;total_amount&quot;: 0,
+          &quot;month_year_title&quot;: &quot;January 26&quot;
+        },
+        &quot;2026-02&quot;: {
+          &quot;month_year&quot;: &quot;2026-02&quot;,
+          &quot;total_amount&quot;: 0,
+          &quot;month_year_title&quot;: &quot;February 26&quot;
+        },
+        &quot;2026-03&quot;: {
+          &quot;month_year&quot;: &quot;2026-03&quot;,
+          &quot;total_amount&quot;: 0,
+          &quot;month_year_title&quot;: &quot;March 26&quot;
+        },
+        &quot;2026-04&quot;: {
+          &quot;month_year&quot;: &quot;2026-04&quot;,
+          &quot;total_amount&quot;: 0,
+          &quot;month_year_title&quot;: &quot;April 26&quot;
+        },
+        &quot;2026-05&quot;: {
+          &quot;month_year&quot;: &quot;2026-05&quot;,
+          &quot;total_amount&quot;: 0,
+          &quot;month_year_title&quot;: &quot;May 26&quot;
+        },
+        &quot;2026-06&quot;: {
+          &quot;month_year&quot;: &quot;2026-06&quot;,
+          &quot;total_amount&quot;: 0,
+          &quot;month_year_title&quot;: &quot;June 26&quot;
+        },
+        &quot;2026-07&quot;: {
+          &quot;month_year&quot;: &quot;2026-07&quot;,
+          &quot;total_amount&quot;: 0,
+          &quot;month_year_title&quot;: &quot;July 26&quot;
+        },
+        &quot;2026-08&quot;: {
+          &quot;month_year&quot;: &quot;2026-08&quot;,
+          &quot;total_amount&quot;: 0,
+          &quot;month_year_title&quot;: &quot;August 26&quot;
+        },
+        &quot;2026-09&quot;: {
+          &quot;month_year&quot;: &quot;2026-09&quot;,
+          &quot;total_amount&quot;: 0,
+          &quot;month_year_title&quot;: &quot;September 26&quot;
+        },
+        &quot;2026-10&quot;: {
+          &quot;month_year&quot;: &quot;2026-10&quot;,
+          &quot;total_amount&quot;: 0,
+          &quot;month_year_title&quot;: &quot;October 26&quot;
+        },
+        &quot;2026-11&quot;: {
+          &quot;month_year&quot;: &quot;2026-11&quot;,
+          &quot;total_amount&quot;: 0,
+          &quot;month_year_title&quot;: &quot;November 26&quot;
+        },
+        &quot;2026-12&quot;: {
+          &quot;month_year&quot;: &quot;2026-12&quot;,
+          &quot;total_amount&quot;: 0,
+          &quot;month_year_title&quot;: &quot;December 26&quot;
+        }
+      },
+      &quot;monthYearTitles&quot;: [
+        &quot;January 26&quot;,
+        &quot;February 26&quot;,
+        &quot;March 26&quot;,
+        &quot;April 26&quot;,
+        &quot;May 26&quot;,
+        &quot;June 26&quot;,
+        &quot;July 26&quot;,
+        &quot;August 26&quot;,
+        &quot;September 26&quot;,
+        &quot;October 26&quot;,
+        &quot;November 26&quot;,
+        &quot;December 26&quot;
+      ]
+    },
+    &quot;latest_days&quot;: {
+      &quot;titles&quot;: [
+        &quot;November 4, 2026&quot;,
+        &quot;November 5, 2026&quot;,
+        &quot;November 6, 2026&quot;,
+        &quot;November 7, 2026&quot;,
+        &quot;November 8, 2026&quot;,
+        &quot;November 9, 2026&quot;,
+        &quot;November 10, 2026&quot;,
+        &quot;November 11, 2026&quot;
+      ],
+      &quot;data&quot;: [
+        {
+          &quot;name&quot;: &quot;Income&quot;,
+          &quot;data&quot;: [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          &quot;name&quot;: &quot;Expense&quot;,
+          &quot;data&quot;: [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          &quot;name&quot;: &quot;Profit&quot;,
+          &quot;data&quot;: [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    }
+  }
+}</code></pre>
+    </section>
+    <section class="card" id="07_energy">
+      <div class="card-head">
+        <div>
+          <h2>Energy summary + days</h2>
+          <p class="meta"><span class="method">GET</span> <code>/api/v1/dashboard/energy</code></p>
+          <p class="meta">Auth: Bearer (dashboard:read)</p>
+        </div>
+        <span class="badge ok">200</span>
+      </div>
+      <pre><code>{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;summary&quot;: {
+      &quot;data&quot;: [],
+      &quot;queryParam&quot;: {
+        &quot;dateStartAt&quot;: &quot;&quot;,
+        &quot;dateEndAt&quot;: &quot;&quot;
+      }
+    },
+    &quot;days&quot;: {
+      &quot;titles&quot;: [
+        &quot;November 5, 2026&quot;,
+        &quot;November 6, 2026&quot;,
+        &quot;November 7, 2026&quot;,
+        &quot;November 8, 2026&quot;,
+        &quot;November 9, 2026&quot;,
+        &quot;November 10, 2026&quot;,
+        &quot;November 11, 2026&quot;
+      ],
+      &quot;data&quot;: []
+    }
+  }
+}</code></pre>
+    </section>
+    <section class="card" id="08_income">
+      <div class="card-head">
+        <div>
+          <h2>Income daily series</h2>
+          <p class="meta"><span class="method">GET</span> <code>/api/v1/dashboard/income</code></p>
+          <p class="meta">Auth: Bearer (dashboard:read)</p>
+        </div>
+        <span class="badge ok">200</span>
+      </div>
+      <pre><code>{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;titles&quot;: [
+      &quot;November 5, 2026&quot;,
+      &quot;November 6, 2026&quot;,
+      &quot;November 7, 2026&quot;,
+      &quot;November 8, 2026&quot;,
+      &quot;November 9, 2026&quot;,
+      &quot;November 10, 2026&quot;,
+      &quot;November 11, 2026&quot;
+    ],
+    &quot;data&quot;: [
+      {
+        &quot;name&quot;: &quot;Customer billing&quot;,
+        &quot;data&quot;: [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    ]
+  }
+}</code></pre>
+    </section>
+    <section class="card" id="09_expense">
+      <div class="card-head">
+        <div>
+          <h2>Expense daily series</h2>
+          <p class="meta"><span class="method">GET</span> <code>/api/v1/dashboard/expense</code></p>
+          <p class="meta">Auth: Bearer (dashboard:read)</p>
+        </div>
+        <span class="badge ok">200</span>
+      </div>
+      <pre><code>{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;titles&quot;: [
+      &quot;November 5, 2026&quot;,
+      &quot;November 6, 2026&quot;,
+      &quot;November 7, 2026&quot;,
+      &quot;November 8, 2026&quot;,
+      &quot;November 9, 2026&quot;,
+      &quot;November 10, 2026&quot;,
+      &quot;November 11, 2026&quot;
+    ],
+    &quot;data&quot;: [
+      {
+        &quot;name&quot;: &quot;Water&quot;,
+        &quot;data&quot;: [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;Electricity&quot;,
+        &quot;data&quot;: [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;Gas&quot;,
+        &quot;data&quot;: [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;Biomass&quot;,
+        &quot;data&quot;: [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;Fuel oil&quot;,
+        &quot;data&quot;: [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;Petrol&quot;,
+        &quot;data&quot;: [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;Chemical&quot;,
+        &quot;data&quot;: [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;Department salary&quot;,
+        &quot;data&quot;: [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;Inventory&quot;,
+        &quot;data&quot;: [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;Truck&quot;,
+        &quot;data&quot;: [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;Washing machine&quot;,
+        &quot;data&quot;: [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;Dryer machine&quot;,
+        &quot;data&quot;: [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    ]
+  }
+}</code></pre>
+    </section>
+    <section class="card" id="10_invalid_date">
+      <div class="card-head">
+        <div>
+          <h2>Validation: วันที่ไม่ถูกต้อง</h2>
+          <p class="meta"><span class="method">GET</span> <code>/api/v1/dashboard/operations?start_at=not-a-date</code></p>
+          <p class="meta">Auth: Bearer (dashboard:read)</p>
+        </div>
+        <span class="badge ok">422</span>
+      </div>
+      <pre><code>{
+  &quot;message&quot;: &quot;The start at is not a valid date.&quot;,
+  &quot;errors&quot;: {
+    &quot;start_at&quot;: [
+      &quot;The start at is not a valid date.&quot;
+    ]
+  }
+}</code></pre>
+    </section>
+  </div>
+</body>
+</html>

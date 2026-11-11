@@ -37,6 +37,13 @@ class Employee extends Model
   protected $perPage = 20;
 
   /**
+   * Hide credentials from API / array serialization.
+   *
+   * @var array<int, string>
+   */
+  protected $hidden = ['password'];
+
+  /**
    * Attributes that should be mass-assignable.
    *
    * @var array

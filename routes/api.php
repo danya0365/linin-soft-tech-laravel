@@ -20,6 +20,59 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+// External Dashboard API (mobile / third-party) — Sanctum Bearer + abilities
+Route::middleware(['auth:sanctum', 'ability:dashboard:read'])
+    ->prefix('v1/dashboard')
+    ->group(function () {
+        Route::get('/', [App\Http\Controllers\Api\V1\DashboardController::class, 'index']);
+        Route::get('/operations', [App\Http\Controllers\Api\V1\DashboardController::class, 'operations']);
+        Route::get('/sales', [App\Http\Controllers\Api\V1\DashboardController::class, 'sales']);
+        Route::get('/energy', [App\Http\Controllers\Api\V1\DashboardController::class, 'energy']);
+        Route::get('/income', [App\Http\Controllers\Api\V1\DashboardController::class, 'income']);
+        Route::get('/expense', [App\Http\Controllers\Api\V1\DashboardController::class, 'expense']);
+    });
+
+// External Resource Read API — plant master/ops tables
+Route::middleware(['auth:sanctum', 'ability:resources:read'])
+    ->prefix('v1')
+    ->group(function () {
+        Route::get('/washing-machines', [App\Http\Controllers\Api\V1\WashingMachineController::class, 'index']);
+        Route::get('/washing-machines/{id}', [App\Http\Controllers\Api\V1\WashingMachineController::class, 'show'])->whereNumber('id');
+
+        Route::get('/dryer-machines', [App\Http\Controllers\Api\V1\DryerMachineController::class, 'index']);
+        Route::get('/dryer-machines/{id}', [App\Http\Controllers\Api\V1\DryerMachineController::class, 'show'])->whereNumber('id');
+
+        Route::get('/trucks', [App\Http\Controllers\Api\V1\TruckController::class, 'index']);
+        Route::get('/trucks/{id}', [App\Http\Controllers\Api\V1\TruckController::class, 'show'])->whereNumber('id');
+
+        Route::get('/customers', [App\Http\Controllers\Api\V1\CustomerController::class, 'index']);
+        Route::get('/customers/{id}', [App\Http\Controllers\Api\V1\CustomerController::class, 'show'])->whereNumber('id');
+
+        Route::get('/customer-groups', [App\Http\Controllers\Api\V1\CustomerGroupController::class, 'index']);
+        Route::get('/customer-groups/{id}', [App\Http\Controllers\Api\V1\CustomerGroupController::class, 'show'])->whereNumber('id');
+
+        Route::get('/employees', [App\Http\Controllers\Api\V1\EmployeeController::class, 'index']);
+        Route::get('/employees/{id}', [App\Http\Controllers\Api\V1\EmployeeController::class, 'show'])->whereNumber('id');
+
+        Route::get('/departments', [App\Http\Controllers\Api\V1\DepartmentController::class, 'index']);
+        Route::get('/departments/{id}', [App\Http\Controllers\Api\V1\DepartmentController::class, 'show'])->whereNumber('id');
+
+        Route::get('/linen-types', [App\Http\Controllers\Api\V1\LinenTypeController::class, 'index']);
+        Route::get('/linen-types/{id}', [App\Http\Controllers\Api\V1\LinenTypeController::class, 'show'])->whereNumber('id');
+
+        Route::get('/linen-products', [App\Http\Controllers\Api\V1\LinenProductController::class, 'index']);
+        Route::get('/linen-products/{id}', [App\Http\Controllers\Api\V1\LinenProductController::class, 'show'])->whereNumber('id');
+
+        Route::get('/operations', [App\Http\Controllers\Api\V1\OperationController::class, 'index']);
+        Route::get('/operations/{id}', [App\Http\Controllers\Api\V1\OperationController::class, 'show'])->whereNumber('id');
+
+        Route::get('/energy-resources', [App\Http\Controllers\Api\V1\EnergyResourceController::class, 'index']);
+        Route::get('/energy-resources/{id}', [App\Http\Controllers\Api\V1\EnergyResourceController::class, 'show'])->whereNumber('id');
+
+        Route::get('/inventories', [App\Http\Controllers\Api\V1\InventoryController::class, 'index']);
+        Route::get('/inventories/{id}', [App\Http\Controllers\Api\V1\InventoryController::class, 'show'])->whereNumber('id');
+    });
+
 // LINE Messaging API Webhook
 // ถอด throttle:api ออก — throttle นับตาม IP แต่ LINE ยิงมาจาก IP ชุดจำกัด
 // พอ OA คุยกันเยอะจะได้ 429 ซึ่ง LINE นับเป็น error และปิด webhook ให้อัตโนมัติ

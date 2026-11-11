@@ -23,6 +23,19 @@ Route::get('/line-oa-use-case', function () {
     return view('line-oa-guide');
 })->name('line-oa-guide');
 
+// External API docs — public (no login) สำหรับ AI / โปรเจคแยก / Swagger Try it out
+Route::get('/docs/external-api', [App\Http\Controllers\Docs\ExternalApiDocsController::class, 'show'])
+    ->name('docs.external-api');
+Route::get('/docs/external-api.json', [App\Http\Controllers\Docs\ExternalApiDocsController::class, 'manifestJson'])
+    ->name('docs.external-api.json');
+Route::get('/docs/external-api/openapi.json', [App\Http\Controllers\Docs\ExternalApiDocsController::class, 'openApiJson'])
+    ->name('docs.external-api.openapi');
+Route::get('/docs/external-api/swagger', [App\Http\Controllers\Docs\ExternalApiDocsController::class, 'swagger'])
+    ->name('docs.external-api.swagger');
+// backward-compatible aliases ของไฟล์ HTML เก่า
+Route::redirect('/docs/external-dashboard-api.html', '/docs/external-api', 301);
+Route::redirect('/docs/external-dashboard-api', '/docs/external-api', 301);
+
 // UI Components Showcase - For testing Tailwind components
 Route::get('/components-showcase', function () {
     return view('components-showcase');
@@ -52,6 +65,12 @@ Route::group(['middleware' => ['auth', 'staff']], function () {
 Route::group(['prefix' => 'admin', 'middleware' => ['admin']], function () {
     Route::get('/', [App\Http\Controllers\SettingController::class, 'index'])->name('admin');
     Route::get('/setting', [App\Http\Controllers\SettingController::class, 'index'])->name('admin.setting');
+
+    // External API tokens (Sanctum personal access tokens)
+    Route::get('/api-tokens', [App\Http\Controllers\Admin\ApiTokenController::class, 'index'])->name('admin.api-tokens.index');
+    Route::get('/api-tokens/create', [App\Http\Controllers\Admin\ApiTokenController::class, 'create'])->name('admin.api-tokens.create');
+    Route::post('/api-tokens', [App\Http\Controllers\Admin\ApiTokenController::class, 'store'])->name('admin.api-tokens.store');
+    Route::delete('/api-tokens/{id}', [App\Http\Controllers\Admin\ApiTokenController::class, 'destroy'])->name('admin.api-tokens.destroy');
 });
 
 Route::group(['middleware' => ['admin']], function () {

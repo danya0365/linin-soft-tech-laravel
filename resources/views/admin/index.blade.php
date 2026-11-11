@@ -109,6 +109,18 @@
         />
     </x-menu.section>
 
+    <!-- Section: Integrations -->
+    <x-menu.section title="Integrations" icon="fa-plug" icon-color="text-indigo-500">
+        <x-menu.card
+            href="{{ route('admin.api-tokens.index') }}"
+            icon="fa-solid fa-key"
+            title="{{ __('API Tokens') }}"
+            subtitle="External Dashboard"
+            gradient="from-indigo-500 to-blue-700"
+            subtitle-color="text-indigo-200"
+        />
+    </x-menu.section>
+
     <!-- Section: AI (super admin เท่านั้น) -->
     @if(Auth::check() && Auth::user()->id == config('auth.super_admin_user_id'))
         <x-menu.section title="AI" icon="fa-robot" icon-color="text-fuchsia-500">
